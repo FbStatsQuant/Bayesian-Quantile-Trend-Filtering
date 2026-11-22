@@ -72,7 +72,7 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 | L4q-M mollification | bias term | **self-checked** (signed order-3 kernel; proof in L4q file) |
 | L5 normalization | propriety, flat c | **advisor-checked** (Astra: accept) |
 | L6 evidence | denominator | **draft**, self-checked given L3/L4/L4q |
-| L8′ bounded numerator | Theorem A | to write (exact-MGF inequality on \|δ\| ≤ Δ) |
+| L8′ bounded numerator | Theorem A | **draft** (`L8p_bounded_numerator.md`): exact-MGF identity, log E e^{−ωX} ≤ −Bω·m(δ) on \|δ\| ≤ Δ with B ≥ η/2 for ω ≤ (1−η)ω̄; Step 2 closed given L6; numerical check queued |
 | L8-b realized numerator | Theorem A⁺ | plan only |
 | L9-a far region | both | to attempt |
 | L9-c, L10 sup-norm | both | open (crux) |
