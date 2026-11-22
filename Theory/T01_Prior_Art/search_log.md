@@ -25,7 +25,7 @@ All agents received the same brief. It gave the model definition and the rules: 
 
 PDFs were fetched from arxiv.org/pdf and author-hosted copies and converted with pdftotext.
 
-- **Onizuka, Hashimoto & Sugasawa, arXiv:2211.04666.** Repo copy `Papers/Onizuka_2023.pdf`. Sections 1–7 read; grep for theorem, proposition, lemma, contraction and consistency hits only the reference to Sriram et al. (2013). No theory.
+- **Onizuka, Hashimoto & Sugasawa, arXiv:2211.04666.** Repo copy listed in the reading list (arXiv:2211.04666). Sections 1–7 read; grep for theorem, proposition, lemma, contraction and consistency hits only the reference to Sriram et al. (2013). No theory.
 - **Syring & Martin, arXiv:2012.04505v6.** Read §3.1–3.3 (Definition 3.1, Condition 1, Thms 3.2–3.5), §5.1 (Assumption 1, Prop. 1) and §5.6 (prior (47)–(50), Assumption 8, Prop. 8).
 - **Sriram, Ramamoorthi & Ghosh (2013), from the IIMA-hosted PDF** (`iima.ac.in/sites/default/files/2022-11/13-BA817 (2).pdf`). Read Assumptions 1a–5, Thms 1–2, Remark 1, and §6 (prior on σ, Assumption 4′, Prop. 3, compact Θσ).
 - **Li & He, arXiv:2111.00642v1.** Read §2.2 (working likelihood (2.3), priors (2.4)–(2.5)), Assumptions 1–4, Thm 1, and the existence of Thms 2–3.

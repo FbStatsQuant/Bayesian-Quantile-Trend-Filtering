@@ -1,6 +1,6 @@
 # T-02 Feasibility read: Syring & Martin (2023) for the BQTF posterior
 
-*Theory Department, 2026-11-22. Source: `Papers/Syring_Martin 2023.pdf` (arXiv v6), read in full myself: §2–4, §5.1, 5.4, 5.6, App. A–C (Lemmas 1–2; proofs of Props 1, 5, 8). Feasibility only. No proofs, sketches or plans.*
+*Theory Department, 2026-11-22. Source: arXiv:2012.04505 (v6), read in full myself: §2–4, §5.1, 5.4, 5.6, App. A–C (Lemmas 1–2; proofs of Props 1, 5, 8). Feasibility only. No proofs, sketches or plans.*
 
 **The bridge.** At fixed σ our ALD posterior **is** their Gibbs posterior: exp{−σ⁻¹Σᵢρ_τ(yᵢ−θᵢ)}·π(θ) = e^{−ω n Rₙ(θ)}π(θ), with ω = 1/σ and Rₙ the empirical check risk. Their expected excess risk is m(θ,θ*) = n⁻¹ΣᵢMᵢ(θᵢ). This is Padilla's M/n, which Padilla's Lemma 13 bounds below by c₀Δ²ₙ(θ−θ*). Two parts of our model fall outside this bridge: the learned σ and the improper, unbounded prior.
 
