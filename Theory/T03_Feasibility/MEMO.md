@@ -328,7 +328,7 @@ Both reviews are in `reviews/`. The CEO's combined list of required changes and 
 
 *Entries: Laplace posterior-mean bias² ÷ smoothing-spline bias² (a Gaussian prior with the same variance), at λ = n^a. "n/a" means numerically infeasible even in long double.*
 
-- **The VP's mechanism is supported (provisional: own MCMC, now retired; being rerun on Engineering's sampler after E-04).** For kinks below the threshold J ≲ n²λ^{−2/3}, the Laplace posterior mean *is* the linear (spline) smoother. The actual bias² is 2–3 orders of magnitude below the draft's ℓ₁-shift bound in every cell.
+- **The VP's mechanism is supported.** This table came from Theory's own MCMC, now retired. The same conclusion is now established on the company sampler by the E-02 Gaussian-twin arm (§8.1a′, E-04 passed). For kinks below the threshold J ≲ n²λ^{−2/3}, the Laplace posterior mean *is* the linear (spline) smoother. The actual bias² is 2–3 orders of magnitude below the draft's ℓ₁-shift bound in every cell.
 - **The asymptotic slope at a ≥ 5/2 is not observable at n ≤ 5000.** Along λ = n^a, the spline bias² has local slopes:
   - at a = 2: −2.6, −2.2, −1.2, −1.4, −1.8 over n = 600 to 19200, approaching the VP's −5/3;
   - at a = 2.5: about −0.4, between the draft's −0.5 and the VP's −0.83;
@@ -394,7 +394,7 @@ The Fubini (integrated-likelihood-ratio) route works **exactly** for σ ≥ σ̄
 
 ### 8.1c Provenance of the numerical evidence (HQ rule, 2026-11-22)
 
-**Rule.** Every E-02 number is **provisional** until Engineering's sampler check **E-04** marks the Gibbs sampler "fit" (due Thu 11-26). Theory's own MCMC code is held to the same standard. The table below gives the source of each piece of evidence and its status.
+**Rule.** Every E-02 number was **provisional** until Engineering's sampler check **E-04** marked the Gibbs sampler "fit". **Update: E-04 passed** (`Engineering/E04_Sampler_Check/REPORT.md`). E-02 numbers now count as evidence, with two qualifiers: (i) runs before the clamp-free fix used latent safety clamps, measured at ≤ 2% on Δ², centre and λ‖Dθ‖₁/m and −1 to −1.8% on rough spread, which is immaterial for slopes; (ii) the learned-λ sin cells at b₀ ∈ {n⁻², n^{−5/2}}, n = 8k (ESS ≈ 8 per 10k) stay flagged as provisional-quality. Theory's own MCMC code is held to the same standard. The table below gives the source of each piece of evidence and its status.
 
 | Evidence | Source and method | Sampler? | Status |
 |---|---|---|---|
@@ -409,8 +409,8 @@ The Fubini (integrated-likelihood-ratio) route works **exactly** for σ ≥ σ̄
 | Laplace-prior posterior spread (Gaussian likelihood; slopes −0.335 to −0.347) | `laplace_gibbs_spread.py`, `laplace_gibbs_bigJ.py`; **Theory's own Park–Casella Gibbs**, banded Cholesky | **own MCMC** | **provisional**, pending the grid validation below. Large-λ cells with a binding cap are already excluded. |
 | Laplace posterior-mean bias = spline bias (ratios 0.995–1.005) | `vp_bias_check.py`; **Theory's own Park–Casella Gibbs**, long-double Cholesky, Rao-Blackwellised mean | **own MCMC** | **provisional**, pending the grid validation below |
 | Virial ratio λ‖Dθ‖₁/m and the λ fixed-point formula | own Gibbs (above), plus the paper's reported λ for Gamma(1, 1) | own MCMC, plus the paper | provisional |
-| ALD spread law (T3lam: slopes −0.37/−0.34, C = 0.28–0.35) | **E-02**, Engineering's exact Gibbs (z-augmentation, scale mixture, banded-QR perturb-and-solve) | **E-02 sampler** | **provisional until E-04 passes** |
-| Learned-λ smoke test (λ ≈ 60 for b₀ = 1) | E-02 sampler; the paper's own report (50–75) | E-02 and paper | the paper's figure is independent; the E-02 figure is provisional |
+| ALD spread law (T3lam: slopes −0.37/−0.34, C = 0.28–0.35) | **E-02**, Engineering's exact Gibbs (z-augmentation, scale mixture, banded-QR perturb-and-solve) | **E-02 sampler** | **evidence (E-04 passed); was provisional until E-04 passes** |
+| Learned-λ smoke test (λ ≈ 60 for b₀ = 1) | E-02 sampler; the paper's own report (50–75) | E-02 and paper | the paper's figure is independent; the E-02 figure is evidence (E-04 passed) |
 
 **Validation of Theory's own Gibbs sampler.** `scratch/gibbs_validation_grid.py` compares it against **exact 3-D numerical integration** at n = 6. The flat quadratic coefficients are integrated analytically, and the posterior mean and variance of each θᵢ are compared, with batch-means z-scores. **First result** (`gibbs_validation_grid.out`; seed 42; 195k draws; λ = 6, κ = 16).
 - **Variances agree** to within 0.5–5% (ratios 1.005–1.048).
@@ -425,11 +425,11 @@ A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin 
 **HQ decision (2026-11-22).** The company uses **one MCMC sampler for theory numerics: Engineering's**, once E-04 marks it fit.
 - **Theory's own Gibbs is retired.** It will not be used for evidence unless the diagnosis shows it is correct *and* it is needed for something Engineering's sampler cannot do.
 - **The bias-equivalence check is being rerun** on Engineering's sampler, through Engineering on NOTS, within the E-02 ceiling: the noiseless PQ table of §8.1a plus the paired Gaussian-twin arm.
-- **Plainly: the numerical support for the n^{−5/6} primary rate is provisional** until that rerun and E-04 are done.
+- **Update:** E-04 has passed, and the E-02 Gaussian-twin arm (§8.1a′) now provides this support on the company sampler: kinked-truth Laplace ÷ twin = 1.00 ± 0.02. **The numerical support for the n^{−5/6} mechanism is therefore evidence.** The rate itself remains conditional on L4q. The noiseless rerun of §8.1a is now optional.
 
 **Conclusions that rest only on exact or deterministic computations.** The small-ball exponent, the Gaussian-analogue spread law, σ̄ and R, the Lemma 19 correction, and the spline-bias scaling. These stand regardless of the sampler checks.
 
-### 8.1a′ Gaussian-twin ratios at E-02 scale: PROVISIONAL (pre-E-04)
+### 8.1a′ Gaussian-twin ratios at E-02 scale (evidence: E-04 passed; produced with the safety clamps, effect ≤ 2%)
 
 *Source: Engineering's sampler, phase "twin". Setup: N(0, 0.25²), τ = 0.5, σ = σ₀, λ = n^a, n ∈ {1k, 4k, 16k}, 10 paired seeds. Each entry is the Laplace ÷ Gaussian-twin ratio, with paired-bootstrap 95% CIs.*
 
@@ -457,9 +457,9 @@ A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin 
 
 ### 8.1d Learned λ: the fixed-point formula holds, but it is not a bias-law test
 
-*Source: E-02 lamlearn, lamlearn2 and lamlearn3 (Engineering's sampler). Provisional until E-04.*
+*Source: E-02 lamlearn, lamlearn2 and lamlearn3 (Engineering's sampler). Evidence since E-04 passed, except the flagged low-ESS sin cells at n = 8k.*
 
-**The fixed-point formula** λ ≈ (0.27·n·κ^{1/6}/b₀)^{3/4} **agrees quantitatively with the E-02 numbers below. PROVISIONAL (pre-E-04): not cited as evidence until E-04 marks the sampler fit.** The independent confirmation is the paper's own Gamma(1, 1) value.
+**The fixed-point formula** λ ≈ (0.27·n·κ^{1/6}/b₀)^{3/4} **is confirmed quantitatively by the E-02 numbers below (E-04 passed).** The independent confirmation is the paper's own Gamma(1, 1) value.
 - **Quadratic truth, κ = 4, b₀ = n⁻²:**
   - predicted λ ≈ 5.3×10⁵, 1.2×10⁷ and 2.7×10⁸ at n = 500, 2k and 8k; observed medians 4.35×10⁵, 1.16×10⁷ and 2.45×10⁸ (ratios 0.82, 0.97, 0.90);
   - slope 2.257 [2.233, 2.278] against a predicted 9/4;
@@ -524,7 +524,7 @@ A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin 
 | 5.1 | Read slopes only where nλ^{−1/3} ≳ 10 | Agreed; also passed to Engineering. |
 | 5.2 | Sub-exponential noise is not a sufficient fallback | **Accepted.** That fallback is removed. |
 | 5.3 | Positioning: "the posterior attains the linear-smoother rate" | **Adopted** for Corollary A1, conditional on L4q. |
-| 5.5 | b₀ ≍ n^{−7/3} | **Consistent with** the fixed-point formula (heuristic; E-02 support provisional). Stage-B candidate (C9). |
+| 5.5 | b₀ ≍ n^{−7/3} | **Consistent with** the fixed-point formula (heuristic; the fixed-point formula itself is confirmed by E-02, §8.1d). Stage-B candidate (C9). |
 | 5.6 | Uniform over λ-window; fix c; polylog or Mₙ, not both; raise the lower window | **Accepted** (B6, A4, C8). |
 | 6 | Suggested Theorem A | **Adopted** as the target statement in STATEMENT v2, with κ made explicit and the primary/fallback split. |
 
