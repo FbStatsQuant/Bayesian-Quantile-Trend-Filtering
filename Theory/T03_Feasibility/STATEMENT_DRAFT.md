@@ -26,13 +26,54 @@
 | **(A1)** | y₁, …, yₙ are independent (not necessarily identically distributed) on the equispaced grid. | This is the paper's setting; Padilla & Chatterjee use the same. |
 | **(A2)** | **Two-sided margin, uniform in i and n.** For all \|δ\| ≤ L: f\|δ\| ≤ \|Fᵢ(θ\*ᵢ + δ) − Fᵢ(θ\*ᵢ)\| ≤ f̄\|δ\|. | The lower half is Padilla's Assumption A. The upper half is *sufficient and proof-driven*: it excludes atoms at the quantile, and it gives the global bound mᵢ(δ) ≤ max(f̄/2, 1/L)·δ². It is checkable for every simulated noise law (Gaussian, Beta, mixed normal, t₂, Cauchy). **No moment conditions.** |
 | **(A3)** | TV⁽³⁾(θ\*) ≤ V, with V fixed (slow growth is allowed later). **No sup-norm bound**: the posterior law of θ − θ\* is exactly invariant to adding a quadratic to θ\*. | The bounded-variation class of Padilla's slow rate (r = 3), equivalently Tibshirani's F₂(C). |
-| **(A4)** | **Any** fixed σ > 0. λ is deterministic, in the window n^{a₀} ≤ λ ≤ n³/(V^{3/2}(log n)^{C₀}). The endpoints are *sufficient*, not necessary. | a₀ comes from the sup-norm lemma L10: a₀ = 3/2 via the two-level sieve (VP), or a₀ = 9/5 conservatively. The upper end keeps the bias term below 1. |
+| **(A4)** | **Theorem A:** σ ≥ σ̄ := τ(1−τ)/f, with f the local density constant in (A2); equivalently ω = 1/σ ≤ ω̄ = f/(τ(1−τ)). **Theorem A⁺ (target):** any fixed σ > 0. In both, λ is deterministic, in the window n^{a₀} ≤ λ ≤ n³/(V^{3/2}(log n)^{C₀}). The endpoints are *sufficient*, not necessary. | σ̄ is **sharp for the integrated-likelihood-ratio route** (see the σ̄ paragraph below). a₀ comes from L10: 3/2 via the two-level sieve, or 9/5 conservatively. The upper end keeps the bias term below 1. |
 
 The law class 𝒫ₙ = 𝒫ₙ(τ, L, f, f̄, V) is the set of all independent laws on the grid satisfying (A2) and (A3).
 
+## σ̄ and κ (explicit)
+
+**Exact increment law.** For a displacement δ > 0 at a coordinate with Z = y − θ\*, the check-loss increment is
+
+  X = (1−τ)δ − clip(Z, 0, δ),
+
+which is bounded and needs no moments. Its moment-generating function is
+
+  E e^{−ωX} = e^{−ω(1−τ)δ}[1 + ∫₀^δ ω e^{ωs}(1 − F(s)) ds].
+
+Expanding at δ = 0 gives log E e^{−ωX} = ½(ω²τ(1−τ) − ωf(q))δ² + o(δ²). So the per-coordinate MGF is below 1 near 0 **iff ω < f(q)/(τ(1−τ))**.
+
+**What this means for the Fubini route.** The threshold is exact, not a Bernstein artefact. Numerically, the exact threshold ω̄(Δ) equals this local value for every Δ tested, for Gaussian, Laplace, t, and uniform noise. So **neither a sharper MGF bound nor a different Δ can close the gap**. The integrated-likelihood-ratio (Fubini) route works exactly for σ ≥ σ̄ = τ(1−τ)/f.
+
+**Comparison with the paper's regime, σ₀ = E ρ_τ(ε − q_τ).** The gap ratio is R := σ̄/σ₀ = τ(1−τ)/(f(q)σ₀):
+
+| Noise | τ | R |
+|---|---|---|
+| Gaussian | 0.50 | **1.571 (π/2)** |
+| Gaussian | 0.75 | 1.857 |
+| Gaussian | 0.90 | 2.922 |
+| Gaussian | 0.95 | 4.466 |
+| Laplace (correctly specified ALD) | 0.50 | **1.000** (boundary) |
+| t₃ | 0.50 | 1.234 |
+| t₂ | 0.50 | 1.000 |
+| Uniform | 0.50 | 2.000 |
+| 0.9 N(0, 0.1²) + 0.1 N(0, 3²) | 0.50 | **0.446** (covered) |
+
+So Theorem A covers the paper's σ₀ only when R ≤ 1, i.e. for noise strongly peaked at the quantile. For Gaussian noise it misses σ₀ by a factor of π/2 at the median, and the factor grows toward the tails. Source: `scratch/omega_bar_exact.out`.
+
+**Dependence on κ = f/σ.** The condition σ ≥ σ̄ is equivalent to κ ≤ f²/(τ(1−τ)). The rate carries κ^{−5/6} in front: ε² ∝ κ^{−5/6}[λ^{−1/3} + V²λ^{5/3}n^{−5}]. Larger σ (smaller κ) widens the spread, but stays within constants.
+
+**Plan for Theorem A⁺ (every fixed σ).** The Fubini route fails above ω̄ because it bounds the *expected* numerator. The fluctuation term ½ω²τ(1−τ)‖δ‖² is then charged on the whole displacement. The plan analyses the *realized* numerator on the sup-norm-localized set from L10, in five steps:
+1. **Knight decomposition.** On {‖δ‖∞ ≤ Δ}, write n·M̂(θ\* + δ) = −u′δ + n·m(δ) + Rₙ(δ). Here uᵢ = τ − 1{Zᵢ ≤ 0} is the bounded score, m is the population excess risk (≳ Δ²ₙ), and Rₙ is a centred remainder with bounded, variance-controlled increments.
+2. **Coarse part.** Split δ into a coarse part on an ε-net of the structured sieve (entropy ≲ nε²) and a fine-scale part. Uniformly over the net, \|u′δ_c\| ≲ √(nε²)·√n·‖δ_c‖ₙ. On the shell ‖δ‖ₙ ≥ √M·ε this is ≤ n‖δ_c‖²ₙ/√M, which is dominated by n·m(δ_c) for **any** ω once M is large.
+3. **Fine part.** Integrate the fine-scale part against the prior rather than taking a supremum. The linear tilt exp(ω u′v) contributes about exp(½ω²u′Σ_v u), whose exponent is ≍ τ(1−τ)·tr Σ_v ≲ nε² in P₀-probability. That is the spread term again.
+4. **Remainder.** Rₙ is controlled by chaining across the scales below ε (the VP's multiscale requirement).
+5. **Far region.** L9-a (convexity and log-concavity) and L10 handle everything outside the localized set.
+
+This is L8-b made concrete. Its risks are the chaining of Rₙ and L10. If it succeeds it removes σ̄ entirely; the constant M then depends on ω.
+
 ## Theorem A (target statement)
 
-Assume (A1)–(A4). Define
+Assume (A1)–(A4), with σ ≥ σ̄ for Theorem A, or any σ for Theorem A⁺. Define
 
   **ε²(λ) := (log n)^c · κ^{−5/6} · [ λ^{−1/3} + min{ κ^{−1/6}λV n^{−3}, V² λ^{5/3} n^{−5} } ].**
 
@@ -82,4 +123,8 @@ Then there are constants c, M depending only on (τ, L, f, f̄, σ) such that
 2. **L8-b and L9-c (likelihood side for arbitrary σ).** These are the main proof risk. L8-a gives a small-ω milestone only.
 3. **L10 and a₀.** The interpolation route is plausible but unproved.
 4. **L3 in the Laplace case.** Open; it is needed by both versions.
-5. **ALD spread law.** Confirmed with a Gaussian likelihood; E-02 is testing the ALD itself.
+5. **ALD spread law: now confirmed for the ALD posterior** (Engineering, E-02 T3lam, exact Gibbs, κ = 16).
+   - The slope of the rough spread in log λ is −0.372 at n = 1000 and −0.342 at n = 4000; predicted −1/3.
+   - The constant is 0.28–0.35; predicted 0.3–0.4.
+   - The spread is flat in n, ratio 1.01–1.04, while n·λ^{−1/3} ≳ 10. It breaks down at n·λ^{−1/3} ≈ 3, as predicted.
+6. **The σ̄ gap.** Theorem A, with σ ≥ σ̄, misses the paper's σ₀ by the factor R (π/2 for Gaussian noise at τ = ½). Closing it is the job of Theorem A⁺ (plan above).

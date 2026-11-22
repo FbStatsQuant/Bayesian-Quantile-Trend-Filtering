@@ -1,0 +1,10 @@
+Delta values are multiples of the noise sd (raw units for Cauchy).
+Gaussian N(0,1)              tau=0.50  w_bar(local)=  1.5958  w_bar(Delta)=['1.5962', '1.5962', '1.5962']  w0=1/sigma0=  2.5066  R=w0/w_bar= 1.571
+Gaussian N(0,1)              tau=0.75  w_bar(local)=  1.6948  w_bar(Delta)=['1.6951', '1.6951', '1.6951']  w0=1/sigma0=  3.1469  R=w0/w_bar= 1.857
+Gaussian N(0,1)              tau=0.90  w_bar(local)=  1.9500  w_bar(Delta)=['1.9503', '1.9503', '1.9503']  w0=1/sigma0=  5.6981  R=w0/w_bar= 2.922
+Gaussian N(0,1)              tau=0.95  w_bar(local)=  2.1713  w_bar(Delta)=['2.1716', '2.1716', '2.1716']  w0=1/sigma0=  9.6960  R=w0/w_bar= 4.466
+Laplace (ALD-correct, tau=.5) tau=0.50  w_bar(local)=  2.0000  w_bar(Delta)=['2.0000', '2.0000', '2.0000']  w0=1/sigma0=  2.0000  R=w0/w_bar= 1.000
+Student t3                   tau=0.50  w_bar(local)=  1.4702  w_bar(Delta)=['1.4706', '1.4706', '1.4706']  w0=1/sigma0=  1.8138  R=w0/w_bar= 1.234
+Student t2                   tau=0.50  w_bar(local)=  1.4142  w_bar(Delta)=['1.4145', '1.4145', '1.4145']  w0=1/sigma0=  1.4142  R=w0/w_bar= 1.000
+Uniform(-1,1)                tau=0.50  w_bar(local)=  2.0000  w_bar(Delta)=['2.0007', '2.0007', '2.0007']  w0=1/sigma0=  4.0000  R=w0/w_bar= 2.000
+0.9 N(0,.1^2)+0.1 N(0,3^2)   tau=0.50  w_bar(local)= 14.4151  w_bar(Delta)=['14.4498', '6.6604', '2.2574']  w0=1/sigma0=  6.4273  R=w0/w_bar= 0.446
