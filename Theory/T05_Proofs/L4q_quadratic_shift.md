@@ -24,7 +24,19 @@ and in particular Π(h + B_ε) ≥ Π(B_ε) · exp(−min{λ‖h‖₁, c_K λ²
 
 **When K ≤ 1.** K is a function of ρ = λε only, and it is decreasing, because Φ is nonincreasing. So it suffices to check K ≤ 1 at one threshold ρ₀; it then holds for all λε ≥ ρ₀. Two ways to check it:
 - **(R1) via L3.** With Φ(ρ/4) ≤ C₃·(4n^{5/2}/ρ)^{2/5}·(log n)^{6/5} and δ_A ≤ n/√3, K ≤ 1 holds once ρ^{7/5} ≥ (4/√3)·4^{2/5}·C₃·n²(log n)^{6/5}, i.e. **λε ≳ n^{10/7}(log n)^{6/7}**. At the oracle, λε = (n^{5/2}/V)^{5/6}; this is fine for V ≲ n^{11/14}.
-- **(R2) without L3** (to be confirmed with explicit constants). We have ‖Au‖₂ ≤ a_max‖u‖₁ with a_max := maxⱼ‖aⱼ‖ ≲ n², so B_r contains the ℓ₁ ball of radius r/a_max. The Gamma(m) distribution of λ‖u‖₁ then gives Φ(ρ) ≤ ρ/a_max + m·log(m·a_max/(eρ)) + O(log m). Hence K ≲ n²·log n/(λε), and K ≤ 1 once λε ≥ C·n²·log n. That covers the oracle λε ≍ n^{25/12} for bounded V, without L3.
+- **(R2) without L3 (explicit constants).**
+  - *Column norms.* ‖aⱼ‖₂ ≤ n^{−1/2}‖sⱼ‖₂, and ‖sⱼ‖₂² = Σ_{k ≤ n−j−2} (k(k+1)/2)² ≤ n⁵/20. So a_max ≤ ā := n²/√20; numerically the ratio is 0.90, 0.975 and 0.995 at n = 50, 200, 1000.
+  - *Containment.* Since ‖Au‖₂ ≤ ā‖u‖₁, B_r contains the ℓ₁ ball of radius r/ā.
+  - *Gamma bound.* Under Π₁, ‖u‖₁ ~ Gamma(m, 1), and P(Gamma(m) ≤ s) ≥ e^{−s}s^m/m!. With Stirling, log m! ≤ m log m − m + ½log(2πm) + 1/(12m), this gives
+
+    Φ(ρ) ≤ ρ/ā + m·log(m ā/(eρ)) + ½log(2πm) + 1  (all ρ > 0).
+
+  - *Bound on K.* Hence
+
+    K ≤ δ_A/ā + (4δ_A/ρ)·[ m log(4mā/(eρ)) + ½log(2πm) + 1 ] ≤ √20/(√3 n) + (4n/(√3 ρ))·[ m log(4mā/(eρ)) + ½log(2πm) + 1 ],
+
+    using δ_A ≤ n/√3. So K ≤ 1 once λε ≥ (4/√3)(1 + o(1))·n²·log(n³/(λε)). At the oracle λε ≍ n^{25/12}V^{−5/6}, this is n^{1/12} ≳ 2.1·V^{5/6}·log n.
+  - *Caveat: this is asymptotic only.* With the worst-case δ_A ≤ n/√3 it needs astronomically large n. With the empirical δ_A ≈ 0.0258n (a factor ≈ 22 smaller) it holds from n ≈ 10⁶ for V = 1. **For finite-n statements, use (R1) via L3.**
 
 ## Proof
 
@@ -105,7 +117,7 @@ Set θ_h := S u_h + (the quadratic part of θ\*). Then ‖θ_h − θ\*‖ₙ = 
 1. Monotonicity of K in ρ = λε (L3 is needed at one radius only).
 2. The lemma is stated for general K. It needs only δ_A ≤ λε/2, which absorbs the radius-ε/2 issue in the corollary.
 3. The corollary is proved by quadratic reproduction outside the window, with a signed kernel. Claim 1 uses Minkowski, and the range of w is stated.
-4. Remark R2: (C) holds without L3 for λε ≳ n² log n (constants to be confirmed).
+4. Remark R2: (C) holds without L3 for λε ≳ n² log n; explicit constants added (asymptotic only; finite n uses R1).
 5. Remark on V growth.
 6. Sharper form: Σⱼ min{|hⱼ|, c_K λhⱼ²}.
 7. The δ_A computation is corrected: the entries are exactly (i−j−2)₊.
