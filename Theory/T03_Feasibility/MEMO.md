@@ -208,11 +208,11 @@ E₀ Πₙ( Δ²ₙ(θ − θ\*) > Mₙ ε²ₙ | y ) → 0, with ε²ₙ = [ ω
 |---|---|---|
 | L1 | **Basis identity.** θ = Hα; the prior is flat on α_{1:3} and iid Laplace(2λ/n²) on α_{4:n}; ‖h_j‖_{2,n} ≤ 1. | Trivial (verified). |
 | L2 | **Excess-risk sandwich under (A±).** c₀Δ²ₙ(δ) ≤ m(θ\* + δ) ≤ (f̄/2)‖δ‖²ₙ when ‖δ‖∞ ≤ L, and m ≤ ‖δ‖₁/n always; v(θ\* + δ) ≤ ‖δ‖²ₙ. | Easy (Padilla Lemma 13 plus the upper half of A±). |
-| L3 | **Centred small-ball.** −log Π(‖P⊥Su‖ₙ ≤ ε) ≤ C(n^{5/2}/(λε))^{2/5} for (log n)/λ ≤ ε ≤ n^{5/2}/λ. | Medium. Gaussian case via Li–Linde/Sytaya-type spectral asymptotics; Laplace case via a small-deviation comparison for weighted sums. Exponent verified numerically. |
+| L3 | **Centred small-ball.** −log Π(‖P⊥Su‖ₙ ≤ ε) ≤ C(n^{5/2}/(λε))^{2/5} for (log n)/λ ≤ ε ≤ n^{5/2}/λ. | Medium. The Gaussian, continuous version is classical: twice-integrated Brownian motion has L² small-ball exponent ε^{−2/5} (Chen & Li; exact asymptotics in Fill & Torcaso 2004 via Sytaja's theorem, `Papers/Fill_2004_*`). Still needed: (i) the discretization to the grid, (ii) the step from Gaussian to Laplace increments (a small-deviation comparison for weighted sums). Both are checked numerically: exponent → 0.404, and Laplace equals Gaussian within 1–3%. This is the main remaining prior-side gap, since ADH only lower-bound small balls via their Theorem 2.13. |
 | L4 | **Shift.** Π(u\* + B) ≥ e^{−λ‖u\*‖₁}Π(B). | Trivial. |
 | L5 | **Improper quadratic part.** The posterior is proper for n ≥ 4. Integrating the 3-dimensional flat component costs only O(log n) in the evidence bound and O(1/n) in the rate. | Low–medium. |
 | L6 | **Evidence lower bound (misspecified, inid).** P₀( ∫ e^{−ωn(R̂ₙ(θ) − R̂ₙ(θ\*))}Π(dθ) ≥ e^{−Cnωε²} ) → 1. | Medium. Syring–Martin Lemma 1 plus L2–L5. |
-| L7 | **Two-level sieve (Talagrand).** For 𝔅ₙ = θ\* + span(N) + S(A_ε + R₂B₂ + R₁B₁), with R₂ = (Cnωε²)^{1/2}/λ and R₁ = Cnωε²/λ: Π(𝔅ₙᶜ) ≤ e^{−C′nωε²}. | Medium. Talagrand's inequality for the product exponential measure, as used for Besov-Laplace priors by Agapiou–Dashti–Helin and Giordano; the exact form is to be checked. |
+| L7 | **Two-level sieve (Talagrand).** For 𝔅ₙ = θ\* + span(N) + S(A_ε + R₂B₂ + R₁B₁), with R₂ = (Cnωε²)^{1/2}/λ and R₁ = Cnωε²/λ: Π(𝔅ₙᶜ) ≤ e^{−C′nωε²}. | **Medium-low, largely transferable.** In falling-factorial coordinates our prior is a (finite-dimensional, scaled) p = 1 exponential measure. Agapiou, Dashti & Helin (2021), Proposition 2.15, give exactly μ(A + r^{1/2}B_Q + rB_Z) ≥ 1 − e^{−r/K}/μ(A) (Talagrand's two-level inequality). Their Theorem 3.1 turns "concentration function ≤ nε²" into the sieve and prior-mass conditions; their Theorem 2.13 is the shifted small-ball bound (our L4). |
 | L8 | **Uniform excess-loss on sieve shells.** With P₀-probability → 1, R̂ₙ(θ) − R̂ₙ(θ\*) ≥ ½c₀Δ²ₙ(θ − θ\*) for all θ ∈ 𝔅ₙ with Δ²ₙ ≥ Mε². This rests on a width bound w(𝔅ₙ ∩ {Δ² ≤ t²}) ≲ t·(J_eff log n)^{1/2} + t^{5/6}(n^{1/2}·n³R₁)^{1/6}. | Medium–high. Extends Padilla's Proposition 2 to the two-level set, including the Δ²-to-ℓ² conversion with ℓ∞ control. |
 | L9 | **Far region by convexity.** Πₙ(𝔅ₙᶜ ∪ {Δ²ₙ > Mε²} | y) → 0 without MGF or moment bounds, using convexity of R̂ₙ, log-concavity of Πₙ, and L6 to L8. | **High: the main novelty and the main risk.** This is the step where Syring–Martin need a bounded-support prior or ω → 0, and where Kleijn–van der Vaart need tests. |
 | L10 | **Posterior ℓ∞ control.** Πₙ(‖θ − θ\*‖∞ > C | y) → 0 (only for Corollary A3). | Medium. |
@@ -235,6 +235,15 @@ E₀ Πₙ( Δ²ₙ(θ − θ\*) > Mₙ ε²ₙ | y ) → 0, with ε²ₙ = [ ω
 **Global kill criterion for the n^{−3/4} programme:** R1 fires, or neither L7 nor any alternative sieve gives matching entropy within two weeks. In either case the deliverable becomes Theorem A′ (n^{−2/3}), which is still new according to T-01.
 
 ---
+
+**Effect of the reference library (`Papers/READING_LIST.md`) on the plan.** The prior side of Theorem A is largely the p = 1 case of the Agapiou–Dashti–Helin framework, transplanted to falling-factorial coordinates:
+- concentration function = shift cost (L4) + small-ball (L3);
+- sieve = Proposition 2.15 (L7);
+- prior-mass and sieve conditions = their Theorem 3.1.
+
+The remaining small-ball step L3 has a classical Gaussian, continuous counterpart (Fill & Torcaso; Chen & Li).
+
+The genuinely new work is therefore concentrated on the **likelihood side**: the misspecified check loss (L6, L8) and the moment-free far-region argument (L9). Ghosal & van der Vaart (2007) is the template for the independent, non-identical structure. Castillo et al. (2015, Theorem 7) is the template for the conjectured sharpness remark.
 
 ## Appendix A: verdicts on the advisor heuristics
 
