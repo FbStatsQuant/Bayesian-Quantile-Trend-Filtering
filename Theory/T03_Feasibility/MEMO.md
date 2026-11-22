@@ -478,6 +478,33 @@ Each entry is the Laplace posterior-mean bias² divided by the spline bias²:
 
 **The slope test** (the calibrated kinked arm, a ∈ {9/4, 2.4, 7/3, 5/2, 2.6, 8/3}, n to 32k) is still running.
 
+### 8.1e Calibrated kinked-truth slopes: the bias law is decided (E-04 passed)
+
+*Source: Engineering. Setup: pq truth, λσ₀ = 2000·(n/500)^a, N(0, 0.5²) so κ = 4, τ = 0.5, 20 reps per cell, n = 250…32k. Slopes are fitted over n ≥ 2k, with paired-bootstrap 95% CIs. Every cell is in the asymptotic regime: n·λ^{−1/3} ≥ 19 and w/n ≤ 0.04.*
+
+**Bias law.** The slope of the spline bias² in n equals the posterior bias² slope, by the equivalence tables (§8.1a′, §8.1a″):
+
+| a | 9/4 | 2.4 | 5/2 | 2.6 | 8/3 |
+|---|---|---|---|---|---|
+| observed | **−1.247** | **−1.007** | **−0.851** | **−0.704** | **−0.602** |
+| VP law (5a/3 − 5) | −1.250 | −1.000 | −0.833 | −0.667 | −0.556 |
+| ℓ₁ law (a − 3) | −0.750 | −0.600 | −0.500 | −0.400 | −0.333 |
+
+**The VP law is confirmed and the ℓ₁ law is excluded at every a.** There is a slight excess at the largest a, as w/n grows.
+
+**Spread along λ = c·n^a (P1).** The rough-spread slopes are −0.734, −0.785, −0.762, −0.819, −0.854 and −0.876, within 0.016 of −a/3 at every a.
+
+**MAP versus posterior.** At 15/7 the MAP beats the posterior: −0.90 against −0.69, while P4 predicted −0.857 against −0.714.
+
+**What is not identifiable.** The risk-minimizing a cannot be identified in this window. Bias stays 2–4 orders of magnitude below variance up to n = 32k, so a = 3 has the lowest risk empirically. The n^{−5/6} optimum at a = 5/2 instead follows from the confirmed bias law together with P1. A direct risk-minimizer test would need a larger-V or lower-noise kinked truth; it is optional.
+
+**Net (numerical side of C7).** All three pieces point the same way:
+- the mechanism: Gaussian-twin ratio ≈ 1, and bias equivalence ≈ 1;
+- the bias slope, which matches the VP law and excludes the ℓ₁ law;
+- the spread law along λ = c·n^a.
+
+**The primary rate n^{−5/6} at λ ≍ n^{5/2}/V is numerically supported.** Theoretically it rests on L4q, now drafted in `Theory/T05_Proofs/L4q_quadratic_shift.md`: it is proved conditional on L3 and on λε ≳ n^{10/7}, and is under independent check.
+
 ### 8.1d Learned λ: the fixed-point formula holds, but it is not a bias-law test
 
 *Source: E-02 lamlearn, lamlearn2 and lamlearn3 (Engineering's sampler). Evidence since E-04 passed, except the flagged low-ESS sin cells at n = 8k.*
