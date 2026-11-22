@@ -1,0 +1,37 @@
+# Default: let git decide, but never rewrite line endings of the sealed packages
+* text=auto
+
+# LF for scripts and sources (the NOTS cluster and the Owls box are Linux)
+*.R      text eol=lf
+*.r      text eol=lf
+*.Rmd    text eol=lf
+*.sh     text eol=lf
+*.slurm  text eol=lf
+*.py     text eol=lf
+*.cpp    text eol=lf
+*.c      text eol=lf
+*.h      text eol=lf
+*.tex    text eol=lf
+*.bib    text eol=lf
+*.md     text eol=lf
+*.cff    text eol=lf
+latexmkrc text eol=lf
+.githooks/* text eol=lf
+# Windows batch file keeps CRLF
+*.bat    text eol=crlf
+
+# Sealed manifests: bytes must never be rewritten (SHA256SUMS are checked)
+SHA256SUMS*   -text
+*SHA256SUMS*  -text
+*.sha256      -text
+
+# Binary
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.rds  binary
+*.rda  binary
+*.RData binary
+*.gz   binary
+*.tar  binary
+*.tgz  binary

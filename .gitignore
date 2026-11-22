@@ -1,0 +1,47 @@
+# ---- LaTeX build (paper/main.pdf stays tracked: current build) ----
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.fdb_latexmk
+paper/*.fls
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.synctex.gz
+**/history/**/build/
+
+# ---- R / Python / editors / OS ----
+.Rhistory
+.RData
+.Rproj.user/
+Rplots.pdf
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# ---- Rcpp build cache ----
+**/.rcpp_cache/
+
+# ---- pilot output written next to the samplers when they are run with no arguments ----
+method/**/results_pmala_aug/
+method/**/results_joint/
+method/**/results_admm_qtf/
+
+# ---- heavy outputs: never in git (they go to the PC through E-01; see DATA.md pointers) ----
+**/raw/
+**/chains/
+**/draws/
+*.npz
+*.feather
+*.parquet
+**/runs/**/tasks/
+**/runs/**/logs/
+**/monitor/history.jsonl
+
+# ---- D3: third-party PDFs are local only; our own paper is the single exception ----
+literature/*.pdf
+!literature/Large Prior.pdf
+
+# ---- scratch ----
+**/scratch/__pycache__/

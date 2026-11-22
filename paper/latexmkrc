@@ -1,0 +1,7 @@
+# latexmk configuration for the manuscript (run `latexmk` in this folder).
+# Needs the LaTeX packages algpseudocode (algorithmicx), bbm and bbold; bibliography: natbib + bibtex (apalike).
+$pdf_mode = 1;
+$bibtex_use = 1.5;
+$pdflatex = 'pdflatex -interaction=nonstopmode -file-line-error %O %S';
+@default_files = ('main.tex');
+$clean_ext = 'bbl synctex.gz';

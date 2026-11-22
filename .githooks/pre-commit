@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# BQTF pre-commit hook: refuse staged files larger than 5 MB unless listed in .githooks/size_allowlist.txt.
+#
+# Install (once per clone; git does not copy hooks on clone):
+#     git config core.hooksPath .githooks
+# Allow one exceptional file (needs HQ's OK): add its repo-relative path, one per line, to
+#     .githooks/size_allowlist.txt   (comment lines start with #)
+# Policy (README, "Data"): chains, raw draws, monitor logs and raw data > 5 MB go to the PC via E-01, not to git.
+set -u
+LIMIT=$((5 * 1024 * 1024))
+root="$(git rev-parse --show-toplevel)"
+allow="$root/.githooks/size_allowlist.txt"
+bad=0
+while IFS= read -r -d '' f; do
+  size="$(git cat-file -s ":$f" 2>/dev/null || echo 0)"
+  if [ "$size" -gt "$LIMIT" ]; then
+    if [ -f "$allow" ] && grep -vE '^[[:space:]]*(#|$)' "$allow" | grep -Fxq -- "$f"; then
+      echo "pre-commit: $f is $((size / 1024)) KB (> 5 MB) but allow-listed; ok." >&2
+      continue
+    fi
+    echo "pre-commit: REFUSED $f ($((size / 1024)) KB > 5 MB)." >&2
+    echo "            Heavy data goes to the PC via E-01.  If HQ approves it, list the path in .githooks/size_allowlist.txt." >&2
+    bad=1
+  fi
+done < <(git diff --cached --name-only -z --diff-filter=ACM)
+exit "$bad"
