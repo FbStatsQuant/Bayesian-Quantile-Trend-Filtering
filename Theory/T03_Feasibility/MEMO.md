@@ -420,7 +420,13 @@ The Fubini (integrated-likelihood-ratio) route works **exactly** for σ ≥ σ̄
 
 A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin control with a closed-form posterior, a second seed with a 400k chain and ESS-based standard errors, and a finer grid. `owls_run` refused for budget, so it has been sent to Engineering to run on NOTS with E-04.
 
-**Until then, the two own-MCMC rows in the table above are provisional and are not used as evidence.** The bias-equivalence claim (Laplace mean = spline) then rests on E-02's Gaussian-twin arm, itself subject to E-04, and on the VP's independent n = 300 check. Note that a mean bias of ≤ 3% of a posterior sd could not overturn a ratio of 1.000 ± 0.005 on *bias²* of order 10⁻³–10⁻⁶.
+**Follow-up result** (`gibbs_validation_grid2.py`, run by Engineering on NOTS, job 2857080, commit 8ba6ed2).
+- **(a) The Gaussian-twin control passes:** |z| ≤ 1.8 and variance ratios 0.99–1.01. So the Gibbs machinery and the banded Gaussian draw are correct.
+- **(c) The exact reference is not converged.** Refining the grid (du 0.01 → 0.005, window 1.2 → 0.9) moves the "exact" means by 0.005–0.014. That is the same size as the Laplace discrepancies, and the smaller window truncates support.
+- **(b) The pieces line up against the coarser, wider grid.** The Laplace minus fine-grid differences (−0.009, 0.011, 0.012, −0.006, −0.020, 0.012) are almost exactly cancelled by the grid change. Gibbs minus the coarse, wider grid is 0.001–0.006, matching run 1.
+- **Verdict: inconclusive, a reference error rather than a sampler error.** There is no evidence of a defect. Since the sampler is retired (HQ decision) and E-02's Gaussian-twin arm now carries the evidence, it is not pursued further. A converged reference would need a rotated-coordinate grid at the 1/λ scale, the approach of Engineering's E-04 part A3.
+
+**The two own-MCMC rows in the table above are not used as evidence.** The bias-equivalence claim (Laplace mean = spline) then rests on E-02's Gaussian-twin arm, itself subject to E-04, and on the VP's independent n = 300 check. Note that a mean bias of ≤ 3% of a posterior sd could not overturn a ratio of 1.000 ± 0.005 on *bias²* of order 10⁻³–10⁻⁶.
 
 **HQ decision (2026-11-22).** The company uses **one MCMC sampler for theory numerics: Engineering's**, once E-04 marks it fit.
 - **Theory's own Gibbs is retired.** It will not be used for evidence unless the diagnosis shows it is correct *and* it is needed for something Engineering's sampler cannot do.

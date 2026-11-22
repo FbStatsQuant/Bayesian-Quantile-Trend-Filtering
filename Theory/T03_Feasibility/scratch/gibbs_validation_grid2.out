@@ -1,2 +1,7 @@
-owls_run: REFUSED: fb31 compute CPU 703% (measured 703%, reserved by running jobs 200%) + requested 100% would exceed the 8-core budget
-owls_run: wait for running jobs to finish, or move this work to NOTS (see /home/fb31/.config/bvs-hq/owls/POLICY.md).
+# Output of gibbs_validation_grid2.py, run by Engineering on NOTS (job 2857080, commit 8ba6ed2, numpy SciPy-bundle/2023.11), verbatim:
+(a) twin  z(mean): [ 0.09 -1.76 -1.34  0.07  0.72 -0.18]  var ratio: [0.988 0.994 1.003 1.007 1.002 1.005]
+(c) grid change in E (du .01 -> .005, window 1.2 -> 0.9): [ 0.0069   -0.00796  -0.008758  0.005033  0.013548 -0.008763]
+(b) ESS per coord: [372347. 325328. 314113. 300661. 264875. 361589.]
+(b) laplace z(mean) vs fine grid: [-23.68  36.32  40.08 -19.16 -57.12  31.22]
+(b) laplace var ratio vs fine grid: [1.016 1.051 1.053 1.051 1.123 1.024]
+(b) abs mean diff: [-0.00919  0.01077  0.01226 -0.00597 -0.01986  0.01238]  post sd: [0.235  0.165  0.1671 0.1668 0.1689 0.2356]
