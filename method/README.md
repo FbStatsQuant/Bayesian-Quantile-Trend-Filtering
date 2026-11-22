@@ -25,3 +25,11 @@ Since E-03 the settings block of `individual/Individual_Sampler_PMALA_Augmented.
 ## Dependencies
 
 R >= 4.4: `Rcpp`, `RcppArmadillo`, `glmgen`, `Matrix`; joint tests also `clarabel`. A C++17 compiler. On Windows the scripts fall back to a mingw `g++` if `Rcpp::sourceCpp` fails.
+
+## Bitwise tests and compiler flags
+Some tests check exact (bitwise) identities, e.g. joint P1 "free box = unbounded kernel" and the J = 1 draw-for-draw check. They pass with the default flags on Owls. On compilers that contract floating-point expressions into FMA instructions by default (seen with GCC 14 on NOTS), P1 differs at 2e-16 and its bitwise assertion fails. That is a rounding difference, not a correctness one. To reproduce the bitwise tests there, build with FMA contraction off, through a user Makevars:
+```
+CXXFLAGS=-O2 -ffp-contract=off
+CXX17FLAGS=-O2 -ffp-contract=off
+```
+(`export R_MAKEVARS_USER=/path/to/Makevars`). With that, `Rscript Joint_Sampler_PMALA_Augmented.R test_prox` prints "all optimisation-kernel tests passed" (E-03 smoke test, 2026-11-22).
