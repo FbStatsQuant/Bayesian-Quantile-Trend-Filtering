@@ -1,0 +1,24 @@
+S  n=  250 a=1.25 mu=9.941e+02 bias2=5.486e-04 bound2muV/n3=1.971e-02 kkt=5.1e-06 feas=1.000
+S  n=  250 a=1.50 mu=3.953e+03 bias2=1.817e-03 bound2muV/n3=7.838e-02 kkt=2.1e-05 feas=1.000
+S  n=  250 a=1.75 mu=1.572e+04 bias2=2.131e-02 bound2muV/n3=3.117e-01 kkt=2.2e-07 feas=1.000
+PQ n=  250 a=1.25 mu=9.941e+02 bias2=4.368e-04 bound2muV/n3=3.308e-03 kkt=1.6e-06 feas=1.000
+PQ n=  250 a=1.50 mu=3.953e+03 bias2=1.717e-03 bound2muV/n3=1.316e-02 kkt=3.8e-09 feas=1.000
+PQ 250 1.75 fail 248th leading minor not positive definite
+S  n=  500 a=1.25 mu=2.364e+03 bias2=3.713e-04 bound2muV/n3=5.917e-03 kkt=8.7e-07 feas=1.000
+S  n=  500 a=1.50 mu=1.118e+04 bias2=6.232e-04 bound2muV/n3=2.798e-02 kkt=3.9e-06 feas=1.000
+S  n=  500 a=1.75 mu=5.287e+04 bias2=4.218e-03 bound2muV/n3=1.323e-01 kkt=8.6e-07 feas=1.000
+PQ n=  500 a=1.25 mu=2.364e+03 bias2=2.276e-04 bound2muV/n3=9.836e-04 kkt=2.1e-06 feas=1.000
+PQ n=  500 a=1.50 mu=1.118e+04 bias2=5.095e-04 bound2muV/n3=4.651e-03 kkt=7.4e-08 feas=1.000
+PQ n=  500 a=1.75 mu=5.287e+04 bias2=6.350e-02 bound2muV/n3=2.199e-02 kkt=1.5e+02 feas=1.000
+S  n= 1000 a=1.25 mu=5.623e+03 bias2=1.520e-04 bound2muV/n3=1.768e-03 kkt=1.1e-07 feas=1.000
+S  n= 1000 a=1.50 mu=3.162e+04 bias2=4.844e-04 bound2muV/n3=9.940e-03 kkt=1.9e-07 feas=1.000
+S  n= 1000 a=1.75 mu=1.778e+05 bias2=1.112e-03 bound2muV/n3=5.590e-02 kkt=8.8e-07 feas=1.000
+PQ n= 1000 a=1.25 mu=5.623e+03 bias2=4.438e-05 bound2muV/n3=2.924e-04 kkt=1.0e-07 feas=1.000
+PQ n= 1000 a=1.50 mu=3.162e+04 bias2=3.062e-04 bound2muV/n3=1.644e-03 kkt=1.2e-07 feas=1.000
+PQ n= 1000 a=1.75 mu=1.778e+05 bias2=1.033e-03 bound2muV/n3=9.247e-03 kkt=7.9e-10 feas=1.000
+S  n= 2000 a=1.25 mu=1.337e+04 bias2=3.418e-05 bound2muV/n3=5.268e-04 kkt=2.3e-09 feas=1.000
+S  n= 2000 a=1.50 mu=8.944e+04 bias2=2.634e-04 bound2muV/n3=3.523e-03 kkt=4.0e-08 feas=1.000
+S  n= 2000 a=1.75 mu=5.981e+05 bias2=5.816e-04 bound2muV/n3=2.356e-02 kkt=3.4e-08 feas=1.000
+PQ n= 2000 a=1.25 mu=1.337e+04 bias2=6.566e-06 bound2muV/n3=8.694e-05 kkt=7.6e-08 feas=1.000
+PQ n= 2000 a=1.50 mu=8.944e+04 bias2=1.167e-04 bound2muV/n3=5.814e-04 kkt=1.9e-07 feas=1.000
+PQ n= 2000 a=1.75 mu=5.981e+05 bias2=4.560e-04 bound2muV/n3=3.888e-03 kkt=1.6e-08 feas=1.000

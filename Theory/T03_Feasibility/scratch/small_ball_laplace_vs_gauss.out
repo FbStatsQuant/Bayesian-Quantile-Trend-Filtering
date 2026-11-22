@@ -1,0 +1,20 @@
+
+Part B: n=400, lambda=1.0, B=400000: P(||P S u||_n <= eps), Gaussian vs Laplace (same variance)
+   eps/median   P_gauss     P_laplace   saddle(Gauss)
+     0.80      3.80e-01    3.81e-01    4.46e-02
+     0.60      2.44e-01    2.45e-01    2.16e-02
+     0.50      1.74e-01    1.75e-01    1.29e-02
+     0.40      1.08e-01    1.09e-01    6.40e-03
+     0.33      6.74e-02    6.80e-02    3.30e-03
+     0.28      4.28e-02    4.34e-02    1.78e-03
+     0.24      2.67e-02    2.74e-02    9.55e-04
+
+Part B: n=1600, lambda=1.0, B=100000: P(||P S u||_n <= eps), Gaussian vs Laplace (same variance)
+   eps/median   P_gauss     P_laplace   saddle(Gauss)
+     0.80      3.78e-01    3.82e-01    4.46e-02
+     0.60      2.42e-01    2.45e-01    2.15e-02
+     0.50      1.73e-01    1.76e-01    1.29e-02
+     0.40      1.07e-01    1.09e-01    6.40e-03
+     0.33      6.62e-02    6.69e-02    3.29e-03
+     0.28      4.17e-02    4.30e-02    1.78e-03
+     0.24      2.59e-02    2.67e-02    9.54e-04

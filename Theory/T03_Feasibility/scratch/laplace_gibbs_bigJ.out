@@ -1,0 +1,15 @@
+n= 1000 lam= 1.0e+02 rough_Lap=7.851e-03 rough_Gauss=8.044e-03 Lap/Gauss=0.976 J_eff~128.7 ratio=0.902 bias2=7.58e-03
+n= 1000 lam= 1.0e+03 rough_Lap=3.617e-03 rough_Gauss=3.688e-03 Lap/Gauss=0.981 J_eff~59.0 ratio=0.954 bias2=3.21e-03
+n= 1000 lam= 1.0e+04 rough_Lap=1.647e-03 rough_Gauss=1.692e-03 Lap/Gauss=0.973 J_eff~27.1 ratio=0.979 bias2=1.18e-03
+n= 1000 lam= 1.0e+05 rough_Lap=7.099e-04 rough_Gauss=7.686e-04 Lap/Gauss=0.924 J_eff~12.3 ratio=0.990 bias2=3.57e-04
+n=1000: slope Laplace -0.347, Gaussian -0.340 (pred -1/3)
+n= 2000 lam= 1.0e+02 rough_Lap=7.769e-03 rough_Gauss=8.059e-03 Lap/Gauss=0.964 J_eff~257.9 ratio=0.897 bias2=5.65e-03
+n= 2000 lam= 1.0e+03 rough_Lap=3.641e-03 rough_Gauss=3.704e-03 Lap/Gauss=0.983 J_eff~118.5 ratio=0.951 bias2=2.46e-03
+n= 2000 lam= 1.0e+04 rough_Lap=1.687e-03 rough_Gauss=1.708e-03 Lap/Gauss=0.988 J_eff~54.7 ratio=0.977 bias2=1.13e-03
+n= 2000 lam= 1.0e+05 rough_Lap=7.519e-04 rough_Gauss=7.842e-04 Lap/Gauss=0.959 J_eff~25.1 ratio=0.990 bias2=6.25e-04
+n=2000: slope Laplace -0.338, Gaussian -0.337 (pred -1/3)
+n= 4000 lam= 1.0e+02 rough_Lap=7.840e-03 rough_Gauss=8.067e-03 Lap/Gauss=0.972 J_eff~516.3 ratio=0.894 bias2=5.85e-03
+n= 4000 lam= 1.0e+03 rough_Lap=3.644e-03 rough_Gauss=3.712e-03 Lap/Gauss=0.982 J_eff~237.5 ratio=0.950 bias2=2.61e-03
+n= 4000 lam= 1.0e+04 rough_Lap=1.695e-03 rough_Gauss=1.716e-03 Lap/Gauss=0.988 J_eff~109.8 ratio=0.976 bias2=1.19e-03
+n= 4000 lam= 1.0e+05 rough_Lap=7.710e-04 rough_Gauss=7.920e-04 Lap/Gauss=0.973 J_eff~50.7 ratio=0.989 bias2=3.62e-04
+n=4000: slope Laplace -0.335, Gaussian -0.336 (pred -1/3)
