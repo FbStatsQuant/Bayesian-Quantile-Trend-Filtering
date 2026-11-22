@@ -392,6 +392,38 @@ The Fubini (integrated-likelihood-ratio) route works **exactly** for σ ≥ σ̄
 - **Theorem A⁺ (every fixed σ) is therefore the theorem that covers the paper's practice.** Its plan is the realized-numerator analysis in STATEMENT v2.1: a Knight score term with entropy on a coarse net, valid for any ω once M is large; the fine part integrated against the prior; and the remainder chained across scales.
 - **Theorem A (σ ≥ σ̄) is the first milestone.** It covers the paper's σ₀ only when R ≤ 1, i.e. for noise sharply peaked at the quantile.
 
+### 8.1c Provenance of the numerical evidence (HQ rule, 2026-11-22)
+
+**Rule.** Every E-02 number is **provisional** until Engineering's sampler check **E-04** marks the Gibbs sampler "fit" (due Thu 11-26). Theory's own MCMC code is held to the same standard. The table below gives the source of each piece of evidence and its status.
+
+| Evidence | Source and method | Sampler? | Status |
+|---|---|---|---|
+| Falling-factorial identity, column norms | `ff_basis_check.py`; linear algebra | none | exact |
+| Spread law, Gaussian analogue (λ^{−1/3}, κ^{−5/6}) | `spread_gaussian_analog.py`; closed-form posterior covariance spectrum | none | exact, up to the eigenvalue approximation |
+| Small-ball exponent 2/5 and the collapse in n^{5/2}/(λε) | `small_ball*.py`; Gaussian saddle point with exact spectrum | none | exact asymptotics; deterministic numerics |
+| Laplace vs Gaussian small-ball probabilities | `small_ball.py` part B; plain i.i.d. Monte Carlo | **no MCMC** (direct sampling) | reliable |
+| Exact σ̄ and the gap ratios R | `omega_bar_exact.py`; quadrature of the exact MGF | none | exact |
+| P&C Lemma 19 counterexample | `padilla_lemma19_check.py`; linear algebra | none | exact |
+| Noiseless MAP bias (k = 2 trend filtering) | `map_bias.py`; ADMM with KKT residual reported | optimizer | reliable where KKT < 1e−5 |
+| Spline (Gaussian-twin) bias along λ = n^a | `spline_bias_scaling.py`; long-double banded solve | none | exact, where Cholesky succeeds |
+| Laplace-prior posterior spread (Gaussian likelihood; slopes −0.335 to −0.347) | `laplace_gibbs_spread.py`, `laplace_gibbs_bigJ.py`; **Theory's own Park–Casella Gibbs**, banded Cholesky | **own MCMC** | **provisional**, pending the grid validation below. Large-λ cells with a binding cap are already excluded. |
+| Laplace posterior-mean bias = spline bias (ratios 0.995–1.005) | `vp_bias_check.py`; **Theory's own Park–Casella Gibbs**, long-double Cholesky, Rao-Blackwellised mean | **own MCMC** | **provisional**, pending the grid validation below |
+| Virial ratio λ‖Dθ‖₁/m and the λ fixed-point formula | own Gibbs (above), plus the paper's reported λ for Gamma(1, 1) | own MCMC, plus the paper | provisional |
+| ALD spread law (T3lam: slopes −0.37/−0.34, C = 0.28–0.35) | **E-02**, Engineering's exact Gibbs (z-augmentation, scale mixture, banded-QR perturb-and-solve) | **E-02 sampler** | **provisional until E-04 passes** |
+| Learned-λ smoke test (λ ≈ 60 for b₀ = 1) | E-02 sampler; the paper's own report (50–75) | E-02 and paper | the paper's figure is independent; the E-02 figure is provisional |
+
+**Validation of Theory's own Gibbs sampler.** `scratch/gibbs_validation_grid.py` compares it against **exact 3-D numerical integration** at n = 6. The flat quadratic coefficients are integrated analytically, and the posterior mean and variance of each θᵢ are compared, with batch-means z-scores. **First result** (`gibbs_validation_grid.out`; seed 42; 195k draws; λ = 6, κ = 16).
+- **Variances agree** to within 0.5–5% (ratios 1.005–1.048).
+- **The means disagree significantly.** Batch-means z-scores are −4.1, 4.5, 5.7, −2.1, −9.7 and 9.6, an absolute difference of about 0.002–0.006 against posterior standard deviations of about 0.17–0.24.
+
+**Status: Theory's Gibbs is NOT yet validated.** The discrepancy is small in absolute terms (≤ 3% of a posterior sd), but significant. There are three candidate causes: underestimated Monte Carlo standard errors (slow mixing of the scale latents), grid error, or a sampler defect.
+
+A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin control with a closed-form posterior, a second seed with a 400k chain and ESS-based standard errors, and a finer grid. `owls_run` refused for budget, so it has been sent to Engineering to run on NOTS with E-04.
+
+**Until then, the two own-MCMC rows in the table above are provisional and are not used as evidence.** The bias-equivalence claim (Laplace mean = spline) then rests on E-02's Gaussian-twin arm, itself subject to E-04, and on the VP's independent n = 300 check. Note that a mean bias of ≤ 3% of a posterior sd could not overturn a ratio of 1.000 ± 0.005 on *bias²* of order 10⁻³–10⁻⁶.
+
+**Conclusions that rest only on exact or deterministic computations.** The small-ball exponent, the Gaussian-analogue spread law, σ̄ and R, the Lemma 19 correction, and the spline-bias scaling. These stand regardless of the sampler checks.
+
 ### 8.2 Other required changes, and where each is made
 
 | Item | Change | Where |
