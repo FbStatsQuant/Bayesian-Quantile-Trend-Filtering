@@ -37,7 +37,7 @@
 // [L, U] the target density is zero: the move is rejected and the reverse map is skipped.
 //
 // This file #includes the unbounded kernel (one translation unit), so one DLL exports both kernels.  Compile with
-// -I<Simulations/Individual>.
+// -I<method/individual>.
 #include "prox_admm_metric.cpp"
 
 struct BoxDiag { int iters, outer, n_active, conv; double rp_D, rp_B, rd, gap, obj, max_viol, zscale; };

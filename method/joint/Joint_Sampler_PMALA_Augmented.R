@@ -1,6 +1,6 @@
 # =============================================================================
 # Joint (non-crossing) Bayesian quantile trend filtering: the individual augmented P-MALA sampler
-# (Simulations/Individual/Individual_Sampler_PMALA_Augmented.R) extended to an ordered set of quantile levels.
+# (method/individual/Individual_Sampler_PMALA_Augmented.R) extended to an ordered set of quantile levels.
 #
 # Target.  Levels tau_1 < ... < tau_J, each with its own (theta_j, z_j, lambda_j, sigma_j) and the individual model
 #   y_i = theta_ij + eps_ij,  eps_ij ~ ALD(0, sigma_j, tau_j)   (Kozumi-Kobayashi augmentation, Laplace prior on D theta_j,
@@ -33,7 +33,7 @@
 suppressPackageStartupMessages(library(glmgen))
 `%||%` <- function(a, b) if (is.null(a)) b else a
 
-# ---- Locate this script's folder (prox_box_metric.cpp beside it; ../Individual/prox_admm_metric.cpp is #included) -------
+# ---- Locate this script's folder (prox_box_metric.cpp beside it; ../individual/prox_admm_metric.cpp is #included) -------
 .norm <- function(p) {
   if (is.null(p) || length(p) != 1L || is.na(p) || !nzchar(p)) return(NA_character_)
   tryCatch(normalizePath(p, winslash = "/", mustWork = FALSE), error = function(e) NA_character_)
@@ -46,16 +46,16 @@ suppressPackageStartupMessages(library(glmgen))
       isTRUE(tryCatch(rstudioapi::isAvailable(), error = function(e) FALSE)))
     p <- .norm(tryCatch(rstudioapi::getActiveDocumentContext()$path, error = function(e) NA_character_))
   if (!is.na(p) && file.exists(file.path(dirname(p), target))) return(dirname(p))
-  rel <- file.path("Simulations", "Joint")
+  rel <- file.path("method", "joint")
   up <- character(0); d <- .norm(getwd())
   while (!is.na(d) && !(d %in% up)) { up <- c(up, d); d <- dirname(d) }
   cand <- c(up, file.path(up, rel), file.path(c("~", "~/Documents", "~/OneDrive/Documents"), "Quantile Regression", rel))
   hit <- cand[file.exists(file.path(cand, target))]
   if (length(hit)) return(.norm(hit[[1L]]))
-  stop("Could not find ", target, ". Open this script from Simulations/Joint, or setwd() there.")
+  stop("Could not find ", target, ". Open this script from method/joint, or setwd() there.")
 }
 script_dir     <- .script_dir()
-individual_dir <- file.path(dirname(script_dir), "Individual")
+individual_dir <- file.path(dirname(script_dir), "individual")
 out_dir        <- file.path(script_dir, "results_joint")
 
 # ---- C++ kernel: the unbounded kernel (#included) and the bounded one ---------------------------------------------------
