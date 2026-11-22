@@ -81,7 +81,7 @@ Then there are constants c, M depending only on (τ, L, f, f̄, σ) such that
 
   sup_{P ∈ 𝒫ₙ} sup_{λ in the window} E_P Πₙ,λ( Δ²ₙ(θ − θ\*) > M ε²(λ) | y ) → 0.
 
-**Which version is primary.** The **primary** version, to be proved first, fixes the single oracle tuning λₙ = n^{5/2}/V and is uniform over 𝒫ₙ. The **target** version above, uniform over the λ-window, is the one Stage B needs. Inside the window the min always selects the second term, V²λ^{5/3}n^{−5}. The first term is what survives if the quadratic shift lemma (L4q) fails.
+**Which version is primary.** Theorem A⁺ (every σ) is the theorem that covers the paper's practice; Theorem A (σ ≥ σ̄) is the first milestone. Within each, the **primary** version, to be proved first, fixes the single oracle tuning λₙ = n^{5/2}/V and is uniform over 𝒫ₙ. The **target** version above, uniform over the λ-window, is the one Stage B needs. Inside the window the min always selects the second term, V²λ^{5/3}n^{−5}. The first term is what survives if the quadratic shift lemma (L4q) fails.
 
 **Corollaries and remarks.**
 - **Corollary A1 (oracle tuning).** λₙ ≍ n^{5/2}/V gives ε² ≍ (log n)^c κ^{−5/6} V^{1/3} n^{−5/6}. This is the **linear-smoother minimax rate** for this class (Donoho–Johnstone, as cited in Tibshirani 2014). The minimax rate is n^{−6/7}.

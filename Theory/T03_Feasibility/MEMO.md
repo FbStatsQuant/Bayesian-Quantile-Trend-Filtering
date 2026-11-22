@@ -371,6 +371,27 @@ Both are in STATEMENT v2. The evidence for the primary version is (a) above toge
 - **Falsifier:** a bias ratio that grows with λ points to the ℓ₁ law, i.e. the fallback.
 - **Secondary test:** the slope of the learned-λ λ̄ in n (2.5 vs 2.25) and the PQ/sin ratio (≈ 6 vs 3.8).
 
+### 8.1b σ: Theorem A is the milestone, Theorem A⁺ covers the paper's practice
+
+The Fubini (integrated-likelihood-ratio) route works **exactly** for σ ≥ σ̄ := τ(1−τ)/f.
+- **Derivation.** The check-loss increment is X = (1−τ)δ − clip(Z, 0, δ), with E e^{−ωX} = e^{−ω(1−τ)δ}[1 + ∫₀^δ ωe^{ωs}(1 − F(s)) ds]. Expanding at δ = 0 gives a coefficient of ½(ω²τ(1−τ) − ωf)δ², so the threshold is ω̄ = f/(τ(1−τ)).
+- **Sharpness.** It is sharp: numerically, ω̄(Δ) equals the local value for every Δ tested (`scratch/omega_bar_exact.out`).
+- **Gap to the paper's regime.** The paper uses σ = σ₀ = E ρ_τ(ε − q_τ). The gap ratio R = σ̄/σ₀ = τ(1−τ)/(f(q)σ₀) is:
+
+| Noise | τ = 0.50 | τ = 0.75 | τ = 0.90 | τ = 0.95 |
+|---|---|---|---|---|
+| Gaussian | **1.571** (π/2) | 1.857 | 2.922 | **4.466** |
+| Laplace (correctly specified ALD) | 1.000 | | | |
+| t₃ | 1.234 | | | |
+| t₂ | 1.000 | | | |
+| Uniform | 2.000 | | | |
+| 0.9 N(0, 0.1²) + 0.1 N(0, 3²) | **0.446** | | | |
+
+**Framing.**
+- Extreme quantiles are a headline use case of the paper, and the gap is largest there (R ≈ 4.5 at τ = 0.95 under Gaussian noise).
+- **Theorem A⁺ (every fixed σ) is therefore the theorem that covers the paper's practice.** Its plan is the realized-numerator analysis in STATEMENT v2.1: a Knight score term with entropy on a coarse net, valid for any ω once M is large; the fine part integrated against the prior; and the remainder chained across scales.
+- **Theorem A (σ ≥ σ̄) is the first milestone.** It covers the paper's σ₀ only when R ≤ 1, i.e. for noise sharply peaked at the quantile.
+
 ### 8.2 Other required changes, and where each is made
 
 | Item | Change | Where |
