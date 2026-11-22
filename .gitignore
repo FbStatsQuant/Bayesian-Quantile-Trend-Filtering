@@ -45,3 +45,6 @@ literature/*.pdf
 
 # ---- scratch ----
 **/scratch/__pycache__/
+
+# NFS silly-rename files (open-but-deleted files on NFS)
+.nfs*

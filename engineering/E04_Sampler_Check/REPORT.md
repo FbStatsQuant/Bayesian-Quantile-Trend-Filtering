@@ -6,7 +6,7 @@
 | Sampler | Used for | Verdict |
 |---|---|---|
 | **Banded Gibbs** (`E02_Rate_Sims/e02_lib.R::run_gibbs_frozen` + `banded_ls.cpp`), fixed and learned λ/σ | every E-02 arm | **Fit for E-02**, with change X: clamp-free exact latents are the default for runs launched from now on. All E-02 runs so far used the production clamps, which move E-02 quantities ≤ 2% (B2), so they stand. |
-| **Paper's Bayesian-PMALA** (`Simulations/Individual/…`, unmodified) | paper results; E-04 reference | **Fit, and the paper's reported results stand.** Not used for E-02's rate grids because of mixing (below). |
+| **Paper's Bayesian-PMALA** (`method/individual/…`, unmodified) | paper results; E-04 reference | **Fit, and the paper's reported results stand.** Not used for E-02's rate grids because of mixing (below). |
 | **Exact P-MALA kernel at fixed λ, σ** (`run_frozen`, the paper's C++ kernel) | validation reference only | **Fit as a reference** (exact, but slow). |
 
 ## 1. Right target
