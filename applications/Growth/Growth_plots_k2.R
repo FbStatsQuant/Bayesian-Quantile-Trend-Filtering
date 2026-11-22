@@ -5,7 +5,7 @@
 # (grey points = children, curves = posterior means of the five levels).  Also prints the in-sample calibration
 # (fraction of children below each curve) and the number of crossings of the posterior-mean curves.
 #
-# Run with the working directory set to this script's folder (Data Applications/Growth).
+# Run with the working directory set to this script's folder (applications/Growth).
 
 suppressPackageStartupMessages({ library(ggplot2) })
 

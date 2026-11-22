@@ -1,10 +1,10 @@
 # =============================================================================
 # Growth centiles (Fifth Dutch Growth Study): joint (non-crossing) P-MALA / Gibbs sampler, k = 2.
-# COPY of Simulations/Joint/Joint_Sampler_PMALA_Augmented.R (2026-10-13), adapted to repeated observations:
+# COPY of method/joint/Joint_Sampler_PMALA_Augmented.R (2026-10-13), adapted to repeated observations:
 #   theta_j lives on the G equally spaced 0.1-year age slots; child i sits at slot g_i.  Given z_j, the augmented likelihood of
 #   level j collapses to one Gaussian pseudo-observation per slot (agg_ar: weight = sum of a_i, centre = a-weighted mean of r_i);
 #   z_j and sigma_j stay per child.  The grid is regular, so D is the plain (k+1)-th difference and the C++ kernels
-#   (Simulations/Joint/prox_box_metric.cpp, which #includes Simulations/Individual/prox_admm_metric.cpp) are used UNCHANGED.
+#   (method/joint/prox_box_metric.cpp, which #includes method/individual/prox_admm_metric.cpp) are used UNCHANGED.
 #   With one observation per slot every function reduces to the original (agg_ar returns (a_i, r_i) exactly).
 #   Everything else (blocks, box, metric, ASIS, adaptation, priors, defaults) is the original's.  The original's simulation
 #   generator, paper-MSE table and test suites are not copied (the kernels they test are unchanged); the adaptation is checked
@@ -27,8 +27,8 @@
 #
 # Usage:  Rscript Growth_Joint_PMALA_k2.R [sex=boy|girl] [out=DIR] [draws=DIR] [kernels=DIR] [gibbs_iter=N] [gibbs_burn=N]
 #   kernels=DIR: folder with subfolders Joint/ (prox_box_metric.cpp) and Individual/ (prox_admm_metric.cpp), the layout of
-#   Simulations/ (frozen run snapshots; the two files must not share a folder, or sourceCpp also compiles the #included one);
-#   default: ../../Simulations/Joint and ../../Simulations/Individual relative to this script.
+#   method/ (or of a frozen source/ snapshot) (frozen run snapshots; the two files must not share a folder, or sourceCpp also compiles the #included one);
+#   default: ../../method/joint and ../../method/individual relative to this script.
 # =============================================================================
 
 suppressPackageStartupMessages(library(glmgen))
@@ -47,13 +47,13 @@ suppressPackageStartupMessages(library(glmgen))
       isTRUE(tryCatch(rstudioapi::isAvailable(), error = function(e) FALSE)))
     p <- .norm(tryCatch(rstudioapi::getActiveDocumentContext()$path, error = function(e) NA_character_))
   if (!is.na(p) && file.exists(file.path(dirname(p), target))) return(dirname(p))
-  rel <- file.path("Data Applications", "Growth")
+  rel <- file.path("applications", "Growth")
   up <- character(0); d <- .norm(getwd())
   while (!is.na(d) && !(d %in% up)) { up <- c(up, d); d <- dirname(d) }
   cand <- c(up, file.path(up, rel), file.path(c("~", "~/Documents", "~/OneDrive/Documents"), "Quantile Regression", rel))
   hit <- cand[file.exists(file.path(cand, target))]
   if (length(hit)) return(.norm(hit[[1L]]))
-  stop("Could not find ", target, ". Open this script from Data Applications/Growth, or setwd() there.")
+  stop("Could not find ", target, ". Open this script from applications/Growth, or setwd() there.")
 }
 script_dir <- .script_dir()
 
@@ -96,9 +96,9 @@ if (!is.null(kv$gibbs_iter)) gibbs_iter <- as.integer(kv$gibbs_iter)
 if (!is.null(kv$gibbs_burn)) gibbs_burn <- as.integer(kv$gibbs_burn)
 if (!is.null(kv$seed))       seed <- as.numeric(kv$seed)
 stopifnot(sex %in% c("boy", "girl"))
-kernel_root <- kv$kernels %||% file.path(dirname(dirname(script_dir)), "Simulations")
-joint_dir <- file.path(kernel_root, "Joint")
-ind_dir   <- file.path(kernel_root, "Individual")
+kernel_root <- kv$kernels %||% file.path(dirname(dirname(script_dir)), "method")
+joint_dir <- if (dir.exists(file.path(kernel_root, "joint"))) file.path(kernel_root, "joint") else file.path(kernel_root, "Joint")
+ind_dir   <- if (dir.exists(file.path(kernel_root, "individual"))) file.path(kernel_root, "individual") else file.path(kernel_root, "Individual")
 out_dir   <- kv$out   %||% file.path(script_dir, "results_joint_k2", sex)
 draws_dir <- kv$draws %||% out_dir
 

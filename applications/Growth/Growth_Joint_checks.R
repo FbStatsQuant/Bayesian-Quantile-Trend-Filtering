@@ -4,7 +4,7 @@
 #   G1 data loader            G2 per-slot aggregation (agg_ar)        G3/G4 bitwise parity with the original joint sampler
 #   G5 box kernel vs grid integration with repeated observations       G6 smoke run on the real data (boys, J = 5)
 # The code under test is source()d into its own environment (main block skipped); the original
-# Simulations/Joint/Joint_Sampler_PMALA_Augmented.R is parsed and only its function definitions (plus %||% and box_ctrl)
+# method/joint/Joint_Sampler_PMALA_Augmented.R is parsed and only its function definitions (plus %||% and box_ctrl)
 # are evaluated into a second environment.  Both see the compiled kernels, which load_box_cpp puts in globalenv.
 # =============================================================================
 t_start <- proc.time()[["elapsed"]]
@@ -12,7 +12,7 @@ t_start <- proc.time()[["elapsed"]]
 growth_dir <- if (!is.na(.this)) normalizePath(dirname(.this), winslash = "/") else
   normalizePath("C:/Users/felip/OneDrive/Documents/Quantile Regression/Data Applications/Growth", winslash = "/")
 new_file  <- file.path(growth_dir, "Growth_Joint_PMALA_k2.R")
-orig_file <- file.path(dirname(dirname(growth_dir)), "Simulations", "Joint", "Joint_Sampler_PMALA_Augmented.R")
+orig_file <- file.path(dirname(dirname(growth_dir)), "method", "joint", "Joint_Sampler_PMALA_Augmented.R")
 stopifnot(file.exists(new_file), file.exists(orig_file))
 
 # ---- code under test (main block guarded by sys.nframe() == 0L) -----------------------------------------------------------
