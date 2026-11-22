@@ -21,6 +21,14 @@
 
 ## 0. Bottom line
 
+> **Revision note (after the reviews).** Items 1–3 below are superseded by §8.
+> - **Primary target:** n^{−5/6} at λ ≍ n^{5/2}/V, the VP's min form. It is conditional on a new quadratic shift lemma (L4q), and is backed by exact-Gibbs evidence that the Laplace posterior mean equals the spline smoother.
+> - **Fallback:** n^{−3/4} at λ ≍ (n³/V)^{3/4}.
+> - **Likelihood side:** L8 is withdrawn and replaced. L9 is split, and L10 is now essential.
+> - **σ:** no σ restriction in the statement.
+>
+> The current statement is `STATEMENT_DRAFT.md` v2.
+
 1. **Best rate for the model as is (Stage A): ε²ₙ ≍ V\*^{1/4} n^{−3/4}, attained at λₙ ≍ (n³/V\*)^{3/4} ≈ n^{9/4}.** For general λ the rate is
 
    ε²ₙ(λ) ≍ max{ κ^{−5/6} λ^{−1/3}, (λ/κ) V\* n^{−3} },
@@ -302,6 +310,108 @@ See `Theory/T04_Template_Sweep/SHORTLIST.md`.
 The remaining small-ball step L3 has a classical Gaussian, continuous counterpart (Fill & Torcaso; Chen & Li).
 
 The genuinely new work is therefore concentrated on the **likelihood side**: the misspecified check loss (L6, L8) and the moment-free far-region argument (L9). Ghosal & van der Vaart (2007) is the template for the independent, non-identical structure. Castillo et al. (2015, Theorem 7) is the template for the conjectured sharpness remark.
+
+## 8. Revision after review (supersedes §0 items 1–3, the bias column of §5, and §6)
+
+Both reviews are in `reviews/`. The CEO's combined list of required changes and decisions has items A1–A4, B5–B6 and C7–C9. The current statement is `STATEMENT_DRAFT.md` v2.
+
+### 8.1 The bias law: the VP's n^{−5/6} claim (C7)
+
+**(a) Repeat of the VP's check, at larger n.** The setup is exact Park–Casella Gibbs with a Laplace prior, a Gaussian likelihood (κ = 16) and noiseless data. The truth is the kinked piecewise quadratic PQ (V = 26). All solves are done in long double, which reaches λ ≈ 10⁹ (`scratch/vp_bias_check*.out`, `spline_bias_scaling.out`).
+
+| n | a = 2.00 | a = 2.25 | a = 2.50 | a = 2.67 |
+|---|---|---|---|---|
+| 300 | 1.004 | 1.002 | 1.001 | 1.000 |
+| 600 | 1.005 | 1.001 | 1.000 | 1.000 |
+| 1200 | 1.000 | 1.004 | n/a | n/a |
+| 2400 | 1.005 | 0.995 | n/a | n/a |
+
+*Entries: Laplace posterior-mean bias² ÷ smoothing-spline bias² (a Gaussian prior with the same variance), at λ = n^a. "n/a" means numerically infeasible even in long double.*
+
+- **The VP's mechanism is confirmed.** For kinks below the threshold J ≲ n²λ^{−2/3}, the Laplace posterior mean *is* the linear (spline) smoother. The actual bias² is 2–3 orders of magnitude below the draft's ℓ₁-shift bound in every cell.
+- **The asymptotic slope at a ≥ 5/2 is not observable at n ≤ 5000.** Along λ = n^a, the spline bias² has local slopes:
+  - at a = 2: −2.6, −2.2, −1.2, −1.4, −1.8 over n = 600 to 19200, approaching the VP's −5/3;
+  - at a = 2.5: about −0.4, between the draft's −0.5 and the VP's −0.83;
+  - at a = 2.67: about −0.05.
+
+  The kernel width w/n ≈ (λ²/κ)^{1/6}/n is still about 15% of the domain at a = 2.5, n = 4800, so the bias is near its saturation value. The VP's asymptotic law (the classical linear-smoother bias of a θ″-kink, J²(w/n)⁵ with w ≍ (λ²/κ)^{1/6}) applies only once w/n ≪ the knot spacing, i.e. n ≳ 10⁵ at a = 5/2.
+- **Consequence for E-02.** At Engineering's n ≤ 32k, the a = 5/2 and 8/3 kinked-truth runs may not separate n^{−5/6} from the draft's law cleanly. At practical n the risk is still lowest near a = 2–9/4 (risk proxy at n = 4800: 1.4e−4 at a = 2, 1.2e−4 at a = 9/4, 6.8e−4 at a = 5/2). **This is a finite-n statement and does not contradict n^{−5/6}.**
+
+**(b) Is an ADH-type quadratic shift inequality available?** **Not off the shelf.** ADH's Proposition 2.11 gives the shift loss exponential in the Z-norm (ℓ₁ for p = 1), and they note that for p ≠ 2 the loss is not in the Hilbert norm Q. A new lemma L4q is needed. A plausible route:
+1. Symmetrize over ±h. Using AM–GM, ½[Π(h+B) + Π(−h+B)] ≥ Π(B)·E_{Π\|B} exp{−λΣⱼ(\|hⱼ\| − \|uⱼ\|)₊}.
+2. Under the (log-concave) conditional marginals, E(\|h\| − \|u\|)₊ ≈ λh²/2 for \|h\| ≪ 1/λ.
+3. That gives a cost of ≈ λ²‖h‖₂²/2, provided the conditioning on the small-ball set B does not inflate the near-zero density of individual uⱼ (B constrains only about J_eff of the m directions).
+
+**(c) Decision.** I **adopt the VP's min form** as the target statement:
+- the **primary rate** is n^{−5/6} at λ ≍ n^{5/2}/V, conditional on L4q;
+- the **fallback** is the draft's n^{−3/4}, via L4 alone, using the same likelihood-side lemmas.
+
+Both are in STATEMENT v2. The evidence for the primary version is (a) above together with classical spline-smoother bias theory; the evidence that it remains open is L4q itself.
+
+**Revised rate table** (fixed σ, V ≍ 1, λ = n^a):
+
+| a | ε² (primary, min form) | ε² (fallback, ℓ₁ shift) |
+|---|---|---|
+| 2 | n^{−2/3} | n^{−2/3} |
+| 15/7 | n^{−5/7} | n^{−5/7} |
+| 9/4 | n^{−3/4} | **n^{−3/4}** (best fallback) |
+| **5/2** | **n^{−5/6}** (best) | n^{−1/2} |
+| 8/3 | n^{−5/9} | n^{−1/3} |
+| 3 | inconsistent | inconsistent |
+
+### 8.2 Other required changes, and where each is made
+
+| Item | Change | Where |
+|---|---|---|
+| A1 | L8 withdrawn. Two replacement routes: L8-a (Fubini-integrated numerator on a sup-norm-bounded set; small-ω milestone) and L8-b (in-probability uniform bounds over nested structured sieves, chained across scales below ε, inside an Atchadé-type peeling over shells; any σ). L7's fine-scale set A_ε becomes a multiscale small-ball set. **Atchadé fits as the outer peeling structure of L8-b, not as a replacement for the chaining.** | STATEMENT v2; `REVISION_L6_L10.md` |
+| A2 | Proper Π_λ on u = Dθ, centred at u\* via L4. The flat c is integrated identically in N(B) and N(ℝⁿ). "Π(𝔅ᶜ)" now refers to Π_λ only. | STATEMENT v2 |
+| A3 | L9 split into L9-a ({Δ² > K}: convexity and log-concavity, moment-free), the shells Mε² < Δ² ≤ K (L8), and L9-c (sieve complement, with an explicit integrated-numerator bound). | STATEMENT v2 |
+| A4 | Dropped ‖θ\*‖∞ ≤ B, the "necessary" language and the lower-bound claims (now a conjecture). Knots: one remark. Corollary A2 uses P&C's exact tuning, λσ = c n^{15/7}(log n)^{1/7}. L2 is stated globally. κ = f/σ is explicit. "+n⁻¹" dropped. A polylog factor inside ε² with a fixed large M (no Mₙ). | STATEMENT v2 |
+| B5 | **No σ restriction** in Theorem A, as decided. Small ω appears only as the L8-a milestone. The VP's π/2 computation confirms that the MGF route would exclude the paper's own σ₀ regime. | STATEMENT v2 |
+| B6 | Primary: oracle tuning, uniform over 𝒫ₙ. Target: also uniform over the λ-window, as Stage B needs. | STATEMENT v2 |
+| C8 | **P&C Lemma 19 is off by n^{r−1}, verified** (`scratch/padilla_lemma19_check.out`). max\|pinv(D³)\| ≈ 0.017n². For a single kink, ‖P_R δ‖∞ = 0.0155 at every n, while the printed bound C·TV/n² → 0. The correct bound is ‖P_R δ‖∞ ≲ TV⁽³⁾(δ). This is harmless for P&C (V = O(1)) but not for us.<br>**L10 is now essential.** Its route is the interpolation bound ‖P_R δ‖∞ ≲ ‖δ‖ₙ^{4/5}TV^{1/5}: the exponent 4/5 is forced by scaling; the discrete version is to be proved.<br>**a₀:** with the two-level sieve's ℓ₁ radius n³ε²/λ and ε² ≈ λ^{−1/3}, sup-norm control holds when λ ≳ n^{3/2} (a₀ = 3/2, as the VP suggests). With the draws' full TV ≍ n³/λ it needs λ ≳ n^{9/5} (conservative a₀). Both lie below both optima.<br>**A′ (TV-ball sieve) is no longer the fallback.** With the corrected Lemma 19 it is not lower-risk. The fallback is now A-fb (ℓ₁ shift). | STATEMENT v2 |
+| C9 | **b₀ under the surviving law.** For λ\* ≍ n^{5/2}/V, the fixed point λb₀ ≈ a₀ + Lₙ(λ) needs b₀ ≲ J_eff(λ\*)/λ\* ≍ V^{4/3}n^{−7/3}, matching the VP's n^{−7/3}. The necessary Gamma-cap scale becomes b₀ ≲ n/λ\* ≍ V·n^{−3/2}; the external advisor's n^{−5/4} was for λ ≍ n^{9/4}.<br>**Engineering's b₀ ~ n⁻² check** should show λ ≈ 0.45·n^{9/4} (b₀-limited), which is consistent with both laws. Reaching n^{5/2} needs b₀ ≲ n^{−7/3}.<br>Kept as a **Stage-B candidate.** The self-tuning heuristic (b₀ → 0 ⇒ λ settles at the bias ≈ spread balance) now points at n^{5/2}/V; still unproved. | §5 (Stage-C plan) is superseded on the exponent |
+
+### 8.3 Responses to reviewers
+
+**External advisor**
+
+| # | Point | Response |
+|---|---|---|
+| 1 | L8 fails: the ε-ball fits the residual signs | **Accepted**; the counterexample is correct. Replaced by L8-a and L8-b (§8.2, A1). An explicit integrated-numerator bound outside the sieve is now L9-c. |
+| 1 | L7 uses an infinite measure | **Accepted.** Proper Π_λ, centring at u\*, and identical integration of c (A2). |
+| 1 | L3 needs an actual Laplace bound | **Accepted.** Still open; listed as doubt 4. The Gaussian half is classical. |
+| 1 | A′ inherits the outside-sieve problem | **Accepted.** A′ is demoted (C8). |
+| 2 | Upper margin; excess risk as the expectation of the loss difference; global forms | **Accepted.** (A2) is labelled sufficient; L2 is stated globally. |
+| 2 | Drop the sup-norm bound in (A3); (A4) is not necessary | **Accepted.** |
+| 2 | Shift-term tightness unknown; no power of σ; Corollary A2 needs the published tuning | **Accepted.** κ is carried explicitly, with no claimed σ-power beyond κ. Corollary A2 is restated. The shift term is now the min form, so tightness is moot for the primary version. |
+| 3.1 | ALD runs test the spread | Agreed. Pending E-02. |
+| 3.2 | Bounded-coordinate likelihood-ratio argument at small ω, plus a separate tail bound | **Adopted as the L8-a milestone and L10.** Per the CEO's decision (B5), not in the final statement. |
+| 3.3 | No "pays n^{3/28}" without a lower bound | **Accepted.** It is now a conjecture. Under the min form the gap to the mode would be n^{1/42}. |
+| 3.4 | Omit the knot-count rate | **Accepted.** One remark. |
+| 3.5 | b₀ ≲ n^{−5/4} necessary; the n⁻² calibration is unproved | **Accepted.** Recomputed for λ\* ≍ n^{5/2}/V: the necessary scale is b₀ ≲ n^{−3/2}, the heuristic n^{−7/3}. Stage-B candidate. |
+| 3.6 | Fixed radius; uniformity over the law class; oracle tuning first | **Accepted** as the primary version (B6). |
+| Suggested theorem | sup over 𝒫ₙ at λₙ = (n³/V₀)^{3/4} | Adopted in spirit, with the oracle λₙ updated to n^{5/2}/V under the min form. The fallback keeps (n³/V)^{3/4}. |
+
+**VP**
+
+| § | Point | Response |
+|---|---|---|
+| 1 | The bias term is an L4 artefact; n^{−5/6} at n^{5/2} | **Largely accepted.** The mechanism is confirmed numerically (Laplace posterior mean = spline, ratios 0.995–1.005, n ≤ 2400). The asymptotic slope at a = 5/2 is not reachable at n ≲ 10⁵. L4q is new and unproved, hence the primary and fallback structure (§8.1). |
+| 1 | "The posterior is slower" is a lower-bound claim | **Accepted.** Reworded; now a conjecture. |
+| 1 | The s^{1/7}n^{−6/7} sparse upside is a property of the mode | **Accepted.** Removed. |
+| 2 | Drop B; label (A2) as proof-driven; global L2; carry κ; drop +n⁻¹ | **Accepted**, all. |
+| 3 | P&C Lemma 19 is off by n^{r−1}; A′ is not lower risk | **Verified and accepted** (C8). |
+| 4 | L8 false; L9 reaches only a constant K; split it | **Accepted** (A1, A3). |
+| 4 | Do not accept σ ≥ σ̄ (π/2) | **Accepted** (B5). Verified: f/(τ(1−τ)) = 1.596/s, against ω = 1/σ₀ = 2.507/s for Gaussian noise at τ = ½. |
+| 4 | L10 essential; interpolation ‖·‖ₙ^{4/5}TV^{1/5} | **Accepted.** Route adopted; a₀ = 3/2 (two-level sieve) or 9/5 (conservative). |
+| 4 | L5 is not the issue, normalization is; L4 needs a quadratic version | **Accepted.** L5 merged into the normalization; L4q added. |
+| 5.1 | Read slopes only where nλ^{−1/3} ≳ 10 | Agreed; also passed to Engineering. |
+| 5.2 | Sub-exponential noise is not a sufficient fallback | **Accepted.** That fallback is removed. |
+| 5.3 | Positioning: "the posterior attains the linear-smoother rate" | **Adopted** for Corollary A1, conditional on L4q. |
+| 5.5 | b₀ ≍ n^{−7/3} | **Confirmed** by the fixed-point formula. Stage-B candidate (C9). |
+| 5.6 | Uniform over λ-window; fix c; polylog or Mₙ, not both; raise the lower window | **Accepted** (B6, A4, C8). |
+| 6 | Suggested Theorem A | **Adopted** as the target statement in STATEMENT v2, with κ made explicit and the primary/fallback split. |
 
 ## Appendix A: verdicts on the advisor heuristics
 

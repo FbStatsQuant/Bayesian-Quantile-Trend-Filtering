@@ -1,0 +1,4 @@
+n=100: max|pinv(D3)|=1.635e+02 (n^2/2=5.000e+03); kink: ||P_R d||_inf=0.0150, TV3=1.000, ratio sup/TV3=0.0150, Padilla bound C*TV3/n^2=1.00e-04
+n=200: max|pinv(D3)|=6.724e+02 (n^2/2=2.000e+04); kink: ||P_R d||_inf=0.0153, TV3=1.000, ratio sup/TV3=0.0153, Padilla bound C*TV3/n^2=2.50e-05
+n=400: max|pinv(D3)|=2.727e+03 (n^2/2=8.000e+04); kink: ||P_R d||_inf=0.0155, TV3=1.000, ratio sup/TV3=0.0155, Padilla bound C*TV3/n^2=6.25e-06
+n=800: max|pinv(D3)|=1.098e+04 (n^2/2=3.200e+05); kink: ||P_R d||_inf=0.0155, TV3=1.000, ratio sup/TV3=0.0155, Padilla bound C*TV3/n^2=1.56e-06

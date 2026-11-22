@@ -1,80 +1,85 @@
-# Stage-A theorem: draft statement for advisor review
+# Stage-A theorem: statement v2 (after both reviews)
 
-*BQTF Theory Department, 2026-11-22. Statement only, with no proofs. Supporting calculations: `MEMO.md` §4–5 and `scratch/`.*
+*BQTF Theory Department. v2, 2026-11-22; supersedes v1. Statement and lemma statements only, no proofs. The responses to the reviewers, and the evidence, are in `MEMO.md` §8. The reviews themselves are in `reviews/`.*
 
-## Setting
+## Setting and normalization
 
-- **Data.** Observations y₁, …, yₙ on the grid xᵢ = i/n. Fix a quantile level τ ∈ (0, 1). The target θ\* = (θ\*₁, …, θ\*ₙ) is the vector of true τ-quantiles, θ\*ᵢ = Fᵢ⁻¹(τ), where Fᵢ is the distribution function of yᵢ.
-- **Posterior (Stage A).** σ > 0 is fixed and λ = λₙ is deterministic:
+- **Data.** Observations y₁, …, yₙ are independent on the grid xᵢ = i/n. Fix τ ∈ (0, 1). The target θ\* = (Fᵢ⁻¹(τ))ᵢ is the vector of true τ-quantiles. All probability is under the true law P₀; the asymmetric Laplace distribution (ALD) is a working likelihood only.
+- **Coordinates.** D = D⁽³⁾ ∈ ℝ^{(n−3)×n}, with m = n − 3. Write θ = Nc + Su, where:
+  - c ∈ ℝ³ is the quadratic part, with N an orthonormal basis of the quadratics;
+  - u = Dθ ∈ ℝᵐ;
+  - S is a right-inverse of D;
+  - u\* = Dθ\*.
+- **Prior.** The prior is dc ⊗ Π_λ(du). Here Π_λ := Laplace(λ)^{⊗m} is a **probability** measure; the Lebesgue part on c is the only improper factor.
+- **Stage-A posterior.** σ > 0 and λ are fixed, and ω := 1/σ. For B ⊂ ℝⁿ,
 
-  Πₙ(dθ | y) ∝ exp{ −σ⁻¹ Σᵢ ρ_τ(yᵢ − θᵢ) − λₙ ‖D θ‖₁ } dθ on ℝⁿ.
+  Πₙ,λ(B | y) = N(B)/N(ℝⁿ), where N(B) = ∫∫_{Nc+Su ∈ B} exp{ −ω Σᵢ [ρ_τ(yᵢ − θᵢ) − ρ_τ(yᵢ − θ\*ᵢ)] } dc Π_λ(du).
 
-  Here D = D⁽³⁾ ∈ ℝ^{(n−3)×n} is the third-difference operator (k = 2), and ρ_τ is the check loss. This is the paper's posterior with σ and λ held fixed, and with the latent z integrated out.
-- **Equivalent basis form** (Tibshirani 2014, Lemma 2). θ = Hα with falling-factorial columns ‖h_j‖_{2,n} ≤ 1. The prior is flat on α₁, α₂, α₃ and iid Laplace(rate 2λₙ/n²) on α₄, …, αₙ.
-- **Loss.** Padilla's Huber-type loss, Δ²ₙ(v) = n⁻¹ Σᵢ min{|vᵢ|, vᵢ²}.
-- **Notation.** TV⁽³⁾(θ) := n²‖Dθ‖₁; ω := 1/σ. All probabilities and expectations are under the true law P₀; the ALD is a working likelihood only.
+  This is the paper's posterior with σ and λ frozen. N(ℝⁿ) < ∞ almost surely for n ≥ 4.
+- **Loss.** Δ²ₙ(v) = n⁻¹ Σᵢ min{|vᵢ|, vᵢ²}.
+- **Other notation.** TV⁽³⁾(θ) := n²‖Dθ‖₁, and κ := f/σ is the effective curvature, with f the lower margin constant in (A2).
 
 ## Assumptions
 
-| Label | Assumption | Why it is reasonable or checkable |
+| Label | Assumption | Why reasonable / checkable |
 |---|---|---|
-| **(A1) Design** | y₁, …, yₙ are independent, not necessarily identically distributed, on the equispaced grid. | This is the paper's setting. Padilla & Chatterjee use the same. |
-| **(A2) Two-sided local margin** | There are constants L, f, f̄ > 0 such that for all n, all i and all \|δ\| ≤ L: f\|δ\| ≤ \|Fᵢ(θ\*ᵢ + δ) − Fᵢ(θ\*ᵢ)\| ≤ f̄\|δ\|. | The lower half is exactly Padilla's Assumption A: the quantile is identified and has a curvature margin. The upper half holds for any density bounded near the quantile. It is checkable for every noise law in our simulations: Gaussian, Beta, mixed normal, t and Cauchy. **No moment conditions are imposed.** |
-| **(A3) Truth class** | TV⁽³⁾(θ\*) ≤ V\* and ‖θ\*‖∞ ≤ B, with V\* and B constants. Some θ\* may have discontinuities in θ″. | This is the bounded-variation class of Padilla's slow rate (r = 3) and of Tibshirani's F₂(C). It is the canonical class for trend filtering with k = 2. |
-| **(A4) Tuning** | σ > 0 is a fixed constant. λₙ is deterministic with (log n)^{C₀} ≤ λₙ ≤ n³/(log n)^{C₀}. | λ ≪ n³ is necessary, since otherwise the bias is O(1). λ → ∞ is necessary, since otherwise the spread is O(1). The rate-optimal choice lies well inside the window. |
+| **(A1)** | y₁, …, yₙ are independent (not necessarily identically distributed) on the equispaced grid. | This is the paper's setting; Padilla & Chatterjee use the same. |
+| **(A2)** | **Two-sided margin, uniform in i and n.** For all \|δ\| ≤ L: f\|δ\| ≤ \|Fᵢ(θ\*ᵢ + δ) − Fᵢ(θ\*ᵢ)\| ≤ f̄\|δ\|. | The lower half is Padilla's Assumption A. The upper half is *sufficient and proof-driven*: it excludes atoms at the quantile, and it gives the global bound mᵢ(δ) ≤ max(f̄/2, 1/L)·δ². It is checkable for every simulated noise law (Gaussian, Beta, mixed normal, t₂, Cauchy). **No moment conditions.** |
+| **(A3)** | TV⁽³⁾(θ\*) ≤ V, with V fixed (slow growth is allowed later). **No sup-norm bound**: the posterior law of θ − θ\* is exactly invariant to adding a quadratic to θ\*. | The bounded-variation class of Padilla's slow rate (r = 3), equivalently Tibshirani's F₂(C). |
+| **(A4)** | **Any** fixed σ > 0. λ is deterministic, in the window n^{a₀} ≤ λ ≤ n³/(V^{3/2}(log n)^{C₀}). The endpoints are *sufficient*, not necessary. | a₀ comes from the sup-norm lemma L10: a₀ = 3/2 via the two-level sieve (VP), or a₀ = 9/5 conservatively. The upper end keeps the bias term below 1. |
 
-## Theorem A (posterior contraction in Δ²ₙ, σ and λ fixed)
+The law class 𝒫ₙ = 𝒫ₙ(τ, L, f, f̄, V) is the set of all independent laws on the grid satisfying (A2) and (A3).
 
-Assume (A1)–(A4). There is a constant c ≥ 0 such that, for every sequence Mₙ → ∞,
+## Theorem A (target statement)
 
-  **E₀ Πₙ( Δ²ₙ(θ − θ\*) > Mₙ εₙ² | y ) → 0,** where **εₙ² = (log n)^c · [ λₙ^{−1/3} + λₙ V\* n^{−3} + n⁻¹ ].**
+Assume (A1)–(A4). Define
 
-The constants depend on (τ, σ, L, f, f̄, B, V\*). The rate is uniform over the class in (A3).
+  **ε²(λ) := (log n)^c · κ^{−5/6} · [ λ^{−1/3} + min{ κ^{−1/6}λV n^{−3}, V² λ^{5/3} n^{−5} } ].**
 
-**Corollary A1 (best rate).** With λₙ ≍ σ^{−1/8}(n³/V\*)^{3/4}, i.e. λₙ ≍ n^{9/4}:
+Then there are constants c, M depending only on (τ, L, f, f̄, σ) such that
 
-  εₙ² ≍ V\*^{1/4} n^{−3/4} (log n)^c.
+  sup_{P ∈ 𝒫ₙ} sup_{λ in the window} E_P Πₙ,λ( Δ²ₙ(θ − θ\*) > M ε²(λ) | y ) → 0.
 
-**Corollary A2 (frequentist tuning).** With λₙσ ≍ n^{15/7}, the MAP-optimal tuning of Tibshirani and of Padilla & Chatterjee:
+**Which version is primary.** The **primary** version, to be proved first, fixes the single oracle tuning λₙ = n^{5/2}/V and is uniform over 𝒫ₙ. The **target** version above, uniform over the λ-window, is the one Stage B needs. Inside the window the min always selects the second term, V²λ^{5/3}n^{−5}. The first term is what survives if the quadratic shift lemma (L4q) fails.
 
-  εₙ² ≍ n^{−5/7} (log n)^c.
+**Corollaries and remarks.**
+- **Corollary A1 (oracle tuning).** λₙ ≍ n^{5/2}/V gives ε² ≍ (log n)^c κ^{−5/6} V^{1/3} n^{−5/6}. This is the **linear-smoother minimax rate** for this class (Donoho–Johnstone, as cited in Tibshirani 2014). The minimax rate is n^{−6/7}.
+- **Corollary A2 (frequentist tuning).** At Padilla & Chatterjee's published tuning, λσ = c·n^{15/7}(log n)^{1/7} with c large enough for the given confidence level, ε² ≍ n^{−5/7} up to logs. At this tuning the MAP estimator attains n^{−6/7}(log n)^{1/7} (P&C Theorem 3).
+- **Corollary A3 (average squared error).** If L10 holds in P₀-probability, the same rate holds for ‖θ − θ\*‖²ₙ, since ‖δ‖²ₙ ≤ max(1, ‖δ‖∞)Δ²ₙ(δ).
+- **Fallback theorem A-fb (if L4q fails).** The same statement holds with the min replaced by its first term, κ^{−1/6}λVn^{−3}. Its best rate is κ^{−7/8}V^{1/4}n^{−3/4}, at λ ≍ (n³/V)^{3/4}. It uses the same likelihood-side lemmas.
+- **Remark (knots).** For piecewise quadratics with s knots, the knot count gives no gain under this prior: the spread term does not depend on the truth. No corollary is stated.
+- **Conjecture (lower bound, not claimed).** Πₙ,λ(Δ²ₙ < c·λ^{−1/3} | y) → 0. If this holds, the posterior is strictly slower than its mode at every λ.
 
-The posterior mode attains n^{−6/7} at this tuning, so the full posterior is slower.
+## Lemmas (revised and split)
 
-**Corollary A3 (average squared error, optional).** If, in addition, Πₙ(‖θ − θ\*‖∞ > C | y) → 0 (Lemma L10), then the same rate holds for n⁻¹‖θ − θ\*‖₂².
-
-**Theorem A′ (fallback, lower risk).** The same conclusion holds with λₙ^{−1/3} replaced by λₙ^{−2/7}. Its best rate is n^{−2/3}, at λₙ ≍ n^{7/3}.
-
-**Interpretation of the two rate terms.**
-- λ^{−1/3} is the posterior **spread**. It does not depend on θ\*: the Laplace prior leaves about n·λ^{−1/3} rough directions unshrunk. This is checked numerically. With a Gaussian likelihood and the exact Laplace prior, the slope is −0.335 to −0.347 against the predicted −1/3, and the spread does not depend on n.
-- λV\*n^{−3} is the **bias**, the shift cost of the truth. This is where the structure of θ\* enters.
-
-## Lemmas Theorem A relies on
+**Prior side.** All statements are under the normalized Π_λ and centred at u\*.
 
 | Lemma | Statement | Difficulty |
 |---|---|---|
-| L1 Basis | θ = Hα. The prior is flat on α₁, α₂, α₃ and iid Laplace(2λ/n²) on the rest. ‖h_j‖_{2,n} ≤ 1. | Trivial; verified numerically. |
-| L2 Excess risk | Under (A2), c₀Δ²ₙ(δ) ≤ n⁻¹M(θ\* + δ) ≤ (f̄/2)‖δ‖²ₙ when ‖δ‖∞ ≤ L. Also n⁻¹Σᵢ Var(ℓ_{θ\*+δ} − ℓ_{θ\*}) ≤ ‖δ‖²ₙ, where ℓ is the check loss. | Easy (Padilla Lemma 13). |
-| L3 Small ball | Write θ = (quadratic part) + Su, with u ~ Laplace(λ)^{⊗(n−3)} and P⊥ the projection that removes the quadratic part. Then −log Π(‖P⊥Su‖ₙ ≤ ε) ≤ C (n^{5/2}/(λε))^{2/5} for (log n)/λ ≤ ε ≤ n^{5/2}/λ. | Medium. The Gaussian continuous analogue is classical (twice-integrated Brownian motion, exponent ε^{−2/5}; Chen & Li, Fill & Torcaso 2004). The grid and Laplace versions are verified numerically. |
-| L4 Shift | Π(u\* + B) ≥ e^{−λ‖u\*‖₁}Π(B) for any set B. | Trivial. |
-| L5 Improper part | The posterior is proper for n ≥ 4. The flat quadratic part costs O(log n) in the evidence bound. | Low–medium. |
-| L6 Evidence lower bound (misspecified) | P₀( ∫ exp{−ω Σᵢ [ρ_τ(yᵢ − θᵢ) − ρ_τ(yᵢ − θ\*ᵢ)]} Π(dθ) ≥ e^{−C n εₙ²} ) → 1. | Medium. Syring–Martin Lemma 1 plus L2–L5. |
-| L7 Sieve | Let A_ε = {u : ‖P⊥Su‖ₙ ≤ ε} (the small-ball set of L3), and let B₂ and B₁ be the unit ℓ₂ and ℓ₁ balls in ℝⁿ⁻³. Define the two-level set 𝔅ₙ = θ\* + {quadratics} + S(A_ε + R₂B₂ + R₁B₁), with R₂ ≍ (nεₙ²)^{1/2}/λ and R₁ ≍ nεₙ²/λ. Then Π(𝔅ₙᶜ) ≤ e^{−C′nεₙ²}. | Medium-low. This is Agapiou, Dashti & Helin (2021), Proposition 2.15 (Talagrand's two-level inequality, p = 1), applied in falling-factorial coordinates. Their Theorem 3.1 converts it into the sieve and prior-mass conditions. |
-| L8 Uniform excess loss | With P₀-probability → 1, uniformly over θ ∈ 𝔅ₙ with Δ²ₙ(θ − θ\*) ≥ Mεₙ²: n⁻¹Σᵢ[ρ_τ(yᵢ − θᵢ) − ρ_τ(yᵢ − θ\*ᵢ)] ≥ ½c₀Δ²ₙ(θ − θ\*). This replaces Hellinger tests; its proof uses symmetrization, contraction and localized widths, as in Padilla's Theorem 7 and Proposition 2. | Medium–high. |
-| L9 Far region | Πₙ(𝔅ₙᶜ ∪ {Δ²ₙ > Mεₙ²} | y) → 0 without MGF or moment bounds. It uses convexity of the empirical check risk and log-concavity of Πₙ. | **High. The key new step.** |
-| L10 ℓ∞ control | Πₙ(‖θ − θ\*‖∞ > C | y) → 0. Needed only for Corollary A3. | Medium. |
+| **L1 (basis)** | θ = Hα (falling factorial, Tibshirani's Lemma 2). Π_λ corresponds to iid Laplace(2λ/n²) on α_{4:n}. | Trivial; verified numerically. |
+| **L3 (small ball)** | −log Π_λ(‖P⊥Su‖ₙ ≤ ε) ≤ C(n^{5/2}/(λε))^{2/5} for (log n)/λ ≤ ε ≤ n^{5/2}/λ. | Medium. The Gaussian case is classical (twice-integrated Brownian motion; Fill & Torcaso; spectral method of Bach & Klein). **The Laplace case is open**: the rotation destroys independence. Verified numerically. |
+| **L4 (ℓ₁ shift)** | Π_λ(u\* + B) ≥ e^{−λ‖u\*‖₁}Π_λ(B) for every B. This is Agapiou–Dashti–Helin's Prop. 2.11 with p = 1. | Trivial. |
+| **L4q (quadratic shift, new)** | For symmetric convex B of small-ball type and ‖h‖∞ ≤ 1/λ: Π_λ(h + B) ≥ exp(−Cλ²‖h‖₂²)Π_λ(B). It is applied with h = D(θ\* mollified over w = (λ²/κ)^{1/6} grid points). | **Medium–high; decides n^{−5/6} versus n^{−3/4}.** Not in ADH: they note the p ≠ 2 shift loss is in the Z-norm. Route: symmetrize over ±h (AM–GM), giving Π(h + B) ≥ Π(B)·E_{Π\|B} exp{−λΣⱼ(\|hⱼ\| − \|uⱼ\|)₊}, then use the near-zero density of the log-concave conditional marginals. |
+| **L5 (quadratic part)** | The flat coordinates c are integrated with the same Lebesgue normalization in N(B) and in N(ℝⁿ). | By construction. |
+| **L7 (sieve)** | For Ã = A_ε + R₂B₂ + R₁B₁ (ADH Prop. 2.15, p = 1): Π_λ((u\* + Ã)ᶜ) ≤ e^{λ‖u\*‖₁}·e^{−r/K}/Π_λ(A_ε). The fine-scale component A_ε is a **multiscale** small-ball set, with entropy controlled at every scale below ε. | Medium. |
 
-Theorem A′ replaces L7 and L8 with a single TV-ball sieve, {TV⁽³⁾(θ − θ\*) ≲ n³/λ}, and Padilla's Proposition 2 width bound.
+**Likelihood side.**
 
-## Main open doubts (feedback especially welcome)
+| Lemma | Statement | Difficulty |
+|---|---|---|
+| **L2 (excess risk)** | For all δ: c₀Δ²ₙ(δ) ≤ n⁻¹M(θ\* + δ) ≤ C₁ min{‖δ‖₁/n, ‖δ‖²ₙ}, globally, and n⁻¹Σᵢ Var Xᵢ ≤ ‖δ‖²ₙ. Here Xᵢ = ρ_τ(yᵢ − θᵢ) − ρ_τ(yᵢ − θ\*ᵢ) and M = Σᵢ E₀Xᵢ. | Easy (P&C Lemma 13 plus (A2)). |
+| **L6 (evidence)** | P₀( N(ℝⁿ) ≥ ε³ exp{−C nκε²} ) → 1, with the prior mass from L3, L4/L4q and L5. | Medium. |
+| **L8 (shells)** | Π(Mε² < Δ²ₙ ≤ K, inside the sieve | y) → 0. **Route L8-a (milestone, small ω only):** a Fubini-integrated numerator bound on {‖θ − θ\*‖∞ ≤ Δ}, with no supremum and no entropy. **Route L8-b (target, any σ):** in-probability uniform bounds on the empirical excess loss over nested structured sieves, chained across scales below ε (VP), inside an Atchadé-type peeling over the shells. | **High.** The old uniform-over-ε-ball version is withdrawn: the reviewers' counterexample shows the ε-ball fits the residual signs. |
+| **L9-a (far region)** | Π(Δ²ₙ > K | y) → 0 for a constant K, by convexity of the empirical risk plus log-concavity of Πₙ. Moment-free. | Medium. Log-concavity in dimension n reaches only a constant K, not Mε². |
+| **L9-c (sieve complement)** | Π(outside the sieve | y) → 0. This needs an explicit bound on the integrated numerator outside the sieve, not just small prior mass. | High. |
+| **L10 (sup-norm)** | Π(‖θ − θ\*‖∞ > Δ | y) → 0. Route: the interpolation bound ‖P_R δ‖∞ ≲ ‖δ‖ₙ^{4/5}·TV⁽³⁾(δ)^{1/5} on localized shells. This sets a₀. | **High; essential.** It is needed for L8-a, for Corollary A3 and for a₀. P&C's Lemma 19 is off by n^{r−1} as printed (verified); the correct bound is ‖P_R δ‖∞ ≲ TV⁽³⁾(δ). |
 
-1. **The ALD spread law is not yet verified.** The λ^{−1/3} spread is confirmed only with a Gaussian likelihood. Engineering's E-02 runs, testing the actual ALD posterior, are due this week. If the spread slope differs, the n^{−3/4} statement falls back to Theorem A′.
-2. **Lemma L9 (far region without moments).** This step is the main risk, and possibly the main contribution. It is not yet clear whether it needs σ large, i.e. the learning rate ω = 1/σ small, as the Gibbs-posterior MGF route does. If it does, (A4) gains the condition "σ ≥ σ̄(f, f̄, τ)". If heavy tails cannot be handled, the fallback adds a sub-exponential noise assumption.
-3. **Sharpness and positioning.** We believe n^{−3/4} is the true posterior rate for this prior. We do not intend to prove a lower bound in Stage A, so it would appear as a remark. Is it acceptable to headline a theorem whose rate is *below* minimax (n^{−6/7})? The honest framing would be "the full posterior pays n^{3/28} relative to the mode".
-4. **Fast-rate class not covered.** For piecewise quadratics with s knots, the theorem gives only s^{1/4}n^{−3/4}. Should it be stated at all?
-5. **Relation to the paper's actual prior.** Stage A fixes σ and λ. With the paper's Gamma(1, b₀) prior and b₀ fixed, our heuristics give λ ≍ n^{3/4} and a rate of only about n^{−1/4}. Reaching the Stage-A rate adaptively appears to need b₀ ≲ n^{−2}. This affects how Stage B is framed.
-6. **Smaller points.**
-   - Should V\* be allowed to grow with n?
-   - Should we state a pointwise or a uniform version?
-   - The polylog power c is unknown.
-   - The lower window could perhaps be raised to n ≤ λₙ if needed. That costs nothing at the optimum.
+## Main open doubts
+
+1. **L4q (quadratic shift).** It decides between the primary rate n^{−5/6} and the fallback n^{−3/4}.
+   - *Evidence for n^{−5/6}:* in my exact-Gibbs check, the Laplace posterior-mean bias² equals the smoothing-spline bias² to within 0.5%, at n = 300–2400 and λ = n² to n^{2.67}. In every cell it is far below the ℓ₁-shift bound (MEMO §8).
+   - *Decisive test:* Engineering's kinked-truth runs at a ∈ {5/2, 8/3}. Under n^{−5/6}, the risk keeps falling until a = 5/2; under n^{−3/4}, it rises past 9/4.
+2. **L8-b and L9-c (likelihood side for arbitrary σ).** These are the main proof risk. L8-a gives a small-ω milestone only.
+3. **L10 and a₀.** The interpolation route is plausible but unproved.
+4. **L3 in the Laplace case.** Open; it is needed by both versions.
+5. **ALD spread law.** Confirmed with a Gaussian likelihood; E-02 is testing the ALD itself.
