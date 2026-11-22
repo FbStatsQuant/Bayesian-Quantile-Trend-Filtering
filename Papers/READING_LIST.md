@@ -13,6 +13,11 @@ One line per paper: what it gives us, and which section of the T-03 memo uses it
 - `Sriram_2013_PosteriorConsistencyMisspecifiedALD.pdf`. Sriram, Ramamoorthi & Ghosh (2013, Bayesian Anal.), *Posterior consistency of Bayesian quantile regression based on the misspecified ALD*. The only consistency result under a misspecified ALD (parametric). Its §6 identifies σ₀ as the KL projection for a learned σ. Used in §2 and §3 (σ stage).
 - `Large Prior.pdf`. Bedoya & Li, *Large series priors for adaptive and optimal Bayesian nonparametric regression*. The house template: the style of Assumptions 1–3 and of Theorem 1, Corollary 1. Our prior is a large series prior with a Laplace coefficient prior that fails its WG3–WG5 conditions. Used in §1 and §6.
 
+## Supporting proof templates (T-04 shortlist)
+
+- `Atchade_2017_Quasi_Posterior_Contraction.pdf`. Atchadé (2017, Ann. Statist.), *On the contraction properties of some high-dimensional quasi-posterior distributions*. A pathwise good-event proof: a score event, curvature and lower-bound events, and peeling over annuli for the far region. There are no tests and no KL neighbourhoods. It is the architecture for our likelihood-side lemmas L6, L8 and L9, with Knight's identity in place of its differentiability assumption (H2). Used in §6 and §7.
+- `Bach_Klein_2022_Bayesian_PSpline_Rates.pdf`. Bach & Klein (2022, arXiv 2109.04288), *Posterior concentration rates for Bayesian penalized splines*. Gaussian difference-penalty prior, improper on polynomials, with a smoothing-variance hyperprior. It gives a proper-ization of the polynomial part (L5), Demmler–Reinsch spectral prior-mass bounds (the Gaussian half of L3), and hyperprior balance condition A5 (template for the Stage-C λ prior). Used in §4, §5 and §6.
+
 ## Laplace-prior behaviour: the main risk and the positive results
 
 - `Castillo_2015_BayesianLinearRegressionSparsePriors.pdf`. Castillo, Schmidt-Hieber & van der Vaart (2015, Ann. Statist.), *Bayesian linear regression with sparse priors*. Theorem 7 shows that the Bayesian-lasso (Laplace) posterior is suboptimal although its mode is optimal. This is the template for our spread floor λ^{−1/3} and the main risk to any fast-rate claim. Used in §0, §4, §5 and §7.
