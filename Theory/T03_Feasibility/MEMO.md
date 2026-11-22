@@ -429,6 +429,25 @@ A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin 
 
 **Conclusions that rest only on exact or deterministic computations.** The small-ball exponent, the Gaussian-analogue spread law, σ̄ and R, the Lemma 19 correction, and the spline-bias scaling. These stand regardless of the sampler checks.
 
+### 8.1d Learned λ: the fixed-point formula holds, but it is not a bias-law test
+
+*Source: E-02 lamlearn, lamlearn2 and lamlearn3 (Engineering's sampler). Provisional until E-04.*
+
+**The fixed-point formula** λ ≈ (0.27·n·κ^{1/6}/b₀)^{3/4} **is confirmed quantitatively.**
+- **Quadratic truth, κ = 4, b₀ = n⁻²:**
+  - predicted λ ≈ 5.3×10⁵, 1.2×10⁷ and 2.7×10⁸ at n = 500, 2k and 8k; observed medians 4.35×10⁵, 1.16×10⁷ and 2.45×10⁸ (ratios 0.82, 0.97, 0.90);
+  - slope 2.257 [2.233, 2.278] against a predicted 9/4;
+  - the same λ̄ (within 2%) from λ₀ = m and from λ₀ = 0.3·n^{9/4}, with ESS(log λ) 536–1310;
+  - λ‖Dθ‖₁/m = 0.998–1.000, against a predicted ≈ 0.995+.
+- **sin and PQ at b₀ = 1 and 10⁻³:** slope 0.745–0.754, with λ̄ ≈ 60 and 1.0×10⁴ at n = 500, as predicted. The paper's own Gamma(1, 1) value (50–75) is independent confirmation.
+
+**The learned-λ λ̄ does not discriminate the bias law** (this corrects §5 and my earlier heuristic). The Gamma conditional sees λE‖Dθ‖₁ = m − L, i.e. the ℓ₁ norm of the draws, not bias².
+- **Kinked truth.** A kink coefficient |u\*ⱼ| ≈ J/n² is far above the prior scale 1/λ (≈ 10⁻⁷ against 10⁻⁹ at n = 8k), so the draws carry it at full ℓ₁ cost. Then λ̄ ∝ (n³/V)^{3/4} whatever the bias law. Observed at b₀ = n^{−5/2}: PQ slope 2.13 [2.03, 2.27], and the PQ/sin ratio falls to 3.7 [3.1, 4.4] at n = 8k, against an ℓ₁ prediction of 3.8.
+- **Smooth truth.** The entries |u\*ⱼ| ≈ V/n³ are dense and ≪ 1/λ, so they cost only quadratically (E\|u\* + v\| − E\|v\| ≈ λu\*²/2) and the self-tuned λ grows faster. Observed sin slope 2.49 [2.45, 2.54]; its n = 8k cells mix poorly.
+- **The bias law** is decided only by the Gaussian-twin ratios and the calibrated PQ centre-bias slopes (§8.1a).
+
+**Stage-C consequence.** With learned λ and b₀,ₙ ↓ 0, *kinked* truths self-tune to λ ≍ (n³/V)^{3/4} ≈ n^{9/4}. At that λ the rate is spread-limited at n^{−3/4}, **even if the oracle rate is n^{−5/6}**. Smooth truths self-tune higher and can do better. A Stage-C theorem should therefore target n^{−3/4} uniformly over the BV class, with n^{−5/6} at the oracle tuning only. This is a natural split between "learned" and "oracle" statements.
+
 ### 8.2 Other required changes, and where each is made
 
 | Item | Change | Where |
