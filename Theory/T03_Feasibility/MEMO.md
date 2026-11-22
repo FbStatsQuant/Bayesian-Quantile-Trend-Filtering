@@ -115,6 +115,41 @@ The lower half is Padilla's Assumption A: it gives identification and the margin
 
 ---
 
+## 3a. Frequentist-to-Bayesian translation (primary blueprints: Padilla & Chatterjee, Tibshirani 2014)
+
+Felipe's steering: Padilla & Chatterjee (P&C) and Tibshirani (2014) are the primary blueprints; Atchadé (2017) and Bach & Klein (2022) are supporting templates. The two tables below map every frequentist step to our lemma (§6) and state what changes. "Verbatim" means the statement and proof should carry over with notation changes only.
+
+**Padilla & Chatterjee (risk bounds for quantile trend filtering, r = 3):**
+
+| P&C step | Our lemma | What carries over | What changes |
+|---|---|---|---|
+| Assumption A (linear CDF growth at θ\*) | (A2), lower half | Verbatim: identification and margin. | Add the **upper** half. The posterior needs prior mass of excess-risk neighbourhoods, which a minimizer never needs. |
+| Lemma 13: M(θ\* + δ) ≥ c₀Δ²(δ); Remark 11 (no moments) | L2 | Verbatim lower bound. Bounded loss differences, so no moments. | Add M ≤ (f̄/2)‖δ‖² and the variance bound v ≤ ‖δ‖²ₙ, used by the Chebyshev step of the evidence bound. |
+| Lemma 9, basic inequality M̂(θ̂) ≤ 0 | L6 (evidence lower bound) | — | **No analogue.** The posterior does not minimize M̂. It is replaced by D_n ≥ e^{−Cnε²}, which needs prior mass (L3, L4, L5). This step is purely Bayesian. |
+| Lemmas 10–11 (symmetrization; Ledoux–Talagrand contraction for the 1-Lipschitz loss), Markov | L8 (uniform excess-loss event) | Same tools: P(sup over shell of (M − M̂) > ½c₀t²) ≤ C·RW(shell)/t². | The supremum is over the **sieve shell** 𝔅ₙ ∩ {Δ² ≈ t²}, not the TV ball K_V. The event must hold uniformly over a region carrying posterior mass, not just at one estimator. Markov still suffices, since we need probability → 0, not exponential. |
+| Prop. 1 / Thm 7, convexity line-segment trick (the point θ̃ on [θ\*, θ̂] with M(θ̃) = t²) | L9 (far region) | Convexity of M̂ along segments from θ\* transfers a lower bound on the shell {Δ² = t²} to every θ beyond it. The sieve 𝔅ₙ is convex and contains θ\*, so it is star-shaped and segments stay inside. | We need M̂(θ) ≳ t² for **all** θ in the far region, not only at θ̂, plus control of 𝔅ₙᶜ (prior mass, ADH). That is where log-concavity and Atchadé's peeling enter. |
+| Lemma 16 (R⊥ = polynomials of degree < r), Lemmas 18, 20, 21 (null-space part ‖P_{R⊥}δ‖∞ ≲ n^{−1/2}·(…)) | L5 and the null-space part of L8 | **Verbatim.** Our flat quadratic part *is* P&C's R⊥ (dimension 3 for r = 3). Their T₁ term bounds its contribution to the width. | The prior is flat on R⊥, so the evidence bound must integrate this 3-dimensional part (Bach & Klein's proper-ization). |
+| Lemma 17, ‖δ‖² ≤ max(‖δ‖∞, 1)Δ²(δ); Lemmas 19, 22 (‖P_Rδ‖∞ ≲ ‖D⁽ʳ⁾δ‖₁; Δ²(P_Rδ) ≲ t²) | Δ²-to-ℓ² conversion inside L8; Corollary A3 | Verbatim for the ℓ₁ part of the sieve, S(R₁B₁), which is a TV ball of radius n²R₁. | **The ℓ₂ part of the sieve, S(R₂B₂), has no ‖D³δ‖₁ control, so Lemma 19 does not apply.** Its ℓ∞ footprint is ≍ R₂n^{5/2} ≍ n^{3/8} at the optimal tuning. ℓ∞ control on Δ²-bounded elements of this ellipsoid needs a new argument. ⚠ This is the likely weak point of L8 as drafted. |
+| Prop. 2, the width of {TV⁽³⁾(δ) ≤ 2V, Δ²(δ) ≤ t²} via Guntuboyina et al. (2020) Lemma B.1 | L8 width bound, ℓ₁ part | Verbatim with V′ = n³R₁ ≍ n³ε²/λ. That gives the exponent ε² ≳ λ^{−2/5} (non-binding). | The ellipsoid part needs a separate Gaussian-width bound, about t·√(J_eff log n), via the Demmler–Reinsch spectrum (Bach & Klein / Xiao). |
+| Thm 3 (PQTF slow rate): Prop. 3 restricted set A, built from the score uᵢ = τ − 1{yᵢ ≤ θ\*ᵢ} (Lemmas 23–25) | Atchadé's score event E_{n,0} inside L8/L9; the sieve replaces A | The bounded score u, with sup over ‖D⁽ʳ⁾x‖₁ ≤ 1 of u′x (Lemma 24), gives the score event without moments. | P&C localize via the penalty (optimality of θ̂). We localize via the **prior** (the ADH two-level sieve). The roles of λ differ: penalty ≍ n^{15/7} there, prior rate ≍ n^{9/4} here. |
+| Thm 4 (fast rate; Ortelli–van de Geer effective sparsity) | — | Not transferable. | The Laplace posterior has a truth-independent spread floor λ^{−1/3} (§4). Fast rates are a remark only (§5). |
+| §5, multiple quantiles under an ordering constraint | B3 (joint, Stage-B preview) | The structure: a product of check losses on an ordered cone. | The truncated product posterior needs prior mass of the truncated set. That is fine when the true quantiles are separated by more than ε. |
+
+**Tibshirani (2014, trend filtering):**
+
+| Tibshirani step | Our use | What changes |
+|---|---|---|
+| Lemma 2, lasso form θ = Hα (falling factorial) | L1, verbatim (verified numerically). Our prior is iid Laplace(2λ/n²) on α_{4:n}. | Nothing. The basis is the prior's natural coordinate system: ADH applies in α. |
+| Penalty scaling (n^k/k!)λ_TF, λ_TF ≍ n^{1/(2k+3)} ⇒ n^{15/7} on ‖D³θ‖₁ | The MAP correspondence (MAP penalty = λσ); Corollary A2 | The posterior-optimal λ is n^{9/4}, not n^{15/7}. |
+| §5.1 minimax rate n^{−(2k+2)/(2k+3)} = n^{−6/7} over F₂(C); linear smoothers suboptimal | Benchmark for Theorem A | Our posterior rate n^{−3/4} is above minimax: the full posterior pays a factor n^{3/28}. |
+| Embedding (33): Besov B^{k+1}₁,₁ ⊂ F_k(C) | Links our class (A3) to the B₁₁ scale, where Laplace-type priors are known to be optimal when scaled (Agapiou–Wang, ADH) | Supports the plausibility of L3 and L7; it is not used in a proof step. |
+| Thm 1 / Lemma 3 (trend filtering ≈ locally adaptive regression splines via lasso stability, ‖G − H‖∞) | Not needed, since our prior is defined through H | Possibly useful for the fast-rate remark (spline approximation with few knots). |
+| (5), df = E[#knots] + k + 1 | Interpretation: the posterior's effective dimension J_eff ≍ nλ^{−1/3} is the Bayesian analogue of df | Heuristic only. |
+
+**Supporting templates.**
+- **Atchadé (2017)** supplies the overall pathwise architecture: the score, curvature and lower-bound events plus peeling. It puts P&C's L8 ingredients and our L6 into one deterministic-on-event argument.
+- **Bach & Klein (2022)** supplies the Gaussian prior-mass mechanics for difference priors with an improper polynomial part (L3 Gaussian half, L5), and a hyperprior-balance condition for Stage C.
+
 ## 4. Prior mass: small-ball and shift (verified)
 
 Write θ = Nc + Su, where u = Dθ has iid Laplace(λ) entries, S is a right-inverse of D (thrice summation, the falling-factorial columns), and N spans the quadratics. The quadratic part is optimized out (flat prior).
