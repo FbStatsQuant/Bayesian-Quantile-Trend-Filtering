@@ -7,7 +7,7 @@ df <- do.call(rbind, lapply(R, function(r) data.frame(base = r$baseline, tau = r
   drift = r$drift, mse = r$mse, sec = r$seconds, L0 = r$L0, acc = r$acc_post)))
 df <- df[order(df$base, df$tau, df$b0, df$n, df$seed), ]
 options(width = 250); print(format(df, digits = 3), row.names = FALSE)
-write.csv(df, "/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims/free_check/free_check_table.csv", row.names = FALSE)
+write.csv(df, "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims/free_check/free_check_table.csv", row.names = FALSE)
 cat("\nTotal CPU seconds (sampler):", sum(df$sec), "\n")
 a <- aggregate(cbind(lam, lamsig) ~ base + tau + n, subset(df, b0 == 0.01), mean)
 for (b in unique(a$base)) for (t in unique(a$tau)) { s <- subset(a, base == b & tau == t)

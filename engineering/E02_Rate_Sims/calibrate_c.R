@@ -1,6 +1,6 @@
 # E-02: calibrate c once at n0 = 500: Lam* = argmin_Lam mean_seeds Delta2(MAP_Lam - theta*) for the smooth truth (sin),
 # Gaussian noise, tau = 0.5.  Then lambda*sigma = c_a n^a with c_a = Lam* / n0^a, so every a-curve passes through Lam* at n0.
-source("/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims/e02_lib.R")
+source("/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims/e02_lib.R")
 n0 <- 500; grid <- exp(seq(log(10), log(1e5), length.out = 41)); seeds <- 1:10
 r <- withCallingHandlers(sapply(grid, function(L) mean(sapply(seeds, function(s) { d <- make_data("sin", "gauss", 0.5, n0, s); Delta2(qtf_map(d$y, 0.5, L) - d$theta_star) }))),
        warning = function(w) { if (grepl("rq.fit.sfn|tiny", conditionMessage(w))) invokeRestart("muffleWarning") })

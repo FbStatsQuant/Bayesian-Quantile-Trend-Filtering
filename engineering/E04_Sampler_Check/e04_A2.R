@@ -1,6 +1,6 @@
 # E-04 part A2: exact check at tau = 0.9 (n = 4) with honest Monte Carlo errors (all draws kept, batch means) and a fine grid
 # accumulated in chunks (no 4-d array in memory).  Also tau = 0.5, lambda = 5 as a control.
-E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims")
+E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
 source(file.path(E02_DIR, "e02_lib.R")); load_kernel()
 bm_se <- function(v, nb = 100) { b <- floor(length(v) / nb); sd(colMeans(matrix(v[1:(b * nb)], b, nb))) / sqrt(nb) }
 y <- c(0.1, 0.5, -0.2, 0.4); n <- 4

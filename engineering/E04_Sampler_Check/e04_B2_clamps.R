@@ -1,7 +1,7 @@
 # E-04 part B2 (Astra findings 1-2): do the latent clamps change E-02's quantities?  Production Gibbs (paper's z safeguards +
 # 1/s cap) vs clamp-free exact latents, on identical data and identical MCMC seeds, in the cells where clamps could bind:
 # Cauchy noise, the largest penalties, an asymmetric quantile, and a moderate control.  Also reports clamp-hit rates.
-E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims")
+E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
 OUT <- file.path(Sys.getenv("E04_OUT", "/home/fb31/BQTF_runs/E04"), "B2"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
 source(file.path(E02_DIR, "e02_lib.R")); load_kernel()
 cal <- readRDS(file.path(E02_DIR, "calibration.rds"))

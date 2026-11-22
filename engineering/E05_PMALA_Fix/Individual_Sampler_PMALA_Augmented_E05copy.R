@@ -1,4 +1,4 @@
-# E-05 COPY of Simulations/Individual/Individual_Sampler_PMALA_Augmented.R (the original is never edited).
+# E-05 COPY of method/individual/Individual_Sampler_PMALA_Augmented.R (the original is never edited).
 # Only change: the curvature-metric cap 1e8 is read from getOption("bqtf.metric_cap", 1e8) (default = original behaviour).
 # =============================================================================
 # Bayesian quantile trend filtering: proper P-MALA (Pereyra 2016) on the
@@ -137,7 +137,7 @@ tf_control   <- trendfilter.control.list(max_iter = 2000L, obj_tol = 1e-8)   # i
             file.path(c("~", "~/Documents", "~/OneDrive/Documents"), "Quantile Regression", rel))
   hit <- cand[file.exists(file.path(cand, target))]
   if (length(hit)) return(.norm(hit[[1L]]))
-  stop("Could not find ", target, ". Open this script from Simulations/Individual, or setwd() there.")
+  stop("Could not find ", target, ". Open this script from method/individual, or setwd() there.")
 }
 script_dir   <- .script_dir()
 cpp_src      <- file.path(script_dir, "prox_admm_metric.cpp")

@@ -6,7 +6,7 @@
 # theta_i at i = n/4, n/2, 3n/4; plus P-MALA acceptance and posterior summaries (to cross-check that both target the same law).
 #   Rscript pmala_vs_gibbs.R      (Slurm array aware; one .rds per task under $E02_OUT/grid/pvg/)
 args <- commandArgs(trailingOnly = TRUE)
-E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims")
+E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
 SMOKE <- Sys.getenv("E02_PVG_SMOKE") == "1"            # quick end-to-end check: short chains, n = 500, seed 1
 OUT <- file.path(Sys.getenv("E02_OUT", "/home/fb31/BQTF_runs/E02"), "grid", if (SMOKE) "pvg_smoke" else "pvg"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
 cores <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "2"))

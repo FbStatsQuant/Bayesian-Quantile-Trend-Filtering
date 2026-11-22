@@ -3,7 +3,7 @@
 # the quadratic null space; d = D'/||D||), so the Laplace term is lambda ||D|| |t| and t is gridded at the 1/lambda scale while
 # alpha uses a coarse 3-d grid.  Compared with long runs of the banded Gibbs sampler (production and exact latents) and P-MALA,
 # with batch-means MC errors.
-E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims")
+E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
 source(file.path(E02_DIR, "e02_lib.R")); load_kernel()
 bm_se <- function(v, nb = 100) { b <- floor(length(v) / nb); sd(colMeans(matrix(v[1:(b * nb)], b, nb))) / sqrt(nb) }
 y <- c(0.1, 0.5, -0.2, 0.4); n <- 4; Dv <- c(-1, 3, -3, 1); cD <- sqrt(sum(Dv^2)); d <- Dv / cD

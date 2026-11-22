@@ -6,7 +6,7 @@
 #     posterior mean and 2.5/97.5% bands, Delta2 vs truth, lambda, sigma; between-chain standard errors and R-hat.
 #  C  R-hat / ESS of the functional E-02 plots: 4 dispersed-start Gibbs chains (fixed lambda, sigma) at representative E-02 cells.
 # Outputs: $E04_OUT/<part>/*.rds
-E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims")
+E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
 OUT <- Sys.getenv("E04_OUT", "/home/fb31/BQTF_runs/E04"); PART <- Sys.getenv("PART", "A")
 cores <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "2"))
 source(file.path(E02_DIR, "e02_lib.R")); load_kernel()

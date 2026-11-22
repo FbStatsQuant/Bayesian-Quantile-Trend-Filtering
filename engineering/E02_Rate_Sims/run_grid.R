@@ -24,7 +24,7 @@
 args <- commandArgs(trailingOnly = TRUE)
 phase <- if (length(args)) args[1] else "p1"
 cores <- if (length(args) > 1) as.integer(args[2]) else as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "2"))
-E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims")
+E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
 OUT_BASE <- Sys.getenv("E02_OUT", "/home/fb31/BQTF_runs/E02")          # NOTS: /projects/ml75/fb31/BQTF/runs/E02-<phase>-<date>
 source(file.path(E02_DIR, "e02_lib.R")); load_kernel()
 cal <- readRDS(Sys.getenv("E02_CAL", "/home/fb31/BQTF_runs/E02/calibration.rds"))

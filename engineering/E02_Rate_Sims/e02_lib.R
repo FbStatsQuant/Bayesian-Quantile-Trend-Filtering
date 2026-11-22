@@ -5,7 +5,7 @@
 #   pi(theta | y) ∝ exp{ -sum_i rho_tau(y_i - theta_i) / sigma - lambda ||D theta||_1 }
 # sampled exactly by the paper's kernels: Kozumi-Kobayashi augmentation z, and the P-MALA trend move in the
 # curvature metric M = W + c D'D (c = min(kappa lambda^2 / 2, c_max)) with the ADMM proximal map
-# (Simulations/Individual/prox_admm_metric.cpp, unchanged).  With lambda and sigma fixed the sweep is
+# (method/individual/prox_admm_metric.cpp, unchanged).  With lambda and sigma fixed the sweep is
 #   theta | z  (P-MALA, exact MH)   ->   z | theta  (inverse Gaussian, exact).
 # The step size is Robbins-Monro adapted during burn-in only, then frozen: the kept chain is time-homogeneous.
 # MAP = quantile trend filter with penalty lambda * sigma, solved exactly by quantreg::rq.fit.sfn (sparse interior point).
@@ -18,8 +18,8 @@ if (dir.exists("/home/fb31/R/e02lib")) .libPaths(c("/home/fb31/R/e02lib", .libPa
 suppressPackageStartupMessages({ library(SparseM); library(quantreg); library(coda) })
 
 # Paths are configurable so the same code runs on Owls and from a NOTS code snapshot (E02_DIR, E02_KERNEL, E02_CACHE).
-E02_DIR  <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/Engineering/E02_Rate_Sims")
-KERNEL   <- Sys.getenv("E02_KERNEL", "/home/fb31/Bayesian-Quantile-Trend-Filtering/Simulations/Individual/prox_admm_metric.cpp")
+E02_DIR  <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
+KERNEL   <- Sys.getenv("E02_KERNEL", "/home/fb31/Bayesian-Quantile-Trend-Filtering/method/individual/prox_admm_metric.cpp")
 load_kernel <- function(cache = Sys.getenv("E02_CACHE", "/home/fb31/BQTF_runs/E02/.rcpp_cache")) {
   dir.create(cache, recursive = TRUE, showWarnings = FALSE)
   Rcpp::sourceCpp(KERNEL, cacheDir = cache, env = globalenv())                       # paper's P-MALA kernel (validation only)
