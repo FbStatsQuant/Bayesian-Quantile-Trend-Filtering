@@ -116,11 +116,11 @@ print(ggplot(pd, aes(t, y)) + geom_point(size = 0.6, colour = "grey50") +
   }
   getwd()
 }
-sampler_file <- file.path(.this_dir(), "Individual_Sampler_PMALA_Augmented.R")
+sampler_file <- file.path(dirname(dirname(dirname(.this_dir()))), "method", "individual", "Individual_Sampler_PMALA_Augmented.R")
 stopifnot(file.exists(sampler_file))
 src <- readLines(sampler_file)
 smp <- new.env(parent = globalenv())
-eval(parse(text = src[seq_len(grep("^# ---- Main", src)[1L] - 1L)]), envir = smp)
+local({ old <- setwd(dirname(sampler_file)); on.exit(setwd(old)); eval(parse(text = src[seq_len(grep("^# ---- Main", src)[1L] - 1L)]), envir = smp) })
 smp$load_prox_cpp(smp$cpp_src)
 
 # ---- Fit: one independent chain per tau, on the whole series y ---------------
