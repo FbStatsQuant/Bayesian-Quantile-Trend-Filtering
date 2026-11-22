@@ -178,7 +178,23 @@ The crude column comes from the entropy of the TV⁽³⁾ ball of radius ≍ n³
 
   **Check against the paper:** Gamma(1, 1) at n = 500 predicts λ ≈ 53; Appendix A reports "between 50 and 75". With b₀ = n^{−β}: λ ≍ n^{3(1+β)/4} and ε² ≍ n^{−(1+β)/4} for β < 2. For **b₀ ≲ n^{−2}**, the fixed point needs Lₙ ≈ −a₀, i.e. bias ≈ spread. That suggests λ self-tunes to the oracle (n³/V\*)^{3/4} and ε² ≍ n^{−3/4}, adaptively in V\*. This is heuristic and worth a Stage-B theorem.
 
-  The paper's b₀ ∈ {10⁻², 10⁻³, 5×10⁻⁴} is fixed in n. Asymptotically that is the slow regime. **Felipe should decide** whether Stage B targets b₀ = bₙ ↓ 0, or analyses the paper's prior and accepts the slower rate.
+  *Remark (fixed b₀, documented for contrast).* The paper's b₀ ∈ {10⁻², 10⁻³, 5×10⁻⁴} is fixed in n. Then λ ≍ n^{3/4} and ε² ≍ n^{−1/4}, which is the slow regime.
+
+**Stage-C plan: n-dependent b₀ = b₀,ₙ (Felipe's direction, 2026-11-22).**
+
+- **Required order.** b₀,ₙ ≲ c·V\*·n^{−2}. At the oracle λ\* ≍ (n³/V\*)^{3/4}, the effective dimension is J_eff(λ\*) ≍ n^{1/4}V\*^{1/4}. The fixed point λb₀ ≈ a₀ + Lₙ ≍ J_eff then puts λ at or beyond λ\* iff b₀ ≲ J_eff(λ\*)/λ\* ≍ V\*n^{−2}. V\* is unknown, so the recommendation is **b₀,ₙ = s_y·n^{−2}/log n**, or n^{−5/2}. Here s_y is a data scale such as sd(y) or σ̂, needed because b₀ carries the units of ‖Dθ‖₁, i.e. data units. This choice also satisfies the hard-cap requirement b₀ ≲ n^{−5/4}.
+- **Pairing with the Stage-A window.** Stage A holds for (log n)^{C₀} ≤ λ ≤ n³/(log n)^{C₀}. The Stage-C theorem would show that the λ-posterior puts mass → 1 on a band [λ\*/Cₙ, Cₙλ\*] ⊂ window, then apply Theorem A **uniformly over λ in that band**. So Theorem A should be stated uniformly in λ over compact-in-log ranges; this is easy to arrange.
+
+  Prediction for Engineering's learned-λ check with b₀ = n^{−2} (κ = 4):
+  - quadratic truth (V\* = 0, no bias): λ ≈ (0.27·κ^{1/6})^{3/4}n^{9/4} ≈ 0.45·n^{9/4};
+  - sin and PQ: λ ≈ min{that, bias-balance value}.
+- **Side effects.**
+  1. **Propriety.** b₀ > 0 is required. With b₀ = 0 the λ-marginal prior on u = Dθ is ∝ ‖u‖₁^{−(a₀+m)}, which is not integrable at u = 0 in ℝᵐ. So the posterior is improper, and b₀,ₙ must stay strictly positive.
+  2. **a₀.** Keep a₀ fixed with 0 < a₀ ≲ J_eff(λ\*) ≍ n^{1/4}; a₀ = 1 is fine. Large a₀ shifts the fixed point upward.
+  3. **Implied prior on smoothness.** The marginal prior on ‖Dθ‖₁ is b₀·Beta′(m, a₀), with typical size ≍ m·b₀/a₀ ≍ n^{−1} for b₀ = n^{−2}. That is rougher than the truth (V\*n^{−2}) and smoother than the posterior draws (m/λ\* ≍ n^{−5/4}), so it is not dominant. The prior mean of λ is a₀/b₀ ≍ n².
+  4. **Mixing.** λ is identified only through the slowly varying Lₙ(λ) ∝ λ^{−1/3}. Removing the b₀ restoring term makes the log-λ posterior flatter, so expect *slower* λ mixing than the paper's already low ESS (log λ ESS ≈ 9 per 20k sweeps), plus a long burn-in from λ⁽⁰⁾ = m up to n^{9/4}. Mitigations: keep the interweaving step, and initialize λ at the n^{9/4} scale.
+  5. **Units and scaling.** b₀,ₙ ∝ s_y·n^{−2} makes the recommendation invariant to rescaling y. The paper standardizes y in the applications, so s_y = 1 there.
+- **Recommended paper setting** (if adopted at the end-of-week gate): λ ~ Gamma(1, n^{−2}·s_y). At n = 500 that is b₀ ≈ 4×10⁻⁶, against the current 10⁻³.
 
 ---
 
@@ -231,6 +247,13 @@ E₀ Πₙ( Δ²ₙ(θ − θ\*) > Mₙ ε²ₙ | y ) → 0, with ε²ₙ = [ ω
 | R5. E-02 is inconclusive because of pre-asymptotics or mixing. | At n ≤ 4000 near a = 9/4, the 3/n parametric term dominates and P-MALA may mix poorly at large λ. | Judge only rough-spread slopes, at a ≤ 2 or in the many-mode regime. Not a theory kill. |
 | R6. Theory and practice diverge on the λ hyperprior. | The b₀-fixed prior of the paper gives ≈ n^{−1/4} asymptotically. | Needs Felipe's decision: Stage B with bₙ ≲ n^{−2}, or analyse the paper's prior and accept the slow rate. Engineering's check of existing λ values (requested) tests the fixed-point formula. |
 | R7. Overclaiming. | — | No coverage, BvM or fast-rate claims (§3). |
+| R8. The L3 Laplace step resists off-the-shelf results (raised by T-04). | The summation operator's singular basis destroys the independence of the Laplace coordinates, so weighted-iid small-deviation theorems do not apply. | Route via the Laplace-as-Gaussian-scale-mixture comparison, or a direct grid argument. The fallback is A′. |
+
+**Proof architecture after T-04.**
+- Likelihood side: Atchadé's (2017) pathwise good-event / peeling structure, with Knight's identity for the check loss.
+- Prior side: ADH's p = 1 concentration, plus Bach & Klein's proper-ization of the polynomial part and their Demmler–Reinsch spectral bounds.
+
+See `Theory/T04_Template_Sweep/SHORTLIST.md`.
 
 **Global kill criterion for the n^{−3/4} programme:** R1 fires, or neither L7 nor any alternative sieve gives matching entropy within two weeks. In either case the deliverable becomes Theorem A′ (n^{−2/3}), which is still new according to T-01.
 
