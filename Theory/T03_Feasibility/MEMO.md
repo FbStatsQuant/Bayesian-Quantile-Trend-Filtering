@@ -407,8 +407,8 @@ The Fubini (integrated-likelihood-ratio) route works **exactly** for σ ≥ σ̄
 | Noiseless MAP bias (k = 2 trend filtering) | `map_bias.py`; ADMM with KKT residual reported | optimizer | reliable where KKT < 1e−5 |
 | Spline (Gaussian-twin) bias along λ = n^a | `spline_bias_scaling.py`; long-double banded solve | none | exact, where Cholesky succeeds |
 | Laplace-prior posterior spread (Gaussian likelihood; slopes −0.335 to −0.347) | `laplace_gibbs_spread.py`, `laplace_gibbs_bigJ.py`; **Theory's own Park–Casella Gibbs**, banded Cholesky | **own MCMC** | **provisional**, pending the grid validation below. Large-λ cells with a binding cap are already excluded. |
-| Laplace posterior-mean bias = spline bias (ratios 0.995–1.005) | `vp_bias_check.py`; **Theory's own Park–Casella Gibbs**, long-double Cholesky, Rao-Blackwellised mean | **own MCMC** | **provisional**, pending the grid validation below |
-| Virial ratio λ‖Dθ‖₁/m and the λ fixed-point formula | own Gibbs (above), plus the paper's reported λ for Gamma(1, 1) | own MCMC, plus the paper | provisional |
+| Laplace posterior-mean bias = spline bias (ratios 0.995–1.005) | `vp_bias_check.py`; **Theory's own Park–Casella Gibbs**, long-double Cholesky, Rao-Blackwellised mean | **own MCMC** | **superseded**: not used as evidence; replaced by the company-sampler table §8.1a″ (0.996–1.013) |
+| Virial ratio λ‖Dθ‖₁/m and the λ fixed-point formula | own Gibbs (above), plus the paper's reported λ for Gamma(1, 1) | own MCMC, plus the paper | **superseded** by E-02 (company sampler; §8.1d), plus the paper's independent value |
 | ALD spread law (T3lam: slopes −0.37/−0.34, C = 0.28–0.35) | **E-02**, Engineering's exact Gibbs (z-augmentation, scale mixture, banded-QR perturb-and-solve) | **E-02 sampler** | **evidence (E-04 passed); was provisional until E-04 passes** |
 | Learned-λ smoke test (λ ≈ 60 for b₀ = 1) | E-02 sampler; the paper's own report (50–75) | E-02 and paper | the paper's figure is independent; the E-02 figure is evidence (E-04 passed) |
 
