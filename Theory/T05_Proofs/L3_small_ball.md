@@ -1,6 +1,6 @@
 # Lemma L3: centred small-ball bound for the Laplace difference prior
 
-**Status:** draft (2026-11-22). The numerical check `checks/l3_singular_values.py` is queued: owls_run refused for budget, so it will be retried or sent to Engineering.
+**Status:** draft, second read done (2026-11-22). Three small fixes are listed at the end. Self-check sign-off waits only on Engineering's run of `checks/l3_singular_values.py` (owls_run refused for budget).
 **Depends on:** standard facts only: the Gaussian scale-mixture representation of the Laplace law, Anderson's theorem, singular values of the cumulative-sum matrix, and Horn's (Ky Fan's) product inequality.
 **Used by:** L6 (prior mass) and L4q (condition (C)).
 
@@ -13,9 +13,11 @@ Notation as in L4q:
 
 ## Statement
 
-There is an absolute constant C such that, for all n ≥ 4, λ > 0, and 0 < ε ≤ n^{5/2}/λ,
+There is an absolute constant C such that, for all n ≥ 5 (so m ≥ 2), λ > 0, and ε > 0,
 
-  φ(ε) ≤ C · x^{2/5} · (log m)^{1/5} · log(e + x)  +  2,  where x := n^{5/2}/(λε).
+  φ(ε) ≤ C · x^{2/5} · (log m)^{1/5} · log(e + x log m)  +  2,  where x := n^{5/2}/(λε).
+
+The relevant range is x ≥ 1, i.e. ε ≤ n^{5/2}/λ, but the bound holds for all ε.
 
 **In words.** φ(ε) ≲ (n^{5/2}/(λε))^{2/5} up to a (log n)^{6/5} factor. This is the exponent verified numerically in T-03 (the twice-integrated-walk law), with a polylog loss. That loss is absorbed by the (log n)^c in Theorem A.
 
@@ -38,11 +40,11 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
 **Step 4 (singular-value bound: σ_r(A) ≤ 91.1·n^{5/2}r^{−3}).**
 1. The cumulative-sum matrix C_N (N×N) satisfies σ_k(C_N) = 1/(2 sin((2k−1)π/(4N+2))). This is standard: C⁻ᵀC⁻¹ is tridiag(−1, 2, −1) with last diagonal entry 1.
 2. Using sin x ≥ 2x/π on [0, π/2], σ_k(C_n) ≤ (2n+1)/(2(2k−1)) ≤ (2n+1)/(2k) ≤ 1.5n/k.
-3. **Horn / Ky Fan:** σ_{i+j+l−2}(XYZ) ≤ σᵢ(X)σⱼ(Y)σₗ(Z). Hence σ_r(C³) ≤ σ_k(C)³ with k := ⌈(r+2)/3⌉ ≥ r/3, which gives σ_r(C³) ≤ (4.5n/r)³.
+3. **Horn / Ky Fan:** σ_{i+j+l−2}(XYZ) ≤ σᵢ(X)σⱼ(Y)σₗ(Z). With i = j = l = k this gives σ_{3k−2}(C³) ≤ σ_k(C)³. Take k := ⌊(r+2)/3⌋, so that 3k − 2 ≤ r and k ≥ r/3. By monotonicity, σ_r(C³) ≤ σ_{3k−2}(C³) ≤ σ_k(C)³ ≤ (1.5n·3/r)³ = (4.5n/r)³.
 4. S is a column-submatrix of C³, so σ_r(S) ≤ σ_r(C³) by Cauchy interlacing. P⊥ is a contraction.
 5. Therefore σ_r(A) ≤ n^{−1/2}(4.5n/r)³ = 91.1·n^{5/2}r^{−3}.
 
-**Step 5 (comparison).** By Anderson's theorem again, for diagonal Gaussian series, increasing any weight decreases the probability. So with b := v₀(91.1)²n⁵,
+**Step 5 (comparison).** Increasing any weight decreases the probability, by pointwise monotonicity (Anderson is not needed). Appending extra terms r > m with positive weights decreases it too. So with b := v₀(91.1)²n⁵,
 
   γ_{v₀}(B_ε) ≥ P( Σ_{r ≥ 1} b r^{−6} ξ_r² ≤ ε² ).
 
@@ -52,12 +54,12 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
 
   P(Σ_{r≤K} b r^{−6}ξ_r² ≤ ε²/2) ≥ ∏_{r≤K} P(ξ_r² ≤ ε²r⁶/(2Kb)) = ∏_{r≤K} P(|ξ| ≤ t_r),  with t_r := εr³/√(2Kb).
 
-  Use P(|ξ| ≤ t) ≥ 0.48·min(t, 1). Also t_r ≥ t₁ = ε/√(2Kb) ≥ c·K^{−3}, from the choice of K. Hence log P(head) ≥ −K·(log(1/0.48) + 3 log K + C).
+  Use P(|ξ| ≤ t) ≥ 2φ(1)·min(t, 1) ≥ 0.48·min(t, 1). From K⁵ ≥ 8b/(5ε²) we get 2Kb ≤ (5/4)ε²K⁶, so t_r ≥ t₁ = ε/√(2Kb) ≥ 0.894·K^{−3}. Hence log P(head) ≥ K·log(0.48·0.894·K^{−3}) = −K(0.85 + 3 log K).
 - **Combining.** The head and tail are independent, so
 
-  −log γ_{v₀}(B_ε) ≤ log(4/3) + K(C + 3 log K),  with K ≍ (b/ε²)^{1/5} = (91.1²·2 log m)^{1/5}·x^{2/5}.
+  −log γ_{v₀}(B_ε) ≤ log(4/3) + K(0.85 + 3 log K),  with K ≤ 1 + (8b/(5ε²))^{1/5} = 1 + (1.6·91.1²·2 log m)^{1/5}·x^{2/5} ≤ 1 + 7.7(log m)^{1/5}x^{2/5}.
 
-**Step 7 (assembly).** φ(ε) ≤ 2 + log(4/3) + C·x^{2/5}(log m)^{1/5}·log(e + x). The condition ε ≤ n^{5/2}/λ, i.e. x ≥ 1, ensures K ≥ 1. ∎
+**Step 7 (assembly).** Since log K ≤ log(8.7) + (2/5)log(e + x) + (1/5)log log m ≤ C log(e + x log m), we get φ(ε) ≤ log 4 + log(4/3) + C·x^{2/5}(log m)^{1/5}·log(e + x log m), and log 4 + log(4/3) ≤ 1.68 ≤ 2. (K ≥ 1 always, because of the ceiling.) ∎
 
 ## Remarks
 
@@ -71,3 +73,11 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
 1. the exact singular values of C_N;
 2. DS = I;
 3. σ_r(A) ≤ 91.1·n^{5/2}r^{−3}. This bound is loose; the true ratio σ₁/(n^{5/2}) is about 0.03.
+
+## Second read (2026-11-22): fixes
+
+1. **Step 4.3:** the index should be ⌊(r+2)/3⌋, not ⌈(r+2)/3⌉. The ceiling can give 3k − 2 > r, which is the wrong direction for monotonicity. The final bound (4.5n/r)³ is unchanged.
+2. **Statement:** n ≥ 5 is required, so that m ≥ 2. For m = 1, v₀ = 0 and Step 2 fails. Also, log(e + x) becomes log(e + x log m), because log K carries a (1/5)·log log m term. In the application x is polynomial in n, so this changes nothing.
+3. **Constants made explicit** in Steps 6–7: t₁ ≥ 0.894K^{−3}, head cost K(0.85 + 3 log K), and K ≤ 1 + 7.7(log m)^{1/5}x^{2/5}. Step 5 needs only pointwise monotonicity.
+
+All other steps were re-verified: the scale-mixture rate λ²/2, Anderson's direction, (1 − 1/m)^m ≥ 1/4, the singular values of C_N (tridiagonal (C⁻¹)ᵀC⁻¹ with last diagonal entry 1), sin x ≥ 2x/π on the relevant range, interlacing for column deletion, the tail integral 1/(5K⁵), and Markov's inequality.
