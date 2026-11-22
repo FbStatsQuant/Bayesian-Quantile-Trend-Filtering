@@ -328,7 +328,7 @@ Both reviews are in `reviews/`. The CEO's combined list of required changes and 
 
 *Entries: Laplace posterior-mean bias² ÷ smoothing-spline bias² (a Gaussian prior with the same variance), at λ = n^a. "n/a" means numerically infeasible even in long double.*
 
-- **The VP's mechanism is confirmed.** For kinks below the threshold J ≲ n²λ^{−2/3}, the Laplace posterior mean *is* the linear (spline) smoother. The actual bias² is 2–3 orders of magnitude below the draft's ℓ₁-shift bound in every cell.
+- **The VP's mechanism is supported (provisional: own MCMC, now retired; being rerun on Engineering's sampler after E-04).** For kinks below the threshold J ≲ n²λ^{−2/3}, the Laplace posterior mean *is* the linear (spline) smoother. The actual bias² is 2–3 orders of magnitude below the draft's ℓ₁-shift bound in every cell.
 - **The asymptotic slope at a ≥ 5/2 is not observable at n ≤ 5000.** Along λ = n^a, the spline bias² has local slopes:
   - at a = 2: −2.6, −2.2, −1.2, −1.4, −1.8 over n = 600 to 19200, approaching the VP's −5/3;
   - at a = 2.5: about −0.4, between the draft's −0.5 and the VP's −0.83;
@@ -421,6 +421,11 @@ The Fubini (integrated-likelihood-ratio) route works **exactly** for σ ≥ σ̄
 A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin control with a closed-form posterior, a second seed with a 400k chain and ESS-based standard errors, and a finer grid. `owls_run` refused for budget, so it has been sent to Engineering to run on NOTS with E-04.
 
 **Until then, the two own-MCMC rows in the table above are provisional and are not used as evidence.** The bias-equivalence claim (Laplace mean = spline) then rests on E-02's Gaussian-twin arm, itself subject to E-04, and on the VP's independent n = 300 check. Note that a mean bias of ≤ 3% of a posterior sd could not overturn a ratio of 1.000 ± 0.005 on *bias²* of order 10⁻³–10⁻⁶.
+
+**HQ decision (2026-11-22).** The company uses **one MCMC sampler for theory numerics: Engineering's**, once E-04 marks it fit.
+- **Theory's own Gibbs is retired.** It will not be used for evidence unless the diagnosis shows it is correct *and* it is needed for something Engineering's sampler cannot do.
+- **The bias-equivalence check is being rerun** on Engineering's sampler, through Engineering on NOTS, within the E-02 ceiling: the noiseless PQ table of §8.1a plus the paired Gaussian-twin arm.
+- **Plainly: the numerical support for the n^{−5/6} primary rate is provisional** until that rerun and E-04 are done.
 
 **Conclusions that rest only on exact or deterministic computations.** The small-ball exponent, the Gaussian-analogue spread law, σ̄ and R, the Lemma 19 correction, and the spline-bias scaling. These stand regardless of the sampler checks.
 
