@@ -1,0 +1,66 @@
+# BQTF reference library: reading list
+
+One line per paper: what it gives us, and which section of the T-03 memo uses it (`theory/T03_Feasibility/MEMO.md`).
+
+**Sources.** The PDFs are kept locally in this folder but are not tracked in git (only `Large Prior.pdf`, our own manuscript, is). Use the links in the last section to fetch any of them. The PDFs on disk are legitimate open copies, from arXiv, an author or institution page, or a file Felipe added himself.
+
+**Not obtained.** Li & Shao (2001), *Gaussian processes: inequalities, small ball probabilities and applications*. Fill & Torcaso is used as its substitute.
+
+## Core theory: posterior contraction and misspecification
+
+- `Ghosal_2007_ConvergenceRatesNoniid.pdf`. Ghosal & van der Vaart (2007, Ann. Statist.), *Convergence rates of posterior distributions for noniid observations*. The general contraction theorem for independent, non-identically distributed / fixed-design data (prior mass, sieve, tests). It is the backbone that Theorem A adapts, with tests replaced by a uniform excess-loss event. Used in §3 and §6.
+- `Syring_Martin 2023.pdf`. Syring & Martin (2023, Bernoulli), *Gibbs posterior concentration rates under sub-exponential type losses*. At fixed σ our posterior is a check-loss Gibbs posterior. Its Lemma 1 (evidence lower bound) and sieve bookkeeping are reused; its MGF/Bernstein route fails for the check loss (see T-02). Used in §3 and §6 (L6).
+- `Sriram_2013_PosteriorConsistencyMisspecifiedALD.pdf`. Sriram, Ramamoorthi & Ghosh (2013, Bayesian Anal.), *Posterior consistency of Bayesian quantile regression based on the misspecified ALD*. The only consistency result under a misspecified ALD (parametric). Its §6 identifies σ₀ as the KL projection for a learned σ. Used in §2 and §3 (σ stage).
+- `Large Prior.pdf`. Bedoya & Li, *Large series priors for adaptive and optimal Bayesian nonparametric regression*. The house template: the style of Assumptions 1–3 and of Theorem 1, Corollary 1. Our prior is a large series prior with a Laplace coefficient prior that fails its WG3–WG5 conditions. Used in §1 and §6.
+
+## Supporting proof templates (T-04 shortlist)
+
+- `Atchade_2017_Quasi_Posterior_Contraction.pdf`. Atchadé (2017, Ann. Statist.), *On the contraction properties of some high-dimensional quasi-posterior distributions*. A pathwise good-event proof: a score event, curvature and lower-bound events, and peeling over annuli for the far region. There are no tests and no KL neighbourhoods. It is the architecture for our likelihood-side lemmas L6, L8 and L9, with Knight's identity in place of its differentiability assumption (H2). Used in §6 and §7.
+- `Bach_Klein_2022_Bayesian_PSpline_Rates.pdf`. Bach & Klein (2022, arXiv 2109.04288), *Posterior concentration rates for Bayesian penalized splines*. Gaussian difference-penalty prior, improper on polynomials, with a smoothing-variance hyperprior. It gives a proper-ization of the polynomial part (L5), Demmler–Reinsch spectral prior-mass bounds (the Gaussian half of L3), and hyperprior balance condition A5 (template for the Stage-C λ prior). Used in §4, §5 and §6.
+
+## Laplace-prior behaviour: the main risk and the positive results
+
+- `Castillo_2015_BayesianLinearRegressionSparsePriors.pdf`. Castillo, Schmidt-Hieber & van der Vaart (2015, Ann. Statist.), *Bayesian linear regression with sparse priors*. Theorem 7 shows that the Bayesian-lasso (Laplace) posterior is suboptimal although its mode is optimal. This is the template for our spread floor λ^{−1/3} and the main risk to any fast-rate claim. Used in §0, §4, §5 and §7.
+- `Agapiou_2021_pExponentialPriorsContraction.pdf`. Agapiou, Dashti & Helin (2021, Bernoulli), *Rates of contraction of posterior distributions based on p-exponential priors*. Contraction for p-exponential (p = 1: Laplace) priors, with the two-level Talagrand-type concentration we need for the sieve (Lemma L7). Used in §4 and §6.
+- `Agapiou_2024_LaplacePriorsSpatialInhomogeneity.pdf`. Agapiou & Wang (Bernoulli), *Laplace priors and spatial inhomogeneity in Bayesian inverse problems*. Minimax rates for rescaled Besov B¹₁-type (Laplace) priors over spatially inhomogeneous classes, which are close to the total-variation scale. It is positive evidence that Laplace-type priors can do well when scaled correctly. Used in §4 and §6.
+- `Giordano_2023_BesovLaplacePriors.pdf`. Giordano (2023, EJS), *Besov–Laplace priors in density estimation*. Optimal and adaptive rates for Besov–Laplace priors, including a hierarchical version (relevant to the Gamma hyperprior on λ). Used in §4 and §5 (Stage B preview).
+
+## Basis, small-ball and trend filtering
+
+- `TF_2014.pdf`. Tibshirani (2014, Ann. Statist.), *Adaptive piecewise polynomial estimation via trend filtering*. The falling-factorial lasso form (Lemma 2), the penalty scaling n^{15/7}, the minimax rate n^{−6/7} for k = 2, and the comparison with locally adaptive regression splines. Used in §1 and §5.
+- `Wang_2014_FallingFactorialBasis.pdf`. Wang, Smola & Tibshirani (2014, ICML), *The falling factorial basis and its statistical applications*. The basis characterization (θ = Hα, with H the inverse of D up to scaling) and the closeness to truncated power splines. Used in §1 (L1). Padilla's Lemma 19 cites it for ‖P_R δ‖∞.
+- `Fill_2004_SmallDeviationsIntegratedBrownianSheets.pdf`. Fill & Torcaso (arXiv 2003, published 2004), *Mellin-transform asymptotics for small deviations in L² of integrated Brownian sheets*. Exact L² small deviations of m-times integrated Brownian motion (the d = 1 case; it cites Chen & Li and Sytaja). For m = 2 it gives the exponent ε^{−2/5} used in Lemma L3. Used in §4.
+
+## Quantile trend filtering and competitors
+
+- `Padilla_Risk Bounds for Quantile Trend Filtering.pdf`. Madrid Padilla & Chatterjee (2022, Biometrika), *Risk bounds for quantile trend filtering*. Assumption A, the Huber loss Δ²ₙ, Lemma 13 (margin), Theorem 7 and Proposition 2 (localized widths), and the slow and fast rates. This is the frequentist benchmark and the source of the uniform excess-loss event (L2, L8). Used in §2, §3, §5 and §6.
+- `Brantley_2020.pdf`. Brantley, Guinness & Chi (2020, AOAS), *Baseline drift estimation for air quality data using quantile trend filtering*. The frequentist method (ADMM, non-crossing constraints, eBIC). It contains no theory. It supplies the MAP connection and the joint constraint set C for Stage B3.
+- `Onizuka_2023.pdf`. Onizuka, Hashimoto & Sugasawa (2023/24), *Fast and locally adaptive Bayesian quantile smoothing using calibrated variational approximations*. The same model class (ALD likelihood with Laplace or horseshoe priors on differences), with no contraction theory. It is the closest prior art (T-01) and the source of the calibration caveat in §3.
+- `Kowal_Dynamic_Shrinkage.pdf`. Kowal, Matteson & Ruppert (2019, JRSS-B), *Dynamic shrinkage processes*. Shrinkage-prior trend filtering under a Gaussian likelihood. Its theorems are prior shrinkage profiles, not contraction. Background only.
+- `Pereyra 2016.pdf`. **This file is actually** Durmus, Moulines & Pereyra (2016/18), *Efficient Bayesian computation by proximal MCMC: when Langevin meets Moreau*. Moreau–Yosida and MYULA theory. It concerns computation only and plays no role in the contraction memo.
+
+## Links (DOI or arXiv) for every paper
+
+Verified against Crossref (DOIs) and arxiv.org (arXiv ids) on 2026-11-22. `TODO` means not verified.
+
+| File | Reference | Link |
+|---|---|---|
+| `Ghosal_2007_ConvergenceRatesNoniid.pdf` | Ghosal & van der Vaart (2007), Ann. Statist. 35(1) | https://doi.org/10.1214/009053606000001172 |
+| `Syring_Martin 2023.pdf` | Syring & Martin (2023), Bernoulli 29(2) | https://doi.org/10.3150/22-BEJ1491 |
+| `Sriram_2013_PosteriorConsistencyMisspecifiedALD.pdf` | Sriram, Ramamoorthi & Ghosh (2013), Bayesian Anal. 8(2) | https://doi.org/10.1214/13-BA817 (correction: https://doi.org/10.1214/17-BA1067) |
+| `Large Prior.pdf` | Bedoya & Li, *Large series priors for adaptive and optimal Bayesian nonparametric regression* (own manuscript) | TODO (no public DOI or arXiv id found; add when posted) |
+| `Atchade_2017_Quasi_Posterior_Contraction.pdf` | Atchadé (2017), Ann. Statist. 45(5) | https://doi.org/10.1214/16-AOS1526 |
+| `Bach_Klein_2022_Bayesian_PSpline_Rates.pdf` | Bach & Klein (2022) | https://arxiv.org/abs/2109.04288 |
+| `Castillo_2015_BayesianLinearRegressionSparsePriors.pdf` | Castillo, Schmidt-Hieber & van der Vaart (2015), Ann. Statist. 43(5) | https://doi.org/10.1214/15-AOS1334 |
+| `Agapiou_2021_pExponentialPriorsContraction.pdf` | Agapiou, Dashti & Helin (2021), Bernoulli 27(3) | https://doi.org/10.3150/20-BEJ1285 |
+| `Agapiou_2024_LaplacePriorsSpatialInhomogeneity.pdf` | Agapiou & Wang (2024), Bernoulli | https://doi.org/10.3150/22-BEJ1563 ; https://arxiv.org/abs/2112.05679 |
+| `Giordano_2023_BesovLaplacePriors.pdf` | Giordano (2023), Electron. J. Stat. | https://doi.org/10.1214/23-EJS2161 |
+| `TF_2014.pdf` | Tibshirani (2014), Ann. Statist. 42(1) | https://doi.org/10.1214/13-AOS1189 |
+| `Wang_2014_FallingFactorialBasis.pdf` | Wang, Smola & Tibshirani (2014), ICML | https://arxiv.org/abs/1405.0558 |
+| `Fill_2004_SmallDeviationsIntegratedBrownianSheets.pdf` | Fill & Torcaso (2004), Probab. Theory Related Fields 130 | https://doi.org/10.1007/s00440-004-0363-x |
+| `Padilla_Risk Bounds for Quantile Trend Filtering.pdf` | Madrid Padilla & Chatterjee (2022), Biometrika | https://doi.org/10.1093/biomet/asab045 |
+| `Brantley_2020.pdf` | Brantley, Guinness & Chi (2020), Ann. Appl. Stat. 14(1) | https://doi.org/10.1214/19-AOAS1318 |
+| `Onizuka_2023.pdf` | Onizuka, Hashimoto & Sugasawa (2023/24), Stat. Comput. | https://doi.org/10.1007/s11222-023-10327-y ; https://arxiv.org/abs/2211.04666 |
+| `Kowal_Dynamic_Shrinkage.pdf` | Kowal, Matteson & Ruppert (2019), JRSS-B 81(4) | https://doi.org/10.1111/rssb.12325 |
+| `Pereyra 2016.pdf` (actually Durmus, Moulines & Pereyra) | Durmus, Moulines & Pereyra (2018), SIAM J. Imaging Sci. 11(1) | https://doi.org/10.1137/16M1108340 |
+| *not obtained* | Li & Shao (2001), *Gaussian processes: inequalities, small ball probabilities and applications* | TODO (Handbook of Statistics 19; not verified) |

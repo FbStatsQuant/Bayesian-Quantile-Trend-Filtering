@@ -1,0 +1,2 @@
+# Paths (repo-relative, exact, one per line) allowed to exceed 5 MB.  Each entry needs HQ's OK.
+# Empty after the E-03 migration: paper/main.pdf is 2.2 MB, so it needs no entry.

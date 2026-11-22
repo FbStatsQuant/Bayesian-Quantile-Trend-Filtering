@@ -1,0 +1,65 @@
+== (1) P-MALA vs Gibbs, learned lambda and sigma, sin, N(0,0.5^2), tau 0.5, 30k sweeps (10k burn) ==
+     b0lab     n sampler  reps       sec     acc       lam    sig        d2    centre ess_d2 ess_loglam ess_theta esspsec_d2 esspsec_loglam esspsec_theta
+    <char> <num>  <char> <int>     <num>   <num>     <num>  <num>     <num>     <num>  <num>      <num>     <num>      <num>          <num>         <num>
+ 1:     B1   500   gibbs     5   27.5810      NA 4.946e+01 0.1933 0.0661100 0.0340300   6136       1331      7316   2.22e+02       4.83e+01      2.65e+02
+ 2:     B1   500   pmala     5  139.3664 0.49961 4.860e+01 0.1935 0.0663000 0.0343200    196         50       131   1.41e+00       3.59e-01      9.37e-01
+ 3:     B1  2000   gibbs     5   72.7092      NA 1.396e+02 0.1946 0.0462600 0.0237900   5027        873      6068   6.92e+01       1.20e+01      8.34e+01
+ 4:     B1  2000   pmala     5  534.6018 0.50030 1.398e+02 0.1947 0.0461400 0.0242400     84         27        42   1.56e-01       5.06e-02      7.94e-02
+ 5:     B1  8000   gibbs     5  206.6820      NA 3.942e+02 0.1962 0.0332600 0.0173200   3603        574      5111   1.74e+01       2.78e+00      2.48e+01
+ 6:     B1  8000   pmala     5 2330.8336 0.50085 3.870e+02 0.1963 0.0335600 0.0186200     40         16        18   1.73e-02       6.94e-03      7.92e-03
+ 7:    Bn2   500   gibbs     5   27.0382      NA 1.144e+05 0.2024 0.0070090 0.0033980   3653        131      3394   1.35e+02       4.86e+00      1.26e+02
+ 8:    Bn2   500   pmala     5  184.1096 0.44776 5.803e+04 0.2020 0.0089190 0.0054160     63          4        43   3.42e-01       2.42e-02      2.32e-01
+ 9:    Bn2  2000   gibbs     5   70.9212      NA 3.469e+06 0.2006 0.0018030 0.0008187   2336         45      3171   3.30e+01       6.39e-01      4.47e+01
+10:    Bn2  2000   pmala     5  686.8878 0.46193 1.253e+04 0.1995 0.0113000 0.0058410     18          2        24   2.55e-02       2.77e-03      3.57e-02
+11:    Bn2  8000   gibbs     5  202.8876      NA 1.049e+08 0.2006 0.0007755 0.0004759   2200         14      2572   1.11e+01       7.01e-02      1.27e+01
+12:    Bn2  8000   pmala     5 2526.2442 0.49962 2.606e+03 0.1982 0.0181200 0.0098080      5          2        16   1.94e-03       7.08e-04      6.55e-03
+Gibbs/P-MALA efficiency gains (ESS per second) and agreement ratios (P-MALA/Gibbs):
+Key: <b0lab, n>
+    b0lab     n speed_per_sweep gain_d2 gain_loglam gain_theta lam_ratio d2_ratio
+   <char> <num>           <num>   <num>       <num>      <num>     <num>    <num>
+1:     B1   500             5.1     157         135        283     0.983    1.003
+2:     B1  2000             7.4     444         237       1050     1.001    0.997
+3:     B1  8000            11.3    1006         401       3131     0.982    1.009
+4:    Bn2   500             6.8     395         201        543     0.507    1.273
+5:    Bn2  2000             9.7    1294         231       1252     0.004    6.267
+6:    Bn2  8000            12.5    5722          99       1939     0.000   23.366
+== (2) lamlong: 30k kept, started at first-pass lambda; drift-clean cells only (|half-chain log-lambda drift| <= 2 MC se) ==
+     truth      a     n  reps clean  lam_med ess_loglam drift_med
+    <char> <char> <num> <int> <int>    <num>      <num>     <num>
+ 1:    PQT    Bn2   500    10     9 3.41e+05        789     0.014
+ 2:    PQT    Bn2  2000    10     9 9.68e+06        282     0.045
+ 3:    PQT    Bn2  8000    10     8 2.37e+08         99     0.031
+ 4:    PQT   Bn25   500    10    10 6.83e+05        647     0.040
+ 5:    PQT   Bn25  2000    10    10 1.80e+07        256     0.061
+ 6:    PQT   Bn25  8000    10    10 4.11e+08         99     0.033
+ 7:    sin    Bn2   500    10     9 1.06e+05        202     0.046
+ 8:    sin    Bn2  2000    10    10 3.66e+06         67     0.038
+ 9:    sin    Bn2  8000    10    10 1.19e+08         24     0.044
+10:    sin   Bn25   500    10    10 1.16e+05        197     0.035
+11:    sin   Bn25  2000    10    10 4.12e+06         72     0.060
+12:    sin   Bn25  8000    10     9 1.33e+08         23     0.075
+lambda-bar slope in n, seeds clean at all three n:
+Key: <truth, a>
+    truth      a slope    lo    hi seeds
+   <char> <char> <num> <num> <num> <int>
+1:    PQT    Bn2 2.322 2.273 2.377     7
+2:    PQT   Bn25 2.139 2.023 2.275    10
+3:    sin    Bn2 2.518 2.479 2.552     9
+4:    sin   Bn25 2.531 2.496 2.565     9
+all seeds (for comparison):
+    truth      a slope    lo    hi seeds
+   <char> <char> <num> <num> <num> <int>
+1:    PQT    Bn2 2.329 2.289 2.374    10
+2:    PQT   Bn25 2.139 2.029 2.275    10
+3:    sin    Bn2 2.514 2.479 2.546    10
+4:    sin   Bn25 2.535 2.503 2.567    10
+PQ/sin lambda-bar ratio (clean cells, means over clean seeds):
+Key: <a, n>
+        a     n         PQT       sin ratio
+   <char> <num>       <num>     <num> <num>
+1:    Bn2   500    387428.7    115146  3.36
+2:    Bn2  2000   9975485.2   3866874  2.58
+3:    Bn2  8000 249652557.6 122255953  2.04
+4:   Bn25   500   1193987.5    119930  9.96
+5:   Bn25  2000  20159440.7   4297593  4.69
+6:   Bn25  8000 449400493.6 136472016  3.29

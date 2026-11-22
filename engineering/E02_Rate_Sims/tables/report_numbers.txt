@@ -1,0 +1,39 @@
+== P1: rough spread vs lambda at fixed n, many-mode cells (n lambda^-1/3 >= 10) ==
+         src  truth kappa     n cells  slope C_median     C_range
+      <char> <char> <num> <num> <int>  <num>    <num>      <char>
+ 1:     Qlam   quad     4  1000     7 -0.385    0.342 0.253-0.369
+ 2:     Qlam   quad     4  4000    10 -0.359    0.357 0.276-0.372
+ 3:     Qlam   quad    16  1000     7 -0.372    0.353 0.278-0.368
+ 4:     Qlam   quad    16  4000    10 -0.353    0.361 0.296-0.372
+ 5:    T3lam    PQT    16  1000     7 -0.372    0.353  0.28-0.368
+ 6:    T3lam    PQT    16  4000    10 -0.353    0.361 0.295-0.372
+ 7:    T3lam    sin    16  1000     7 -0.371    0.353 0.281-0.368
+ 8:    T3lam    sin    16  4000    10 -0.353    0.361 0.296-0.372
+ 9: lamcurve     pq     4  2000    10 -0.372    0.347 0.258-0.366
+10: lamcurve     pq     4  8000    11 -0.365    0.351  0.267-0.37
+11: lamcurve   quad     4  2000    10 -0.372    0.347 0.259-0.366
+12: lamcurve   quad     4  8000    11 -0.365    0.352  0.265-0.37
+13: lamcurve    sin     4  2000    10 -0.372    0.347 0.259-0.366
+14: lamcurve    sin     4  8000    11 -0.365    0.351  0.265-0.37
+== raw grid T3 (lambda = n^a, N(0,0.25^2), tau 0.5): slopes in n (n >= 1000) vs -a/3 ==
+     truth      a     aval    n_range  rough   pred centre   risk    map pen_max
+    <char> <char>    <num>     <char>  <num>  <num>  <num>  <num>  <num>   <num>
+ 1:    PQT   b1.5 1.500000 1000-16000 -0.485 -0.500 -0.472 -0.502 -0.596    1.00
+ 2:    PQT     b2 2.000000 1000-16000 -0.607 -0.667 -0.658 -0.690 -0.935    1.00
+ 3:    PQT  b15_7 2.142857 1000-16000 -0.630 -0.714 -0.805 -0.793 -0.629    1.00
+ 4:    PQT   b9_4 2.250000 1000-16000 -0.634 -0.750 -1.002 -0.926 -0.686    1.01
+ 5:    PQT   b7_3 2.333333 1000-16000 -0.629 -0.778 -0.958 -0.925 -0.534    1.01
+ 6:    PQT   b2.5 2.500000 1000-16000 -0.521 -0.833 -0.485 -0.518 -0.041    1.01
+ 7:    sin   b1.5 1.500000 1000-16000 -0.485 -0.500 -0.472 -0.501 -0.639    1.00
+ 8:    sin     b2 2.000000 1000-16000 -0.606 -0.667 -0.688 -0.703 -0.578    1.01
+ 9:    sin  b15_7 2.142857 1000-16000 -0.634 -0.714 -0.952 -0.881 -0.653    1.05
+10:    sin   b9_4 2.250000 1000-16000 -0.657 -0.750 -1.186 -1.092 -0.818    1.16
+11:    sin   b7_3 2.333333 1000-16000 -0.692 -0.778 -1.151 -1.123 -0.924    1.35
+12:    sin   b2.5 2.500000 1000-16000 -0.909 -0.833 -1.256 -1.256 -1.282    1.69
+Error in .External2(C_X11, paste0("png::", filename), g$width, g$height,  : 
+  unable to start device PNG
+Calls: png
+In addition: Warning message:
+In png(file.path(O, "fig_P1.png"), width = 1500, height = 560, res = 130) :
+  unable to open connection to X11 display ''
+Execution halted
