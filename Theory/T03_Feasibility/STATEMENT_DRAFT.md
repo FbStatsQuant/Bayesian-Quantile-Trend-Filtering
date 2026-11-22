@@ -1,6 +1,6 @@
-# Stage-A theorem: statement v2 (after both reviews)
+# Stage-A theorem: statement v3 (FINAL for T-03; after both reviews and E-02)
 
-*BQTF Theory Department. v2, 2026-11-22; supersedes v1. Statement and lemma statements only, no proofs. The responses to the reviewers, and the evidence, are in `MEMO.md` §8. The reviews themselves are in `reviews/`.*
+*BQTF Theory Department. v3, final for T-03, 2026-11-22; supersedes v1–v2.1. Statement and lemma statements only, no proofs. The responses to the reviewers, and the evidence, are in `MEMO.md` §8. The reviews themselves are in `reviews/`.*
 
 ## Setting and normalization
 
@@ -121,8 +121,8 @@ Then there are constants c, M depending only on (τ, L, f, f̄, σ) such that
    - *Evidence for n^{−5/6} (company sampler, E-04 passed):* the E-02 Gaussian-twin arm gives Laplace ÷ Gaussian-twin = 1.00 ± 0.02 for bias², Δ² and MSE on the kinked truth, over a ∈ {2, 9/4, 5/2, 8/3} and n ≤ 16k (MEMO §8.1a′). The noiseless bias-equivalence table on the company sampler gives Laplace ÷ spline bias² = 0.996–1.013 in all 16 cells (n = 300–2400, a = 2–8/3; MEMO §8.1a″). Earlier, in my own-Gibbs check, since retired, the Laplace posterior-mean bias² equals the smoothing-spline bias² to within 0.5%, at n = 300–2400 and λ = n² to n^{2.67}. In every cell it is far below the ℓ₁-shift bound (MEMO §8).
    - *Decided numerically:* the calibrated kinked-truth bias² slopes are −1.25, −1.01, −0.85, −0.70 and −0.60 at a = 9/4…8/3. That matches the VP law 5a/3 − 5 and excludes the ℓ₁ law at every a (MEMO §8.1e). L4q is drafted (T05), conditional on L3 and λε ≳ n^{10/7}.
 2. **L8-b and L9-c (likelihood side for arbitrary σ).** These are the main proof risk. L8-a gives a small-ω milestone only.
-3. **L10 and a₀.** The interpolation route is plausible but unproved.
-4. **L3 in the Laplace case.** Open; it is needed by both versions.
+3. **L10 and a₀.** The interpolation route is plausible but unproved. It is the next proof target in T-05.
+4. **L3: now drafted (T-05).** It is proved up to a (log n)^{6/5} factor via the Gaussian scale mixture, Anderson's theorem and the singular values of C³ (`Theory/T05_Proofs/L3_small_ball.md`). **L4q** is drafted conditional on its window λε ≳ n^{10/7}·polylog, which holds at the oracle (`L4q_quadratic_shift.md`). Both await self-check and advisor check.
 5. **ALD spread law: confirmed for the ALD posterior** (Engineering, E-02 T3lam, exact Gibbs, κ = 16; E-04 passed, clamp effect ≤ 2%).
    - The slope of the rough spread in log λ is −0.372 at n = 1000 and −0.342 at n = 4000; predicted −1/3.
    - The constant is 0.28–0.35; predicted 0.3–0.4.
