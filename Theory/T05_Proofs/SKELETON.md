@@ -68,8 +68,8 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 | L2 excess risk | margins, C₁ | **self-checked** |
 | L3 small ball | φ(ε) bound | **draft**: proved up to a (log n)^{6/5} factor via the Gaussian scale mixture + Anderson + singular values of C³ (no Laplace small-deviation theory needed) |
 | L4 ℓ₁ shift | fallback prior mass | **self-checked** |
-| L4q quadratic shift | primary prior mass | **draft**, proved conditional on L3 and λε ≳ n^{10/7}; under independent check |
-| L4q-M mollification | bias term | draft (kernel details to write) |
+| L4q quadratic shift | primary prior mass | **self-checked** (Fable adversarial check: correct with fixable gaps, all fixed); awaiting advisor check |
+| L4q-M mollification | bias term | **self-checked** (signed order-3 kernel; proof in L4q file) |
 | L5 normalization | propriety, flat c | **self-checked** |
 | L6 evidence | denominator | **draft**, self-checked given L3/L4/L4q |
 | L8′ bounded numerator | Theorem A | to write (exact-MGF inequality on \|δ\| ≤ Δ) |
