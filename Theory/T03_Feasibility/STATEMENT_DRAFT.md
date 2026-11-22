@@ -118,7 +118,7 @@ Then there are constants c, M depending only on (τ, L, f, f̄, σ) such that
 ## Main open doubts
 
 1. **L4q (quadratic shift).** It decides between the primary rate n^{−5/6} and the fallback n^{−3/4}.
-   - *Evidence for n^{−5/6} (company sampler, E-04 passed):* the E-02 Gaussian-twin arm gives Laplace ÷ Gaussian-twin = 1.00 ± 0.02 for bias², Δ² and MSE on the kinked truth, over a ∈ {2, 9/4, 5/2, 8/3} and n ≤ 16k (MEMO §8.1a′). Earlier, in my own-Gibbs check, since retired, the Laplace posterior-mean bias² equals the smoothing-spline bias² to within 0.5%, at n = 300–2400 and λ = n² to n^{2.67}. In every cell it is far below the ℓ₁-shift bound (MEMO §8).
+   - *Evidence for n^{−5/6} (company sampler, E-04 passed):* the E-02 Gaussian-twin arm gives Laplace ÷ Gaussian-twin = 1.00 ± 0.02 for bias², Δ² and MSE on the kinked truth, over a ∈ {2, 9/4, 5/2, 8/3} and n ≤ 16k (MEMO §8.1a′). The noiseless bias-equivalence table on the company sampler gives Laplace ÷ spline bias² = 0.996–1.013 in all 16 cells (n = 300–2400, a = 2–8/3; MEMO §8.1a″). Earlier, in my own-Gibbs check, since retired, the Laplace posterior-mean bias² equals the smoothing-spline bias² to within 0.5%, at n = 300–2400 and λ = n² to n^{2.67}. In every cell it is far below the ℓ₁-shift bound (MEMO §8).
    - *Decisive test:* Engineering's kinked-truth runs at a ∈ {5/2, 8/3}. Under n^{−5/6}, the risk keeps falling until a = 5/2; under n^{−3/4}, it rises past 9/4.
 2. **L8-b and L9-c (likelihood side for arbitrary σ).** These are the main proof risk. L8-a gives a small-ω milestone only.
 3. **L10 and a₀.** The interpolation route is plausible but unproved.

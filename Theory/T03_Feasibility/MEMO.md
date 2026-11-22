@@ -435,6 +435,23 @@ A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin 
 
 **Conclusions that rest only on exact or deterministic computations.** The small-ball exponent, the Gaussian-analogue spread law, σ̄ and R, the Lemma 19 correction, and the spline-bias scaling. These stand regardless of the sampler checks.
 
+### 8.1a″ Bias-equivalence table on the company sampler (E-04 passed)
+
+*Source: Engineering, `Engineering/E02_Rate_Sims/bias_equiv.R`. Setup: Gaussian likelihood with κ = 16, noiseless y = θ\* (PQ), frozen-λ Laplace posterior, Rao-Blackwellised mean. This replaces the own-MCMC table of §8.1a.*
+
+Each entry is the Laplace posterior-mean bias² divided by the spline bias²:
+
+| a \ n | 300 | 600 | 1200 | 2400 |
+|---|---|---|---|---|
+| 2 | 1.013 | 1.011 | 1.008 | 1.004 |
+| 9/4 | 1.003 | 1.000 | 1.001 | 0.9997 |
+| 5/2 | 1.000 | 0.9996 | 0.9968 | 0.9960 |
+| 8/3 | 0.9999 | 1.000 | 0.9998 | 0.9997 |
+
+- **All 16 cells lie in 0.996–1.013**, covering w/n from 0.047 to 0.33, with λ‖Dθ‖₁/m = 0.993–1.007.
+- The small excess at a = 2 is Monte Carlo noise relative to a tiny bias² (10⁻⁶ to 10⁻⁴).
+- Together with the noisy-data Gaussian-twin ratios of §8.1a′, this **establishes the linear-smoother mechanism for kinked truths on the company sampler**.
+
 ### 8.1a′ Gaussian-twin ratios at E-02 scale (evidence: E-04 passed; produced with the safety clamps, effect ≤ 2%)
 
 *Source: Engineering's sampler, phase "twin". Setup: N(0, 0.25²), τ = 0.5, σ = σ₀, λ = n^a, n ∈ {1k, 4k, 16k}, 10 paired seeds. Each entry is the Laplace ÷ Gaussian-twin ratio, with paired-bootstrap 95% CIs.*
