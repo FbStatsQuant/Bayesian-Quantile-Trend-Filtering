@@ -147,8 +147,8 @@ suppressPackageStartupMessages({
 }
 script_path <- .script_path()
 script_dir <- if (!is.na(script_path)) dirname(script_path) else {
-  cand <- c(.norm("~/Quantile Regression/Simulations/ADMM"), .norm("~/OneDrive/Documents/Quantile Regression/Simulations/ADMM"),
-            .norm(file.path(getwd(), "Simulations", "ADMM")), .norm(getwd()))
+  cand <- c(.norm("~/Quantile Regression/method/admm_qtf"), .norm("~/OneDrive/Documents/Quantile Regression/method/admm_qtf"),
+            .norm(file.path(getwd(), "method", "admm_qtf")), .norm(getwd()))
   cand[dir.exists(cand)][[1L]]
 }
 out_dir <- file.path(script_dir, "results_admm_qtf")

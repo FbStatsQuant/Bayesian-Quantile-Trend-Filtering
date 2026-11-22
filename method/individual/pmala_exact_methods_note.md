@@ -1,6 +1,6 @@
 # Exact augmented P-MALA for Bayesian quantile trend filtering — algorithm changes, their justification, and the multi-seed evidence
 
-Date: 2026-09-25. Scripts: `Individual_Sampler_PMALA_Augmented.R`, `prox_admm_metric.cpp`, `variants_cells.R` (Simulations/Individual; variants_cells.R is no longer in the project).
+Date: 2026-09-25. Scripts: `Individual_Sampler_PMALA_Augmented.R`, `prox_admm_metric.cpp`, `variants_cells.R` (method/individual; variants_cells.R is no longer in the project).
 Rule governing every choice below: one default per sampler, fixed before seeing any dataset, identical across S and VS, all noise types
 and all quantile levels; a change is evaluated on all 30 cells before adoption, never on the cell that motivated it.
 

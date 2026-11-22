@@ -128,14 +128,14 @@ tf_control   <- trendfilter.control.list(max_iter = 2000L, obj_tol = 1e-8)   # i
       isTRUE(tryCatch(rstudioapi::isAvailable(), error = function(e) FALSE)))
     p <- .norm(tryCatch(rstudioapi::getActiveDocumentContext()$path, error = function(e) NA_character_))
   if (!is.na(p) && file.exists(file.path(dirname(p), target))) return(dirname(p))
-  rel <- file.path("Simulations", "Individual")                                             # fallback: search known roots
+  rel <- file.path("method", "individual")                                             # fallback: search known roots
   up <- character(0); d <- .norm(getwd())
   while (!is.na(d) && !(d %in% up)) { up <- c(up, d); d <- dirname(d) }
   cand <- c(up, file.path(up, rel),
             file.path(c("~", "~/Documents", "~/OneDrive/Documents"), "Quantile Regression", rel))
   hit <- cand[file.exists(file.path(cand, target))]
   if (length(hit)) return(.norm(hit[[1L]]))
-  stop("Could not find ", target, ". Open this script from Simulations/Individual, or setwd() there.")
+  stop("Could not find ", target, ". Open this script from method/individual, or setwd() there.")
 }
 script_dir   <- .script_dir()
 cpp_src      <- file.path(script_dir, "prox_admm_metric.cpp")
