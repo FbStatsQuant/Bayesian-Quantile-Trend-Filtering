@@ -123,7 +123,7 @@ Then there are constants c, M depending only on (τ, L, f, f̄, σ) such that
 2. **L8-b and L9-c (likelihood side for arbitrary σ).** These are the main proof risk. L8-a gives a small-ω milestone only.
 3. **L10 and a₀.** The interpolation route is plausible but unproved.
 4. **L3 in the Laplace case.** Open; it is needed by both versions.
-5. **ALD spread law: now confirmed for the ALD posterior** (Engineering, E-02 T3lam, exact Gibbs, κ = 16).
+5. **ALD spread law: consistent with the ALD posterior, PROVISIONAL (pre-E-04; not yet evidence)** (Engineering, E-02 T3lam, exact Gibbs, κ = 16).
    - The slope of the rough spread in log λ is −0.372 at n = 1000 and −0.342 at n = 4000; predicted −1/3.
    - The constant is 0.28–0.35; predicted 0.3–0.4.
    - The spread is flat in n, ratio 1.01–1.04, while n·λ^{−1/3} ≳ 10. It breaks down at n·λ^{−1/3} ≈ 3, as predicted.

@@ -433,7 +433,7 @@ A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin 
 
 *Source: E-02 lamlearn, lamlearn2 and lamlearn3 (Engineering's sampler). Provisional until E-04.*
 
-**The fixed-point formula** λ ≈ (0.27·n·κ^{1/6}/b₀)^{3/4} **is confirmed quantitatively.**
+**The fixed-point formula** λ ≈ (0.27·n·κ^{1/6}/b₀)^{3/4} **agrees quantitatively with the E-02 numbers below. PROVISIONAL (pre-E-04): not cited as evidence until E-04 marks the sampler fit.** The independent confirmation is the paper's own Gamma(1, 1) value.
 - **Quadratic truth, κ = 4, b₀ = n⁻²:**
   - predicted λ ≈ 5.3×10⁵, 1.2×10⁷ and 2.7×10⁸ at n = 500, 2k and 8k; observed medians 4.35×10⁵, 1.16×10⁷ and 2.45×10⁸ (ratios 0.82, 0.97, 0.90);
   - slope 2.257 [2.233, 2.278] against a predicted 9/4;
@@ -498,7 +498,7 @@ A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin 
 | 5.1 | Read slopes only where nλ^{−1/3} ≳ 10 | Agreed; also passed to Engineering. |
 | 5.2 | Sub-exponential noise is not a sufficient fallback | **Accepted.** That fallback is removed. |
 | 5.3 | Positioning: "the posterior attains the linear-smoother rate" | **Adopted** for Corollary A1, conditional on L4q. |
-| 5.5 | b₀ ≍ n^{−7/3} | **Confirmed** by the fixed-point formula. Stage-B candidate (C9). |
+| 5.5 | b₀ ≍ n^{−7/3} | **Consistent with** the fixed-point formula (heuristic; E-02 support provisional). Stage-B candidate (C9). |
 | 5.6 | Uniform over λ-window; fix c; polylog or Mₙ, not both; raise the lower window | **Accepted** (B6, A4, C8). |
 | 6 | Suggested Theorem A | **Adopted** as the target statement in STATEMENT v2, with κ made explicit and the primary/fallback split. |
 
