@@ -429,6 +429,32 @@ A follow-up (`gibbs_validation_grid2.py`) separates them, using a Gaussian-twin 
 
 **Conclusions that rest only on exact or deterministic computations.** The small-ball exponent, the Gaussian-analogue spread law, σ̄ and R, the Lemma 19 correction, and the spline-bias scaling. These stand regardless of the sampler checks.
 
+### 8.1a′ Gaussian-twin ratios at E-02 scale: PROVISIONAL (pre-E-04)
+
+*Source: Engineering's sampler, phase "twin". Setup: N(0, 0.25²), τ = 0.5, σ = σ₀, λ = n^a, n ∈ {1k, 4k, 16k}, 10 paired seeds. Each entry is the Laplace ÷ Gaussian-twin ratio, with paired-bootstrap 95% CIs.*
+
+**Kinked truth (PQT, V = 26): the ratio is ≈ 1 everywhere.**
+- Bias² ratio, at n = 1k / 4k / 16k:
+
+  | a | n = 1k | n = 4k | n = 16k |
+  |---|---|---|---|
+  | 2 | 0.995 | 1.003 | 0.990 |
+  | 9/4 | 1.003 | 0.998 | 0.981 [0.965, 0.997] |
+  | 5/2 | 0.999 | 0.995 | 0.999 |
+  | 8/3 | 1.001 | 0.999 | 0.998 |
+
+- Total Δ² and MSE ratios: 0.992–1.003.
+- Rough-spread ratio: 0.999–1.046.
+- λ‖Dθ‖₁/m: 0.997–1.006.
+- This holds across kernel widths w/n from 0.025 to 0.29. It is exactly the VP's mechanism: for kinks, the Laplace posterior behaves like its Gaussian twin, whose posterior mean is the linear smoother. That is the numerical basis for the primary rate n^{−5/6}, and it now comes from the company sampler rather than Theory's retired one, still pending E-04.
+
+**Smooth truth (sin, V = 157): ≈ 1 except in the bias-dominated corner.**
+- In the many-mode regime the ratio is ≈ 1: at a = 2, bias² 0.99–1.01; at a = 9/4, bias² 0.82 → 0.98 → 1.00 as n grows.
+- Where λ‖Dθ‖₁/m ≫ 1 (a ≥ 5/2, saturated, w/n ≥ 0.13), the Laplace posterior has **15–52% less bias²** than its twin, at the price of 1.15–2.5× the rough spread. This is ℓ₁ adaptivity.
+- This is consistent with Theorem A, which is an *upper* bound with a min over the quadratic and ℓ₁ shift costs: Laplace never does worse than the twin on bias.
+
+**The slope test** (the calibrated kinked arm, a ∈ {9/4, 2.4, 7/3, 5/2, 2.6, 8/3}, n to 32k) is still running.
+
 ### 8.1d Learned λ: the fixed-point formula holds, but it is not a bias-law test
 
 *Source: E-02 lamlearn, lamlearn2 and lamlearn3 (Engineering's sampler). Provisional until E-04.*
