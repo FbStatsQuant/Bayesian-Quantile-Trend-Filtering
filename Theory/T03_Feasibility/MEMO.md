@@ -342,6 +342,13 @@ Both reviews are in `reviews/`. The CEO's combined list of required changes and 
 2. Under the (log-concave) conditional marginals, E(\|h\| − \|u\|)₊ ≈ λh²/2 for \|h\| ≪ 1/λ.
 3. That gives a cost of ≈ λ²‖h‖₂²/2, provided the conditioning on the small-ball set B does not inflate the near-zero density of individual uⱼ (B constrains only about J_eff of the m directions).
 
+> **L4q in one line (the point Felipe's gate turns on).**
+> - **What it needs:** for symmetric convex small-ball sets B and shifts h with ‖h‖∞ ≤ 1/λ, Π_λ(h + B) ≥ exp(−Cλ²‖h‖₂²)·Π_λ(B).
+> - **Why it is plausible:**
+>   1. On average a Laplace shift costs only quadratically: KL(Laplace(h, λ) ‖ Laplace(0, λ)) = λ\|h\| + e^{−λ\|h\|} − 1 ≈ λ²h²/2 for \|h\| ≪ 1/λ.
+>   2. Symmetrizing over ±h (AM–GM) reduces the lemma to bounding the near-zero density of individual uⱼ under Π_λ conditioned on B, and B constrains only about J_eff ≪ m directions.
+>   3. Empirically, the Laplace posterior mean equals the Gaussian-twin (spline) posterior mean to within 0.5% (§8.1a).
+
 **(c) Decision.** I **adopt the VP's min form** as the target statement:
 - the **primary rate** is n^{−5/6} at λ ≍ n^{5/2}/V, conditional on L4q;
 - the **fallback** is the draft's n^{−3/4}, via L4 alone, using the same likelihood-side lemmas.
@@ -358,6 +365,11 @@ Both are in STATEMENT v2. The evidence for the primary version is (a) above toge
 | **5/2** | **n^{−5/6}** (best) | n^{−1/2} |
 | 8/3 | n^{−5/9} | n^{−1/3} |
 | 3 | inconsistent | inconsistent |
+
+**What E-02 will show for the bias law** (agreed with Engineering; CC HQ). A paired **Gaussian-twin** arm: the same exact Gibbs sampler with the scale latents frozen at tⱼ ≡ 2/λ². Settings: sin and PQ, κ = 16, a ∈ {2, 9/4, 5/2, 8/3}, n up to 32k. It reports Laplace÷twin ratios for bias², rough spread and Δ² risk.
+- **Prediction:** all ratios ≈ 1 (within about 5%). That establishes the linear-smoother mechanism, from which n^{−5/6} follows by classical theory, without needing the asymptotic slope.
+- **Falsifier:** a bias ratio that grows with λ points to the ℓ₁ law, i.e. the fallback.
+- **Secondary test:** the slope of the learned-λ λ̄ in n (2.5 vs 2.25) and the PQ/sin ratio (≈ 6 vs 3.8).
 
 ### 8.2 Other required changes, and where each is made
 
