@@ -1,6 +1,6 @@
 # Lemma L4q: quadratic shift inequality for the Laplace prior on small balls
 
-**Status:** draft, self-check in progress (2026-11-22). **Depends on:** L3 (an upper bound on the small-ball exponent) and L4 (the ℓ₁ shift). It also uses one standard fact, Borell's log-concavity of r ↦ μ(rK). **Used by:** L6 (the evidence lower bound) through the mollified shift (Corollary L4q-M), which gives the bias term V²λ^{5/3}n^{−5} of Theorem A.
+**Status:** draft, self-check in progress (2026-11-22); L3 is now drafted (L3_small_ball.md). **Depends on:** L3 (an upper bound on the small-ball exponent) and L4 (the ℓ₁ shift). It also uses one standard fact, Borell's log-concavity of r ↦ μ(rK). **Used by:** L6 (the evidence lower bound) through the mollified shift (Corollary L4q-M), which gives the bias term V²λ^{5/3}n^{−5} of Theorem A.
 
 ## Setting
 

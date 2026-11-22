@@ -66,7 +66,7 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 |---|---|---|
 | L1 basis | coordinates | trivial (verified numerically, T-03) |
 | L2 excess risk | margins, C₁ | **self-checked** |
-| L3 small ball | φ(ε) bound | open (Laplace case); the Gaussian analogue is classical |
+| L3 small ball | φ(ε) bound | **draft**: proved up to a (log n)^{6/5} factor via the Gaussian scale mixture + Anderson + singular values of C³ (no Laplace small-deviation theory needed) |
 | L4 ℓ₁ shift | fallback prior mass | **self-checked** |
 | L4q quadratic shift | primary prior mass | **draft**, proved conditional on L3 and λε ≳ n^{10/7}; under independent check |
 | L4q-M mollification | bias term | draft (kernel details to write) |

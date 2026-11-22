@@ -1,0 +1,2 @@
+owls_run: REFUSED: fb31 compute CPU 727% (measured 727%, reserved by running jobs 200%) + requested 100% would exceed the 8-core budget
+owls_run: wait for running jobs to finish, or move this work to NOTS (see /home/fb31/.config/bvs-hq/owls/POLICY.md).
