@@ -65,12 +65,12 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 | Lemma | Role | Status |
 |---|---|---|
 | L1 basis | coordinates | trivial (verified numerically, T-03) |
-| L2 excess risk | margins, C₁ | **self-checked** |
+| L2 excess risk | margins, C₁ | **advisor-checked** (Astra: accept with fixes; fixes applied) |
 | L3 small ball | φ(ε) bound | **draft**: proved up to a (log n)^{6/5} factor via the Gaussian scale mixture + Anderson + singular values of C³ (no Laplace small-deviation theory needed) |
-| L4 ℓ₁ shift | fallback prior mass | **self-checked** |
+| L4 ℓ₁ shift | fallback prior mass | **advisor-checked** (Astra: accept) |
 | L4q quadratic shift | primary prior mass | **self-checked** (Fable adversarial check: correct with fixable gaps, all fixed); awaiting advisor check |
 | L4q-M mollification | bias term | **self-checked** (signed order-3 kernel; proof in L4q file) |
-| L5 normalization | propriety, flat c | **self-checked** |
+| L5 normalization | propriety, flat c | **advisor-checked** (Astra: accept) |
 | L6 evidence | denominator | **draft**, self-checked given L3/L4/L4q |
 | L8′ bounded numerator | Theorem A | to write (exact-MGF inequality on \|δ\| ≤ Δ) |
 | L8-b realized numerator | Theorem A⁺ | plan only |

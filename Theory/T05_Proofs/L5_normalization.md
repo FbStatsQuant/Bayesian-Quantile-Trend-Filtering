@@ -1,6 +1,6 @@
 # Lemma L5: normalization and propriety (the flat quadratic part)
 
-**Status:** self-checked (2026-11-22). **Depends on:** nothing. **Used by:** every lemma that writes Πₙ(B | y) as a ratio N(B)/N(ℝⁿ).
+**Status:** self-checked (2026-11-22); advisor-checked by Astra (ACCEPT, `reviews/ASTRA_L2_L4_L5.md`). **Depends on:** nothing. **Used by:** every lemma that writes Πₙ(B | y) as a ratio N(B)/N(ℝⁿ).
 
 ## Setting
 
@@ -36,3 +36,9 @@ Propriety needs only coercivity of the check loss; it does not need n ≥ 4. The
 **What this lemma fixes.** The reviewers' objection that "Π(𝔅ᶜ) has no meaning" is handled as follows:
 - every probability statement about the prior is made under Π_λ, which is proper;
 - the flat c is integrated identically in the numerator and the denominator, as above.
+
+## Response to the advisor check (Astra)
+
+Accepted; no change needed. Astra adds two points, recorded here because the skeleton uses them:
+- **Measurability.** For Borel events the integrand is nonnegative and measurable, and the prior is σ-finite. So N(B) is a measurable function of the data.
+- **Finite prior mass of the sup-norm-restricted set** (SKELETON, Step 2). For each u, the constraint ‖θ − θ\*‖∞ ≤ Δ confines c to a translated Euclidean ball of radius √n·Δ, by orthogonal projection. No bound on the quadratic part of the truth enters.

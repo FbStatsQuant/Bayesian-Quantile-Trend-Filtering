@@ -108,7 +108,7 @@ Then there are constants c, M depending only on (τ, L, f, f̄, σ) such that
 
 | Lemma | Statement | Difficulty |
 |---|---|---|
-| **L2 (excess risk)** | For all δ: c₀Δ²ₙ(δ) ≤ n⁻¹M(θ\* + δ) ≤ C₁ min{‖δ‖₁/n, ‖δ‖²ₙ}, globally, and n⁻¹Σᵢ Var Xᵢ ≤ ‖δ‖²ₙ. Here Xᵢ = ρ_τ(yᵢ − θᵢ) − ρ_τ(yᵢ − θ\*ᵢ) and M = Σᵢ E₀Xᵢ. | Easy (P&C Lemma 13 plus (A2)). |
+| **L2 (excess risk)** | For all δ: c₀Δ²ₙ(δ) ≤ n⁻¹M(θ\* + δ) ≤ min{‖δ‖₁/n, C₁‖δ‖²ₙ}, globally, and n⁻¹Σᵢ Var Xᵢ ≤ ‖δ‖²ₙ. Here Xᵢ = ρ_τ(yᵢ − θᵢ) − ρ_τ(yᵢ − θ\*ᵢ) and M = Σᵢ E₀Xᵢ. *(Erratum 2026-11-22, per the Astra review: C₁ now multiplies only the quadratic branch.)* | Easy (P&C Lemma 13 plus (A2)). |
 | **L6 (evidence)** | P₀( N(ℝⁿ) ≥ ε³ exp{−C nκε²} ) → 1, with the prior mass from L3, L4/L4q and L5. | Medium. |
 | **L8 (shells)** | Π(Mε² < Δ²ₙ ≤ K, inside the sieve | y) → 0. **Route L8-a (milestone, small ω only):** a Fubini-integrated numerator bound on {‖θ − θ\*‖∞ ≤ Δ}, with no supremum and no entropy. **Route L8-b (target, any σ):** in-probability uniform bounds on the empirical excess loss over nested structured sieves, chained across scales below ε (VP), inside an Atchadé-type peeling over the shells. | **High.** The old uniform-over-ε-ball version is withdrawn: the reviewers' counterexample shows the ε-ball fits the residual signs. |
 | **L9-a (far region)** | Π(Δ²ₙ > K | y) → 0 for a constant K, by convexity of the empirical risk plus log-concavity of Πₙ. Moment-free. | Medium. Log-concavity in dimension n reaches only a constant K, not Mε². |
