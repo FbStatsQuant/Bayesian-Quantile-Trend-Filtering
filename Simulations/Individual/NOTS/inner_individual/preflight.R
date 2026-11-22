@@ -1,0 +1,10 @@
+# Configuration/source audit only; does not generate data or run chains.
+source("config.R"); source("common.R")
+validate_config(cfg, production=TRUE)
+for (p in c("glmgen", "Rcpp", "coda")) stopifnot(requireNamespace(p, quietly=TRUE))
+load_sampler(normalizePath("."), compile=FALSE)
+check_sampler_defaults(cfg)
+saveRDS(cfg, "../metadata/config.rds"); dput(cfg, file="../metadata/config.txt")
+write.csv(task_grid(cfg), "../metadata/task_manifest.csv", row.names=FALSE)
+capture.output(sessionInfo(), file="../metadata/sessionInfo.txt")
+cat("PREFLIGHT_OK: 3000 independent fits; 15000 sweeps, 3000 burn-in, 12000 retained; lambda shape=1 rate=0.01\n")

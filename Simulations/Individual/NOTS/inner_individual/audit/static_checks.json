@@ -1,0 +1,193 @@
+{
+  "utc": "2026-10-03T21:34:06.574151+00:00",
+  "command": [
+    "Simulations/Individual/NOTS/inner_individual/prepare_package.py"
+  ],
+  "scope": "Syntax and file identity only; no simulation or numerical validation",
+  "checks": [
+    {
+      "file": "environment.sh",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/environment.sh"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "inspect_nots.py",
+      "check": "Python AST parse",
+      "exit_status": 0
+    },
+    {
+      "file": "monitor.py",
+      "check": "Python AST parse",
+      "exit_status": 0
+    },
+    {
+      "file": "operations/predeploy.sh",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/operations/predeploy.sh"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "operations/submit_validation.sh",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/operations/submit_validation.sh"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "path_guard.sh",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/path_guard.sh"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "prepare_package.py",
+      "check": "Python AST parse",
+      "exit_status": 0
+    },
+    {
+      "file": "remote_admin.py",
+      "check": "Python AST parse",
+      "exit_status": 0
+    },
+    {
+      "file": "run_task.sh",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/run_task.sh"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "slurm/array.slurm",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/slurm/array.slurm"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "slurm/process.slurm",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/slurm/process.slurm"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "slurm/validate.slurm",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/slurm/validate.slurm"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "start_monitor.sh",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/start_monitor.sh"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "status.py",
+      "check": "Python AST parse",
+      "exit_status": 0
+    },
+    {
+      "file": "submit.sh",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/submit.sh"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "file": "upload_package.py",
+      "check": "Python AST parse",
+      "exit_status": 0
+    },
+    {
+      "file": "validate.sh",
+      "check": "bash -n",
+      "command": [
+        "C:/Program Files/Git/bin/bash.exe",
+        "-n",
+        "C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Individual/NOTS/inner_individual/validate.sh"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "check": "R parse only",
+      "command": [
+        "C:/Program Files/R/R-4.4.1/bin/Rscript.exe",
+        "--vanilla",
+        "-e",
+        "for (f in list.files(\".\", pattern=\"[.]R$\", recursive=TRUE, full.names=TRUE)) { parse(f); cat(\"PARSE_OK\", f, \"\\n\") }"
+      ],
+      "exit_status": 0,
+      "output": "PARSE_OK ./common.R \nPARSE_OK ./config.R \nPARSE_OK ./preflight.R \nPARSE_OK ./process_results.R \nPARSE_OK ./source/Individual_Sampler_PMALA_Augmented.R \nPARSE_OK ./validate_outputs.R \nPARSE_OK ./worker.R \nDuring startup - Warning messages:\n1: Setting LC_COLLATE=C.UTF-8 failed \n2: Setting LC_CTYPE=C.UTF-8 failed \n3: Setting LC_MONETARY=C.UTF-8 failed \n4: Setting LC_TIME=C.UTF-8 failed \n"
+    }
+  ],
+  "source_identity": [
+    {
+      "original": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\Simulations\\Individual\\Individual_Sampler_PMALA_Augmented.R",
+      "snapshot": "source/Individual_Sampler_PMALA_Augmented.R",
+      "sha256": "300d2b6678771f03aa281d41e82d0056b2735572e563748033c782f05c74d324"
+    },
+    {
+      "original": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\Simulations\\Individual\\prox_admm_metric.cpp",
+      "snapshot": "source/prox_admm_metric.cpp",
+      "sha256": "ed607632e3518d63ac0d8b87671de287970e9a5b3bd9f943fb1ae94e5042f766"
+    },
+    {
+      "original": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\sections\\simulations.tex",
+      "snapshot": "paper_reference/simulations.tex",
+      "sha256": "826dca713968e33e0bbdf641116f22dd0284735e73d4f3073148cbb79be60bf0"
+    },
+    {
+      "original": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\sections\\appendix_pmala.tex",
+      "snapshot": "paper_reference/appendix_pmala.tex",
+      "sha256": "52df6b4c788759ead25c54ce0f9487429b26cfbdc479c01efd95db81778f8f84"
+    }
+  ]
+}

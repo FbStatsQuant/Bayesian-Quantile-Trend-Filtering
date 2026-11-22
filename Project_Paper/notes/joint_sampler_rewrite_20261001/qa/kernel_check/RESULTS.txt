@@ -1,0 +1,77 @@
+LOCAL CANDIDATE RESULTS — 2026-09-30
+
+1. First acceptance test: singleton tau=c(.10)
+   Same VS Normal observations, data seed=1, chain seed=1001, n=50,
+   120 sweeps, burn=60, warm=10, ADMM=200, original guards, ASIS on.
+   EXACT identical theta/lambda/sigma/delta/acceptance/roughness trajectories
+   and final RNG state against the approved D reference.
+   Both MSE=0.4039141 and mean check loss=0.07554636.
+   Both retained acceptance=0.6666667 and final delta=0.4239156.
+   Delta adapts through sweep60 and is unchanged thereafter.
+   Evidence: singleton_parity.csv/.rds/.log, test_singleton.R.
+   These short-run estimates establish parity only, not estimation quality.
+
+2. Bounded whole-U metric prox
+   Diagonal quadratic lambda=0 reference: PASS against analytic bounded optimum.
+   Small n=6 full-metric lambda>0 reference: independent epigraph QP, with
+   explicit 1e-9 auxiliary ridge; independent unperturbed KKT checks also pass.
+   ADMM200 max coordinate error versus QP: 2.240883e-10;
+   primal residual=1.010816e-10, dual residual=3.593580e-11,
+   stationarity infinity norm=1.565575e-9, l1 Fenchel gap=1.11e-16,
+   box-normal violation=0. Cold-start repeated result is identical.
+   High-budget solve stops at222 iterations at absolute tol1e-11.
+   This fixture's accuracy does not establish general ADMM200 exactness.
+   Evidence: prox_checks.csv, bounded_checks.log/.rds, test_bounded.R.
+
+3. Support, density, interweaving, validation
+   PASS: real outside-Gaussian-support proposal rejected without projection;
+   reverse map uses identical fixed box and metric; independently reconstructed
+   Gaussian log acceptance and selected state match.
+   PASS: bounded ASIS mixed-sign/zero-component feasible scale domain,
+   equality box remains unchanged, every sampled state feasible.
+   5000 retained ASIS log-lambda draws: mean=.9835671 versus independent
+   quadrature=.9829932, batch SE=.004322998.
+   PASS: inverted bounds; tau0/1, duplicates, unsorted/nonfinite/empty inputs;
+   numerically collapsed strictly-ordered initialization rejection.
+   Evidence: asis_checks.csv, bounded_checks.log/.rds.
+
+4. Joint smoke tests (VS Normal, n=60, total1000/burn500/warm50, seeds1/1001)
+   No manual delta tuning. For every quantile, retained delta is frozen.
+   No crossing after every theta move, theta block and interweaving block,
+   or at any retained sweep. Minimum gap over the whole run was0 (weak ordering
+   allows equality during warmup). Every quantile accepted retained theta moves.
+
+   tau    outside rate   accept rate   retained theta moves   ASIS moves
+   .10       .040           .568              284                500
+   .50       .248           .410              205                500
+   .90       .210           .428              214                500
+   .96       .428           .504              252                500
+   .97       .454           .496              248                500
+   .98       .342           .554              277                500
+   .99       .000           .482              241                500
+
+   Audit counts central: initial1, theta_move2850, theta3000, interweaving3000.
+   Audit counts tail: initial1, theta_move3800, theta4000, interweaving4000.
+   Runtime about8.9s central and11.2s tail, excluding native compilation.
+   Evidence: joint_checks.csv/.log, joint_central.rds, joint_tail.rds.
+
+5. Material limitation: movement is not useful mixing
+   Descriptive ESS of mean(theta) over the500 retained draws:
+   central .10/.50/.90: 5.37 / 7.20 / 3.88;
+   tail .96/.97/.98/.99: 3.60 / 2.68 / 9.63 / 1.13.
+   Tau=.99 mean curve level was14.40; second-half minus first-half mean level
+   was-7.43, and max coordinate SD=5.086. This is substantial nonstationarity
+   in the short test, not validation of the extreme-tail estimate.
+   The small n=60 test cannot establish behavior or efficiency at n=500.
+   No claimed convergence, useful-mixing result, production adoption, cluster
+   campaign, manual delta adjustment, or changes to inherited guards.
+   Evidence: short_chain_diagnostics.csv/.log and saved chains.
+
+6. Review and preservation
+   Independent mathematical, code and saved-evidence review: PASS, no core
+   correctness blocker for this local candidate. A robustness recommendation
+   to reject numerically collapsed joint initialization was implemented/tested.
+   Independent reviewer checked movement counts, ordering, final states and
+   adaptation boundary directly from the RDS artifacts.
+   Source hashes verify original/D reference preservation and byte-identical
+   local reference snapshots; artifact_hashes.json records local deliverables.

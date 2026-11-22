@@ -1,0 +1,2 @@
+"baseline","noise","n","seed","tau","target","mse","mad","mciw","coverage","paper_individual_mse","acc_post","outside_rate","ipm_share","asis_moved","delta_final","lambda_mean","sigma_mean","gibbs_iter","gibbs_burn","b0","kappa","admm_iter","seconds","mse_ratio_to_paper"
+"VS","Normal",500,1,0.95,TRUE,0.0388493351179311,0.10415677051218,0.26582996964088,0.76,0.018994,0.49845,0,0,1,0.0975135300228601,1220.54689735493,0.0321203848399124,30000,10000,0.01,3,150,270.72,2.04534774760088

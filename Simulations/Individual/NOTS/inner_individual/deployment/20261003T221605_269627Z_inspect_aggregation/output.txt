@@ -1,0 +1,16 @@
+2026-10-03T22:16:06+00:00
+JobID|State|ExitCode|Elapsed|MaxRSS
+1786241|COMPLETED|0:0|00:14:15|
+1786241.batch|COMPLETED|0:0|00:14:15|4190360K
+1786241.extern|COMPLETED|0:0|00:14:15|
+              8.850111             52.20726
+              7.653246             39.22607
+              5.698600             38.38904
+             13.003582             52.74225
+             13.045470             57.65974
+             10.749262             52.13754
+              5.533504             39.25091
+PROCESS_SUCCESS /home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z/summary/attempt_20261003T220144_663066 2026-10-03T22:15:57Z 
+exit_status=0
+finished_utc=2026-10-03T22:15:57+00:00
+runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z/summary/attempt_20261003T220144_663066/SUCCESS

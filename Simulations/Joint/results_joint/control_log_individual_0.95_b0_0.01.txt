@@ -1,0 +1,83 @@
+it   500 | acc 0.266 | out 0.000 | delta 1.17e-01 | lambda 475.5 | sigma 0.0306 | 4s
+it  1000 | acc 0.393 | out 0.000 | delta 9.87e-02 | lambda 675.2 | sigma 0.0323 | 9s
+it  1500 | acc 0.417 | out 0.000 | delta 1.02e-01 | lambda 634.6 | sigma 0.0313 | 14s
+it  2000 | acc 0.438 | out 0.000 | delta 1.06e-01 | lambda 847.4 | sigma 0.0304 | 19s
+it  2500 | acc 0.450 | out 0.000 | delta 1.05e-01 | lambda 917.8 | sigma 0.0334 | 26s
+it  3000 | acc 0.454 | out 0.000 | delta 9.77e-02 | lambda 913.0 | sigma 0.0323 | 32s
+it  3500 | acc 0.464 | out 0.000 | delta 1.00e-01 | lambda 976.3 | sigma 0.0335 | 38s
+it  4000 | acc 0.468 | out 0.000 | delta 1.07e-01 | lambda 1074.9 | sigma 0.0340 | 46s
+it  4500 | acc 0.469 | out 0.000 | delta 1.02e-01 | lambda 845.6 | sigma 0.0305 | 50s
+it  5000 | acc 0.470 | out 0.000 | delta 9.57e-02 | lambda 830.7 | sigma 0.0322 | 55s
+it  5500 | acc 0.472 | out 0.000 | delta 9.55e-02 | lambda 888.2 | sigma 0.0327 | 60s
+it  6000 | acc 0.477 | out 0.000 | delta 1.02e-01 | lambda 754.7 | sigma 0.0320 | 65s
+it  6500 | acc 0.476 | out 0.000 | delta 9.97e-02 | lambda 802.1 | sigma 0.0334 | 70s
+it  7000 | acc 0.479 | out 0.000 | delta 1.05e-01 | lambda 846.8 | sigma 0.0304 | 75s
+it  7500 | acc 0.479 | out 0.000 | delta 1.01e-01 | lambda 983.4 | sigma 0.0322 | 80s
+it  8000 | acc 0.482 | out 0.000 | delta 1.06e-01 | lambda 1017.4 | sigma 0.0330 | 84s
+it  8500 | acc 0.483 | out 0.000 | delta 1.03e-01 | lambda 1132.8 | sigma 0.0317 | 89s
+it  9000 | acc 0.483 | out 0.000 | delta 9.75e-02 | lambda 1431.9 | sigma 0.0305 | 93s
+it  9500 | acc 0.484 | out 0.000 | delta 9.83e-02 | lambda 1145.7 | sigma 0.0331 | 98s
+it 10000 | acc 0.486 | out 0.000 | delta 9.85e-02 | lambda 857.4 | sigma 0.0310 | 103s
+it 10500 | acc 0.488 | out 0.000 | delta 1.01e-01 | lambda 878.9 | sigma 0.0308 | 108s
+it 11000 | acc 0.488 | out 0.000 | delta 9.94e-02 | lambda 1032.3 | sigma 0.0344 | 113s
+it 11500 | acc 0.489 | out 0.000 | delta 1.01e-01 | lambda 910.4 | sigma 0.0311 | 118s
+it 12000 | acc 0.490 | out 0.000 | delta 1.01e-01 | lambda 930.7 | sigma 0.0306 | 124s
+it 12500 | acc 0.490 | out 0.000 | delta 1.00e-01 | lambda 927.6 | sigma 0.0299 | 128s
+it 13000 | acc 0.491 | out 0.000 | delta 1.05e-01 | lambda 1225.8 | sigma 0.0328 | 133s
+it 13500 | acc 0.491 | out 0.000 | delta 1.02e-01 | lambda 1041.3 | sigma 0.0303 | 138s
+it 14000 | acc 0.491 | out 0.000 | delta 1.00e-01 | lambda 1010.8 | sigma 0.0291 | 143s
+it 14500 | acc 0.492 | out 0.000 | delta 9.91e-02 | lambda 970.9 | sigma 0.0316 | 148s
+it 15000 | acc 0.493 | out 0.000 | delta 1.05e-01 | lambda 1088.7 | sigma 0.0313 | 153s
+it 15500 | acc 0.494 | out 0.000 | delta 1.05e-01 | lambda 1065.1 | sigma 0.0316 | 157s
+it 16000 | acc 0.493 | out 0.000 | delta 1.06e-01 | lambda 1105.0 | sigma 0.0303 | 162s
+it 16500 | acc 0.493 | out 0.000 | delta 1.04e-01 | lambda 1040.2 | sigma 0.0310 | 167s
+it 17000 | acc 0.493 | out 0.000 | delta 1.03e-01 | lambda 1037.4 | sigma 0.0320 | 172s
+it 17500 | acc 0.493 | out 0.000 | delta 1.02e-01 | lambda 1089.2 | sigma 0.0293 | 177s
+it 18000 | acc 0.493 | out 0.000 | delta 1.02e-01 | lambda 1066.9 | sigma 0.0319 | 182s
+it 18500 | acc 0.493 | out 0.000 | delta 1.01e-01 | lambda 977.0 | sigma 0.0311 | 186s
+it 19000 | acc 0.494 | out 0.000 | delta 1.02e-01 | lambda 1089.5 | sigma 0.0315 | 192s
+it 19500 | acc 0.494 | out 0.000 | delta 1.05e-01 | lambda 842.9 | sigma 0.0315 | 198s
+it 20000 | acc 0.494 | out 0.000 | delta 1.05e-01 | lambda 753.5 | sigma 0.0308 | 203s
+it 20500 | acc 0.493 | out 0.000 | delta 9.93e-02 | lambda 828.8 | sigma 0.0317 | 208s
+it 21000 | acc 0.493 | out 0.000 | delta 9.64e-02 | lambda 1053.9 | sigma 0.0336 | 212s
+it 21500 | acc 0.492 | out 0.000 | delta 9.26e-02 | lambda 1256.4 | sigma 0.0312 | 216s
+it 22000 | acc 0.493 | out 0.000 | delta 9.33e-02 | lambda 1220.9 | sigma 0.0327 | 220s
+it 22500 | acc 0.493 | out 0.000 | delta 9.32e-02 | lambda 1381.7 | sigma 0.0316 | 224s
+it 23000 | acc 0.493 | out 0.000 | delta 9.54e-02 | lambda 1069.3 | sigma 0.0330 | 229s
+it 23500 | acc 0.493 | out 0.000 | delta 9.45e-02 | lambda 1281.9 | sigma 0.0306 | 233s
+it 24000 | acc 0.493 | out 0.000 | delta 9.60e-02 | lambda 1769.3 | sigma 0.0347 | 237s
+it 24500 | acc 0.494 | out 0.000 | delta 1.00e-01 | lambda 1922.4 | sigma 0.0335 | 241s
+it 25000 | acc 0.494 | out 0.000 | delta 1.00e-01 | lambda 1582.3 | sigma 0.0312 | 244s
+it 25500 | acc 0.493 | out 0.000 | delta 9.80e-02 | lambda 1667.8 | sigma 0.0319 | 247s
+it 26000 | acc 0.494 | out 0.000 | delta 9.91e-02 | lambda 1499.3 | sigma 0.0303 | 251s
+it 26500 | acc 0.494 | out 0.000 | delta 9.70e-02 | lambda 1479.6 | sigma 0.0313 | 254s
+it 27000 | acc 0.494 | out 0.000 | delta 9.94e-02 | lambda 1566.5 | sigma 0.0307 | 257s
+it 27500 | acc 0.494 | out 0.000 | delta 9.70e-02 | lambda 1676.9 | sigma 0.0373 | 261s
+it 28000 | acc 0.495 | out 0.000 | delta 1.00e-01 | lambda 1514.4 | sigma 0.0352 | 263s
+it 28500 | acc 0.495 | out 0.000 | delta 1.03e-01 | lambda 1495.1 | sigma 0.0325 | 265s
+it 29000 | acc 0.495 | out 0.000 | delta 1.03e-01 | lambda 1720.9 | sigma 0.0339 | 267s
+it 29500 | acc 0.495 | out 0.000 | delta 1.02e-01 | lambda 1523.6 | sigma 0.0319 | 269s
+it 30000 | acc 0.494 | out 0.000 | delta 9.75e-02 | lambda 1532.1 | sigma 0.0326 | 271s
+
+==== per-quantile results ====
+  tau target     mse paper_individual_mse mse_ratio_to_paper    mad   mciw
+ 0.95   TRUE 0.03885              0.01899              2.045 0.1042 0.2658
+ coverage acc_post outside_rate ipm_share asis_moved delta_final lambda_mean
+     0.76   0.4985            0         0          1     0.09751        1221
+ sigma_mean
+    0.03212
+
+==== crossings between adjacent levels (posterior means and draws) ====
+data frame with 0 columns and 0 rows
+
+==== crossings between all pairs ====
+data frame with 0 columns and 0 rows
+
+total time 271 s
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+saved: C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Joint/results_joint/joint_*_VS_Normal_n500_seed1_b0_0.01_taus_0.95.{csv,rds,png} 

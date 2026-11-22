@@ -1,0 +1,261 @@
+Munich: N = 2035 apartments at n = 134 floor sizes (17-185 m2), k = 2, m = 131 | 20000 sweeps, 5000 burn-in
+
+== tau = 0.10 ==
+it   500 | acc 0.358 | delta 1.99e-01 | lambda   181.71 | sigma 0.4324 | 1s
+it  1000 | acc 0.459 | delta 2.15e-01 | lambda   338.32 | sigma 0.4115 | 3s
+it  1500 | acc 0.499 | delta 2.64e-01 | lambda   682.88 | sigma 0.4334 | 4s
+it  2000 | acc 0.503 | delta 2.19e-01 | lambda   373.13 | sigma 0.4152 | 5s
+it  2500 | acc 0.512 | delta 2.14e-01 | lambda   979.38 | sigma 0.4243 | 6s
+it  3000 | acc 0.516 | delta 2.05e-01 | lambda  1615.26 | sigma 0.4223 | 8s
+it  3500 | acc 0.519 | delta 1.98e-01 | lambda  1302.29 | sigma 0.4049 | 10s
+it  4000 | acc 0.529 | delta 2.24e-01 | lambda   754.49 | sigma 0.4068 | 11s
+it  4500 | acc 0.534 | delta 2.22e-01 | lambda  1310.56 | sigma 0.4132 | 13s
+it  5000 | acc 0.531 | delta 2.02e-01 | lambda  1603.20 | sigma 0.4232 | 15s
+it  5500 | acc 0.534 | delta 2.04e-01 | lambda  2716.42 | sigma 0.4053 | 16s
+it  6000 | acc 0.532 | delta 1.85e-01 | lambda  2519.23 | sigma 0.4125 | 18s
+it  6500 | acc 0.536 | delta 1.99e-01 | lambda  1251.18 | sigma 0.4184 | 19s
+it  7000 | acc 0.543 | delta 2.22e-01 | lambda   991.01 | sigma 0.4121 | 21s
+it  7500 | acc 0.546 | delta 2.27e-01 | lambda  1197.50 | sigma 0.4206 | 22s
+it  8000 | acc 0.546 | delta 2.22e-01 | lambda   436.29 | sigma 0.4336 | 23s
+it  8500 | acc 0.545 | delta 2.18e-01 | lambda   620.67 | sigma 0.4266 | 25s
+it  9000 | acc 0.544 | delta 2.14e-01 | lambda  1119.54 | sigma 0.4439 | 26s
+it  9500 | acc 0.545 | delta 2.25e-01 | lambda  1305.04 | sigma 0.4145 | 27s
+it 10000 | acc 0.545 | delta 2.19e-01 | lambda  1499.30 | sigma 0.4145 | 28s
+it 10500 | acc 0.545 | delta 2.16e-01 | lambda  1389.17 | sigma 0.4244 | 29s
+it 11000 | acc 0.544 | delta 2.12e-01 | lambda  1166.44 | sigma 0.4288 | 31s
+it 11500 | acc 0.546 | delta 2.26e-01 | lambda  1176.51 | sigma 0.4167 | 32s
+it 12000 | acc 0.545 | delta 2.13e-01 | lambda  1921.94 | sigma 0.4188 | 33s
+it 12500 | acc 0.544 | delta 2.10e-01 | lambda   924.14 | sigma 0.4273 | 34s
+it 13000 | acc 0.545 | delta 2.14e-01 | lambda   798.31 | sigma 0.4153 | 35s
+it 13500 | acc 0.544 | delta 2.08e-01 | lambda   533.33 | sigma 0.4236 | 37s
+it 14000 | acc 0.543 | delta 2.04e-01 | lambda   581.19 | sigma 0.4238 | 38s
+it 14500 | acc 0.543 | delta 1.98e-01 | lambda   875.73 | sigma 0.4191 | 39s
+it 15000 | acc 0.543 | delta 2.01e-01 | lambda  1277.38 | sigma 0.4223 | 40s
+it 15500 | acc 0.545 | delta 2.08e-01 | lambda   679.65 | sigma 0.4138 | 41s
+it 16000 | acc 0.545 | delta 2.08e-01 | lambda   604.83 | sigma 0.4262 | 42s
+it 16500 | acc 0.546 | delta 2.13e-01 | lambda   530.19 | sigma 0.4172 | 44s
+it 17000 | acc 0.546 | delta 2.12e-01 | lambda   700.67 | sigma 0.4261 | 45s
+it 17500 | acc 0.546 | delta 2.15e-01 | lambda   504.05 | sigma 0.4205 | 46s
+it 18000 | acc 0.548 | delta 2.24e-01 | lambda   765.08 | sigma 0.4207 | 47s
+it 18500 | acc 0.547 | delta 2.12e-01 | lambda   776.38 | sigma 0.4193 | 48s
+it 19000 | acc 0.547 | delta 2.16e-01 | lambda   864.50 | sigma 0.4406 | 49s
+it 19500 | acc 0.548 | delta 2.22e-01 | lambda  1098.14 | sigma 0.4181 | 51s
+it 20000 | acc 0.548 | delta 2.19e-01 | lambda  1531.63 | sigma 0.4047 | 52s
+  tau k a0    b0 a_sigma b_sigma gibbs_iter gibbs_burn  acc_post delta_final
+1 0.1 2  1 0.001     0.1     0.1      20000       5000 0.5531333   0.2191876
+  lambda_mean sigma_mean   SD_mean frac_below ess_theta_median ess_theta_min
+1    1078.338   0.421152 0.1465329  0.0992629         90.51021      64.79714
+  ess_lambda ess_sigma lambda_drift_halves seconds
+1   7.843745   7501.87           0.4460002  51.697
+
+== tau = 0.30 ==
+it   500 | acc 0.342 | delta 2.34e-01 | lambda   411.92 | sigma 0.8251 | 1s
+it  1000 | acc 0.439 | delta 2.04e-01 | lambda   657.56 | sigma 0.8476 | 2s
+it  1500 | acc 0.476 | delta 2.22e-01 | lambda   695.15 | sigma 0.8046 | 4s
+it  2000 | acc 0.501 | delta 2.33e-01 | lambda  1267.35 | sigma 0.8284 | 5s
+it  2500 | acc 0.505 | delta 2.15e-01 | lambda  1748.19 | sigma 0.8075 | 6s
+it  3000 | acc 0.515 | delta 2.12e-01 | lambda  2168.04 | sigma 0.8440 | 7s
+it  3500 | acc 0.520 | delta 2.21e-01 | lambda  1304.62 | sigma 0.8206 | 8s
+it  4000 | acc 0.522 | delta 2.31e-01 | lambda  1149.22 | sigma 0.8542 | 9s
+it  4500 | acc 0.521 | delta 2.23e-01 | lambda  2305.20 | sigma 0.8105 | 11s
+it  5000 | acc 0.522 | delta 2.21e-01 | lambda  1644.85 | sigma 0.8258 | 12s
+it  5500 | acc 0.521 | delta 2.04e-01 | lambda  1687.60 | sigma 0.8292 | 14s
+it  6000 | acc 0.524 | delta 2.03e-01 | lambda  1324.97 | sigma 0.8174 | 16s
+it  6500 | acc 0.529 | delta 2.09e-01 | lambda   974.51 | sigma 0.8056 | 17s
+it  7000 | acc 0.532 | delta 2.17e-01 | lambda  1239.26 | sigma 0.8205 | 19s
+it  7500 | acc 0.531 | delta 2.12e-01 | lambda  1082.14 | sigma 0.8279 | 21s
+it  8000 | acc 0.535 | delta 2.27e-01 | lambda   793.26 | sigma 0.8331 | 23s
+it  8500 | acc 0.536 | delta 2.17e-01 | lambda   808.11 | sigma 0.8214 | 24s
+it  9000 | acc 0.536 | delta 2.14e-01 | lambda  1022.46 | sigma 0.8164 | 26s
+it  9500 | acc 0.537 | delta 2.22e-01 | lambda   697.75 | sigma 0.8054 | 28s
+it 10000 | acc 0.538 | delta 2.26e-01 | lambda   633.75 | sigma 0.8399 | 30s
+it 10500 | acc 0.540 | delta 2.25e-01 | lambda  1374.51 | sigma 0.8179 | 31s
+it 11000 | acc 0.540 | delta 2.22e-01 | lambda   789.79 | sigma 0.8170 | 33s
+it 11500 | acc 0.538 | delta 2.17e-01 | lambda  1371.89 | sigma 0.8018 | 35s
+it 12000 | acc 0.538 | delta 2.02e-01 | lambda  2109.82 | sigma 0.8318 | 37s
+it 12500 | acc 0.538 | delta 2.02e-01 | lambda  2284.61 | sigma 0.8261 | 39s
+it 13000 | acc 0.539 | delta 2.05e-01 | lambda  2252.58 | sigma 0.8394 | 40s
+it 13500 | acc 0.540 | delta 2.15e-01 | lambda  2362.55 | sigma 0.8447 | 42s
+it 14000 | acc 0.541 | delta 2.19e-01 | lambda  1029.42 | sigma 0.8391 | 44s
+it 14500 | acc 0.541 | delta 2.21e-01 | lambda   847.22 | sigma 0.8145 | 47s
+it 15000 | acc 0.542 | delta 2.26e-01 | lambda  1362.09 | sigma 0.8171 | 49s
+it 15500 | acc 0.541 | delta 2.20e-01 | lambda  1291.40 | sigma 0.8300 | 52s
+it 16000 | acc 0.541 | delta 2.12e-01 | lambda  1402.24 | sigma 0.8379 | 55s
+it 16500 | acc 0.541 | delta 2.14e-01 | lambda  1209.96 | sigma 0.8288 | 57s
+it 17000 | acc 0.542 | delta 2.17e-01 | lambda  1581.10 | sigma 0.8016 | 59s
+it 17500 | acc 0.543 | delta 2.23e-01 | lambda  2926.33 | sigma 0.8194 | 62s
+it 18000 | acc 0.543 | delta 2.19e-01 | lambda  1353.68 | sigma 0.8515 | 64s
+it 18500 | acc 0.543 | delta 2.25e-01 | lambda  1770.99 | sigma 0.7872 | 67s
+it 19000 | acc 0.543 | delta 2.16e-01 | lambda  1661.51 | sigma 0.8015 | 69s
+it 19500 | acc 0.543 | delta 2.15e-01 | lambda   824.77 | sigma 0.8583 | 71s
+it 20000 | acc 0.543 | delta 2.18e-01 | lambda  1144.08 | sigma 0.8531 | 74s
+  tau k a0    b0 a_sigma b_sigma gibbs_iter gibbs_burn  acc_post delta_final
+1 0.3 2  1 0.001     0.1     0.1      20000       5000 0.5494667   0.2183805
+  lambda_mean sigma_mean   SD_mean frac_below ess_theta_median ess_theta_min
+1    1394.116  0.8265396 0.1052404  0.2972973         120.6741      93.12961
+  ess_lambda ess_sigma lambda_drift_halves seconds
+1   12.91822  7446.269           0.2341495  74.261
+
+== tau = 0.50 ==
+it   500 | acc 0.330 | delta 2.29e-01 | lambda   242.10 | sigma 0.9085 | 2s
+it  1000 | acc 0.443 | delta 2.27e-01 | lambda   839.31 | sigma 0.8899 | 4s
+it  1500 | acc 0.475 | delta 2.28e-01 | lambda  1209.74 | sigma 0.9000 | 6s
+it  2000 | acc 0.492 | delta 2.14e-01 | lambda  1959.80 | sigma 0.9396 | 8s
+it  2500 | acc 0.506 | delta 2.41e-01 | lambda  2940.15 | sigma 0.9136 | 10s
+it  3000 | acc 0.505 | delta 2.05e-01 | lambda  1667.82 | sigma 0.8925 | 12s
+it  3500 | acc 0.511 | delta 2.06e-01 | lambda  2894.85 | sigma 0.9408 | 14s
+it  4000 | acc 0.519 | delta 2.17e-01 | lambda  3824.45 | sigma 0.9405 | 15s
+it  4500 | acc 0.524 | delta 2.14e-01 | lambda  1319.75 | sigma 0.9416 | 18s
+it  5000 | acc 0.526 | delta 2.25e-01 | lambda  1887.87 | sigma 0.9284 | 20s
+it  5500 | acc 0.526 | delta 2.14e-01 | lambda  1678.59 | sigma 0.9351 | 22s
+it  6000 | acc 0.528 | delta 2.04e-01 | lambda  1943.59 | sigma 0.9600 | 24s
+it  6500 | acc 0.529 | delta 1.94e-01 | lambda  1451.68 | sigma 0.9120 | 26s
+it  7000 | acc 0.531 | delta 1.94e-01 | lambda  1430.95 | sigma 0.9374 | 28s
+it  7500 | acc 0.535 | delta 1.99e-01 | lambda  1531.56 | sigma 0.9415 | 31s
+it  8000 | acc 0.535 | delta 1.95e-01 | lambda  2420.26 | sigma 0.9260 | 33s
+it  8500 | acc 0.535 | delta 1.96e-01 | lambda  2627.62 | sigma 0.9440 | 35s
+it  9000 | acc 0.536 | delta 1.96e-01 | lambda  2574.83 | sigma 0.9327 | 38s
+it  9500 | acc 0.536 | delta 1.99e-01 | lambda  4967.07 | sigma 0.8881 | 41s
+it 10000 | acc 0.538 | delta 2.12e-01 | lambda  5167.06 | sigma 0.9370 | 43s
+it 10500 | acc 0.540 | delta 2.23e-01 | lambda  3171.05 | sigma 0.9379 | 45s
+it 11000 | acc 0.539 | delta 2.24e-01 | lambda  1839.01 | sigma 0.9289 | 47s
+it 11500 | acc 0.539 | delta 2.23e-01 | lambda  1994.58 | sigma 0.9049 | 49s
+it 12000 | acc 0.538 | delta 2.26e-01 | lambda  3754.34 | sigma 0.9464 | 52s
+it 12500 | acc 0.536 | delta 2.08e-01 | lambda  3429.75 | sigma 0.9449 | 54s
+it 13000 | acc 0.537 | delta 2.07e-01 | lambda  3407.12 | sigma 0.9426 | 57s
+it 13500 | acc 0.537 | delta 2.04e-01 | lambda  2812.06 | sigma 0.9403 | 60s
+it 14000 | acc 0.537 | delta 2.06e-01 | lambda  2287.34 | sigma 0.9392 | 63s
+it 14500 | acc 0.539 | delta 2.17e-01 | lambda  2774.99 | sigma 0.9172 | 65s
+it 15000 | acc 0.539 | delta 2.11e-01 | lambda  2008.62 | sigma 0.9029 | 67s
+it 15500 | acc 0.539 | delta 2.10e-01 | lambda  2933.78 | sigma 0.9193 | 70s
+it 16000 | acc 0.540 | delta 2.16e-01 | lambda  2849.16 | sigma 0.9285 | 72s
+it 16500 | acc 0.539 | delta 2.11e-01 | lambda  2354.81 | sigma 0.9078 | 73s
+it 17000 | acc 0.541 | delta 2.19e-01 | lambda  1744.29 | sigma 0.9237 | 76s
+it 17500 | acc 0.541 | delta 2.19e-01 | lambda  2446.84 | sigma 0.9114 | 78s
+it 18000 | acc 0.540 | delta 2.10e-01 | lambda  5635.26 | sigma 0.9507 | 81s
+it 18500 | acc 0.540 | delta 2.06e-01 | lambda  4896.69 | sigma 0.9096 | 83s
+it 19000 | acc 0.541 | delta 2.13e-01 | lambda  2868.58 | sigma 0.8998 | 85s
+it 19500 | acc 0.541 | delta 2.09e-01 | lambda  2813.19 | sigma 0.9326 | 88s
+it 20000 | acc 0.541 | delta 2.11e-01 | lambda  2986.94 | sigma 0.9696 | 91s
+  tau k a0    b0 a_sigma b_sigma gibbs_iter gibbs_burn  acc_post delta_final
+1 0.5 2  1 0.001     0.1     0.1      20000       5000 0.5457333   0.2114658
+  lambda_mean sigma_mean    SD_mean frac_below ess_theta_median ess_theta_min
+1    2635.239  0.9251764 0.05385549  0.4992629         118.6082      79.51871
+  ess_lambda ess_sigma lambda_drift_halves seconds
+1   17.87865  7504.586           0.1364661  90.877
+
+== tau = 0.70 ==
+it   500 | acc 0.292 | delta 1.78e-01 | lambda   515.96 | sigma 0.8193 | 2s
+it  1000 | acc 0.430 | delta 2.18e-01 | lambda   682.98 | sigma 0.7563 | 5s
+it  1500 | acc 0.473 | delta 2.24e-01 | lambda  1578.35 | sigma 0.7884 | 7s
+it  2000 | acc 0.493 | delta 2.23e-01 | lambda   745.78 | sigma 0.7834 | 10s
+it  2500 | acc 0.494 | delta 1.95e-01 | lambda  1468.09 | sigma 0.7820 | 13s
+it  3000 | acc 0.507 | delta 2.09e-01 | lambda  1460.74 | sigma 0.8322 | 16s
+it  3500 | acc 0.509 | delta 2.20e-01 | lambda  2759.56 | sigma 0.7859 | 18s
+it  4000 | acc 0.509 | delta 2.12e-01 | lambda  1648.63 | sigma 0.8069 | 21s
+it  4500 | acc 0.515 | delta 2.13e-01 | lambda  1747.44 | sigma 0.7698 | 23s
+it  5000 | acc 0.514 | delta 1.97e-01 | lambda  2257.45 | sigma 0.7854 | 26s
+it  5500 | acc 0.520 | delta 2.15e-01 | lambda  1854.34 | sigma 0.7833 | 28s
+it  6000 | acc 0.521 | delta 2.16e-01 | lambda  1125.65 | sigma 0.7694 | 30s
+it  6500 | acc 0.521 | delta 2.09e-01 | lambda   588.15 | sigma 0.7875 | 32s
+it  7000 | acc 0.521 | delta 2.06e-01 | lambda   802.52 | sigma 0.8139 | 34s
+it  7500 | acc 0.524 | delta 2.10e-01 | lambda  1166.16 | sigma 0.7739 | 37s
+it  8000 | acc 0.524 | delta 2.06e-01 | lambda   721.94 | sigma 0.7973 | 39s
+it  8500 | acc 0.527 | delta 2.14e-01 | lambda   583.06 | sigma 0.8037 | 42s
+it  9000 | acc 0.529 | delta 2.19e-01 | lambda   767.42 | sigma 0.7652 | 44s
+it  9500 | acc 0.532 | delta 2.25e-01 | lambda   605.72 | sigma 0.7862 | 47s
+it 10000 | acc 0.534 | delta 2.22e-01 | lambda  1059.43 | sigma 0.7925 | 49s
+it 10500 | acc 0.536 | delta 2.27e-01 | lambda   927.51 | sigma 0.7901 | 52s
+it 11000 | acc 0.536 | delta 2.19e-01 | lambda   607.18 | sigma 0.7864 | 54s
+it 11500 | acc 0.537 | delta 2.26e-01 | lambda   431.82 | sigma 0.7850 | 56s
+it 12000 | acc 0.535 | delta 2.15e-01 | lambda   882.65 | sigma 0.7989 | 58s
+it 12500 | acc 0.537 | delta 2.20e-01 | lambda  1020.44 | sigma 0.7812 | 60s
+it 13000 | acc 0.539 | delta 2.22e-01 | lambda  1317.90 | sigma 0.7802 | 62s
+it 13500 | acc 0.540 | delta 2.32e-01 | lambda   735.30 | sigma 0.7827 | 65s
+it 14000 | acc 0.538 | delta 2.23e-01 | lambda   542.35 | sigma 0.7879 | 67s
+it 14500 | acc 0.538 | delta 2.19e-01 | lambda   816.03 | sigma 0.8013 | 70s
+it 15000 | acc 0.538 | delta 2.19e-01 | lambda   450.97 | sigma 0.7671 | 73s
+it 15500 | acc 0.538 | delta 2.19e-01 | lambda  1018.02 | sigma 0.7958 | 75s
+it 16000 | acc 0.539 | delta 2.13e-01 | lambda   702.28 | sigma 0.7972 | 78s
+it 16500 | acc 0.539 | delta 2.12e-01 | lambda  1477.78 | sigma 0.8029 | 80s
+it 17000 | acc 0.539 | delta 2.11e-01 | lambda  1216.73 | sigma 0.8056 | 82s
+it 17500 | acc 0.540 | delta 2.13e-01 | lambda   927.23 | sigma 0.8158 | 84s
+it 18000 | acc 0.542 | delta 2.18e-01 | lambda   584.42 | sigma 0.8016 | 87s
+it 18500 | acc 0.542 | delta 2.18e-01 | lambda   503.42 | sigma 0.7845 | 89s
+it 19000 | acc 0.542 | delta 2.14e-01 | lambda   670.26 | sigma 0.7609 | 92s
+it 19500 | acc 0.543 | delta 2.16e-01 | lambda   514.05 | sigma 0.7558 | 94s
+it 20000 | acc 0.542 | delta 2.09e-01 | lambda   532.13 | sigma 0.7840 | 97s
+  tau k a0    b0 a_sigma b_sigma gibbs_iter gibbs_burn  acc_post delta_final
+1 0.7 2  1 0.001     0.1     0.1      20000       5000 0.5512667   0.2086052
+  lambda_mean sigma_mean   SD_mean frac_below ess_theta_median ess_theta_min
+1    889.8325  0.7884253 0.1685289  0.7041769         116.2823       88.5941
+  ess_lambda ess_sigma lambda_drift_halves seconds
+1    13.0819   7470.31          0.06400047  96.517
+
+== tau = 0.90 ==
+it   500 | acc 0.346 | delta 2.18e-01 | lambda   196.25 | sigma 0.3934 | 2s
+it  1000 | acc 0.451 | delta 2.22e-01 | lambda   471.95 | sigma 0.3875 | 5s
+it  1500 | acc 0.487 | delta 2.35e-01 | lambda   599.40 | sigma 0.3933 | 7s
+it  2000 | acc 0.500 | delta 2.19e-01 | lambda   491.24 | sigma 0.4007 | 9s
+it  2500 | acc 0.514 | delta 2.33e-01 | lambda   365.34 | sigma 0.3942 | 12s
+it  3000 | acc 0.516 | delta 2.21e-01 | lambda   521.11 | sigma 0.3960 | 14s
+it  3500 | acc 0.526 | delta 2.36e-01 | lambda   493.10 | sigma 0.4061 | 17s
+it  4000 | acc 0.534 | delta 2.47e-01 | lambda   478.25 | sigma 0.3988 | 19s
+it  4500 | acc 0.532 | delta 2.25e-01 | lambda   405.89 | sigma 0.3904 | 22s
+it  5000 | acc 0.535 | delta 2.32e-01 | lambda   787.79 | sigma 0.3954 | 24s
+it  5500 | acc 0.536 | delta 2.29e-01 | lambda  1446.46 | sigma 0.3931 | 27s
+it  6000 | acc 0.537 | delta 2.22e-01 | lambda   839.89 | sigma 0.3747 | 29s
+it  6500 | acc 0.537 | delta 2.12e-01 | lambda   741.57 | sigma 0.3981 | 32s
+it  7000 | acc 0.542 | delta 2.28e-01 | lambda   703.48 | sigma 0.3938 | 34s
+it  7500 | acc 0.539 | delta 2.05e-01 | lambda   905.33 | sigma 0.3926 | 36s
+it  8000 | acc 0.540 | delta 2.01e-01 | lambda   688.90 | sigma 0.3780 | 37s
+it  8500 | acc 0.544 | delta 2.12e-01 | lambda   854.97 | sigma 0.3866 | 39s
+it  9000 | acc 0.546 | delta 2.16e-01 | lambda   618.24 | sigma 0.3763 | 42s
+it  9500 | acc 0.545 | delta 2.17e-01 | lambda   773.96 | sigma 0.3935 | 44s
+it 10000 | acc 0.545 | delta 2.20e-01 | lambda  1329.61 | sigma 0.3963 | 47s
+it 10500 | acc 0.546 | delta 2.18e-01 | lambda   669.89 | sigma 0.3816 | 49s
+it 11000 | acc 0.546 | delta 2.15e-01 | lambda   706.08 | sigma 0.4003 | 52s
+it 11500 | acc 0.546 | delta 2.14e-01 | lambda   985.08 | sigma 0.4028 | 54s
+it 12000 | acc 0.545 | delta 2.13e-01 | lambda   972.13 | sigma 0.3805 | 56s
+it 12500 | acc 0.546 | delta 2.16e-01 | lambda  1509.42 | sigma 0.4096 | 59s
+it 13000 | acc 0.547 | delta 2.07e-01 | lambda   811.26 | sigma 0.3971 | 61s
+it 13500 | acc 0.548 | delta 2.14e-01 | lambda   551.86 | sigma 0.3996 | 64s
+it 14000 | acc 0.547 | delta 2.14e-01 | lambda   498.51 | sigma 0.3896 | 65s
+it 14500 | acc 0.548 | delta 2.28e-01 | lambda  1205.78 | sigma 0.3936 | 68s
+it 15000 | acc 0.549 | delta 2.22e-01 | lambda  1139.85 | sigma 0.3932 | 70s
+it 15500 | acc 0.548 | delta 2.18e-01 | lambda  1047.40 | sigma 0.3890 | 73s
+it 16000 | acc 0.549 | delta 2.15e-01 | lambda  1112.80 | sigma 0.3916 | 75s
+it 16500 | acc 0.549 | delta 2.16e-01 | lambda   594.65 | sigma 0.3847 | 78s
+it 17000 | acc 0.550 | delta 2.19e-01 | lambda  1130.82 | sigma 0.4058 | 80s
+it 17500 | acc 0.550 | delta 2.19e-01 | lambda  1511.45 | sigma 0.3744 | 83s
+it 18000 | acc 0.549 | delta 2.10e-01 | lambda  1149.25 | sigma 0.3808 | 86s
+it 18500 | acc 0.548 | delta 1.98e-01 | lambda  1101.34 | sigma 0.3819 | 88s
+it 19000 | acc 0.547 | delta 1.98e-01 | lambda   837.82 | sigma 0.3863 | 90s
+it 19500 | acc 0.547 | delta 2.02e-01 | lambda  1412.55 | sigma 0.3875 | 92s
+it 20000 | acc 0.547 | delta 2.04e-01 | lambda  1299.72 | sigma 0.3983 | 94s
+  tau k a0    b0 a_sigma b_sigma gibbs_iter gibbs_burn  acc_post delta_final
+1 0.9 2  1 0.001     0.1     0.1      20000       5000 0.5509333   0.2035791
+  lambda_mean sigma_mean   SD_mean frac_below ess_theta_median ess_theta_min
+1    941.0763  0.3893831 0.1530856  0.9002457         105.3205      79.16597
+  ess_lambda ess_sigma lambda_drift_halves seconds
+1   19.14086  7524.218           0.1278033  93.907
+
+floor sizes where the posterior-mean curves are not ordered: 0 of 134 
+  tau k a0    b0 a_sigma b_sigma gibbs_iter gibbs_burn  acc_post delta_final
+1 0.1 2  1 0.001     0.1     0.1      20000       5000 0.5531333   0.2191876
+2 0.3 2  1 0.001     0.1     0.1      20000       5000 0.5494667   0.2183805
+3 0.5 2  1 0.001     0.1     0.1      20000       5000 0.5457333   0.2114658
+4 0.7 2  1 0.001     0.1     0.1      20000       5000 0.5512667   0.2086052
+5 0.9 2  1 0.001     0.1     0.1      20000       5000 0.5509333   0.2035791
+  lambda_mean sigma_mean    SD_mean frac_below ess_theta_median ess_theta_min
+1   1078.3378  0.4211520 0.14653295  0.0992629         90.51021      64.79714
+2   1394.1163  0.8265396 0.10524044  0.2972973        120.67412      93.12961
+3   2635.2386  0.9251764 0.05385549  0.4992629        118.60821      79.51871
+4    889.8325  0.7884253 0.16852894  0.7041769        116.28228      88.59410
+5    941.0763  0.3893831 0.15308561  0.9002457        105.32052      79.16597
+  ess_lambda ess_sigma lambda_drift_halves seconds
+1   7.843745  7501.870          0.44600022  51.697
+2  12.918217  7446.269          0.23414954  74.261
+3  17.878654  7504.586          0.13646608  90.877
+4  13.081896  7470.310          0.06400047  96.517
+5  19.140862  7524.218          0.12780330  93.907

@@ -1,0 +1,129 @@
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Munich data: 2035 rents at 134 distinct floor sizes
+Observations per floor size (min/median/max): 1 / 13 / 57 
+Trend filtering order k = 2 | lambda ~ Gamma( 1 , 1 )
+Step size delta: ADAPTIVE (Robbins-Monro on log delta during burn-in, frozen afterwards) 
+
+Difference operator D: 131 x 134 
+
+
+==============================================
+Starting three-block Gibbs sampler for tau = 0.1 
+Initial: lambda = 20 , sigma = 2.424 , delta = 0.01 
+Adapting delta for iterations 1 .. 1000 | target acceptance = 0.45 | gain_i = 1 / i^ 0.6 
+Iter 500 | lambda = 129.41 | sigma = 0.4177 | delta = 0.1015 | Acc (cum): 0.442 | Acc (last 500): 0.442 | adapting 
+Iter 1000 | lambda = 116.386 | sigma = 0.4149 | delta = 0.1072 | Acc (cum): 0.448 | Acc (last 500): 0.454 | adapting 
+Iter 1500 | lambda = 119.678 | sigma = 0.4244 | delta = 0.1072 | Acc (cum): 0.437 | Acc (last 500): 0.416 | frozen 
+Iter 2000 | lambda = 109.075 | sigma = 0.4228 | delta = 0.1072 | Acc (cum): 0.438 | Acc (last 500): 0.438 | frozen 
+Iter 2500 | lambda = 135.744 | sigma = 0.4293 | delta = 0.1072 | Acc (cum): 0.454 | Acc (last 500): 0.518 | frozen 
+Iter 3000 | lambda = 134.264 | sigma = 0.422 | delta = 0.1072 | Acc (cum): 0.45 | Acc (last 500): 0.432 | frozen 
+Iter 3500 | lambda = 126.895 | sigma = 0.4097 | delta = 0.1072 | Acc (cum): 0.454 | Acc (last 500): 0.478 | frozen 
+Iter 4000 | lambda = 128.408 | sigma = 0.4237 | delta = 0.1072 | Acc (cum): 0.457 | Acc (last 500): 0.478 | frozen 
+Iter 4500 | lambda = 118.046 | sigma = 0.4337 | delta = 0.1072 | Acc (cum): 0.46 | Acc (last 500): 0.488 | frozen 
+Iter 5000 | lambda = 143.106 | sigma = 0.4275 | delta = 0.1072 | Acc (cum): 0.454 | Acc (last 500): 0.4 | frozen 
+Iter 5500 | lambda = 118.75 | sigma = 0.4265 | delta = 0.1072 | Acc (cum): 0.451 | Acc (last 500): 0.418 | frozen 
+Iter 6000 | lambda = 120.268 | sigma = 0.4193 | delta = 0.1072 | Acc (cum): 0.452 | Acc (last 500): 0.464 | frozen 
+  done in 0.59 min | delta: 0.01 -> 0.1072 | acc (post burn-in): 0.453 
+
+==============================================
+Starting three-block Gibbs sampler for tau = 0.3 
+Initial: lambda = 20 , sigma = 2.424 , delta = 0.01 
+Adapting delta for iterations 1 .. 1000 | target acceptance = 0.45 | gain_i = 1 / i^ 0.6 
+Iter 500 | lambda = 130.806 | sigma = 0.8244 | delta = 0.1099 | Acc (cum): 0.446 | Acc (last 500): 0.446 | adapting 
+Iter 1000 | lambda = 111.911 | sigma = 0.8323 | delta = 0.101 | Acc (cum): 0.448 | Acc (last 500): 0.45 | adapting 
+Iter 1500 | lambda = 121.668 | sigma = 0.8355 | delta = 0.101 | Acc (cum): 0.473 | Acc (last 500): 0.522 | frozen 
+Iter 2000 | lambda = 102.626 | sigma = 0.8272 | delta = 0.101 | Acc (cum): 0.476 | Acc (last 500): 0.486 | frozen 
+Iter 2500 | lambda = 144.15 | sigma = 0.8083 | delta = 0.101 | Acc (cum): 0.48 | Acc (last 500): 0.498 | frozen 
+Iter 3000 | lambda = 120.543 | sigma = 0.8551 | delta = 0.101 | Acc (cum): 0.479 | Acc (last 500): 0.47 | frozen 
+Iter 3500 | lambda = 133.111 | sigma = 0.8171 | delta = 0.101 | Acc (cum): 0.487 | Acc (last 500): 0.536 | frozen 
+Iter 4000 | lambda = 114.668 | sigma = 0.8287 | delta = 0.101 | Acc (cum): 0.483 | Acc (last 500): 0.458 | frozen 
+Iter 4500 | lambda = 118.558 | sigma = 0.8431 | delta = 0.101 | Acc (cum): 0.483 | Acc (last 500): 0.484 | frozen 
+Iter 5000 | lambda = 116.939 | sigma = 0.8096 | delta = 0.101 | Acc (cum): 0.483 | Acc (last 500): 0.484 | frozen 
+Iter 5500 | lambda = 120.158 | sigma = 0.8378 | delta = 0.101 | Acc (cum): 0.483 | Acc (last 500): 0.474 | frozen 
+Iter 6000 | lambda = 113.986 | sigma = 0.8285 | delta = 0.101 | Acc (cum): 0.487 | Acc (last 500): 0.536 | frozen 
+  done in 0.65 min | delta: 0.01 -> 0.101 | acc (post burn-in): 0.495 
+
+==============================================
+Starting three-block Gibbs sampler for tau = 0.5 
+Initial: lambda = 20 , sigma = 2.424 , delta = 0.01 
+Adapting delta for iterations 1 .. 1000 | target acceptance = 0.45 | gain_i = 1 / i^ 0.6 
+Iter 500 | lambda = 118.484 | sigma = 0.9435 | delta = 0.1085 | Acc (cum): 0.476 | Acc (last 500): 0.476 | adapting 
+Iter 1000 | lambda = 143.816 | sigma = 0.9093 | delta = 0.1039 | Acc (cum): 0.46 | Acc (last 500): 0.444 | adapting 
+Iter 1500 | lambda = 136.337 | sigma = 0.893 | delta = 0.1039 | Acc (cum): 0.468 | Acc (last 500): 0.484 | frozen 
+Iter 2000 | lambda = 149.673 | sigma = 0.9377 | delta = 0.1039 | Acc (cum): 0.461 | Acc (last 500): 0.44 | frozen 
+Iter 2500 | lambda = 129.072 | sigma = 0.9195 | delta = 0.1039 | Acc (cum): 0.457 | Acc (last 500): 0.44 | frozen 
+Iter 3000 | lambda = 113.995 | sigma = 0.8923 | delta = 0.1039 | Acc (cum): 0.462 | Acc (last 500): 0.486 | frozen 
+Iter 3500 | lambda = 121.836 | sigma = 0.959 | delta = 0.1039 | Acc (cum): 0.453 | Acc (last 500): 0.4 | frozen 
+Iter 4000 | lambda = 112.718 | sigma = 0.919 | delta = 0.1039 | Acc (cum): 0.453 | Acc (last 500): 0.452 | frozen 
+Iter 4500 | lambda = 150.489 | sigma = 0.9338 | delta = 0.1039 | Acc (cum): 0.455 | Acc (last 500): 0.472 | frozen 
+Iter 5000 | lambda = 126.565 | sigma = 0.9503 | delta = 0.1039 | Acc (cum): 0.455 | Acc (last 500): 0.46 | frozen 
+Iter 5500 | lambda = 138.391 | sigma = 0.928 | delta = 0.1039 | Acc (cum): 0.458 | Acc (last 500): 0.484 | frozen 
+Iter 6000 | lambda = 125.608 | sigma = 0.9195 | delta = 0.1039 | Acc (cum): 0.464 | Acc (last 500): 0.524 | frozen 
+  done in 0.65 min | delta: 0.01 -> 0.1039 | acc (post burn-in): 0.464 
+
+==============================================
+Starting three-block Gibbs sampler for tau = 0.7 
+Initial: lambda = 20 , sigma = 2.424 , delta = 0.01 
+Adapting delta for iterations 1 .. 1000 | target acceptance = 0.45 | gain_i = 1 / i^ 0.6 
+Iter 500 | lambda = 130.876 | sigma = 0.7748 | delta = 0.08995 | Acc (cum): 0.446 | Acc (last 500): 0.446 | adapting 
+Iter 1000 | lambda = 122.239 | sigma = 0.7669 | delta = 0.1015 | Acc (cum): 0.44 | Acc (last 500): 0.434 | adapting 
+Iter 1500 | lambda = 132.67 | sigma = 0.7918 | delta = 0.1015 | Acc (cum): 0.437 | Acc (last 500): 0.432 | frozen 
+Iter 2000 | lambda = 135.207 | sigma = 0.7782 | delta = 0.1015 | Acc (cum): 0.451 | Acc (last 500): 0.492 | frozen 
+Iter 2500 | lambda = 119.134 | sigma = 0.7868 | delta = 0.1015 | Acc (cum): 0.46 | Acc (last 500): 0.498 | frozen 
+Iter 3000 | lambda = 145.328 | sigma = 0.7959 | delta = 0.1015 | Acc (cum): 0.461 | Acc (last 500): 0.462 | frozen 
+Iter 3500 | lambda = 101.686 | sigma = 0.7909 | delta = 0.1015 | Acc (cum): 0.457 | Acc (last 500): 0.432 | frozen 
+Iter 4000 | lambda = 140.967 | sigma = 0.7482 | delta = 0.1015 | Acc (cum): 0.45 | Acc (last 500): 0.408 | frozen 
+Iter 4500 | lambda = 117.593 | sigma = 0.7647 | delta = 0.1015 | Acc (cum): 0.456 | Acc (last 500): 0.5 | frozen 
+Iter 5000 | lambda = 113.996 | sigma = 0.7763 | delta = 0.1015 | Acc (cum): 0.454 | Acc (last 500): 0.434 | frozen 
+Iter 5500 | lambda = 99.716 | sigma = 0.771 | delta = 0.1015 | Acc (cum): 0.458 | Acc (last 500): 0.496 | frozen 
+Iter 6000 | lambda = 133.776 | sigma = 0.8102 | delta = 0.1015 | Acc (cum): 0.455 | Acc (last 500): 0.424 | frozen 
+  done in 0.59 min | delta: 0.01 -> 0.1015 | acc (post burn-in): 0.458 
+
+==============================================
+Starting three-block Gibbs sampler for tau = 0.9 
+Initial: lambda = 20 , sigma = 2.424 , delta = 0.01 
+Adapting delta for iterations 1 .. 1000 | target acceptance = 0.45 | gain_i = 1 / i^ 0.6 
+Iter 500 | lambda = 124.923 | sigma = 0.3978 | delta = 0.08268 | Acc (cum): 0.432 | Acc (last 500): 0.432 | adapting 
+Iter 1000 | lambda = 131.837 | sigma = 0.379 | delta = 0.08227 | Acc (cum): 0.448 | Acc (last 500): 0.464 | adapting 
+Iter 1500 | lambda = 127.392 | sigma = 0.3941 | delta = 0.08227 | Acc (cum): 0.437 | Acc (last 500): 0.414 | frozen 
+Iter 2000 | lambda = 139.062 | sigma = 0.4026 | delta = 0.08227 | Acc (cum): 0.441 | Acc (last 500): 0.454 | frozen 
+Iter 2500 | lambda = 132.445 | sigma = 0.3767 | delta = 0.08227 | Acc (cum): 0.439 | Acc (last 500): 0.43 | frozen 
+Iter 3000 | lambda = 127.417 | sigma = 0.3863 | delta = 0.08227 | Acc (cum): 0.439 | Acc (last 500): 0.438 | frozen 
+Iter 3500 | lambda = 132.381 | sigma = 0.381 | delta = 0.08227 | Acc (cum): 0.444 | Acc (last 500): 0.476 | frozen 
+Iter 4000 | lambda = 126.46 | sigma = 0.3869 | delta = 0.08227 | Acc (cum): 0.445 | Acc (last 500): 0.45 | frozen 
+Iter 4500 | lambda = 120.957 | sigma = 0.4074 | delta = 0.08227 | Acc (cum): 0.447 | Acc (last 500): 0.462 | frozen 
+Iter 5000 | lambda = 128.217 | sigma = 0.4076 | delta = 0.08227 | Acc (cum): 0.453 | Acc (last 500): 0.508 | frozen 
+Iter 5500 | lambda = 132.618 | sigma = 0.3828 | delta = 0.08227 | Acc (cum): 0.454 | Acc (last 500): 0.462 | frozen 
+Iter 6000 | lambda = 101.524 | sigma = 0.383 | delta = 0.08227 | Acc (cum): 0.457 | Acc (last 500): 0.496 | frozen 
+  done in 0.6 min | delta: 0.01 -> 0.08227 | acc (post burn-in): 0.459 
+
+=== FINAL RESULTS (one fit per quantile, k = 2 ) ===
+  tau order lambda_estimate sigma_estimate delta_final acceptance_rate
+1 0.1     2        124.2514      0.4208913  0.10716561       0.4521667
+2 0.3     2        126.0438      0.8259754  0.10101491       0.4870000
+3 0.5     2        126.0611      0.9250565  0.10386127       0.4635000
+4 0.7     2        123.3284      0.7871890  0.10150493       0.4548333
+5 0.9     2        124.6639      0.3887695  0.08226967       0.4571667
+  acceptance_rate_burn acceptance_rate_post frac_below runtime_min
+1                0.448               0.4530  0.1002457   0.5852084
+2                0.448               0.4948  0.3041769   0.6501045
+3                0.460               0.4642  0.5012285   0.6529890
+4                0.440               0.4578  0.7002457   0.5927818
+5                0.448               0.4590  0.9022113   0.6033374
+
+Locations where the five posterior-mean curves are not ordered: 0 of 134 
+Warning message:
+Removed 995 rows containing missing values or values outside the scale range
+(`geom_line()`). 
+
+Done. Fits and summaries in results_pmala_k2  

@@ -1,0 +1,2 @@
+"dataset","completed","r_version","note"
+"Munich","2026-07-28 10:15:44 CDT","R version 4.4.1 (2024-06-14 ucrt)","Single-chain diagnostics only; split-Rhat is not reported because the unchanged application script runs one chain per quantile."

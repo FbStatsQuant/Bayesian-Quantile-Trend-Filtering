@@ -1,0 +1,189 @@
+--- before/sections/methodology.tex
++++ sections/methodology.tex
+@@ -138,4 +138,99 @@
+ \subsection{Joint Quantile Sampler}
+ \label{subsec:joint}
+ 
+-% Content removed on 2026-09-26; this subsection will be rewritten for Bayesian-PMALA (Section~\ref{subsec:individual}).
++Let $0 < \tau_1 < \cdots < \tau_J < 1$ be the quantile levels of interest, and write $\theta_j$, $z_j$, $\lambda_j$ and $\sigma_j$ for the trend, latent variables, regularization parameter and likelihood scale at level $\tau_j$. Each level uses the individual specification of Section~\ref{subsec:individual}, including the unscaled difference prior \eqref{eq:prior_theta} and the hyperpriors \eqref{eq:hyperpriors}. The levels are coupled by the requirement that their trends be ordered at every observed index,
++\begin{equation}
++    \mathcal C = \left\{(\theta_1,\ldots,\theta_J):
++    \theta_{i1} \leq \cdots \leq \theta_{iJ},\quad i=1,\ldots,n\right\}.
++    \label{eq:joint_order}
++\end{equation}
++This constraint concerns the observation grid; it does not by itself specify an ordering-preserving interpolation between observations.
++
++\paragraph{Joint target.} Let $\pi_j(\theta_j,z_j,\lambda_j,\sigma_j\mid\by)$ denote the augmented posterior factor in \eqref{eq:posterior}, with $\tau=\tau_j$. We define the joint working posterior by
++\begin{equation}
++    \pi_{\mathcal C}(\Theta,Z,\blambda,\bm\sigma\mid\by)
++    \propto \mathbbm{1}_{\mathcal C}(\Theta)
++    \prod_{j=1}^J \pi_j(\theta_j,z_j,\lambda_j,\sigma_j\mid\by),
++    \label{eq:joint_target}
++\end{equation}
++where $\Theta=(\theta_1,\ldots,\theta_J)$ and $Z=(z_1,\ldots,z_J)$. This is a globally constrained product of working posterior factors for the same data, not a claim that the data are independently observed at each quantile level. In particular, the factors are not replaced by separately normalized truncated priors: a normalizing constant that depended on $\lambda_j$ would change its conditional distribution. Under \eqref{eq:joint_target}, the order indicator depends only on $\Theta$. Thus, conditional on the trends, the updates for $z_j$, $\lambda_j$ and $\sigma_j$ remain \eqref{eq:zupdate}--\eqref{eq:sigmaupdate}, with the appropriate quantile index. There is one $\lambda_j$ and one $\sigma_j$ per level, and no additional penalty parameter coupling the levels.
++
++\paragraph{Sequential conditional bounds.} A sweep visits $j=1,\ldots,J$ in increasing order and completes all updates for level $j$ before proceeding to $j+1$. At sweep $t$, its lower and upper bounds are
++\begin{equation}
++\begin{aligned}
++    \ell_j &= \begin{cases}\theta_{j-1}^{(t)}, & j>1,\\ -\infty\mathbf 1, & j=1,\end{cases}
++    & u_j &= \begin{cases}\theta_{j+1}^{(t-1)}, & j<J,\\ +\infty\mathbf 1, & j=J,\end{cases} \\
++    B_j &= \{\vartheta\in\R^n:\ell_j\leq\vartheta\leq u_j\}.
++\end{aligned}
++    \label{eq:joint_box}
++\end{equation}
++All inequalities are componentwise. The lower neighbor already includes its trend and interweaving updates from the current sweep. The upper neighbor has not yet been visited. These bounds are held fixed throughout the trend and interweaving updates for level $j$; using them preserves \eqref{eq:joint_order} after each accepted move, rather than only at the end of a sweep.
++
++\paragraph{Bounded proximal proposal and Metropolis correction.} With $w_{ij}$ and $r_{ij}$ defined by \eqref{eq:weights} at level $\tau_j$, set
++\begin{equation}
++\begin{aligned}
++    U_j(\vartheta) &= \frac12\sum_{i=1}^n w_{ij}(\vartheta_i-r_{ij})^2
++                    +\lambda_j\norm{D\vartheta}_1,\\
++    T_j(x) &= \arg\min_{\vartheta\in B_j}
++             \left\{U_j(\vartheta)+\frac{1}{2\gamma_j}\norm{\vartheta-x}_{M_j}^2\right\},
++             \qquad \gamma_j=\delta_j/2.
++\end{aligned}
++    \label{eq:joint_prox}
++\end{equation}
++The metric is $M_j=W_j+c_jD^\top D$, where $W_j=\mathrm{diag}(w_{1j},\ldots,w_{nj})$ and the implemented curvature coefficient is $c_j=\min(\kappa\lambda_j^2/2,10^8)$, with $\kappa=3$. It is fixed during this conditional trend update. The bounded optimization includes the Gaussian likelihood term and the difference penalty together. ADMM approximates \eqref{eq:joint_prox} by splitting both the differences and the box constraint; it is not an unconstrained optimization followed by clipping its solution. Denote the resulting deterministic, finite-iteration map by $\widehat T_j$ (Appendix~\ref{app:pmala:joint}).
++
++From the current trend $\theta_j$, draw the ordinary Gaussian proposal
++\begin{equation}
++    \theta_j^\star\sim q_j(\,\cdot\mid\theta_j)
++    =\mathcal N\!\left(\widehat T_j(\theta_j),\delta_jM_j^{-1}\right).
++    \label{eq:joint_proposal}
++\end{equation}
++If $\theta_j^\star\notin B_j$, reject it because its conditional target density is zero. The Gaussian draw is neither projected into the box nor repeatedly drawn until feasible. For an in-box proposal, compute $\widehat T_j(\theta_j^\star)$ with the same neighbors, metric, step size and solver rule, and accept with probability $\min(1,\alpha_j)$, where
++\begin{equation}
++\begin{aligned}
++    \log\alpha_j ={}& U_j(\theta_j)-U_j(\theta_j^\star)\\
++    &+\frac{\norm{\theta_j^\star-\widehat T_j(\theta_j)}_{M_j}^2
++            -\norm{\theta_j-\widehat T_j(\theta_j^\star)}_{M_j}^2}{2\delta_j}.
++\end{aligned}
++    \label{eq:joint_accept}
++\end{equation}
++The two Gaussian normalizing constants cancel because their covariance matrices coincide. There is no truncated-Gaussian normalizer. Given the other blocks, this is a valid Metropolis--Hastings update for $e^{-U_j(\theta_j)}\mathbbm{1}_{B_j}(\theta_j)$ even when $\widehat T_j\ne T_j$: the computed map defines the proposal mean in both directions. This conditional invariance statement does not assert exact optimization, convergence of a finite chain, or exactness of numerical safeguards in the other blocks.
++
++\paragraph{Constrained interweaving.} After updating $z_j$ and drawing $\lambda_j$ from \eqref{eq:lambdaupdate}, we apply the interweaving construction of Appendix~\ref{app:pmala:asis}, retaining the same box $B_j$. Write $p_j=QQ^\top\theta_j$ and $v_j=\theta_j-p_j$, with $Q$ an orthonormal basis of the null space of $D$. Holding $p_j$ and $\lambda_jD\theta_j$ fixed, a new $\lambda_j'>0$ implies
++\begin{equation}
++    \theta_j(\lambda_j')=p_j+(\lambda_j/\lambda_j')v_j.
++    \label{eq:joint_asis_curve}
++\end{equation}
++We slice sample $\eta=\log\lambda_j'$ from the ancillary conditional restricted to $\theta_j(e^\eta)\in B_j$. Both $\lambda_j$ and $\theta_j$ are then replaced together. An unconstrained redraw could undo the ordering enforced by the trend move, so the restriction is essential. Appendix~\ref{app:pmala:joint} derives the feasible interval and its log density. The subsequent update of $\sigma_j$ uses this updated trend and the current $z_j$; the unscaled prior contributes no $\lambda_j\norm{D\theta_j}_1$ term to its rate.
++
++\paragraph{Unified sweep and its scope.} Algorithm~\ref{alg:joint_pmala} summarizes the update. The current unified implementation uses $200$ ADMM iterations per map, including the discarded optimization warm-up. It adapts a separate $\delta_j$ only after warm-up and through the last burn-in sweep, then freezes it. These settings apply also when $J=1$ and differ from the earlier individual simulation settings described in Appendix~\ref{app:pmala:admm}--\ref{app:pmala:adapt}; those earlier experiments are not rerun by defining the joint extension. Initialization, adaptation and the distinction between the mathematical kernels and the retained numerical guards are detailed in Appendix~\ref{app:pmala:joint}.
++
++For $J=1$, $B_1=\R^n$ and \eqref{eq:joint_target} reduces to \eqref{eq:posterior}. The implementation dispatches the unbounded proximal, Metropolis and interweaving updates to the guarded individual routines without extra random draws. A matched-seed check at $\tau=0.10$ reproduced the complete individual trajectories and final random-number-generator state. Short joint checks at central and upper-tail levels preserved ordering, but exhibited poor mixing, especially at $\tau=0.99$. They establish implementation agreement and support preservation in the tested cases, not convergence or reliable tail inference. Extra quantile levels, if supplied, enter \eqref{eq:joint_target} as full factors and change the target; the algorithm does not automatically add sentinel levels or prescribe their placement.
++
++\begin{algorithm}[!htbp]
++\caption{Unified Bayesian-PMALA for ordered quantile levels}
++\label{alg:joint_pmala}
++\begin{algorithmic}[1]
++\Require Data $\by$, ordered levels $\tau_1,\ldots,\tau_J$, sweeps $T$, burn-in $B$, warm-up $H\leq B$, trend moves $K$ (default $1$).
++\State Initialize ordered trends and each $(z_j,\lambda_j,\sigma_j,\delta_j)$ as in Appendix~\ref{app:pmala:joint}
++\For{$t=1,\ldots,T$}
++    \For{$j=1,\ldots,J$}
++        \State Fix $B_j$ using the latest neighbors in \eqref{eq:joint_box}
++        \If{$t\leq H$}
++            \State Apply the bounded optimization warm-up to $\theta_j$
++        \Else
++            \State Apply $K$ moves \eqref{eq:joint_proposal}--\eqref{eq:joint_accept} at fixed $(z_j,\lambda_j,\sigma_j,\delta_j,B_j)$
++        \EndIf
++        \State Update $z_j$ by \eqref{eq:zupdate}; draw $\lambda_j$ by \eqref{eq:lambdaupdate}
++        \If{$t>H$}
++            \State Redraw $(\lambda_j,\theta_j)$ by constrained interweaving in $B_j$
++        \EndIf
++        \State Draw $\sigma_j$ by \eqref{eq:sigmaupdate} using the updated $\theta_j$
++        \If{$H<t\leq B$}
++            \State Adapt $\delta_j$ using the mean acceptance probability of its $K$ trend moves
++        \EndIf
++    \EndFor
++    \State Retain the completed sweep only if $t>B$
++\EndFor
++\end{algorithmic}
++\end{algorithm}
+--- before/sections/appendix_pmala.tex
++++ sections/appendix_pmala.tex
+@@ -2,7 +2,7 @@
+ \section{Computational Details of Bayesian-PMALA}
+ \label{app:pmala}
+ 
+-This appendix gives the derivations of the full conditional distributions used in Section~\ref{subsec:individual}, the ADMM solver for the proximal map \eqref{eq:prox}, the interweaving step for $\lambda$, the initialization, warm-up and step-size adaptation, and the numerical safeguards, followed by the reason each component was needed. All settings below are defaults: they are fixed in advance and are identical for every signal, noise distribution and quantile level.
++This appendix gives the derivations of the full conditional distributions used in Section~\ref{subsec:individual}, the ADMM solver for the proximal map \eqref{eq:prox}, the interweaving step for $\lambda$, the initialization, warm-up and step-size adaptation, and the numerical safeguards, followed by the reason each component was needed. The individual simulation settings are described first. Appendix~\ref{app:pmala:joint} then gives the bounded updates and the revised solver and adaptation settings of the current unified implementation in Section~\ref{subsec:joint}.
+ 
+ \subsection{Full conditional distributions}
+ \label{app:pmala:conditionals}
+@@ -122,3 +122,74 @@
+ \label{app:pmala:tests}
+ 
+ The implementation is checked by nine tests: the normal--exponential identity \eqref{eq:ald_mixture}; the generalized inverse Gaussian conditional of $z_i$; agreement of the proximal map with the \texttt{glmgen} trend filtering solver \citep{tibshirani2014adaptive} at $M = \mathbf{I}_n$; the minimizing property of the proximal map in the metric \eqref{eq:metric}; the trend move against the closed-form Gaussian conditional at $\lambda = 0$; the trend move against numerical integration on a grid at $n = 4$, with a fixed metric and with the curvature metric; bitwise agreement of the shared-factorization move with separate solves; the interweaving chain against grid integration; and the joint $(\lambda,\theta)$ move against grid integration. All tests pass.
++
++\subsection{Computational details of the unified joint sampler}
++\label{app:pmala:joint}
++
++\paragraph{Bounded ADMM.} Fix a quantile block and suppress its index. For $B=[\ell,u]$, introduce $v=D\vartheta$ and $b=\vartheta$ in \eqref{eq:joint_prox}, assigning $\lambda\norm{v}_1$ to the difference variable and the convex indicator $I_B(b)$ to the box variable. Here $I_B$ equals zero in $B$ and $+\infty$ outside. The objective is
++\[
++    \frac12(\vartheta-r)^\top W(\vartheta-r)
++    +\frac{1}{2\gamma}\norm{\vartheta-x}_M^2
++    +\lambda\norm{v}_1+I_B(b),
++    \qquad v=D\vartheta,\quad b=\vartheta.
++\]
++Use scaled dual variables $a_D,a_B$ and positive penalties $\varrho,\zeta$ for these two equalities. With $M=\mathrm{diag}(d)+cD^\top D$, the default penalties are
++\[
++    \varrho=0.1(\bar d+c)/\gamma,\qquad
++    \zeta=n^{-1}\sum_i(w_i+d_i/\gamma).
++\]
++Starting from $v^0=Dx$, $b^0=\Pi_B(x)$ and $a_D^0=a_B^0=0$, the iterations solve for the increment $h^{s+1}=\vartheta^{s+1}-x$:
++\begin{align*}
++    A_B &= W+\gamma^{-1}M+\varrho D^\top D+\zeta\mathbf I_n,\\
++    A_Bh^{s+1} &= W(r-x)+\varrho D^\top(v^s-Dx-a_D^s)
++                         +\zeta(b^s-x-a_B^s),\\
++    \vartheta^{s+1} &= x+h^{s+1},\\
++    v^{s+1} &= \mathcal S_{\lambda/\varrho}(D\vartheta^{s+1}+a_D^s),
++    & b^{s+1} &= \Pi_B(\vartheta^{s+1}+a_B^s),\\
++    a_D^{s+1} &= a_D^s+D\vartheta^{s+1}-v^{s+1},
++    & a_B^{s+1} &= a_B^s+\vartheta^{s+1}-b^{s+1}.
++\end{align*}
++The two separable updates of $(v,b)$ form one ADMM block. The returned map is the feasible variable $b^{200}$, not the unconstrained iterate $\vartheta^{200}$. The default uses the full $200$ iterations without early stopping, with a fresh deterministic initialization for each input. Thus the map used in the forward and reverse proposal densities is reproducible without carrying solver state from a previous move. A user-specified residual tolerance also gives a deterministic map when applied with the same initialization and rule in both directions; it is not used by default.
++
++$A_B$ is banded with half-bandwidth $k+1$, and its factorization is reused within each solve. Although the forward and reverse systems are identical, the current bounded wrapper factors them separately; it also factors $M$ separately for Gaussian simulation. Consequently, shared factorization across both maps is an available optimization, not a property of this bounded implementation. For fixed $k$ and iteration budget, each map still costs $O(n)$. A sweep's trend proposals cost $O(JKn)$ for fixed $K$, while each interweaving log-density evaluation costs $O(n)$; the number of slice evaluations is variable.
++
++\paragraph{Interweaving density and feasible interval.} Use $p=QQ^\top\theta$ and $v=\theta-p$ from \eqref{eq:joint_asis_curve}, now letting $v$ denote the orthogonal component of the trend. For a scale $s=\lambda/\lambda'>0$, feasibility requires
++\[
++    \ell_i\leq p_i+s v_i\leq u_i,\qquad i=1,\ldots,n.
++\]
++For $v_i\ne0$, intersect the interval with endpoints $(\ell_i-p_i)/v_i$ and $(u_i-p_i)/v_i$ with the corresponding intervals for all other coordinates and with $(0,\infty)$. If $v_i=0$, require $p_i\in[\ell_i,u_i]$. Denote the resulting endpoints by $s_-$ and $s_+$; endpoints at zero or infinity are allowed as limits. In $\eta=\log\lambda'$ coordinates the interval is
++\begin{equation}
++    \log\lambda-\log s_+\ \leq\ \eta\ \leq\ \log\lambda-\log s_-.
++    \label{eq:joint_asis_interval}
++\end{equation}
++The $m$-dimensional change of variables from the rough part of $\theta$ to $\lambda'D\theta$ contributes a factor proportional to $\lambda'^{-m}$, cancelling the $\lambda'^m$ in the difference prior. The change from $\lambda'$ to $\eta$ contributes $e^\eta$. Therefore the log density for the slice update, up to a constant, is
++\begin{equation}
++\begin{aligned}
++    \log f(\eta)={}&a_0\eta-b_0e^\eta
++       -\frac12\sum_i w_i\{p_i+\lambda e^{-\eta}v_i-r_i\}^2\\
++       &+\log\mathbbm{1}_{B}(p+\lambda e^{-\eta}v).
++\end{aligned}
++    \label{eq:joint_asis_density}
++\end{equation}
++The weights and pseudo-responses here use the newly drawn $z$ and the current $\sigma$. The implementation checks both \eqref{eq:joint_asis_interval} and the reconstructed trend's support, assigning log density $-\infty$ outside it. It uses an initial slice width of $1$, a randomized division of at most $29$ outward extensions between the two endpoints (the stepping-out parameter is $30$), and interval shrinkage. Degenerate scale intervals and a numerically infeasible reconstruction of the current trend leave the state unchanged. These checks preserve support without clipping the rescaled trend.
++
++\paragraph{Initialization and adaptation.} For $J>1$, the initial trends are
++\[
++    \theta_j^{(0)}=\by+s_y\left\{\Phi^{-1}(\tau_j)
++                -\mathrm{median}_{h}\Phi^{-1}(\tau_h)\right\}\mathbf 1,
++    \qquad s_y=\max\{\mathrm{sd}(\by),0.1\},
++\]
++where $\Phi$ is the standard normal distribution function. This separates the levels without random initialization; inputs that yield nonfinite or numerically indistinguishable adjacent curves are rejected. For $J=1$, initialize exactly at $\by$. At every level set $z_i=1$, $\sigma=1$, $\lambda=m$ and $\delta=0.2$ by default. The first $H=200$ sweeps use only the bounded proximal map for the trend, with $M=W$, $\gamma_{\mathrm w}=10^4$, $\varrho=\mathrm{median}(w_i)$ and the same $200$-iteration budget. These are optimization warm-up sweeps, not posterior transitions; the other three blocks are drawn, but interweaving and step-size adaptation have not yet started.
++
++For sweeps $H<t\leq B$, let $\bar\alpha_{jt}$ be the mean of the $K$ Metropolis acceptance probabilities at level $j$, including zero for outside-box proposals. With $\Pi_{[a,b]}$ denoting clipping to a scalar interval, the default adaptation is
++\[
++    \delta_j\ \leftarrow\ \Pi_{[10^{-8},10^2]}
++        \left[\exp\left\{\log\delta_j+t^{-0.6}(\bar\alpha_{jt}-0.5)\right\}\right].
++\]
++Adaptation ends after sweep $B$, so retained sweeps use fixed step sizes. The defaults are $T=30000$, $B=10000$ and $K=1$, with interweaving enabled. Neither this run length nor freezing adaptation establishes that burn-in is sufficient.
++
++\paragraph{Invariance and numerical qualifications.} In exact arithmetic, the Metropolis kernel \eqref{eq:joint_accept}, the stated full conditional draws and the support-restricted slice kernel each leave their conditional target invariant; their sequential composition therefore leaves \eqref{eq:joint_target} invariant once the proposal settings are fixed. The finite ADMM budget does not compromise the Metropolis argument, because the actual deterministic mean is used in both proposal densities. The cap on $c$ likewise changes a proposal metric rather than the target, and the deterministic ridge retry in the ADMM solve only changes that proposal mean. The metric used for noise and for the two Gaussian norms must agree.
++
++This argument must be distinguished from the inherited guards in the executed sampler. The residual floor $10^{-10}$ and clipping of latent draws to $[10^{-8},10^4]$ alter the ideal $z$ conditional; clipping is not sampling from a correctly normalized truncated conditional. The original inverse-Gaussian arithmetic is retained. The bounded slice routine returns the current state when its initial log slice height is nonfinite or its shrinking interval has width below $10^{-10}$, and nonfinite Metropolis log ratios are rejected. Such numerical interventions are not justified by the finite-solve Metropolis argument. Accordingly, exact conditional correction of the trend proposal is not an assertion that the entire guarded implementation samples the ideal joint posterior exactly. Its numerical sensitivity and the mixing of the retained chain require separate assessment.
++
++\paragraph{Checks and their limits.} Local checks compare the bounded map with an analytic quadratic solution and with an independent small quadratic program, including optimality residuals. Further checks cover repeatability, the forward/reverse Gaussian ratio, outside-box rejection, and the constrained interweaving density against numerical quadrature. The $200$-iteration map was accurate on the small optimization fixture; this is not a uniform error bound for all conditional problems. A singleton check with $n=50$, $\tau=0.10$ and $120$ sweeps reproduced the guarded individual sampler's full trajectories and final random-number-generator state. Joint checks with $n=60$, $1000$ sweeps and $500$ retained draws used levels $(0.10,0.50,0.90)$ and $(0.96,0.97,0.98,0.99)$; no crossings were found after trend or interweaving moves, and retained step sizes were constant. However, descriptive effective sample sizes for the spatial mean of the trend were about $1$--$10$, and at $\tau=0.99$ its second-half mean was $7.43$ lower than its first-half mean. These short checks verify specific implementation properties and expose substantial nonstationarity; they do not validate upper-tail estimates, interval calibration or performance at the larger simulation sizes.

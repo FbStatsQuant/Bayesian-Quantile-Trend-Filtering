@@ -1,0 +1,32 @@
+./audit/nots_readonly_probe.txt: OK
+./audit/static_checks.json: OK
+./common.R: OK
+./config.R: OK
+./environment.sh: OK
+./inspect_nots.py: OK
+./monitor.py: OK
+./operations/predeploy.sh: OK
+./operations/submit_validation.sh: OK
+./paper_reference/appendix_pmala.tex: OK
+./paper_reference/simulations.tex: OK
+./path_guard.sh: OK
+./preflight.R: OK
+./prepare_package.py: OK
+./process_results.R: OK
+./README.md: OK
+./remote_admin.py: OK
+./run_task.sh: OK
+./slurm/array.slurm: OK
+./slurm/process.slurm: OK
+./slurm/validate.slurm: OK
+./source/Individual_Sampler_PMALA_Augmented.R: OK
+./source/prox_admm_metric.cpp: OK
+./start_monitor.sh: OK
+./status.py: OK
+./submit.sh: OK
+./upload_package.py: OK
+./validate.sh: OK
+./validate_outputs.R: OK
+./worker.R: OK
+1785936
+2026-10-03T21:34:42+00:00

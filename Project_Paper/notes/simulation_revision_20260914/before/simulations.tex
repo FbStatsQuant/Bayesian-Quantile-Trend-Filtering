@@ -1,0 +1,313 @@
+\section{Simulation}
+
+\label{sec:simulations}
+
+We evaluate the proposed samplers on three test signals of increasing smoothness, each observed under three error distributions, across a common grid of quantile levels. Throughout we take $n = 400$ equally spaced design points $x_i = i$, $i = 1,\dots,n$, and write $\tilde{x}_i = i/n \in (0,1]$ for the rescaled index. Every configuration is replicated over $100$ independent data sets, and all reported figures are averages over these replications. The individual sampler is run for $6000$ Gibbs iterations with a burn-in of $1000$, and its point estimate is the posterior mean of $\theta$ unless stated otherwise. Performance is measured by mean squared error (MSE) and mean absolute deviation (MAD) of the point estimate against the true conditional quantile $Q_\tau$, and by the mean credible interval width (MCIW) of the $95\%$ pointwise posterior intervals. To keep the main presentation focused, this section reports MSE and MCIW for the piecewise constant and varying-smoothness signals. All MAD results, together with the complete MSE, MAD, and MCIW results for the smooth signal fit at $k=2$, are reported in Appendix~\ref{app:simulation_results}.
+
+\paragraph{Baseline signals.} The mean function $f$ is one of the following, indexed by the difference order $k$ at which it is fit:
+\begin{align}
+\text{(a) Piecewise constant } (k=0):\quad
+  f(\tilde{x}) &= 2.5\,\mathbb{1}\{\tilde{x}\in(0,0.2]\} + 1.0\,\mathbb{1}\{\tilde{x}\in(0.2,0.4]\} \notag\\
+  &\quad + 3.5\,\mathbb{1}\{\tilde{x}\in(0.4,0.6]\} + 1.5\,\mathbb{1}\{\tilde{x}\in(0.6,1]\}, \\[4pt]
+\text{(b) Varying smoothness } (k=1):\quad
+  f(\tilde{x}) &= 2 + \sin(4\tilde{x}-2) + 2\exp\!\big(-30(4\tilde{x}-2)^2\big), \\[4pt]
+\text{(c) Smooth } (k=2):\quad
+  f(\tilde{x}) &= \sin(2\pi\tilde{x}).
+\end{align}
+Signal (a) is piecewise constant with three change points, signal (b) combines a slowly varying sinusoid with a sharply localized bump, and signal (c) is globally smooth.
+
+\paragraph{Noise distributions.} Observations are generated as $y_i = f(\tilde{x}_i) + \varepsilon_i$, with a design-dependent error $\varepsilon_i$ drawn from one of:
+\begin{itemize}
+\item \emph{Gaussian (heteroscedastic):} $\varepsilon_i \sim \mathcal{N}\!\big(0, s(\tilde{x}_i)^2\big)$ with $s(\tilde{x}) = (1+\tilde{x}^2)/4$, so that $Q_\tau(\tilde{x}) = f(\tilde{x}) + s(\tilde{x})\,\Phi^{-1}(\tau)$.
+\item \emph{Beta:} $\varepsilon_i \sim \mathrm{Beta}\big(1,\, 11 - 10\tilde{x}_i\big)$, so that $Q_\tau(\tilde{x}) = f(\tilde{x}) + F^{-1}_{\mathrm{Beta}(1,\,11-10\tilde{x})}(\tau)$; the error is right-skewed and its shape varies with the design.
+\item \emph{Mixed normal (location mixture):} $\varepsilon_i \sim \tilde{x}_i\,\mathcal{N}(-0.2, 0.5) + (1-\tilde{x}_i)\,\mathcal{N}(0.2, 0.5)$, a two-component mixture whose mixing weight drifts with the design. The true quantile $Q_\tau(\tilde{x}) = f(\tilde{x}) + G_{\tilde{x}}^{-1}(\tau)$ is obtained by inverting the mixture CDF $G_{\tilde{x}}(t) = \tilde{x}\,\Phi\!\big((t+0.2)/\sqrt{0.5}\big) + (1-\tilde{x})\,\Phi\!\big((t-0.2)/\sqrt{0.5}\big)$.
+\end{itemize}
+The Gaussian case is symmetric but heteroscedastic, the Beta case is skewed, and the mixed normal case is the most adversarial to the asymmetric Laplace working likelihood because its shape---not merely its scale---changes across the domain.
+
+\subsection{Individual Sampler}
+\label{sec:sim:individual}
+
+This subsection reports the single-quantile sampler at the interior levels 
+\begin{align*}
+	\tau \in \{0.05, 0.25, 0.5, 0.75, 0.95\}
+\end{align*}
+ against the two Onizuka variants (Laplace and Horseshoe), both run in MCMC mode.
+
+\subsubsection{Piecewise Constant}
+\label{sec:sim:ind:pc}
+
+On the piecewise constant signal all three methods recover the trend accurately: the MSE values in Table~\ref{tab:pc_int_mse} are small relative to the scale of the signal, whose segment levels range from $1.0$ to $3.5$, so the differences among methods, while systematic, are minor in practical terms. Within these margins the horseshoe prior of Onizuka is the strongest competitor, as its local adaptivity is well matched to a mean function that is flat almost everywhere with a few abrupt jumps. The individual sampler improves uniformly on the Laplace variant, which shares its single-scale prior structure, and is strongest at the near-tail levels $\tau \in \{0.05, 0.95\}$, where under the mixed normal design it records the lowest MSE of the three methods; it also leads across the Beta design at the lower levels. The corresponding MAD results are reported in Appendix Table~\ref{tab:pc_int_mad}. Interval widths (Table~\ref{tab:pc_int_mciw}) are shaped in part by the exploration range of the chain: the P-MALA step size is tuned to an acceptance rate of 40--60\%, and this tuning constrains how far the sampler travels per iteration and hence the dispersion of the resulting posterior sample. The widths reported here and in the analogous tables below should be read with this mechanism in mind.
+
+\begin{table}[htbp]
+\centering
+\caption{Mean squared error (MSE) for the piecewise constant signal ($k=0$) at interior quantile levels, across noise distributions.}
+\label{tab:pc_int_mse}
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{5}{c}{MSE} \\
+\cmidrule(lr){2-6}
+(I) Gauss & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.0248 & 0.0043 & 0.0027 & 0.0044 & 0.0246 \\
+Onizuka (Laplace)   & 0.0570 & 0.0257 & 0.0201 & 0.0254 & 0.0587 \\
+Individual Sampler  & 0.0426 & 0.0161 & 0.0127 & 0.0153 & 0.0398 \\
+\midrule
+(II) Beta & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.0146 & 0.0020 & 0.0018 & 0.0033 & 0.0103 \\
+Onizuka (Laplace)   & 0.0085 & 0.0048 & 0.0063 & 0.0112 & 0.0169 \\
+Individual Sampler  & 0.0024 & 0.0015 & 0.0027 & 0.0062 & 0.0093 \\
+\midrule
+(III) Mixed normal & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.1273 & 0.0256 & 0.0190 & 0.0228 & 0.1230 \\
+Onizuka (Laplace)   & 0.2679 & 0.0812 & 0.0655 & 0.0793 & 0.2754 \\
+Individual Sampler  & 0.1089 & 0.0813 & 0.0725 & 0.0792 & 0.1051 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Mean credible interval width (MCIW) for the piecewise constant signal ($k=0$) at interior quantile levels, across noise distributions.}
+\label{tab:pc_int_mciw}
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{5}{c}{MCIW} \\
+\cmidrule(lr){2-6}
+(I) Gauss & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.4277 & 0.2085 & 0.1908 & 0.2055 & 0.4269 \\
+Onizuka (Laplace)   & 0.6691 & 0.6326 & 0.6139 & 0.6343 & 0.6684 \\
+Individual Sampler  & 0.2796 & 0.3596 & 0.3542 & 0.3603 & 0.2811 \\
+\midrule
+(II) Beta & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.0593 & 0.0758 & 0.1105 & 0.1519 & 0.2836 \\
+Onizuka (Laplace)   & 0.3029 & 0.2756 & 0.3081 & 0.3353 & 0.4031 \\
+Individual Sampler  & 0.0111 & 0.0940 & 0.1164 & 0.1407 & 0.0569 \\
+\midrule
+(III) Mixed normal & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.9432 & 0.4489 & 0.4180 & 0.4372 & 0.9177 \\
+Onizuka (Laplace)   & 1.2988 & 1.1193 & 1.0561 & 1.1161 & 1.3020 \\
+Individual Sampler  & 0.6274 & 0.5738 & 0.5703 & 0.5710 & 0.6341 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Varying Smoothness}
+\label{sec:sim:ind:vs}
+
+On the varying smoothness signal the individual sampler is broadly competitive with the horseshoe and improves on the Laplace variant across most levels and noise distributions. Under Gaussian noise it sits between the two Onizuka variants and overtakes the horseshoe at the upper level $\tau = 0.95$; under mixed normal noise the horseshoe retains a modest edge while the individual sampler remains ahead of the Laplace variant throughout. Under Beta noise the individual sampler attains the lowest MSE among the three methods at every level (Table~\ref{tab:vs_int_mse}). The corresponding MAD comparison is given in Appendix Table~\ref{tab:vs_int_mad}, while Table~\ref{tab:vs_int_mciw} reports interval widths in the main text.
+\begin{table}[htbp]
+\centering
+\caption{Mean squared error (MSE) for the varying smoothness signal ($k=1$) at interior quantile levels, across noise distributions.}
+\label{tab:vs_int_mse}
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{5}{c}{MSE} \\
+\cmidrule(lr){2-6}
+(I) Gauss & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.0165 & 0.0065 & 0.0055 & 0.0063 & 0.0155 \\
+Onizuka (Laplace)   & 0.0276 & 0.0099 & 0.0082 & 0.0095 & 0.0262 \\
+Individual Sampler  & 0.0231 & 0.0080 & 0.0066 & 0.0069 & 0.0149 \\
+\midrule
+(II) Beta & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.0146 & 0.0020 & 0.0018 & 0.0033 & 0.0103 \\
+Onizuka (Laplace)   & 0.0085 & 0.0048 & 0.0063 & 0.0112 & 0.0169 \\
+Individual Sampler  & 0.00696 & 0.0012 & 0.0018 & 0.0034 & 0.0067 \\
+\midrule
+(III) Mixed normal & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.0575 & 0.0262 & 0.0218 & 0.0242 & 0.0576 \\
+Onizuka (Laplace)   & 0.1124 & 0.0366 & 0.0311 & 0.0346 & 0.1119 \\
+Individual Sampler  & 0.0778 & 0.0319 & 0.0280 & 0.0318 & 0.0756 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Mean credible interval width (MCIW) for the varying smoothness signal ($k=1$) at interior quantile levels, across noise distributions.}
+\label{tab:vs_int_mciw}
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{5}{c}{MCIW} \\
+\cmidrule(lr){2-6}
+(I) Gauss & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.3007 & 0.2595 & 0.2551 & 0.2555 & 0.2928 \\
+Onizuka (Laplace)   & 0.3849 & 0.3489 & 0.3430 & 0.3460 & 0.3805 \\
+Individual Sampler  & 0.2423 & 0.2677 & 0.2692 & 0.2696 & 0.2344 \\
+\midrule
+(II) Beta & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.0593 & 0.0758 & 0.1105 & 0.1519 & 0.2836 \\
+Onizuka (Laplace)   & 0.3029 & 0.2756 & 0.3081 & 0.3353 & 0.4031 \\
+Individual Sampler  & 0.0974 & 0.0845 & 0.1160 & 0.1260 & 0.1051 \\
+\midrule
+(III) Mixed normal & $0.05$ & $0.25$ & $0.5$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Horseshoe) & 0.5875 & 0.5147 & 0.5158 & 0.5177 & 0.5940 \\
+Onizuka (Laplace)   & 0.7676 & 0.6475 & 0.6369 & 0.6493 & 0.7671 \\
+Individual Sampler  & 0.5453 & 0.5757 & 0.5728 & 0.5741 & 0.5446 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Smooth Function}
+\label{sec:sim:ind:smooth}
+
+For compactness, all individual-sampler results for the smooth signal fit at $k=2$ are deferred to Appendix~\ref{app:sim:individual:smooth}. Tables~\ref{tab:s_int_mse}--\ref{tab:s_int_mciw} there report MSE, MAD, and MCIW, respectively. These results provide the smooth-signal evidence used in the cross-signal summary below.
+
+\paragraph{Summary across signals.} The three-block sampler of Section~\ref{subsec:individual} regularizes $\theta$ through a single Laplace prior on $D\theta$ with one shared scale $\lambda$, and calibrates the effective noise level through a single scale $\sigma$; both parameters admit closed-form conjugate full conditionals---Gamma for $\lambda$, inverse-Gamma for $\sigma$---driven respectively by the sufficient statistics $S_D = \norm{D\theta}_1$ and $S_\rho = \sum_i \rho_\tau(y_i - \theta_i)$, so that the amount of smoothing and the assumed noise scale both self-adjust to the current fit of $\theta$ without any external tuning step. This is a substantially thinner hierarchy than the horseshoe construction of Onizuka (Horseshoe), which places a local shrinkage parameter on every one of the $n$ coordinates of $D\theta$ in addition to a global scale, and it is this added hierarchy, not a fundamentally different fitting principle, that gives the horseshoe its local adaptivity to jumps and its edge on the piecewise constant signal. The simulation results are consistent with this trade-off. Against the Laplace variant, which shares the individual sampler's single-scale prior but fixes $\lambda$ by an external criterion rather than adapting it within the chain, the individual sampler is on par or ahead at essentially every level, signal, and noise distribution, indicating that the conjugate self-tuning of $\lambda$ and $\sigma$ is doing real work. Against the horseshoe, the individual sampler trails by small absolute margins on the piecewise constant signal, where isolated jumps reward coordinate-specific shrinkage; is closely competitive on the varying smoothness signal; and surpasses the horseshoe at nearly every level on the smooth signal, whose complete results are reported in Appendix~\ref{app:sim:individual:smooth}. In no configuration does either method fail to recover the signal: the comparison is one of fine-grained ordering among estimators that all fit well, not of success against failure. Because the horseshoe's advantage is concentrated in signals with strong local heterogeneity, and because it is bought with $n$ additional per-coordinate parameters sampled at every Gibbs iteration against the individual sampler's two, the individual sampler offers a favorable accuracy-to-complexity trade-off: it recovers most of the horseshoe's benefit where that benefit exists, exceeds it where it does not, and does so with a model that is easier to specify, easier to diagnose, and cheaper to update per iteration.
+\paragraph{Default difference order.} When the smoothness of the underlying trend is not known in advance, our default recommendation is the difference order $k = 2$. A penalty on second differences fits piecewise linear trends and thereby provides a reasonable local approximation to a wide variety of quantile functions, from globally smooth curves to signals with localized features, degrading gracefully when the truth departs from the assumed order. The lower orders are more specialized: $k = 0$ is well matched only when the trend is genuinely piecewise constant, while $k = 1$ occupies an intermediate position. Accordingly, the order-specific fits reported in this section and Appendix~\ref{app:simulation_results} should be read as each order evaluated on its best-case signal, with $k = 2$ the sensible choice absent prior structural knowledge.
+
+\subsection{Joint Sampler for Extreme Quantiles}
+\label{sec:sim:joint}
+
+This subsection reports the joint sequential sampler at the extreme levels
+\begin{align*}
+	\tau \in \{0.01, 0.02, 0.98, 0.99\}
+\end{align*} 
+equipped with the sentinel construction described above. As before, the two Onizuka variants estimate each quantile in isolation and serve as the point of comparison.
+
+\subsubsection{Piecewise Constant}
+\label{sec:sim:joint:pc}
+
+Tables~\ref{tab:pc_ext_mse} and \ref{tab:pc_ext_mciw} report MSE and MCIW for the piecewise constant signal at the extreme quantile levels, fit at difference order $k = 0$. At these levels the comparison with the horseshoe, already close at the interior of this signal, tilts toward the Joint Sequential Sampler. It improves on Onizuka (Laplace) in MSE at every level and noise distribution. Against Onizuka (Horseshoe) the comparison splits by tail and by error distribution: under Beta noise the Joint Sequential Sampler attains the lowest MSE at all four levels; under mixed normal noise it leads at $\tau \in \{0.02, 0.98, 0.99\}$, with the horseshoe retaining an advantage only at the deepest lower level $\tau = 0.01$; and under Gaussian noise the horseshoe remains more accurate at the lower levels $\{0.01, 0.02\}$ while the Joint Sequential Sampler records the lowest MSE at the upper levels $\{0.98, 0.99\}$. The corresponding MAD results, including the distinct ranking at the lower Beta tail, are reported in Appendix Table~\ref{tab:pc_ext_mad}. As elsewhere, the credible intervals of the Joint Sequential Sampler are far narrower than those of both competitors (Table~\ref{tab:pc_ext_mciw}); the origin of this contraction is discussed at the end of the section.
+
+\begin{table}[htbp]
+\centering
+\caption{Mean squared error (MSE) for the piecewise constant signal at extreme quantile levels, difference order $k = 0$, across noise distributions. The Joint Sequential Sampler is the sequential joint sampler equipped with sentinel quantiles.}
+\label{tab:pc_ext_mse}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{4}{c}{MSE} \\
+\cmidrule(lr){2-5}
+(I) Gauss & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.0676 & 0.0544 & 0.0496 & 0.0655 \\
+Onizuka (Laplace)        & 0.1217 & 0.1024 & 0.1002 & 0.1187 \\
+Joint Sequential Sampler & 0.1061 & 0.0826 & 0.0296 & 0.0484 \\
+\midrule
+(II) Beta & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.0283 & 0.0114 & 0.0164 & 0.0224 \\
+Onizuka (Laplace)        & 0.0166 & 0.0076 & 0.0325 & 0.0363 \\
+Joint Sequential Sampler & 0.0028 & 0.0011 & 0.0110 & 0.0154 \\
+\midrule
+(III) Mixed normal & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.3788 & 0.2715 & 0.2819 & 0.3887 \\
+Onizuka (Laplace)        & 0.5896 & 0.4673 & 0.4811 & 0.6037 \\
+Joint Sequential Sampler & 0.4092 & 0.2103 & 0.1276 & 0.2630 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Mean credible interval width (MCIW) for the piecewise constant signal at extreme quantile levels, difference order $k = 0$, across noise distributions.}
+\label{tab:pc_ext_mciw}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{4}{c}{MCIW} \\
+\cmidrule(lr){2-5}
+(I) Gauss & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.3938 & 0.4140 & 0.4024 & 0.3824 \\
+Onizuka (Laplace)        & 0.6919 & 0.6627 & 0.6595 & 0.6862 \\
+Joint Sequential Sampler & 0.0167 & 0.0538 & 0.0652 & 0.0210 \\
+\midrule
+(II) Beta & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.0433 & 0.0363 & 0.2304 & 0.2115 \\
+Onizuka (Laplace)        & 0.3656 & 0.3084 & 0.4111 & 0.4675 \\
+Joint Sequential Sampler & 0.0530 & 0.0235 & 0.0162 & 0.0465 \\
+\midrule
+(III) Mixed normal & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.8976 & 0.9257 & 0.9297 & 0.9064 \\
+Onizuka (Laplace)        & 1.2581 & 1.2601 & 1.2553 & 1.2487 \\
+Joint Sequential Sampler & 0.0271 & 0.0830 & 0.1145 & 0.0474 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Varying Smoothness}
+\label{sec:sim:joint:vs}
+
+Tables~\ref{tab:vs_ext_mse} and \ref{tab:vs_ext_mciw} report MSE and MCIW for the varying smoothness signal at the extreme quantile levels
+\begin{align*}
+	\tau \in \{0.01, 0.02, 0.98, 0.99\}
+\end{align*}
+fit at difference order $k = 1$ and estimated with the joint sequential sampler under the sentinel construction described above. In point estimation the Joint Sequential Sampler improves on Onizuka (Laplace) at essentially all levels and is competitive with Onizuka (Horseshoe). The advantage is clearest under mixed normal noise, where it attains the lowest MSE at every extreme level, including the upper tail $\{0.98, 0.99\}$ where the location mixture is most adversarial to the asymmetric Laplace working likelihood. Under Gaussian noise it sits between the two Onizuka variants, retaining the per-coordinate advantage of the horseshoe at these tails, and under Beta noise the three methods are close. The corresponding MAD results are given in Appendix Table~\ref{tab:vs_ext_mad}. Across all noise distributions the credible intervals produced by the Joint Sequential Sampler are substantially narrower than those of both competitors, by a factor of three to five under Gaussian and mixed normal noise; this contraction is a direct consequence of the box-constraint geometry discussed at the end of the section.
+
+\begin{table}[htbp]
+\centering
+\caption{Mean squared error (MSE) for the varying smoothness signal at extreme quantile levels, difference order $k = 1$, across noise distributions. The Joint Sequential Sampler is the sequential joint sampler equipped with sentinel quantiles.}
+\label{tab:vs_ext_mse}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{4}{c}{MSE} \\
+\cmidrule(lr){2-5}
+(I) Gauss & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.043 & 0.032 & 0.030 & 0.041 \\
+Onizuka (Laplace)        & 0.068 & 0.051 & 0.046 & 0.065 \\
+Joint Sequential Sampler & 0.051 & 0.036 & 0.032 & 0.049 \\
+\midrule
+(II) Beta & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.002 & 0.001 & 0.010 & 0.012 \\
+Onizuka (Laplace)        & 0.001 & 0.001 & 0.016 & 0.020 \\
+Joint Sequential Sampler & 0.002 & 0.001 & 0.013 & 0.019 \\
+\midrule
+(III) Mixed normal & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.197 & 0.132 & 0.144 & 0.212 \\
+Onizuka (Laplace)        & 0.317 & 0.221 & 0.238 & 0.336 \\
+Joint Sequential Sampler & 0.197 & 0.128 & 0.124 & 0.192 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Mean credible interval width (MCIW) for the varying smoothness signal at extreme quantile levels, difference order $k = 1$, across noise distributions.}
+\label{tab:vs_ext_mciw}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{4}{c}{MCIW} \\
+\cmidrule(lr){2-5}
+(I) Gauss & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.268 & 0.269 & 0.267 & 0.254 \\
+Onizuka (Laplace)        & 0.362 & 0.357 & 0.340 & 0.348 \\
+Joint Sequential Sampler & 0.069 & 0.063 & 0.070 & 0.070 \\
+\midrule
+(II) Beta & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.079 & 0.070 & 0.158 & 0.154 \\
+Onizuka (Laplace)        & 0.146 & 0.118 & 0.212 & 0.227 \\
+Joint Sequential Sampler & 0.041 & 0.006 & 0.032 & 0.053 \\
+\midrule
+(III) Mixed normal & $0.01$ & $0.02$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Horseshoe)      & 0.507 & 0.536 & 0.553 & 0.525 \\
+Onizuka (Laplace)        & 0.674 & 0.696 & 0.720 & 0.705 \\
+Joint Sequential Sampler & 0.128 & 0.153 & 0.157 & 0.126 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Smooth Function}
+\label{sec:sim:joint:smooth}
+
+All extreme-quantile results for the smooth signal fit at $k=2$ are deferred to Appendix~\ref{app:sim:joint:smooth}. Tables~\ref{tab:s_ext_mse}--\ref{tab:s_ext_mciw} there report MSE, MAD, and MCIW. The appendix also discusses the stronger competition from the Onizuka variants on this signal and the interaction between Beta-tail spacing and the sentinel construction.
+
+The interval widths of the Joint Sequential Sampler reported throughout this subsection (Tables~\ref{tab:pc_ext_mciw}, \ref{tab:vs_ext_mciw}, and \ref{tab:s_ext_mciw}) are determined largely by how the inferential set is constructed. Under the sentinel mechanism the target quantile is bracketed at every index by the innermost sentinels on either side, and the non-crossing constraint forces the target trend to remain between these neighbours throughout the chain. With the compressed spacing used near the boundary---$0.003$ below the target and $0.01$ above it for $\tau = 0.01$, and analogously for the other extreme levels---the admissible vertical band for the target is narrow by construction, which mechanically limits the dispersion of its posterior and hence the width of its credible intervals. The small MCIW values reported in these tables are therefore largely a consequence of this geometric confinement, and are not directly comparable to the widths of the unconstrained Onizuka samplers, which estimate each quantile in isolation. Empirical coverage remains the appropriate criterion for judging the calibration of all intervals reported in this section, for the competitors as much as for the proposed samplers.

@@ -1,0 +1,138 @@
+\section{Computational cost}
+\label{sec:scalability}
+
+% ===========================================================================
+% PLACEHOLDER SECTION -- skeleton plus the timings that have actually been
+% measured. Slots marked TODO have no data behind them yet. Evidence lives in
+% notes/complexity_analysis/ (comparison.md, timings.csv, prox_iterations.csv,
+% timing_environment.txt, benchmark_existing.R).
+% NOTE: the Table 1 figures were measured on a laptop with R's reference BLAS.
+% Cluster timings under a different BLAS are not comparable and must not be
+% merged into the same table; see the TODO before Table 2.
+% ===========================================================================
+
+Section~\ref{sec:simulations} compared estimation accuracy at a single sample size. This
+section turns to cost per iteration. The comparison with ADMM is not of this kind: ADMM
+returns a point estimate and no posterior draws, so a per-iteration comparison is not
+meaningful, and the relevant difference is what each method delivers rather than what each
+costs. Against \citet{onizuka2024fast} the comparison is direct, since both methods draw
+the same object from the same working likelihood.
+
+\paragraph{What each iteration does.}
+One sweep of the individual sampler consists of a P-MALA update for $\theta$ followed by the
+two conjugate scalar draws for $\lambda$ and $\sigma$. The $\theta$ update evaluates the
+proximal operator of the difference penalty three times per sweep --- once for the proposal
+and once for each of the forward and reverse drift terms in the acceptance ratio. That
+proximal map is a quadratic objective with an $\ell_1$ difference penalty, and is therefore
+not the check-loss problem of \citet{brantley2020baseline}, although it is solved by an ADMM
+of the same banded form: each inner iteration performs one solve against a factorization of
+a banded kernel that is computed once per call and reused across inner iterations. The cost
+of a sweep is consequently dominated by the total number of inner iterations rather than by
+any dense factorization. Two implementation details qualify this description. Each proximal
+call constructs its own operators and factorizations before iterating, so a sweep performs
+several such setups rather than none; and the difference operator is stored densely in the
+implementation timed here, which contributes a term outside the proximal calls that a
+stencil or successive-differencing representation would remove.
+
+One Gibbs sweep of \citet{onizuka2024fast} instead draws $\theta$ directly from its augmented
+Gaussian full conditional. That conditional has a banded precision matrix --- half-bandwidth
+$k+1$, with the boundary rows of the prior leaving the bandwidth unchanged --- so the draw
+can in principle be obtained from one banded Cholesky factorization and two triangular
+solves. The implementation supplied with that paper does not take this route: it forms the
+explicit inverse of the precision matrix, symmetrizes the resulting dense covariance, and
+passes it to a multivariate normal generator that decomposes it afresh at every sweep. This
+is not governed by that implementation's \texttt{sparse} option, which changes only how the
+difference operator is stored and leaves the $\theta$ draw untouched; the two settings are
+reported separately below only to document that the option does not address this cost.
+
+\paragraph{Measured cost at $n = 500$.}
+Table~\ref{tab:cost_n500} reports the time per complete iteration on one Gaussian $S$ data
+set at $n = 500$, $k = 2$, $\tau = 0.5$. The protocol is three repetitions of thirty measured
+iterations, each preceded by five untimed iterations for warm-up only; the reported figure
+is the median of the three repetition means, not a median over individual iterations, and
+the spread across repetitions is given alongside it. Setup, data generation and output are
+excluded; for the individual sampler the figure includes all three proximal calls and their
+internal iterations. The warm-up is a timing device and not a convergence claim: the
+measured window sits early in the chain.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Time per complete iteration at $n = 500$, $k = 2$, $\tau = 0.5$, $S$ signal with
+Gaussian noise; median of three repetition means, with the range across repetitions. The
+\citet{onizuka2024fast} rows use the implementation supplied with that paper at its default
+\texttt{sparse = FALSE}. Measured on a single machine with R's reference BLAS.}
+\label{tab:cost_n500}
+\begin{tabular}{lrr}
+\toprule
+Method & Median ms/iteration & Range across repetitions \\
+\midrule
+Individual sampler & 30.33 & 30.00--85.33 \\
+Onizuka (Laplace) & 435.67 & 418.67--1126.33 \\
+Onizuka (Horseshoe) & 649.00 & 424.00--1001.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Across the $90$ measured iterations the individual sampler made $270$ proximal calls
+totalling $87{,}201$ inner ADMM iterations, or about $969$ inner iterations per sweep, and
+the proximal calls accounted for roughly $97\%$ of timed work. No call reached the iteration
+limit; the largest observed count was $581$. The per-iteration ordering at this sample size
+is therefore obtained with the proximal updates solved to the solver's own stopping rule
+rather than truncated at a fixed budget.
+
+\paragraph{Effect of the sparse option and of sample size.}
+% TODO: Table 2 is not yet populated. What is needed:
+%   (i) all methods across n (e.g. 250, 500, 1000, 2000), measured on ONE machine with a
+%       recorded BLAS, since Table 1 was measured under R's reference BLAS and cluster
+%       timings differ by an order of magnitude;
+%   (ii) both settings of the competitor's `sparse` option at each n, to document that the
+%        option does not affect the theta draw;
+%   (iii) the proximal iteration count per sweep at each n, since that is what carries the
+%         individual sampler's cost;
+%   (iv) a protocol/environment file recorded alongside, as for Table 1.
+% The measured window must follow enough iterations for lambda to leave its transient,
+% since the proximal iteration count depends on it.
+Table~\ref{tab:cost_scaling} is to report the time per iteration across sample sizes, under
+both settings of the competitor's \texttt{sparse} option. Two questions are open until it is
+populated. The first is whether the ordering at $n = 500$ persists and how the ratio behaves
+as $n$ grows; nothing in this section establishes a trend, since every figure in
+Table~\ref{tab:cost_n500} is at one sample size. The second is how much of the difference is
+attributable to the supplied implementation rather than to the sampling scheme it
+implements. The \texttt{sparse} option cannot answer that, because it does not alter the
+$\theta$ draw; answering it requires timing a banded implementation of the same Gaussian
+conditional, which is not what the option provides and is not attempted here.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{PLACEHOLDER --- to be populated. Time per complete iteration against sample size,
+for the individual sampler and for \citet{onizuka2024fast} under both settings of the
+\texttt{sparse} option, all measured on one machine with a recorded BLAS. The $n = 500$
+column is deliberately left empty rather than filled from
+Table~\ref{tab:cost_n500}, whose figures come from different hardware.}
+\label{tab:cost_scaling}
+\begin{tabular}{lrrrr}
+\toprule
+Method & $n = 250$ & $n = 500$ & $n = 1000$ & $n = 2000$ \\
+\midrule
+Individual sampler & --- & --- & --- & --- \\
+Onizuka (Laplace), \texttt{sparse = TRUE} & --- & --- & --- & --- \\
+Onizuka (Laplace), \texttt{sparse = FALSE} & --- & --- & --- & --- \\
+Onizuka (Horseshoe), \texttt{sparse = TRUE} & --- & --- & --- & --- \\
+Onizuka (Horseshoe), \texttt{sparse = FALSE} & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{What these timings do and do not establish.}
+Three limitations bound what can be read from this section. First, time per iteration is not
+time per effective draw: the individual sampler's $\theta$ update is a
+Metropolis-within-Gibbs step, whereas \citet{onizuka2024fast} draw $\theta$ from an exact full
+conditional, so equal iteration counts need not carry equal information, and a comparison in
+effective sample size requires mixing diagnostics that are not reported here. Second, the
+figures measure the computational work of the implementations as supplied, including the
+draft form of the P-MALA proposal; they are not a statement about the cost of a kernel whose
+invariant distribution has been verified. Third, the two hierarchies differ in boundary
+treatment and in their scale and shrinkage priors, so the comparison is between two complete
+procedures and not between two implementations of one algorithm.

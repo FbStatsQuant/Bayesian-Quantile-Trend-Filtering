@@ -1,0 +1,32 @@
+Independent review by separate review_unified agent, 2026-09-30.
+Reviewer was read-only; no files edited by reviewer.
+
+Design: PASS. Globally constrained product supports intended Gamma/IG
+conditionals. ASIS lambda^m cancellation, eta Jacobian and feasible-domain
+derivation correct. Fixed-neighbor Gaussian MH with support rejection correct.
+
+Code: PASS. Inspected Unified_Sampler.R, bounded_helpers.R, prox_bounded.cpp,
+build_unified.py. Same L/U and M reused in reverse; ordinary Gaussian rejects
+outside; ASIS checks derived interval plus reconstructed support; sequential
+state and theta/ASIS audits consistent. Bounded ADMM increment equation and
+normal-cone signs correct. Finite feasible map is approximate, not exact prox.
+
+Recommendation resolved: reject numerically collapsed initialization for nearly
+identical taus or large y. Independently exercised y=1e16/nearly identical taus:
+new rejection PASS.
+
+Independent executable ASIS check: n=3, Q constant, theta=(-1,0,1),lambda=1,
+L=(-2,-.2,.5),U=(-.5,.2,2),a=0,a0=b0=1. Exact conditional is Gamma(1,1)
+truncated to[.5,2]. Seed765,16000 updates,discard1000:
+sample mean1.067565985 vs exact1.069174625,batch SE.003879665,z=-.414633645.
+Every draw obeyed bounds and lambda*theta=(-1,0,1) to1e-9.
+
+Final saved-evidence review: PASS, no remaining core blocker. Independently
+loaded joint RDS and checked exact audit counts; retained colSums(acc) equal
+reported theta-movement counts for every quantile; final-state theta equals
+last stored draw; retained ordering and delta freezing pass. Audit prev-matrix
+logic correctly isolates theta/ASIS movement for the tested K=1.
+DESIGN accurately distinguishes intended target, inherited guards and finite-
+budget prox. Tau=.99 SD5.08577 remains a short-chain limitation, not evidence of
+convergence or useful mixing. Parent's subsequent descriptive ESS/drift report
+further documents this limitation.

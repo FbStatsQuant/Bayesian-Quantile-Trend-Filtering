@@ -1,0 +1,345 @@
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Data Model and Likelihood}
+\label{subsec:model}
+
+Let $\by = (y_1, \ldots, y_n)^\top \in \R^n$ denote an observed time series. We model the data as
+\begin{equation}
+    y_i = \theta_i + \varepsilon_i, \quad i = 1, \ldots, n,
+    \label{eq:datamodel}
+\end{equation}
+where $\theta = (\theta_1, \ldots, \theta_n)^\top$ is an unknown smooth trend and $\varepsilon_i$ are independent errors. For a given quantile level $\tau \in (0,1)$, we model the errors as following an asymmetric Laplace distribution (ALD). The ALD with location zero, scale $\sigma > 0$, and skewness parameter $\tau$ has density
+\begin{equation}
+    f(u \mid \tau, \sigma) = \frac{\tau(1-\tau)}{\sigma}
+    \exp\!\left\{-\frac{\rho_\tau(u)}{\sigma}\right\},
+    \label{eq:ald}
+\end{equation}
+where $\rho_\tau(u) = u(\tau - \mathbbm{1}(u < 0))$ is the asymmetric check function. This choice of likelihood connects the Bayesian framework directly to frequentist quantile regression: the maximum a posteriori (MAP) estimate of $\theta$ under a flat prior coincides with the solution to the standard quantile regression problem. Rather than fixing $\sigma$, we treat it as an unknown parameter and assign it a prior, so that the scale of the likelihood adapts to the data within the Gibbs scheme.
+
+The log-likelihood for $\theta$ given $\by$ at quantile level $\tau$ and scale $\sigma$ is
+\begin{align*}
+    \ell(\theta \mid \by, \tau, \sigma)
+    = n \log\!\left[\frac{\tau(1-\tau)}{\sigma}\right]
+    - \frac{1}{\sigma}\sum_{i=1}^n \rho_\tau(y_i - \theta_i).
+\end{align*}
+
+\subsection{Individual Quantile Sampler}
+\label{subsec:individual}
+
+We first describe the sampler that targets a single quantile level $\tau$. The joint sampler of Section~\ref{subsec:joint} builds directly on this construction.
+
+\paragraph{Prior specification.}
+To encourage smoothness of the estimated trend, we place a penalty on the $(k+1)$-th order discrete differences of $\theta$. Let $D = D^{(k+1)} \in \R^{m \times n}$ denote the discrete difference operator of order $k+1$, where $m = n - k - 1$ is its row rank. We use the hierarchical prior
+\begin{align*}
+    p(\theta \mid \lambda) \propto
+    \exp\!\left\{-\lambda \norm{D\theta}_1\right\},
+\end{align*}
+which corresponds to placing independent Laplace distributions on each of the $m$ entries $(D\theta)_j$, all sharing the common scale parameter $\lambda$. This prior, combined with the ALD likelihood, yields a posterior whose MAP is the frequentist quantile trend filtering estimator of \citet{brantley2020baseline}.
+
+Rather than treating $\lambda$ as a fixed tuning parameter selected by an external criterion, we place a Gamma hyperprior on $\lambda$,
+\begin{align*}
+    \lambda \sim \mathrm{Gamma}(a_0, b_0),
+\end{align*}
+with shape $a_0 > 0$ and rate $b_0 > 0$. For the ALD scale, we place an inverse-Gamma prior
+\begin{align*}
+    \sigma \sim \mathrm{IG}(a_\sigma, b_\sigma),
+\end{align*}
+with shape $a_\sigma > 0$ and rate $b_\sigma > 0$. In our implementation we set $a_\sigma = b_\sigma = 0.1$, a weakly informative choice that lets the data dominate the posterior for $\sigma$. Both hyperpriors are conjugate given $\theta$, yielding closed-form full conditionals that are sampled as part of the inference.
+
+\paragraph{Hyperparameter scaling by difference order.}
+The conjugate full conditional for $\lambda$ is $\mathrm{Gamma}(a_0 + m,\, b_0 + S_D)$ with posterior mean $(a_0 + m)/(b_0 + S_D)$, where $S_D = \norm{D\theta}_1$. Because $m = n - k - 1$ grows linearly with $n$, the appropriate scaling of $(a_0, b_0)$ depends on the difference order $k$, and the qualitative consequences of misspecification differ markedly across orders. The guiding principle is that the posterior mean of $\lambda$ should scale appropriately with the complexity of the signal class being fit.
+
+For $k = 0$, the estimator is piecewise constant and an unbounded posterior mean of $\lambda$ obliterates the jump structure of the signal by shrinking the first differences of $\theta$ toward zero. The required scaling is $a_0 = c_1 n$ and $b_0 = n$, yielding posterior mean approximately $c_1 + 1$ independent of $n$, with prior variance $c_1/n$ that shrinks with sample size. We use $c_1 = 1$ as the default and recommend the posterior mode as the point estimate. Alternative scalings of the form $a_0 = 1$, $b_0 = c_2 n^\alpha$ with $\alpha < 1$ produce a posterior mean of order $n^{1-\alpha}$, which diverges and is not viable for piecewise constant signals.
+
+For $k = 1$, the estimator is piecewise linear, and slow growth of $\lambda$ with $n$ is appropriate: more data warrant stronger regularization, but excessive penalization suppresses local features such as spikes or sharp curvature transitions. We set $a_0 = 1$ and $b_0 = c_2 \sqrt{n}$, giving posterior mean approximately $\sqrt{n}/c_2$. The shape parameter $a_0 = 1$ is nearly noninformative, so the posterior mean of $\lambda$ is driven by $m$ and the sufficient statistic $S_D$. We use $c_2 = 1$ as the default, with the range $[0.5, 2]$ providing a reasonable operating window, and recommend the posterior mean as the point estimate.
+
+For $k = 2$, the estimator is piecewise quadratic and the sufficient statistic $S_D = \norm{D^{(3)}\theta}_1$ remains small regardless of $n$ for signals well approximated by piecewise quadratics. Linear growth of $\lambda$ in $n$ is then appropriate: we set $a_0 = c n$ and $b_0 = 1$, yielding posterior mean approximately $(c+1)n$. We use $c = 1$ as the default and the posterior mean as the point estimate. This order exhibits a degree of robustness that lower orders do not share: misspecification of $c$ produces gradual degradation in mean squared error rather than the catastrophic structural collapse observed for $k = 0$.
+
+We adopt $k = 2$ as the default difference order in the absence of prior knowledge about signal structure. It does not require commitment to a specific signal class, exhibits the lowest sensitivity to hyperparameter misspecification among the three orders, and degrades gracefully under it. Lower orders may outperform $k = 2$ when the signal class matches the estimator structure exactly and the hyperparameters are well-tuned, but the gain is modest relative to the additional tuning effort required.
+
+\paragraph{Posterior.}
+The joint posterior over $(\theta, \lambda, \sigma)$ is
+\begin{equation}
+    p(\theta, \lambda, \sigma \mid \by) \propto
+    \sigma^{-n}
+    \exp\!\left\{-\frac{1}{\sigma}\sum_{i=1}^n \rho_\tau(y_i - \theta_i)
+    - \lambda \norm{D\theta}_1\right\}
+    \lambda^{a_0 - 1} e^{-b_0 \lambda}
+    \sigma^{-a_\sigma - 1} e^{-b_\sigma / \sigma}.
+    \label{eq:posterior}
+\end{equation}
+Direct sampling from \eqref{eq:posterior} is intractable due to the non-smooth ALD likelihood and the $\ell_1$ penalty. We construct a three-block Gibbs sampler that alternates between sampling $\theta \mid \lambda, \sigma, \by$ via proximal MALA, $\lambda \mid \theta, \by$ from its Gamma conjugate update, and $\sigma \mid \theta, \by$ from its inverse-Gamma conjugate update.
+
+\paragraph{Sampling the trend via P-MALA.}
+Sampling $\theta \mid \lambda, \sigma, \by$ requires drawing from a distribution with a non-smooth log-density. The P-MALA algorithm of \citet{pereyra2016proximal} handles this by incorporating the proximal operator of the non-smooth component into the Langevin proposal, yielding proposals that respect the geometry of the posterior. The negative log-likelihood contribution from the ALD is $f(\theta) = \sigma^{-1}\sum_{i=1}^n \rho_\tau(y_i - \theta_i)$, which depends on $\sigma$ both as a multiplicative scale and through the residual magnitude. To compute the gradient required by P-MALA, we use a smooth approximation of the check function evaluated on the standardized residual $u_i = (y_i - \theta_i)/\sigma$,
+\begin{align*}
+    \tilde{\rho}_\tau(u, \varepsilon) =
+    \tau u + \varepsilon \log\!\left(1 + e^{-u/ \varepsilon}\right),
+\end{align*}
+for a small smoothing parameter $\varepsilon > 0$. The gradient of the smoothed negative log-likelihood $\tilde{f}(\theta) = \sigma^{-1}\sum_{i=1}^n \tilde{\rho}_\tau((y_i - \theta_i)/\sigma,\, \varepsilon)\,\sigma$ with respect to $\theta_i$ is
+\begin{align*}
+    \nabla_{\theta_i} \tilde{f}(\theta)
+    = -\frac{1}{\sigma}\left(\tau -
+    \frac{1}{1 + e^{(y_i - \theta_i)/(\sigma \varepsilon)}}\right).
+\end{align*}
+The factor $\sigma^{-1}$ means that smaller values of $\sigma$ produce sharper gradients and stronger drift toward the quantile, while larger values flatten the gradient; this is the mechanism by which the scale parameter actively shapes the P-MALA proposal rather than acting as an inert nuisance.
+
+The non-smooth component of the log-posterior is $g(\theta) = \lambda \norm{D\theta}_1$. Its proximal operator with step size $\gamma > 0$ is
+\begin{align*}
+    \mathrm{prox}_{\gamma g}(z)
+    = \arg\min_{\theta \in \R^n}
+    \left\{\lambda \norm{D\theta}_1
+    + \frac{1}{2\gamma}\norm{\theta - z}_2^2\right\},
+\end{align*}
+which is the $\ell_1$ trend filtering problem with response $z$ and penalty $\gamma\lambda$. In the individual sampler this proximal map is unconstrained and we solve it directly using the \texttt{trendfilter} function of the \texttt{glmgen} package \citep{tibshirani2014adaptive}, which provides an efficient ADMM-based solver for the standard trend filtering problem.
+
+Given the current state $\theta^{(t)}$, the P-MALA proposal is
+\begin{align*}
+    \theta^\star
+    = \mathrm{prox}_{\gamma g}\!\left(
+    \theta^{(t)} - \delta \nabla \tilde{f}(\theta^{(t)})
+    + \sqrt{2\delta}\,\xi
+    \right),
+\end{align*}
+where $\xi \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_n)$ and $\delta > 0$ is the P-MALA step size. The proposal is accepted with the Metropolis-Hastings probability $\min(1, \alpha)$, where
+\begin{align*}
+    \log \alpha = \log p(\theta^\star \mid \lambda, \sigma, \by)
+    - \log p(\theta^{(t)} \mid \lambda, \sigma, \by)
+    + \log q(\theta^{(t)} \mid \theta^\star)
+    - \log q(\theta^\star \mid \theta^{(t)}),
+\end{align*}
+and the proposal log-density is
+\begin{align*}
+    \log q(\theta^\star \mid \theta^{(t)})
+    = -\frac{1}{4\delta}
+    \norm{\theta^\star - \mu^{(t)}}_2^2, \quad
+    \mu^{(t)} = \theta^{(t)}
+    - \delta \nabla \psi(\theta^{(t)}),
+\end{align*}
+with $\nabla \psi(\theta) = (\theta - \mathrm{prox}_{\gamma g}(\theta - \gamma \nabla \tilde{f}(\theta)))/\gamma$ the gradient of the Moreau envelope. The posterior log-density in the acceptance ratio uses the exact (non-smoothed) check function, evaluated with the current value of $\sigma$.
+
+\paragraph{Sampling the regularization parameter.}
+Given $\theta$, the conditional posterior for $\lambda$ follows directly from \eqref{eq:posterior}. Because the prior places independent Laplace distributions on each of the $m$ entries $(D\theta)_j$ with shared scale $\lambda$, the likelihood contribution of $\theta$ to $\lambda$ is
+\begin{align*}
+    p(\theta \mid \lambda) \propto \lambda^{m}
+    \exp\!\left\{-\lambda \norm{D\theta}_1\right\}.
+\end{align*}
+Combining with the Gamma hyperprior,
+\begin{align*}
+    p(\lambda \mid \theta, \by) \propto
+    \lambda^{a_0 + m - 1}
+    \exp\!\left\{-(b_0 + \norm{D\theta}_1)\,\lambda\right\},
+\end{align*}
+which is the kernel of a Gamma distribution,
+\begin{equation}
+    \lambda \mid \theta, \by \sim
+    \mathrm{Gamma}\!\left(a_0 + m,\; b_0 + S_D\right),
+    \quad S_D = \norm{D\theta}_1.
+    \label{eq:lambdaupdate}
+\end{equation}
+The sufficient statistic $S_D$ measures the total variation of the current trend estimate. When the sampled $\theta$ is rough, $S_D$ is large and the posterior for $\lambda$ shifts toward larger values, increasing regularization in the next iteration; when $\theta$ is smooth, $\lambda$ is drawn from a distribution with smaller mean. This self-regulating behavior is a principal advantage of the Bayesian formulation over a fixed eBIC-selected penalty.
+
+\paragraph{Sampling the ALD scale.}
+Given $(\theta, \lambda)$, only the likelihood and the inverse-Gamma prior on $\sigma$ contribute to its full conditional. From \eqref{eq:posterior},
+\begin{align*}
+    p(\sigma \mid \theta, \by) \propto
+    \sigma^{-(n + a_\sigma + 1)}
+    \exp\!\left\{-\frac{1}{\sigma}
+    \left(\sum_{i=1}^n \rho_\tau(y_i - \theta_i) + b_\sigma\right)\right\},
+\end{align*}
+which is the kernel of an inverse-Gamma distribution,
+\begin{equation}
+    \sigma \mid \theta, \by \sim
+    \mathrm{IG}\!\left(n + a_\sigma,\; S_\rho + b_\sigma\right),
+    \quad S_\rho = \sum_{i=1}^n \rho_\tau(y_i - \theta_i).
+    \label{eq:sigmaupdate}
+\end{equation}
+The sufficient statistic $S_\rho$ is the total check loss at the current trend estimate. When the residuals are large, $S_\rho$ is large and the posterior for $\sigma$ concentrates at larger values, which flattens the likelihood gradient at the next P-MALA step; when the trend fits the data well, $\sigma$ is drawn from a distribution with smaller mean, sharpening the gradient. The three blocks of the Gibbs sampler therefore interact: $\sigma$ calibrates the effective noise level seen by $\theta$, $\lambda$ calibrates the effective smoothness penalty seen by $\theta$, and $\theta$ in turn determines the sufficient statistics for both scale parameters.
+
+\subsection{Joint Quantile Sampler}
+\label{subsec:joint}
+
+We now extend the individual sampler to target $K$ quantile levels simultaneously. Let $\tau_1 < \tau_2 < \cdots < \tau_K$ denote the quantile levels of interest. Each quantile inherits its own copy of the full parameter set from the individual construction: a trend $\theta_{\tau_k}$, a regularization parameter $\lambda_{\tau_k}$, and an ALD scale $\sigma_{\tau_k}$. We seek joint posterior inference on $(\theta_{\tau_1}, \ldots, \theta_{\tau_K}, \lambda_{\tau_1}, \ldots, \lambda_{\tau_K}, \sigma_{\tau_1}, \ldots, \sigma_{\tau_K})$ subject to the non-crossing constraint
+\begin{align*}
+    \theta_{\tau_1, i} \leq \theta_{\tau_2, i} \leq \cdots
+    \leq \theta_{\tau_K, i}, \quad i = 1, \ldots, n.
+\end{align*}
+The joint posterior is
+\begin{align*}
+    p(\theta_{\tau_1}, \ldots, \theta_{\tau_K},
+    \lambda_{\tau_1}, \ldots, \lambda_{\tau_K},
+    \sigma_{\tau_1}, \ldots, \sigma_{\tau_K} \mid \by)
+    \propto \prod_{k=1}^K
+    \Bigg[
+    \sigma_{\tau_k}^{-(n + a_\sigma + 1)}
+    \lambda_{\tau_k}^{a_0 - 1} e^{-b_0 \lambda_{\tau_k}} \\
+    \times \exp\!\left\{-\frac{1}{\sigma_{\tau_k}}
+    \sum_{i=1}^n \rho_{\tau_k}(y_i - \theta_{\tau_k, i})
+    - \lambda_{\tau_k} \norm{D\theta_{\tau_k}}_1
+    - \frac{b_\sigma}{\sigma_{\tau_k}}\right\}
+    \Bigg]
+    \cdot \mathbbm{1}(\mathcal{C}),
+\end{align*}
+where $\mathcal{C}$ denotes the non-crossing feasible set.
+
+We sample from this posterior using a fixed-scan Gibbs sampler. Each full Gibbs iteration proceeds as follows.
+
+\paragraph{Sequential trend updates.}
+For $k = 1, \ldots, K$, sample $\theta_{\tau_k}$ via a single P-MALA step of the form described in Section~\ref{subsec:individual}, using the current values of $\lambda_{\tau_k}$ and $\sigma_{\tau_k}$ in the gradient and acceptance ratio, with the non-crossing constraint enforced as a box constraint. At step $k$, the constraint reduces to
+\begin{align*}
+    \ell_{\tau_k, i} \leq \theta_{\tau_k, i} \leq u_{\tau_k, i},
+    \quad i = 1, \ldots, n,
+\end{align*}
+where $\ell_{\tau_k, i} = \theta_{\tau_{k-1}, i}$ (or $-\infty$ if $k = 1$) and $u_{\tau_k, i} = \theta_{\tau_{k+1}, i}$ (or $+\infty$ if $k = K$), using the most recently updated values of adjacent trends. The box constraint at each step is exact: it is fully determined by the current values of the neighboring quantile trends, which are updated sequentially so that the lower bound always reflects the most recent sample of $\theta_{\tau_{k-1}}$.
+
+The presence of the box constraint changes the proximal subproblem. The unconstrained \texttt{glmgen::trendfilter} solver used in the individual sampler no longer applies, and we instead solve the constrained proximal map via ADMM; see Section~\ref{subsec:admm}.
+
+\paragraph{Sequential scale and regularization updates.}
+For $k = 1, \ldots, K$, sample $\lambda_{\tau_k}$ and $\sigma_{\tau_k}$ from their conditional posteriors given $\theta_{\tau_k}$. The derivations are identical to the individual case in \eqref{eq:lambdaupdate} and \eqref{eq:sigmaupdate} applied quantile-by-quantile, so
+\begin{align*}
+    \lambda_{\tau_k} \mid \theta_{\tau_k}, \by &\sim
+    \mathrm{Gamma}\!\left(a_0 + m,\;
+    b_0 + \norm{D\theta_{\tau_k}}_1\right), \\
+    \sigma_{\tau_k} \mid \theta_{\tau_k}, \by &\sim
+    \mathrm{IG}\!\left(n + a_\sigma,\;
+    \textstyle\sum_{i=1}^n \rho_{\tau_k}(y_i - \theta_{\tau_k, i}) + b_\sigma\right),
+\end{align*}
+for $k = 1, \ldots, K$. Each $\lambda_{\tau_k}$ and $\sigma_{\tau_k}$ is updated independently, so that each quantile's degree of smoothing and its effective noise scale adapt to the fit of its own estimated trend.
+
+\paragraph{Parameter structure.}
+Each quantile $\tau_k$ has its own P-MALA step size $\delta_k$, allowing the proposal to adapt to the differing curvatures of the conditional posteriors across quantile levels. The smoothing parameter $\varepsilon$ for the check loss approximation, the proximal step size $\gamma$, and the ADMM penalty parameter $\rho$ are shared across all quantiles. The Gamma prior hyperparameters $(a_0, b_0)$ and the inverse-Gamma hyperparameters $(a_\sigma, b_\sigma)$ are also shared, encoding a common prior belief about the scale of regularization and the noise level.
+
+\subsection{ADMM Proximal Operator for the Constrained Subproblem}
+\label{subsec:admm}
+
+At each Gibbs step of the joint sampler, the P-MALA proposal for $\theta_{\tau_k}$ requires solving the constrained proximal problem
+\begin{equation}
+    \min_{\theta \in \R^n}
+    \left\{
+    \lambda_{\tau_k} \norm{D\theta}_1
+    + \frac{1}{2\gamma}\norm{\theta - z}_2^2
+    \right\}
+    \quad \text{subject to} \quad
+    \boldsymbol{\ell} \leq \theta \leq \mathbf{u},
+    \label{eq:constrained_prox}
+\end{equation}
+where $z$ is the P-MALA input and $[\boldsymbol{\ell}, \mathbf{u}]$ is the box defined by the neighboring quantile trends. We solve \eqref{eq:constrained_prox} via ADMM by introducing auxiliary variables $v = D\theta$ and $w = \theta$, yielding the equivalent problem
+\begin{align*}
+    \min_{\theta, v, w}
+    \left\{
+    \lambda_{\tau_k} \norm{v}_1
+    + \frac{1}{2\gamma}\norm{\theta - z}_2^2
+    \right\}
+    \quad \text{subject to} \quad
+    v = D\theta, \quad w = \theta, \quad
+    \boldsymbol{\ell} \leq w \leq \mathbf{u}.
+\end{align*}
+The augmented Lagrangian is
+\begin{align*}
+    \mathcal{L}_\rho(\theta, v, w, {\alpha}, {\beta})
+    &= \lambda_{\tau_k} \norm{v}_1
+    + \frac{1}{2\gamma}\norm{\theta - z}_2^2
+    + {\alpha}^\top(D\theta - v)
+    + \frac{\rho}{2}\norm{D\theta - v}_2^2 \\
+    &\quad + {\beta}^\top(\theta - w)
+    + \frac{\rho}{2}\norm{\theta - w}_2^2,
+\end{align*}
+where $\rho > 0$ is the ADMM penalty parameter and ${\alpha}, {\beta}$ are dual variables. The ADMM updates at iteration $t$ are:
+
+\paragraph{$\theta$-update (linear system).}
+Minimizing over $\theta$ gives
+\begin{align*}
+    \left(\frac{1}{\gamma}\mathbf{I} + \rho D^{T}D
+    + \rho\mathbf{I}\right)\theta^{t+1}
+    = \frac{1}{\gamma}z
+    + D^{T}(\rho v^t - {\alpha}^t)
+    + (\rho w^t - {\beta}^t).
+\end{align*}
+The system matrix $\mathbf{A} = \frac{1}{\gamma}\mathbf{I} + \rho D^{T}D + \rho\mathbf{I}$ depends only on $\gamma$, $\rho$, and $D$, all of which are fixed within a Gibbs iteration. Exploiting this, we factorize $\mathbf{A}$ once at the beginning of each Gibbs step and reuse the factorization across all ADMM iterations. Combined with sparse storage of $D$ and $D^{T}D$, this constitutes the primary computational optimization of the algorithm.
+
+\paragraph{$v$-update (soft-thresholding).}
+Minimizing over $v$ decouples elementwise and yields the soft-threshold operator,
+\begin{align*}
+    v_j^{t+1} = \mathcal{S}_{\lambda_{\tau_k}/\rho}\!\left(
+    (D\theta^{t+1})_j + \alpha_j^t / \rho
+    \right),
+\end{align*}
+where $\mathcal{S}_\kappa(x) = \mathrm{sign}(x)\max(|x| - \kappa, 0)$ is the soft-thresholding operator.
+
+\paragraph{$w$-update (box projection).}
+Minimizing over $w$ subject to $\boldsymbol{\ell} \leq w \leq \mathbf{u}$ yields the elementwise projection onto the box,
+\begin{align*}
+    w_{i}^{t+1} = \mathrm{clip}\!\left(
+    \theta_i^{t+1} + \beta_i^t / \rho,\;
+    \ell_i,\; u_i
+    \right),
+\end{align*}
+where $\mathrm{clip}(x, \ell, u) = \max(\ell, \min(u, x))$. This is the step that enforces the non-crossing constraint: the box $[\boldsymbol{\ell}, \mathbf{u}]$ is defined by the current values of the neighboring quantile trends, and the projection is exact and elementwise.
+
+\paragraph{Dual updates.}
+\begin{align*}
+    {\alpha}^{t+1} &= {\alpha}^t
+    + \rho(D\theta^{t+1} - v^{t+1}), \\
+    {\beta}^{t+1} &= {\beta}^t
+    + \rho(\theta^{t+1} - w^{t+1}).
+\end{align*}
+All three subproblem updates have exact closed-form solutions, and the algorithm converges to the global optimum of \eqref{eq:constrained_prox} as the number of ADMM iterations grows. In practice, we run a fixed number of ADMM iterations per Gibbs step, with convergence monitored via primal and dual residuals.
+
+\subsection{Sentinel Quantile Strategy for Extreme Quantile Estimation}
+\label{subsec:sentinel}
+
+A fundamental difficulty in Bayesian sampling for extreme quantile trend filtering arises from the behavior of the ALD likelihood gradient. For a quantile level $\tau$ close to zero or one, nearly all residuals $y_i - \theta_i$ have the same sign, and the gradient of the smoothed check loss $\nabla \tilde{f}(\theta)$ approaches a constant vector. The P-MALA proposal then carries negligible gradient information and degenerates toward a random walk. Because the posterior at extreme quantile levels has a heavy tail in the direction away from the bulk of the data, the Markov chain occasionally accepts large moves in that direction, causing persistent upward or downward drift. For the 0.99 quantile with $n = 400$, this pathology produces large RMSE values under individual estimation, rendering the estimate essentially useless. \citet{onizuka2024fast} document degraded coverage at $\tau \in \{0.05, 0.95\}$ across their full simulation suite, which spans two signal structures---piecewise constant (PC) and varying smoothness (VS)---under three noise distributions: Gaussian, Beta, and mixed normal.
+
+The sentinel quantile strategy resolves this by exploiting the sequential box constraint structure of the joint sampler. We augment the set of quantiles of inferential interest with auxiliary sentinel quantiles placed beyond the target range. The sentinels are treated as full members of the joint posterior: they are sampled by the same Gibbs scheme, receive their own regularization and scale parameters, and their estimates are computable. However they are not primary targets of inference; their role is structural.
+
+Concretely, to estimate the 0.99 quantile stably, we include sentinel quantiles at 0.995 and 0.999. The 0.995 sentinel provides a dynamic upper wall for the 0.99 quantile through the box constraint $\theta_{0.99, i} \leq \theta_{0.995, i}$, and is itself controlled from above by the 0.999 sentinel through $\theta_{0.995, i} \leq \theta_{0.999, i}$. A stable scaffold of lower quantiles (e.g., 0.3, 0.5, 0.7, 0.9, 0.95, 0.97, 0.98) anchors the structure from below, preventing downward drift of the 0.99 quantile. The result is that the 0.99 quantile is sandwiched within a dynamically updating interval at every Gibbs iteration, which confines its exploration to a statistically sensible region without imposing any fixed constraint on its value. The strategy is computationally free in the sense that adding sentinel quantiles increases the number of sequential Gibbs steps by the number of sentinels, which is small, without changing the per-step cost.
+
+\subsection{Summary of the Algorithm}
+\label{subsec:algorithm}
+
+Algorithm~\ref{alg:joint} summarizes the full sequential Gibbs sampler for joint quantile trend filtering.
+
+\begin{algorithm}[h!]
+\caption{Sequential Gibbs Sampler for Joint Bayesian Quantile Trend Filtering}
+\label{alg:joint}
+\begin{algorithmic}[1]
+\Require Data $\by$, quantile levels $\tau_1 < \cdots < \tau_K$ (including sentinels), difference order $k$, prior hyperparameters $a_0, b_0, a_\sigma, b_\sigma$, ADMM iterations $T_{\mathrm{admm}}$, Gibbs iterations $T_{\mathrm{gibbs}}$, burn-in $T_{\mathrm{burn}}$.
+\State Initialize $\theta_{\tau_k}^{(0)}$, $\lambda_{\tau_k}^{(0)}$, $\sigma_{\tau_k}^{(0)}$ for $k = 1, \ldots, K$
+\For{$t = 1, \ldots, T_{\mathrm{gibbs}}$}
+    \For{$k = 1, \ldots, K$} \Comment{Sequential trend updates}
+        \State Set box $[\boldsymbol{\ell}_k, \mathbf{u}_k]$ using current $\theta_{\tau_{k-1}}^{(\cdot)}$ and $\theta_{\tau_{k+1}}^{(t-1)}$
+        \State Compute gradient $\nabla \tilde{f}_k(\theta_{\tau_k}^{(t-1)})$ using $\sigma_{\tau_k}^{(t-1)}$
+        \State Form proposal input $z = \theta_{\tau_k}^{(t-1)} - \delta_k \nabla \tilde{f}_k + \sqrt{2\delta_k}\,\xi$, $\xi \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$
+        \State Solve \eqref{eq:constrained_prox} via ADMM (Algorithm~\ref{alg:admm}) to get $\theta^\star$
+        \State Accept/reject $\theta^\star$ via Metropolis-Hastings using $(\lambda_{\tau_k}^{(t-1)}, \sigma_{\tau_k}^{(t-1)})$
+        \State Set $\theta_{\tau_k}^{(t)} \leftarrow$ accepted state
+    \EndFor
+    \For{$k = 1, \ldots, K$} \Comment{Sequential regularization updates}
+        \State Sample $\lambda_{\tau_k}^{(t)} \sim \mathrm{Gamma}(a_0 + m,\; b_0 + \norm{D\theta_{\tau_k}^{(t)}}_1)$
+    \EndFor
+    \For{$k = 1, \ldots, K$} \Comment{Sequential scale updates}
+        \State Sample $\sigma_{\tau_k}^{(t)} \sim \mathrm{IG}(n + a_\sigma,\; \sum_{i=1}^n \rho_{\tau_k}(y_i - \theta_{\tau_k, i}^{(t)}) + b_\sigma)$
+    \EndFor
+\EndFor
+\State \Return posterior samples $\{\theta_{\tau_k}^{(t)}, \lambda_{\tau_k}^{(t)}, \sigma_{\tau_k}^{(t)}\}_{t > T_{\mathrm{burn}}}$ for $k = 1, \ldots, K$
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[h!]
+\caption{ADMM for Constrained Proximal Subproblem}
+\label{alg:admm}
+\begin{algorithmic}[1]
+\Require Input $z$, box $[\boldsymbol{\ell}, \mathbf{u}]$, $\lambda$, $\gamma$, $\rho$, $D$, iterations $T_{\mathrm{admm}}$
+\State Factorize $\mathbf{A} = \frac{1}{\gamma}\mathbf{I} + \rho D^{T} D + \rho\mathbf{I}$ \Comment{Once per Gibbs step}
+\State Initialize $v^0, w^0, {\alpha}^0, {\beta}^0$
+\For{$t = 0, \ldots, T_{\mathrm{admm}} - 1$}
+    \State $\theta^{t+1} \leftarrow \mathbf{A}^{-1} \left(\frac{1}{\gamma}z + D^\top(\rho v^t - {\alpha}^t) + \rho w^t - {\beta}^t\right)$
+    \State $v^{t+1} \leftarrow \mathcal{S}_{\lambda/\rho}(D\theta^{t+1} + {\alpha}^t/\rho)$
+    \State $w^{t+1} \leftarrow \mathrm{clip}(\theta^{t+1} + {\beta}^t/\rho,\, \boldsymbol{\ell},\, \mathbf{u})$
+    \State ${\alpha}^{t+1} \leftarrow {\alpha}^t + \rho(D\theta^{t+1} - v^{t+1})$
+    \State ${\beta}^{t+1} \leftarrow {\beta}^t + \rho(\theta^{t+1} - w^{t+1})$
+\EndFor
+\State \Return $\theta^{T_{\mathrm{admm}}}$
+\end{algorithmic}
+\end{algorithm}

@@ -1,0 +1,23 @@
+{
+  "host": "nots",
+  "project": "/home/fb31/projects/Quant_Reg/Inner_Individual",
+  "run_name": "VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z",
+  "run_directory": "/home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z",
+  "raw_directory": "/scratch/fb31/qr_data/inner_individual/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z",
+  "validation_job_id": "1785936",
+  "validation_exit_status": "0:0",
+  "validation_cases_passed": 60,
+  "array_job_id": "1786240",
+  "aggregation_job_id": "1786241",
+  "array_size": 3000,
+  "concurrency": 400,
+  "gibbs_iterations": 15000,
+  "burn_in": 3000,
+  "lambda_shape": 1,
+  "lambda_rate": 0.01,
+  "submitted_utc": "2026-10-03T21:41:57Z",
+  "first_observed_400_running_utc": "2026-10-03T21:42:30Z",
+  "monitor_pid": 3017539,
+  "monitor_login_host": "loginx3.nots.rice.edu",
+  "monitor_interval_seconds": 600
+}

@@ -1,0 +1,58 @@
+JOINT SAMPLER REWRITE COMPLETED - 2026-10-01
+
+Project: C:\Users\felip\OneDrive\Documents\Quantile Regression\PMALA version Tex Project
+
+Edited manuscript files:
+ - sections\methodology.tex:138 onward, Section 2.3, pages 8-11 of main.pdf.
+ - sections\appendix_pmala.tex:126 onward, new Appendix A.10, pages 38-41;
+   plus the opening scope sentence on page 33.
+The single-quantile methodology, its priors/conditionals, the existing appendix
+body, main.tex, and unrelated sections were preserved. No production sampler
+source was edited. Abstract/discussion/experiment updates are inventoried only.
+
+Substantive additions:
+ - Globally constrained product working posterior and unchanged conjugate blocks.
+ - Sequential latest-neighbor boxes, fixed throughout each conditional block.
+ - Whole-conditional bounded proximal optimization and actual finite map.
+ - Ordinary Gaussian proposal, support rejection, matched forward/reverse MH.
+ - Constrained ASIS scale interval, Jacobian and log-lambda conditional.
+ - Implemented 200-iteration budget, discarded warm-up, burn-in-only adaptation.
+ - Mathematical and implementation singleton reduction; limits of the evidence.
+ - Explicit separation of ideal finite-solve MH from inherited numerical guards.
+ - Correct bounded factorization description (separate calls, not shared cache).
+
+Audited implementation:
+ Simulations\My Samplers\diagnostics_20260930\E_unified\Unified_Sampler.R
+ with bounded_helpers.R, prox_bounded.cpp, prox_admm_metric.cpp,
+ and guarded_reference.R. Read-only copies are in source_snapshot\.
+ final_audit.json records SHA256 hashes and the final live-source comparison.
+ All five core files match the audited text after newline normalization.
+ The reporting worker's completion introduced no method change.
+
+Review and checks:
+ - Fresh isolated bounded optimizer/density/ASIS checks: PASS.
+ - Fresh singleton full-trajectory and final RNG parity: PASS.
+ - Source/code consistency and mathematical review: PASS within stated scope.
+ - Earlier joint smoke-test evidence reviewed; no new joint campaign launched.
+ - pdflatex + bibtex + resolving passes succeeded: main.pdf, 60 pages.
+ - Final log: zero LaTeX errors, undefined references/citations, duplicate labels,
+   overfull/underfull boxes, or pending cross-reference rerun warnings.
+ - Rendered and visually inspected pages 2,3,8-12,33,38-41: clean equations,
+   algorithms, margins and section transitions. No remaining build limitation.
+
+Recovery and evidence:
+ - before\: original main.tex/main.pdf and both edited section sources.
+ - manuscript.diff: exact textual changes, with normalized line endings.
+ - MATHEMATICAL_REVIEW.txt; code_source_map.tsv; final_audit.json.
+ - qa\: fresh test logs, isolated test copies, compile logs and page PNGs.
+ - WRITING_INVENTORY.txt: concrete two-day writing priorities versus items
+   requiring experiment results or source/protocol reconciliation.
+
+Remaining methodological limitations:
+ No convergence or reliable tail inference is claimed. The previous short
+ upper-tail runs mixed poorly (tau=.99 mean-curve ESS about 1.13; half-chain
+ drift -7.43). Latent flooring/clipping and numerical slice guards do not become
+ exact merely because the trend proposal is MH-corrected. Calibration, guard
+ sensitivity and larger-sample performance still need evidence. Historical
+ sentinel claims and old benchmark descriptions elsewhere remain unchanged
+ and are explicitly identified for the next writing pass.

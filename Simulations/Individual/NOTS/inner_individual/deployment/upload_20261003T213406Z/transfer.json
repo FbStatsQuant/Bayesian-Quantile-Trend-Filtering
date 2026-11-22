@@ -1,0 +1,37 @@
+{
+  "utc": "20261003T213406Z",
+  "archive_sha256": "5d0b8f202ff4791d02386864b2d0acb4afaa6a0cf9adf2bbab7b7854f95f4a8a",
+  "commands": [
+    {
+      "command": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "nots",
+        "mkdir -p /home/fb31/projects/Quant_Reg/Inner_Individual/deployment"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "scp",
+        "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\Simulations\\Individual\\NOTS\\inner_individual\\deployment\\upload_20261003T213406Z\\package.tar.gz",
+        "nots:/home/fb31/projects/Quant_Reg/Inner_Individual/deployment/package_20261003T213406Z.tar.gz"
+      ],
+      "exit_status": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "ssh",
+        "-o",
+        "BatchMode=yes",
+        "nots",
+        "bash -s"
+      ],
+      "exit_status": 0,
+      "output": "/home/fb31/projects/Quant_Reg/Inner_Individual/deployment/package_20261003T213406Z.tar.gz: OK\n./audit/nots_readonly_probe.txt: OK\n./audit/static_checks.json: OK\n./common.R: OK\n./config.R: OK\n./environment.sh: OK\n./inspect_nots.py: OK\n./monitor.py: OK\n./operations/predeploy.sh: OK\n./operations/submit_validation.sh: OK\n./paper_reference/appendix_pmala.tex: OK\n./paper_reference/simulations.tex: OK\n./path_guard.sh: OK\n./preflight.R: OK\n./prepare_package.py: OK\n./process_results.R: OK\n./README.md: OK\n./remote_admin.py: OK\n./run_task.sh: OK\n./slurm/array.slurm: OK\n./slurm/process.slurm: OK\n./slurm/validate.slurm: OK\n./source/Individual_Sampler_PMALA_Augmented.R: OK\n./source/prox_admm_metric.cpp: OK\n./start_monitor.sh: OK\n./status.py: OK\n./submit.sh: OK\n./upload_package.py: OK\n./validate.sh: OK\n./validate_outputs.R: OK\n./worker.R: OK\n2026-10-03T21:34:25+00:00\n"
+    }
+  ]
+}

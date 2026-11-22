@@ -1,0 +1,12 @@
+Source: PMALA version Tex Project/main.pdf, Table 2, printed/PDF page 19.
+PDF SHA-256: ccf83343ef84a82f822a1d290e67f847cb721ca150d4e6e6e94b2dea8cbf4e93
+Extracted with pdftotext and visually verified against rendered page 19.
+Gaussian maps to Normal; Mixed normal maps to Mixed.
+Paper PMALA prior: Gamma(shape=1, rate=0.001), as stated on pages 7, 16 and 18.
+Current joint experiment prior: Gamma(shape=1, rate=0.01), exactly as in the unchanged current R sampler.
+User explicitly chose the file's 0.01 default and superseded all earlier prior instructions for this run.
+Both use n=500, VS baseline, order k=2, 30000 sweeps, 10000 burn-in.
+The paper describes the pending joint row as a four-quantile fit; this requested run
+fits six quantiles, adding 0.90 and 0.93. Compare reported targets 0.96 to 0.99 only.
+The paper averages available valid replications; the new run requires all 100 seeds.
+No paired significance claim is justified from these rounded paper aggregates alone.

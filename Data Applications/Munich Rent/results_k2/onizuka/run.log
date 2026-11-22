@@ -1,0 +1,35 @@
+
+Attaching package: ‘dplyr’
+
+The following object is masked from ‘package:MASS’:
+
+    select
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+Munich data: 2035 rents at 134 distinct floor sizes
+
+Onizuka MCMC-HS, tau = 0.1 ...
+  done in 25.22 min
+Onizuka MCMC-HS, tau = 0.3 ...
+  done in 2.28 min
+Onizuka MCMC-HS, tau = 0.5 ...
+  done in 2.26 min
+Onizuka MCMC-HS, tau = 0.7 ...
+  done in 2.27 min
+Onizuka MCMC-HS, tau = 0.9 ...
+  done in 2.28 min
+
+=== FINAL RESULTS (one chain per quantile) ===
+  tau frac_below
+1 0.1  0.0982801
+2 0.3  0.2997543
+3 0.5  0.5007371
+4 0.7  0.7031941
+5 0.9  0.9027027

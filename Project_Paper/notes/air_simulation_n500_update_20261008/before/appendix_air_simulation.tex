@@ -1,0 +1,192 @@
+% !TeX root = ../main.tex
+\clearpage
+\section{Additional results for the simulated air-quality experiment}
+\label{app:air_simulation}
+
+Tables~\ref{tab:air_n500}, \ref{tab:air_n2000}, and \ref{tab:air_n4000} give the remaining sample sizes for the experiment in Section~\ref{sec:air_simulation}. They use the same posterior-mean summaries, independently fitted ADMM benchmark, and replication-wise averaging as Table~\ref{tab:air_n1000}. Undefined CAA values are omitted. CL and MSE are smaller-is-better measures; larger CAA indicates better classification.
+
+Three further tables complete the record. Table~\ref{tab:air_mse_se} gives the standard error of each method's mean MSE across replications and, since the three methods fit identical datasets, the paired differences between Bayesian-PMALA and each competitor. Table~\ref{tab:air_diagnostics} collects the finite-chain diagnostics of the two samplers and the coverage and width of their pointwise $95\%$ bands for the target \eqref{eq:air_target}. Table~\ref{tab:air_penalty} records the penalty levels reached by Bayesian-PMALA under the prior \eqref{eq:air_prior} and by the eBIC selection, together with the number of ADMM fits whose selected penalty was the largest grid value.
+
+% AIR-TABLE-500-BEGIN
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Simulated air-quality results for $n=500$. Entries are means across replications. CL denotes check loss; HS denotes the horseshoe sampler. CAA excludes undefined cases.}
+\label{tab:air_n500}
+\begin{tabular}{@{}rlrrrrrr@{}}
+\toprule
+ & & & & \multicolumn{4}{c}{CAA at threshold $h$} \\
+\cmidrule(lr){5-8}
+$\tau$ & Method & CL & MSE & $0.5$ & $0.75$ & $1$ & $1.2$ \\
+\midrule
+0.01 & Bayesian-PMALA & 0.005670 & 0.045318 & 0.6953 & 0.7771 & 0.7488 & 0.6903 \\
+0.01 & Onizuka (HS) & 0.005409 & 0.084943 & 0.6211 & 0.6729 & 0.6583 & 0.6285 \\
+0.01 & ADMM & 0.006454 & 0.025415 & 0.6906 & 0.8246 & 0.8423 & 0.7813 \\
+\addlinespace[3pt]
+0.05 & Bayesian-PMALA & 0.028247 & 0.014059 & 0.7911 & 0.8534 & 0.7921 & 0.7158 \\
+0.05 & Onizuka (HS) & 0.023725 & 0.100832 & 0.5852 & 0.5898 & 0.5665 & 0.5451 \\
+0.05 & ADMM & 0.029033 & 0.012435 & 0.7948 & 0.8727 & 0.8171 & 0.7339 \\
+\addlinespace[3pt]
+0.10 & Bayesian-PMALA & 0.049553 & 0.013446 & 0.8335 & 0.8346 & 0.7508 & 0.6780 \\
+0.10 & Onizuka (HS) & 0.041748 & 0.103128 & 0.5764 & 0.5565 & 0.5354 & 0.5204 \\
+0.10 & ADMM & 0.050729 & 0.010944 & 0.8438 & 0.8652 & 0.7797 & 0.6949 \\
+\bottomrule
+\end{tabular}
+\end{table}
+% AIR-TABLE-500-END
+
+% AIR-TABLE-2000-BEGIN
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Simulated air-quality results for $n=2000$. Entries are means across replications. CL denotes check loss; HS denotes the horseshoe sampler.}
+\label{tab:air_n2000}
+\begin{tabular}{@{}rlrrrrrr@{}}
+\toprule
+ & & & & \multicolumn{4}{c}{CAA at threshold $h$} \\
+\cmidrule(lr){5-8}
+$\tau$ & Method & CL & MSE & $0.5$ & $0.75$ & $1$ & $1.2$ \\
+\midrule
+0.01 & Bayesian-PMALA & 0.005698 & 0.039902 & 0.7012 & 0.7862 & 0.7634 & 0.7065 \\
+0.01 & Onizuka (HS) & 0.005164 & 0.102222 & 0.5729 & 0.6077 & 0.6004 & 0.5816 \\
+0.01 & ADMM & 0.006744 & 0.013823 & 0.6984 & 0.8493 & 0.8859 & 0.8323 \\
+\addlinespace[3pt]
+0.05 & Bayesian-PMALA & 0.028054 & 0.011567 & 0.7983 & 0.8669 & 0.8055 & 0.7286 \\
+0.05 & Onizuka (HS) & 0.023631 & 0.100248 & 0.5666 & 0.5692 & 0.5472 & 0.5320 \\
+0.05 & ADMM & 0.028935 & 0.007766 & 0.8063 & 0.8942 & 0.8444 & 0.7626 \\
+\addlinespace[3pt]
+0.10 & Bayesian-PMALA & 0.049143 & 0.010889 & 0.8397 & 0.8526 & 0.7655 & 0.6931 \\
+0.10 & Onizuka (HS) & 0.041597 & 0.101549 & 0.5656 & 0.5488 & 0.5266 & 0.5167 \\
+0.10 & ADMM & 0.050560 & 0.007371 & 0.8527 & 0.8863 & 0.8023 & 0.7207 \\
+\bottomrule
+\end{tabular}
+\end{table}
+% AIR-TABLE-2000-END
+
+% AIR-TABLE-4000-BEGIN
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Simulated air-quality results for $n=4000$. Entries are means across replications. CL denotes check loss; HS denotes the horseshoe sampler.}
+\label{tab:air_n4000}
+\begin{tabular}{@{}rlrrrrrr@{}}
+\toprule
+ & & & & \multicolumn{4}{c}{CAA at threshold $h$} \\
+\cmidrule(lr){5-8}
+$\tau$ & Method & CL & MSE & $0.5$ & $0.75$ & $1$ & $1.2$ \\
+\midrule
+0.01 & Bayesian-PMALA & 0.006155 & 0.029525 & 0.6786 & 0.7820 & 0.7758 & 0.7178 \\
+0.01 & Onizuka (HS) & 0.005129 & 0.102225 & 0.5684 & 0.6005 & 0.5927 & 0.5748 \\
+0.01 & ADMM & 0.006748 & 0.014661 & 0.6960 & 0.8428 & 0.8763 & 0.8188 \\
+\addlinespace[3pt]
+0.05 & Bayesian-PMALA & 0.027957 & 0.012798 & 0.7937 & 0.8558 & 0.7895 & 0.7135 \\
+0.05 & Onizuka (HS) & 0.023695 & 0.096366 & 0.5672 & 0.5705 & 0.5465 & 0.5308 \\
+0.05 & ADMM & 0.028987 & 0.007729 & 0.8034 & 0.8890 & 0.8377 & 0.7548 \\
+\addlinespace[3pt]
+0.10 & Bayesian-PMALA & 0.049030 & 0.011869 & 0.8333 & 0.8399 & 0.7506 & 0.6796 \\
+0.10 & Onizuka (HS) & 0.041736 & 0.097465 & 0.5678 & 0.5518 & 0.5276 & 0.5169 \\
+0.10 & ADMM & 0.050719 & 0.007566 & 0.8514 & 0.8801 & 0.7936 & 0.7127 \\
+\bottomrule
+\end{tabular}
+\end{table}
+% AIR-TABLE-4000-END
+
+% AIR-TABLE-MSE-SE-BEGIN
+\begin{table}[H]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption{Mean MSE with its standard error across replications (in parentheses), and paired comparisons of Bayesian-PMALA with each competitor on the shared datasets. $10^{3}\Delta$ is the mean per-replication difference in MSE between Bayesian-PMALA and the competitor, with its standard error, multiplied by $10^{3}$; negative values favor Bayesian-PMALA. ``Lower'' is the percentage of replications in which Bayesian-PMALA has the lower MSE.}
+\label{tab:air_mse_se}
+\begin{tabular}{@{}rrrrrrrrr@{}}
+\toprule
+ & & & & & \multicolumn{2}{c}{vs.\ Onizuka (HS)} & \multicolumn{2}{c}{vs.\ ADMM} \\
+\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+$\tau$ & $n$ & Bayesian-PMALA & Onizuka (HS) & ADMM & $10^{3}\Delta$ & Lower & $10^{3}\Delta$ & Lower \\
+\midrule
+0.01 & 500 & 0.0453 (0.0027) & 0.0849 (0.0099) & 0.0254 (0.0032) & $-39.63$ (8.31) & 72 & $19.90$ (3.12) & 12 \\
+ & 1000 & 0.0454 (0.0020) & 0.1007 (0.0053) & 0.0189 (0.0013) & $-55.28$ (4.58) & 97 & $26.48$ (1.67) & 0 \\
+ & 2000 & 0.0399 (0.0012) & 0.1022 (0.0047) & 0.0138 (0.0006) & $-62.32$ (4.09) & 100 & $26.08$ (1.12) & 0 \\
+ & 4000 & 0.0295 (0.0008) & 0.1022 (0.0037) & 0.0147 (0.0005) & $-72.70$ (3.18) & 100 & $14.86$ (0.69) & 0 \\
+\addlinespace[3pt]
+0.05 & 500 & 0.0141 (0.0011) & 0.1008 (0.0114) & 0.0124 (0.0010) & $-86.77$ (10.98) & 96 & $1.62$ (0.77) & 42 \\
+ & 1000 & 0.0124 (0.0006) & 0.0999 (0.0061) & 0.0093 (0.0006) & $-87.56$ (6.02) & 100 & $3.04$ (0.46) & 22 \\
+ & 2000 & 0.0116 (0.0005) & 0.1002 (0.0045) & 0.0078 (0.0004) & $-88.68$ (4.27) & 100 & $3.80$ (0.36) & 11 \\
+ & 4000 & 0.0128 (0.0004) & 0.0964 (0.0032) & 0.0077 (0.0003) & $-83.57$ (3.04) & 100 & $5.07$ (0.30) & 2 \\
+\addlinespace[3pt]
+0.10 & 500 & 0.0134 (0.0012) & 0.1031 (0.0109) & 0.0109 (0.0013) & $-89.68$ (10.27) & 97 & $2.50$ (0.75) & 28 \\
+ & 1000 & 0.0115 (0.0007) & 0.1007 (0.0060) & 0.0093 (0.0006) & $-89.17$ (5.84) & 100 & $2.24$ (0.51) & 25 \\
+ & 2000 & 0.0109 (0.0005) & 0.1015 (0.0046) & 0.0074 (0.0004) & $-90.66$ (4.34) & 100 & $3.52$ (0.38) & 13 \\
+ & 4000 & 0.0119 (0.0004) & 0.0975 (0.0032) & 0.0076 (0.0003) & $-85.60$ (3.08) & 100 & $4.30$ (0.30) & 6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+% AIR-TABLE-MSE-SE-END
+
+% AIR-TABLE-DIAG-BEGIN
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{3pt}
+\caption{Finite-chain diagnostics and pointwise $95\%$ interval summaries for the two samplers over replications. For Bayesian-PMALA: mean acceptance rate of the trend move, number of chains that stopped moving (acceptance rate below $0.05$), median effective sample size of $\theta$ over the $20000$ retained sweeps, empirical coverage of the target \eqref{eq:air_target} by the pointwise $95\%$ band, and mean band width. For the horseshoe sampler: coverage and width of the same band, the median over fits of the minimum monitored effective sample size (column ``Min ESS''), and the number of fits with a mixing warning (monitored ESS below $100$ or split $\widehat R$ above $1.05$). Coverage is the proportion of the $n$ grid points at which the band contains the target, averaged over replications.}
+\label{tab:air_diagnostics}
+\begin{tabular}{@{}rrrrrrrrrrr@{}}
+\toprule
+ & & \multicolumn{5}{c}{Bayesian-PMALA} & \multicolumn{4}{c}{Onizuka (HS)} \\
+\cmidrule(lr){3-7}\cmidrule(lr){8-11}
+$\tau$ & $n$ & Accept. & Frozen & ESS & Cover. & Width & Cover. & Width & Min ESS & Warned \\
+\midrule
+0.01 & 500 & 0.500 & 0 & 33.1 & 0.294 & 0.139 & 0.373 & 0.194 & 106.9 & 48 \\
+ & 1000 & 0.500 & 0 & 21.9 & 0.286 & 0.133 & 0.332 & 0.180 & 41.6 & 91 \\
+ & 2000 & 0.500 & 0 & 14.9 & 0.330 & 0.143 & 0.317 & 0.170 & 28.5 & 96 \\
+ & 4000 & 0.500 & 0 & 7.8 & 0.689 & 0.337 & 0.301 & 0.164 & 14.9 & 100 \\
+\addlinespace[3pt]
+0.05 & 500 & 0.500 & 0 & 11.5 & 0.514 & 0.131 & 0.626 & 0.226 & 121.3 & 50 \\
+ & 1000 & 0.500 & 0 & 9.6 & 0.481 & 0.114 & 0.619 & 0.214 & 61.9 & 79 \\
+ & 2000 & 0.499 & 0 & 8.6 & 0.431 & 0.101 & 0.620 & 0.206 & 36.0 & 90 \\
+ & 4000 & 0.494 & 0 & 8.0 & 0.386 & 0.092 & 0.606 & 0.203 & 18.7 & 99 \\
+\addlinespace[3pt]
+0.10 & 500 & 0.500 & 0 & 12.8 & 0.589 & 0.139 & 0.711 & 0.227 & 151.1 & 40 \\
+ & 1000 & 0.500 & 0 & 10.3 & 0.565 & 0.123 & 0.707 & 0.217 & 101.2 & 57 \\
+ & 2000 & 0.499 & 0 & 8.9 & 0.513 & 0.110 & 0.705 & 0.211 & 48.8 & 88 \\
+ & 4000 & 0.496 & 0 & 8.3 & 0.458 & 0.099 & 0.696 & 0.209 & 28.9 & 96 \\
+\bottomrule
+\end{tabular}
+\end{table}
+% AIR-TABLE-DIAG-END
+
+% AIR-TABLE-PENALTY-BEGIN
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\caption{Penalty levels of the two penalized procedures. For Bayesian-PMALA, $\bar\lambda$ and $\overline{\lambda\sigma}$ are the posterior means of $\lambda$ and of the effective penalty $\lambda\sigma$, averaged over replications. For ADMM, $\bar\lambda$ is the mean eBIC-selected penalty and ``At bound'' counts the fits whose selected value is the largest grid point $e^{8}\approx 2981$. The quantity comparable with the ADMM penalty is $\lambda\sigma$ (Section~\ref{subsec:air_fitting}).}
+\label{tab:air_penalty}
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+ & & \multicolumn{2}{c}{Bayesian-PMALA} & \multicolumn{2}{c}{ADMM} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+$\tau$ & $n$ & $\bar\lambda$ & $\overline{\lambda\sigma}$ & $\bar\lambda$ & At bound \\
+\midrule
+0.01 & 500 & 4872 & 29.0 & 242 & 0 \\
+ & 1000 & 4860 & 28.4 & 317 & 0 \\
+ & 2000 & 4879 & 28.4 & 326 & 0 \\
+ & 4000 & 4939 & 30.8 & 274 & 0 \\
+\addlinespace[3pt]
+0.05 & 500 & 29368 & 844.0 & 983 & 4 \\
+ & 1000 & 29521 & 839.5 & 1368 & 16 \\
+ & 2000 & 29506 & 835.6 & 1376 & 13 \\
+ & 4000 & 28757 & 809.1 & 1455 & 14 \\
+\addlinespace[3pt]
+0.10 & 500 & 29379 & 1476.8 & 1476 & 20 \\
+ & 1000 & 29578 & 1473.2 & 1859 & 33 \\
+ & 2000 & 29604 & 1466.2 & 2056 & 39 \\
+ & 4000 & 29137 & 1437.9 & 2371 & 55 \\
+\bottomrule
+\end{tabular}
+\end{table}
+% AIR-TABLE-PENALTY-END
+\clearpage

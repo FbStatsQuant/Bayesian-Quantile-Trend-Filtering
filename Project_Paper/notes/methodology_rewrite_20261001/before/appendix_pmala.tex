@@ -1,0 +1,195 @@
+% !TeX root = ../main.tex
+\section{Computational Details of Bayesian-PMALA}
+\label{app:pmala}
+
+This appendix gives the derivations of the full conditional distributions used in Section~\ref{subsec:individual}, the ADMM solver for the proximal map \eqref{eq:prox}, the interweaving step for $\lambda$, the initialization, warm-up and step-size adaptation, and the numerical safeguards, followed by the reason each component was needed. The individual simulation settings are described first. Appendix~\ref{app:pmala:joint} then gives the bounded updates and the revised solver and adaptation settings of the current unified implementation in Section~\ref{subsec:joint}.
+
+\subsection{Full conditional distributions}
+\label{app:pmala:conditionals}
+
+Write $e_i = y_i - \theta_i$. The terms of \eqref{eq:posterior} that involve $\theta$ are $\sum_i (e_i - \psi_\tau z_i)^2/(2\omega_\tau^2\sigma z_i) + \lambda\norm{D\theta}_1$, which equals $U(\theta)$ in \eqref{eq:Utheta} up to a constant, with $w_i$ and $r_i$ as in \eqref{eq:weights}.
+
+For $z_i$, expanding the square gives $(e_i - \psi_\tau z_i)^2/(2\omega_\tau^2\sigma z_i) = e_i^2/(2\omega_\tau^2\sigma z_i) - \psi_\tau e_i/(\omega_\tau^2\sigma) + \psi_\tau^2 z_i/(2\omega_\tau^2\sigma)$, and the middle term does not depend on $z_i$. Hence
+\[
+p(z_i \mid \theta, \sigma, \by) \propto z_i^{-1/2} \exp\!\left\{-\frac{1}{2}\left(\frac{\chi_i}{z_i} + \tilde\psi\, z_i\right)\right\},
+\]
+with $\chi_i = e_i^2/(\omega_\tau^2 \sigma)$ and $\tilde\psi = \sigma^{-1}(\psi_\tau^2/\omega_\tau^2 + 2) = 1/\{2\tau(1-\tau)\sigma\}$. This is a generalized inverse Gaussian distribution $\mathrm{GIG}(1/2, \chi_i, \tilde\psi)$. Its reciprocal is inverse Gaussian with mean $(\tilde\psi/\chi_i)^{1/2} = 1/\{\tau(1-\tau)|e_i|\}$ and shape $\tilde\psi$, which is \eqref{eq:zupdate}.
+
+The terms involving $\lambda$ are $\lambda^{a_0+m-1}\exp\{-\lambda(b_0 + \norm{D\theta}_1)\}$, giving \eqref{eq:lambdaupdate}. The terms involving $\sigma$ are $\sigma^{-n/2}$ from the Gaussian factors, $\sigma^{-n}$ from the exponential densities of $z$, and the inverse-Gamma prior; collecting the exponents gives the inverse-Gamma distribution \eqref{eq:sigmaupdate} with shape $a_\sigma + 3n/2$ and rate $b_\sigma + \sum_i\{z_i + (e_i - \psi_\tau z_i)^2/(2\omega_\tau^2 z_i)\}$. The blocks are updated in the order $\theta$, $z$, $\lambda$, $\sigma$, each conditional on the most recent values of the others.
+
+\subsection{The proximal map and its ADMM solution}
+\label{app:pmala:admm}
+
+With $v = D\theta$, problem \eqref{eq:prox} becomes $\min_{\theta, v}\{\frac12\sum_i w_i(\theta_i - r_i)^2 + \lambda\norm{v}_1 + \norm{\theta - x}_M^2/(2\gamma)\}$ subject to $v = D\theta$. We apply scaled ADMM with penalty parameter $\varrho > 0$ and scaled dual variable $u$. Starting from $v^0 = Dx$ and $u^0 = 0$, iteration $t$ is
+\begin{align*}
+\theta^{t+1} &= A^{-1}\left\{ W r + \gamma^{-1} M x + \varrho D^\top (v^t - u^t) \right\}, \qquad A = W + \gamma^{-1} M + \varrho D^\top D, \\
+v^{t+1} &= \mathcal{S}_{\lambda/\varrho}\!\left(D\theta^{t+1} + u^t\right), \\
+u^{t+1} &= u^t + D\theta^{t+1} - v^{t+1},
+\end{align*}
+where $\mathcal{S}_c(a) = \mathrm{sign}(a)\max(|a| - c, 0)$ acts elementwise and $r = (r_1,\ldots,r_n)^\top$. We use $\varrho = 0.1\,(\bar w + \kappa\lambda^2/2)/\gamma$ with $\bar w = n^{-1}\sum_i w_i$, and a fixed budget of $150$ iterations with no data-dependent stopping rule.
+
+Both $M$ in \eqref{eq:metric} and $A$ are symmetric positive definite and banded, with bandwidth $k+1$ for every $n$. Within one P-MALA move, $A$ does not depend on the input $x$, so it is factorized once by a banded Cholesky decomposition and the factor is reused for the forward map $T(\theta)$ and the reverse map $T(\theta^\star)$. The metric is factorized once as $M = LL^\top$; the factor gives the noise $L^{-\top}\xi$ in \eqref{eq:pmala_proposal}, and the norms in \eqref{eq:pmala_accept} are evaluated as $\norm{v}_M^2 = \sum_i w_i v_i^2 + \kappa(\lambda^2/2)\norm{Dv}_2^2$. Each ADMM iteration costs one banded solve and two applications of $D$, so the cost of a sweep grows linearly with $n$ for the fixed iteration budget. The $\theta$-update of each iteration is computed for the increment $\theta - x$ rather than for $\theta$: subtracting $Ax$ from both sides gives $A(\theta - x) = w\odot(r - x) + \rho D^\top(v - u - Dx)$, where $u$ is the scaled dual variable, and this system has the same solution as the original one. The right-hand side is then of the order of the move $T(x) - x$, which vanishes with $\gamma$, whereas the right-hand side $w\odot r + Mx/\gamma + \rho D^\top(v - u)$ of the original system grows like $1/\gamma$; in floating point the rounding error of the original solve is proportional to $\norm{x}$ and does not decrease with $\gamma$, and it enters the acceptance ratio \eqref{eq:pmala_accept} divided by $\delta$. For long series with a large dynamic range, as in Section~\ref{sec:app:spod}, that error stopped the chains once the adaptation had reduced $\delta$, and the increment form removes it. The simulations of Section~\ref{sec:simulations} were run before this change; rerunning replications $1$--$10$ of every configuration with the increment form reproduces them, with no configuration differing significantly (all paired $|t| < 2$, geometric mean of the MSE ratios $1.01$). The experiments of Sections~\ref{sec:air_simulation} and \ref{sec:app:spod} use the increment form throughout.
+
+The Metropolis--Hastings correction requires only that $T$ be a deterministic function of its input, given $(z, \lambda, \sigma, \delta)$: the proposal density is then exactly $\mathcal{N}(\theta^\star; T(\theta), \delta M^{-1})$, and the kernel leaves the conditional invariant whether or not $T$ is the exact minimizer of \eqref{eq:prox}. The initialization from the input and the fixed iteration budget guarantee this. A solver warm-started from a previous sweep's solution would make $T$ depend on the history of the chain and would invalidate the correction. In our runs the acceptance rate at a given $\delta$ did not change when the iteration budget was increased, so the budget does not limit the step size.
+
+\subsection{Interweaving step for the regularization parameter}
+\label{app:pmala:asis}
+
+Posterior draws of the trend satisfy $\norm{D\theta}_1 \approx m/\lambda$; across the simulation configurations of Section~\ref{sec:simulations} the ratio $\norm{D\theta}_1/(m/\lambda)$ was between $1.0$ and $1.1$. The conditional \eqref{eq:lambdaupdate} is therefore concentrated near the current value of $\lambda$, and the conjugate draw alone moves $\lambda$ by a few percent per sweep. We interweave it with a draw in the ancillary parameterization \citep{yu2011center}.
+
+Let $Q \in \R^{n\times(k+1)}$ be an orthonormal basis of the null space of $D$, and decompose $\theta = \theta_\parallel + \theta_\perp$ with $\theta_\parallel = QQ^\top\theta$. Under \eqref{eq:prior_theta}, the standardized differences $\tilde u = \lambda D\theta = \lambda D\theta_\perp$ have independent standard Laplace entries and do not depend on $\lambda$. Holding $(\tilde u, \theta_\parallel, z, \sigma)$ fixed, a new value $\lambda'$ implies the trend $\theta(\lambda') = \theta_\parallel + (\lambda/\lambda')\theta_\perp$. The factor $\lambda'^m$ in \eqref{eq:prior_theta} cancels the Jacobian of the map $\theta_\perp \mapsto \tilde u$, so the conditional density of $\lambda'$ is
+\[
+p(\lambda' \mid \tilde u, \theta_\parallel, z, \sigma, \by) \propto \lambda'^{\,a_0 - 1} e^{-b_0\lambda'} \exp\!\left\{-\frac12 \sum_{i=1}^n w_i\left(\theta_i(\lambda') - r_i\right)^2\right\}.
+\]
+We draw $\eta = \log\lambda'$ by univariate slice sampling with stepping out \citep{neal2003slice}, using the log density $a_0\eta - b_0 e^\eta - \frac12\sum_i w_i(\theta_i(e^\eta) - r_i)^2$, an initial interval width of $1$ and at most $30$ stepping-out steps, and then set $\theta \leftarrow \theta(\lambda')$. Each evaluation costs $O(n)$ operations. The sufficient-parameterization draw \eqref{eq:lambdaupdate} and this ancillary draw each leave \eqref{eq:posterior} invariant, so their composition does as well. The step moves $\lambda$ and the rough part of $\theta$ together along the direction in which the conjugate draw is slow.
+
+\subsection{Initialization and warm-up}
+\label{app:pmala:init}
+
+Every chain starts at the data, $\theta^{(0)} = \by$, with $\sigma^{(0)} = 1$, $z_i^{(0)} = \sigma^{(0)}$, $\lambda^{(0)} = m$ and $\delta^{(0)} = 0.2$. Starting at $\by$ rather than at a smooth preliminary fit is deliberate: a chain started near a good smooth estimate can report a small error without having explored the posterior. The hyperparameters start at these data-free values rather than at their conditional distributions given $\theta = \by$, because at $\theta = \by$ those conditionals place $\sigma$ and $z$ near zero, a nearly degenerate interpolating configuration from which a Gibbs chain does not escape.
+
+An exact Metropolis--Hastings chain also cannot leave $\theta = \by$ directly. Every proposal $\theta^\star$ is close to the output of a proximal map, which is smooth in $D\theta$, while $\by$ is rough; the reverse term $\norm{\by - T(\theta^\star)}_M^2/(2\delta)$ in \eqref{eq:pmala_accept} is then very large and every proposal is rejected. The first $200$ sweeps therefore replace the P-MALA move by the deterministic step
+\[
+\theta \leftarrow \arg\min_{\vartheta}\left\{U(\vartheta) + \frac{1}{2\gamma_{\mathrm{w}}}\norm{\vartheta - \theta}_W^2\right\}, \qquad \gamma_{\mathrm{w}} = 10^4,
+\]
+a proximal-point step toward the conditional mode, computed by the solver of Appendix~\ref{app:pmala:admm} with $M = W$, $\gamma = \gamma_{\mathrm{w}}$, $\varrho = \mathrm{median}(w_i)$ and $300$ iterations. The blocks for $z$, $\lambda$ and $\sigma$ are drawn as usual during these sweeps; the interweaving step and the step-size adaptation start after them. The warm-up sweeps belong to the burn-in period and are discarded.
+
+\subsection{Step-size adaptation}
+\label{app:pmala:adapt}
+
+After the warm-up, the step size is updated at every sweep by the Robbins--Monro recursion
+\[
+\log\delta_{t+1} = \log\delta_t + t^{-0.6}\left(\alpha_t - 0.5\right), \qquad \alpha_t = \min(1, \alpha),
+\]
+with $\alpha$ from \eqref{eq:pmala_accept}, and $\delta$ is confined to $[10^{-8}, 10^{2}]$. The adaptation continues after burn-in, because $\lambda$ can still drift slowly in the retained sweeps and a frozen step size then lets the acceptance rate drift with it. The gain $t^{-0.6}$ decreases to zero, so the adaptation satisfies the diminishing-adaptation condition of \citet{roberts2007coupling}. In the $3000$ simulation runs of Section~\ref{sec:simulations} the post-burn-in acceptance rate was between $0.47$ and $0.52$.
+
+\subsection{Numerical safeguards}
+\label{app:pmala:safeguards}
+
+Four safeguards are part of the default algorithm and are applied identically in every run. (i) Each draw $z_i$ is restricted to $[10^{-8}, 10^{4}]$, and $|y_i - \theta_i|$ is floored at $10^{-10}$ in \eqref{eq:zupdate}; this keeps the weights $w_i$ within a range in which $M$ and $A$ can be factorized, and the upper bound is essentially never active because $z_i$ has an exponential prior with mean $\sigma$. (ii) The difference-precision coefficient $\kappa\lambda^2/2$ in \eqref{eq:metric} is capped at $10^{8}$. (iii) If the banded Cholesky factorization of $A$ fails because of rounding, a ridge $\epsilon\max_i A_{ii}$ is added to the diagonal, starting from $\epsilon = 10^{-12}$ and multiplying $\epsilon$ by $100$ up to five times; the ridge is part of the solver, so $T$ remains a deterministic map. (iv) A non-finite value of $\log\alpha$ is treated as a rejection, and any non-finite state stops the run with an error rather than propagating. None of the $3000$ runs of Section~\ref{sec:simulations} stopped.
+
+\subsection{Run length}
+\label{app:pmala:runlength}
+
+Each run uses $30000$ sweeps and discards the first $10000$, which include the $200$ warm-up sweeps, leaving $20000$ retained draws. For the simulations at $n = 500$ the median wall time per run was $152$ seconds on one core of a Linux compute cluster; the median effective sample size over the $20000$ retained draws was $66$ for the trend (median over coordinates) and $9.2$ for $\log\lambda$. From $\lambda^{(0)} = m$ the chain approaches the posterior level of $\lambda$ more slowly as $n$ grows. In the design of Section~\ref{sec:air_simulation}, $\lambda$ is stationary over the retained draws for $n \le 2000$, with a median relative change below $1\%$ between the two halves of the retained sweeps, and a residual median change of $3$--$5\%$ at $n = 4000$ for $\tau = 0.05$ and $0.10$. The application of Section~\ref{sec:app:spod}, with $n = 8640$, therefore uses longer chains.
+
+\subsection{Why each component was needed}
+\label{app:pmala:changes}
+
+The sampler was developed under one rule: a single default configuration, fixed before seeing any data set and identical across signals, noise distributions and quantile levels, with every candidate change evaluated on all $30$ configurations of Section~\ref{sec:simulations} before adoption rather than on the configuration that motivated it.
+
+\paragraph{Proximal map of the whole conditional.} P-MALA requires the proximal map of the entire negative log-density. Under the ALD likelihood that map contains the check loss, and the alternative of smoothing the check loss and applying a proximal map to the penalty alone did not perform well in preliminary experiments. The normal--exponential representation \eqref{eq:ald_mixture} makes the conditional of $\theta$ a weighted quadratic plus the $\ell_1$ penalty, whose proximal map is a weighted trend filtering problem, without approximating the likelihood.
+
+\paragraph{Noise after the proximal map.} Adding the Gaussian noise after $T$, as in \eqref{eq:pmala_proposal}, gives a proposal with an explicit density. If the noise is added before a proximal map, the proposal is the image of a Gaussian under a nonlinear map that concentrates mass on trends that are sparse in $D\theta$; its density is not available, and a Gaussian density evaluated in its place does not give a valid Metropolis--Hastings ratio for the stated posterior.
+
+\paragraph{Curvature-matched metric.} With $M = \mathbf{I}_n$ the noise in \eqref{eq:pmala_proposal} is white, and its $(k+1)$-th differences have standard deviation of order $\sqrt{\delta}$ in each of the $m$ coordinates, each charged by the penalty at rate $\lambda$. For the posterior values of $\lambda$ at $n = 500$ this increases $U$ by far more than the Metropolis--Hastings ratio can absorb: on a pilot configuration (VS signal, Gaussian noise, $\tau = 0.5$) the acceptance rate was zero for every step size tried down to $\delta = 10^{-5}$. The metric \eqref{eq:metric} scales the noise in the rough directions by $1/\lambda$. Values of $\kappa$ between $3$ and $10$ raised the adapted step size three- to tenfold relative to $\kappa = 1$ at the same acceptance rate and increased the effective sample size of $\theta$ several-fold; the default is $\kappa = 3$.
+
+\paragraph{Rate of the Gamma prior.} Because the posterior draws of the trend satisfy $\norm{D\theta}_1 \approx m/\lambda$ (Appendix~\ref{app:pmala:asis}), the data determine the level of $\lambda$ only weakly, and the prior rate $b_0$ must be small relative to $\norm{D\theta}_1$ for $\lambda$ to be learned. A unit rate is far from weak on this scale: $\mathrm{Gamma}(1,1)$ gives $P(\lambda > 500) = e^{-500}$, whereas $\mathrm{Gamma}(1, 10^{-3})$ gives $P(\lambda > 500) \approx 0.61$. Under $\mathrm{Gamma}(1,1)$ the chain settled at $\lambda$ between $50$ and $75$ on the pilot configuration and returned undersmoothed trends. We therefore use $b_0 = 10^{-3}$. A sensitivity run with $b_0 = 10^{-4}$ on all $30$ configurations with $10$ replications each was not uniformly better: on the smooth signal the geometric-mean MSE ratio to the default was $0.86$, with $7$ of $15$ configurations significantly lower and none higher, but the median coverage of the $95\%$ intervals fell from $0.91$ to $0.84$; on the varying-smoothness signal the ratio was $1.01$, with $1$ configuration significantly lower and $2$ higher. The default was kept. A Laplace prior scaled by $\sigma$ \citep{park2008bayesian}, under which the penalty enters as $\lambda/\sigma$, was also examined and rejected, because in one configuration $\lambda$ and $\sigma$ escalated together to very large values for a long stretch of the chain, a mode the unscaled prior \eqref{eq:prior_theta} does not exhibit.
+
+\paragraph{Prior on the likelihood scale.} The inverse-Gamma parameters enter \eqref{eq:sigmaupdate} next to $3n/2$ and a sum over $n$ observations, so $a_\sigma = b_\sigma = 0.1$ carries negligible information while keeping the prior proper and away from the improper limit $a_\sigma, b_\sigma \to 0$.
+
+\paragraph{Start at the data and warm-up.} The start $\theta^{(0)} = \by$ and the warm-up are explained in Appendix~\ref{app:pmala:init}.
+
+\paragraph{Continuous adaptation.} Adapting $\delta$ only during burn-in left the acceptance rate drifting in configurations where $\lambda$ was still moving after burn-in; the diminishing recursion of Appendix~\ref{app:pmala:adapt} removes this drift.
+
+\paragraph{Interweaving step and other candidate changes.} Table~\ref{tab:pmala_variants} lists the variants evaluated for the last change to the default, each run on all $30$ configurations with one replication. Single-replication MSE differences of this size are within replication noise (the standard deviation of $\log$ MSE across replications within a configuration is about $0.4$), so the decision was made on efficiency at equal wall time. The interweaving step of Appendix~\ref{app:pmala:asis} increased the effective sample size of $\lambda$ per hour from $50$ to $87$ and reduced the median absolute log ratio of the mean of $\lambda$ between the two halves of the retained draws from $0.26$ to $0.10$, and was adopted. An early exit of the ADMM iterations on a residual criterion, which keeps $T$ deterministic, saved no time at the $150$-iteration budget. Several trend moves per sweep increased the effective sample size of $\theta$ but lowered it per hour for both $\theta$ and $\lambda$. A joint Metropolis move on $(\lambda, \theta)$ is exact but its adapted log-step settled near $0.075$, so it also moved $\lambda$ slowly.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Candidate changes to Bayesian-PMALA, evaluated on the $30$ simulation configurations of Section~\ref{sec:simulations} with one replication each ($n = 500$, $30000$ sweeps, $10000$ discarded). MSE ratio: geometric mean over configurations of the MSE relative to the default. ESS: median effective sample size over the $20000$ retained draws, for $\log\lambda$ (also per hour of wall time) and for $\theta$ (median over coordinates). Time: wall time per run.}
+\label{tab:pmala_variants}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrl}
+\toprule
+Variant & MSE ratio & ESS $\lambda$ & per hour & ESS $\theta$ & Time (s) & Adopted \\
+\midrule
+Previous default & 1.000 & 4.9 & 50 & 62 & 352 & -- \\
+ADMM early exit & 1.020 & 5.9 & 53 & 63 & 397 & no \\
+Interweaving for $\lambda$ & 0.963 & 9.8 & 87 & 69 & 404 & yes \\
+$3$ trend moves per sweep & 0.975 & 11.6 & 33 & 173 & 1264 & no \\
+$5$ trend moves per sweep & 0.948 & 15.2 & 26 & 264 & 2089 & no \\
+Interweaving, $3$ moves & 0.938 & 20.3 & 57 & 173 & 1275 & no \\
+Joint $(\lambda,\theta)$ move & 0.955 & 7.4 & 28 & 83 & 960 & no \\
+Joint move, interweaving & 0.959 & 10.4 & 39 & 100 & 963 & no \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Numerical safeguards.} The safeguards of Appendix~\ref{app:pmala:safeguards} were introduced after factorization failures and non-finite states in a few configurations of early multi-replication runs; with them in place no run failed.
+
+\subsection{Exactness checks}
+\label{app:pmala:tests}
+
+The implementation is checked by nine tests: the normal--exponential identity \eqref{eq:ald_mixture}; the generalized inverse Gaussian conditional of $z_i$; agreement of the proximal map with the \texttt{glmgen} trend filtering solver \citep{tibshirani2014adaptive} at $M = \mathbf{I}_n$; the minimizing property of the proximal map in the metric \eqref{eq:metric}; the trend move against the closed-form Gaussian conditional at $\lambda = 0$; the trend move against numerical integration on a grid at $n = 4$, with a fixed metric and with the curvature metric; bitwise agreement of the shared-factorization move with separate solves; the interweaving chain against grid integration; and the joint $(\lambda,\theta)$ move against grid integration. All tests pass.
+
+\subsection{Computational details of the unified joint sampler}
+\label{app:pmala:joint}
+
+\paragraph{Bounded ADMM.} Fix a quantile block and suppress its index. For $B=[\ell,u]$, introduce $v=D\vartheta$ and $b=\vartheta$ in \eqref{eq:joint_prox}, assigning $\lambda\norm{v}_1$ to the difference variable and the convex indicator $I_B(b)$ to the box variable. Here $I_B$ equals zero in $B$ and $+\infty$ outside. The objective is
+\[
+    \frac12(\vartheta-r)^\top W(\vartheta-r)
+    +\frac{1}{2\gamma}\norm{\vartheta-x}_M^2
+    +\lambda\norm{v}_1+I_B(b),
+    \qquad v=D\vartheta,\quad b=\vartheta.
+\]
+Use scaled dual variables $a_D,a_B$ and positive penalties $\varrho,\zeta$ for these two equalities. With $M=\mathrm{diag}(d)+cD^\top D$, the default penalties are
+\[
+    \varrho=0.1(\bar d+c)/\gamma,\qquad
+    \zeta=n^{-1}\sum_i(w_i+d_i/\gamma).
+\]
+Starting from $v^0=Dx$, $b^0=\Pi_B(x)$ and $a_D^0=a_B^0=0$, the iterations solve for the increment $h^{s+1}=\vartheta^{s+1}-x$:
+\begin{align*}
+    A_B &= W+\gamma^{-1}M+\varrho D^\top D+\zeta\mathbf I_n,\\
+    A_Bh^{s+1} &= W(r-x)+\varrho D^\top(v^s-Dx-a_D^s)
+                         +\zeta(b^s-x-a_B^s),\\
+    \vartheta^{s+1} &= x+h^{s+1},\\
+    v^{s+1} &= \mathcal S_{\lambda/\varrho}(D\vartheta^{s+1}+a_D^s),
+    & b^{s+1} &= \Pi_B(\vartheta^{s+1}+a_B^s),\\
+    a_D^{s+1} &= a_D^s+D\vartheta^{s+1}-v^{s+1},
+    & a_B^{s+1} &= a_B^s+\vartheta^{s+1}-b^{s+1}.
+\end{align*}
+The two separable updates of $(v,b)$ form one ADMM block. The returned map is the feasible variable $b^{200}$, not the unconstrained iterate $\vartheta^{200}$. The default uses the full $200$ iterations without early stopping, with a fresh deterministic initialization for each input. Thus the map used in the forward and reverse proposal densities is reproducible without carrying solver state from a previous move. A user-specified residual tolerance also gives a deterministic map when applied with the same initialization and rule in both directions; it is not used by default.
+
+$A_B$ is banded with half-bandwidth $k+1$, and its factorization is reused within each solve. Although the forward and reverse systems are identical, the current bounded wrapper factors them separately; it also factors $M$ separately for Gaussian simulation. Consequently, shared factorization across both maps is an available optimization, not a property of this bounded implementation. For fixed $k$ and iteration budget, each map still costs $O(n)$. A sweep's trend proposals cost $O(JKn)$ for fixed $K$, while each interweaving log-density evaluation costs $O(n)$; the number of slice evaluations is variable.
+
+\paragraph{Interweaving density and feasible interval.} Use $p=QQ^\top\theta$ and $v=\theta-p$ from \eqref{eq:joint_asis_curve}, now letting $v$ denote the orthogonal component of the trend. For a scale $s=\lambda/\lambda'>0$, feasibility requires
+\[
+    \ell_i\leq p_i+s v_i\leq u_i,\qquad i=1,\ldots,n.
+\]
+For $v_i\ne0$, intersect the interval with endpoints $(\ell_i-p_i)/v_i$ and $(u_i-p_i)/v_i$ with the corresponding intervals for all other coordinates and with $(0,\infty)$. If $v_i=0$, require $p_i\in[\ell_i,u_i]$. Denote the resulting endpoints by $s_-$ and $s_+$; endpoints at zero or infinity are allowed as limits. In $\eta=\log\lambda'$ coordinates the interval is
+\begin{equation}
+    \log\lambda-\log s_+\ \leq\ \eta\ \leq\ \log\lambda-\log s_-.
+    \label{eq:joint_asis_interval}
+\end{equation}
+The $m$-dimensional change of variables from the rough part of $\theta$ to $\lambda'D\theta$ contributes a factor proportional to $\lambda'^{-m}$, cancelling the $\lambda'^m$ in the difference prior. The change from $\lambda'$ to $\eta$ contributes $e^\eta$. Therefore the log density for the slice update, up to a constant, is
+\begin{equation}
+\begin{aligned}
+    \log f(\eta)={}&a_0\eta-b_0e^\eta
+       -\frac12\sum_i w_i\{p_i+\lambda e^{-\eta}v_i-r_i\}^2\\
+       &+\log\mathbbm{1}_{B}(p+\lambda e^{-\eta}v).
+\end{aligned}
+    \label{eq:joint_asis_density}
+\end{equation}
+The weights and pseudo-responses here use the newly drawn $z$ and the current $\sigma$. The implementation checks both \eqref{eq:joint_asis_interval} and the reconstructed trend's support, assigning log density $-\infty$ outside it. It uses an initial slice width of $1$, a randomized division of at most $29$ outward extensions between the two endpoints (the stepping-out parameter is $30$), and interval shrinkage. Degenerate scale intervals and a numerically infeasible reconstruction of the current trend leave the state unchanged. These checks preserve support without clipping the rescaled trend.
+
+\paragraph{Initialization and adaptation.} For $J>1$, the initial trends are
+\[
+    \theta_j^{(0)}=\by+s_y\left\{\Phi^{-1}(\tau_j)
+                -\mathrm{median}_{h}\Phi^{-1}(\tau_h)\right\}\mathbf 1,
+    \qquad s_y=\max\{\mathrm{sd}(\by),0.1\},
+\]
+where $\Phi$ is the standard normal distribution function. This separates the levels without random initialization; inputs that yield nonfinite or numerically indistinguishable adjacent curves are rejected. For $J=1$, initialize exactly at $\by$. At every level set $z_i=1$, $\sigma=1$, $\lambda=m$ and $\delta=0.2$ by default. The first $H=200$ sweeps use only the bounded proximal map for the trend, with $M=W$, $\gamma_{\mathrm w}=10^4$, $\varrho=\mathrm{median}(w_i)$ and the same $200$-iteration budget. These are optimization warm-up sweeps, not posterior transitions; the other three blocks are drawn, but interweaving and step-size adaptation have not yet started.
+
+For sweeps $H<t\leq B$, let $\bar\alpha_{jt}$ be the mean of the $K$ Metropolis acceptance probabilities at level $j$, including zero for outside-box proposals. With $\Pi_{[a,b]}$ denoting clipping to a scalar interval, the default adaptation is
+\[
+    \delta_j\ \leftarrow\ \Pi_{[10^{-8},10^2]}
+        \left[\exp\left\{\log\delta_j+t^{-0.6}(\bar\alpha_{jt}-0.5)\right\}\right].
+\]
+Adaptation ends after sweep $B$, so retained sweeps use fixed step sizes. The defaults are $T=30000$, $B=10000$ and $K=1$, with interweaving enabled. Neither this run length nor freezing adaptation establishes that burn-in is sufficient.
+
+\paragraph{Invariance and numerical qualifications.} In exact arithmetic, the Metropolis kernel \eqref{eq:joint_accept}, the stated full conditional draws and the support-restricted slice kernel each leave their conditional target invariant; their sequential composition therefore leaves \eqref{eq:joint_target} invariant once the proposal settings are fixed. The finite ADMM budget does not compromise the Metropolis argument, because the actual deterministic mean is used in both proposal densities. The cap on $c$ likewise changes a proposal metric rather than the target, and the deterministic ridge retry in the ADMM solve only changes that proposal mean. The metric used for noise and for the two Gaussian norms must agree.
+
+This argument must be distinguished from the inherited guards in the executed sampler. The residual floor $10^{-10}$ and clipping of latent draws to $[10^{-8},10^4]$ alter the ideal $z$ conditional; clipping is not sampling from a correctly normalized truncated conditional. The original inverse-Gaussian arithmetic is retained. The bounded slice routine returns the current state when its initial log slice height is nonfinite or its shrinking interval has width below $10^{-10}$, and nonfinite Metropolis log ratios are rejected. Such numerical interventions are not justified by the finite-solve Metropolis argument. Accordingly, exact conditional correction of the trend proposal is not an assertion that the entire guarded implementation samples the ideal joint posterior exactly. Its numerical sensitivity and the mixing of the retained chain require separate assessment.
+
+\paragraph{Checks and their limits.} Local checks compare the bounded map with an analytic quadratic solution and with an independent small quadratic program, including optimality residuals. Further checks cover repeatability, the forward/reverse Gaussian ratio, outside-box rejection, and the constrained interweaving density against numerical quadrature. The $200$-iteration map was accurate on the small optimization fixture; this is not a uniform error bound for all conditional problems. A singleton check with $n=50$, $\tau=0.10$ and $120$ sweeps reproduced the guarded individual sampler's full trajectories and final random-number-generator state. Joint checks with $n=60$, $1000$ sweeps and $500$ retained draws used levels $(0.10,0.50,0.90)$ and $(0.96,0.97,0.98,0.99)$; no crossings were found after trend or interweaving moves, and retained step sizes were constant. However, descriptive effective sample sizes for the spatial mean of the trend were about $1$--$10$, and at $\tau=0.99$ its second-half mean was $7.43$ lower than its first-half mean. These short checks verify specific implementation properties and expose substantial nonstationarity; they do not validate upper-tail estimates, interval calibration or performance at the larger simulation sizes.

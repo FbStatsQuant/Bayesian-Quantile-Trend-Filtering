@@ -1,0 +1,31 @@
+n=500; data seed=1; S signal; Gaussian heteroscedastic noise; tau=.5; k=2
+3 repetitions; 5 warm iterations then 30 measured; setup excluded.
+PMALA: gamma=.1 delta=.02 eps=.01 a0=500 b0=1 a_sigma=b_sigma=.1 lambda_init=20.
+Original proposal/acceptance mismatch retained for faithful runtime audit.
+Prox diagnostic recording adds small allocation overhead to PMALA timings.
+Onizuka: supplied dense implementation, sig.init=c(1,1), both priors.
+R version 4.4.1 (2024-06-14 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 26200)
+
+Matrix products: default
+
+
+locale:
+[1] C
+system code page: 65001
+
+time zone: America/Chicago
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] MCMCpack_1.7-1 coda_0.19-4.1  Bessel_0.7-0   invgamma_1.2   GIGrvg_0.8    
+[6] MASS_7.3-65    glmgen_0.0.3  
+
+loaded via a namespace (and not attached):
+ [1] Matrix_1.7-4       lattice_0.22-9     splines_4.4.1      gmp_0.7-5.1       
+ [5] grid_4.4.1         Rmpfr_1.1-2        compiler_4.4.1     quantreg_6.1      
+ [9] SparseM_1.84-2     survival_3.8-6     mcmc_0.9-8         MatrixModels_0.5-4

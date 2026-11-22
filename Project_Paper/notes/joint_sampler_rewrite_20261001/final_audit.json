@@ -1,0 +1,83 @@
+{
+  "checked_at_utc": "2026-10-01T17:55:25.238083+00:00",
+  "audited_source_directory": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\Simulations\\My Samplers\\diagnostics_20260930\\E_unified",
+  "immutable_snapshot_directory": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot",
+  "core_live_comparison": [
+    {
+      "file": "Unified_Sampler.R",
+      "snapshot_sha256": "ddbcc9df864b3a4010d9d9e30c2f490350063bd98f9c2720a4d628aaa50dac72",
+      "live_sha256": "c95ecabd1660b274f16ea97dbb8b55ef61355fdb758a7a583da9bbdb878d7245",
+      "identical_after_newline_normalization": true
+    },
+    {
+      "file": "bounded_helpers.R",
+      "snapshot_sha256": "b0dd4fda1edb2729aeb122444611398ecfee765efaac6ffd0f29d635b27f6715",
+      "live_sha256": "b0dd4fda1edb2729aeb122444611398ecfee765efaac6ffd0f29d635b27f6715",
+      "identical_after_newline_normalization": true
+    },
+    {
+      "file": "prox_bounded.cpp",
+      "snapshot_sha256": "19bb7399e65ad3ad93308d39e3c815c1a73f20c2779c0d311dc82e15d1db06cd",
+      "live_sha256": "19bb7399e65ad3ad93308d39e3c815c1a73f20c2779c0d311dc82e15d1db06cd",
+      "identical_after_newline_normalization": true
+    },
+    {
+      "file": "prox_admm_metric.cpp",
+      "snapshot_sha256": "ed607632e3518d63ac0d8b87671de287970e9a5b3bd9f943fb1ae94e5042f766",
+      "live_sha256": "ed607632e3518d63ac0d8b87671de287970e9a5b3bd9f943fb1ae94e5042f766",
+      "identical_after_newline_normalization": true
+    },
+    {
+      "file": "guarded_reference.R",
+      "snapshot_sha256": "2d8d6ad3260851df22f580ea1e39e037db0dd5d429d9058a5320e4766c2c8864",
+      "live_sha256": "2d8d6ad3260851df22f580ea1e39e037db0dd5d429d9058a5320e4766c2c8864",
+      "identical_after_newline_normalization": true
+    }
+  ],
+  "snapshot_sha256": {
+    "asis_checks.csv": "1596b2a94c5bf97baa1612a66ecf144d2638fdcb2aa4af1205bb35a1e2b781d1",
+    "bounded_helpers.R": "b0dd4fda1edb2729aeb122444611398ecfee765efaac6ffd0f29d635b27f6715",
+    "DESIGN.txt": "ec68289e4bc12c5f365d8af2f6a7f2973d2324e4d856c4ede0ca1ab207bb873e",
+    "guarded_reference.R": "2d8d6ad3260851df22f580ea1e39e037db0dd5d429d9058a5320e4766c2c8864",
+    "independent_review.txt": "753251de0c517692127e9506438fa8d102ac372778152025c562a837dcac2820",
+    "joint_checks.csv": "8fcea788cf8321c33c80ae859ffe3342eb4602037c07031549d809b0d728bc7b",
+    "prox_admm_metric.cpp": "ed607632e3518d63ac0d8b87671de287970e9a5b3bd9f943fb1ae94e5042f766",
+    "prox_bounded.cpp": "19bb7399e65ad3ad93308d39e3c815c1a73f20c2779c0d311dc82e15d1db06cd",
+    "prox_checks.csv": "6141d1419958584cc56e2a9851e62eb9299c5b8d6c5773d621c259518b5d8aa9",
+    "RESULTS.txt": "4f77f6ccc4b07c3be9a6487864fc7bbbd613509aaaf5553e905420ff40183196",
+    "short_chain_diagnostics.csv": "8940c4d3c5e0a3c750bc7143506dad8150b53436791e122c0e40343bb32280f4",
+    "singleton_parity.csv": "9f65655e0fbb3862d8c9dac09099b87cc2042070ea6ddab542d53f4d077abaa3",
+    "test_bounded.R": "aa9bf213225af6e63f9a1ae52f7ad5f1a388c1faa74d35e24163cad7962743d7",
+    "test_joint.R": "8c87ca268aff884e28d37b98e3ecd35b77c7a4c4cf7c3d8fe449b3ac09e65569",
+    "test_singleton.R": "f992793d1269ea4b35e36552af3b0ba49c77575d418e8ac5daf6a6e3a1deec95",
+    "unified_reporting.R": "89ad834b754d99cc6a8a5c80ddc77e0b1296dcce6b34191241d55d23c5f54077",
+    "Unified_Sampler.R": "ddbcc9df864b3a4010d9d9e30c2f490350063bd98f9c2720a4d628aaa50dac72"
+  },
+  "final_manuscript_sha256": {
+    "main.tex": "62109ac5b9c0f96c5fff449b5bff2671e4e1674c27f0565dfc4327cfbd8e520f",
+    "sections\\methodology.tex": "d33b7c67a0da7fbd21047769cd709d02e667cabe3f95f7fcd4751d0088153b13",
+    "sections\\appendix_pmala.tex": "5ae8dab84501f712485d1560ca6ad17d5d262c864466d58faeaa2f6645818445",
+    "main.pdf": "4ea688e5fbec83ba4331cb8e083f0e3c2a3f5a58460d5ffd22c83fd9b7cd7ab4"
+  },
+  "checks": {
+    "individual_methodology_preserved": true,
+    "existing_appendix_body_preserved": true,
+    "main_tex_unchanged": true,
+    "final_latex_errors_and_layout_or_reference_warnings": [],
+    "pdf_pages": 60,
+    "visually_reviewed_pdf_pages": [
+      2,
+      3,
+      8,
+      9,
+      10,
+      11,
+      12,
+      33,
+      38,
+      39,
+      40,
+      41
+    ]
+  }
+}

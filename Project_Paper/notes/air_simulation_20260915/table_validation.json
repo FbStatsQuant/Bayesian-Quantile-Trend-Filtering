@@ -1,0 +1,7 @@
+{
+  "source_workbook": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\outputs\\air_simulation_summary_20260915\\Air_Simulation_Mean_Metrics.xlsx",
+  "numeric_metric_entries": 216,
+  "tables": 4,
+  "sampler_estimate": "posterior mean",
+  "individual_mse_below_admm_cells": 10
+}

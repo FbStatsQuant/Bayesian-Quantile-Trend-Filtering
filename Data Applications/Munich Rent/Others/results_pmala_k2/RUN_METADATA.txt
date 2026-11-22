@@ -1,0 +1,18 @@
+run_id: munich_pmala_k2_ab1_20260918T165833Z
+host: owls.stat.rice.edu
+workdir: /home/fb31/.claude-science-scratch/.claude-science/jobs/230081a9-00c7-40cd-8c3a-1942b85d618c
+launch_command: Rscript --vanilla Munich_PMALA_k2.R
+start_utc: 2026-09-18T17:02:24Z
+R: R version 4.6.0 (2026-04-24)
+glmgen: 
+method: individual P-MALA/Gibbs, adaptive delta (Robbins-Monro on log delta, frozen after burn-in)
+order_k: 2
+taus: 0.10 0.30 0.50 0.70 0.90 (five independent fits, sequential)
+iterations: 6000 total, 1000 burn-in, 5000 retained
+lambda_prior: Gamma(a=1, b=1) -- EXPLICIT USER OVERRIDE of the AGENTS.md sqrt(n) default, stated 2026-09-18
+sigma_prior: IG(0.01, 0.01)
+gamma: 0.1   eps: 0.01   delta_init: 0.01   delta_target: 0.45   adapt_kappa: 0.6   adapt_gain: 1.0
+seed: set.seed(800) once at script start, then the five tau fits run in the order listed
+data: munich.rda (spmrf distribution), 2035 rents at 134 distinct floor sizes
+exit_status: 0
+end_utc: 2026-09-18T17:05:37Z

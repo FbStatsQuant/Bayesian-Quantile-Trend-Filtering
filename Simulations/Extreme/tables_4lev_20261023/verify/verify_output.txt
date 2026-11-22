@@ -1,0 +1,40 @@
+summary rows (tau filtered): joint4 24 joint6 24 indiv 96 ['admm', 'onizuka_hs', 'onizuka_lap', 'pmala']
+per-task rows (tau filtered): joint4 2400 joint6 2400
+per-task methods: joint4 file ['joint'] joint6 file ['joint']
+[C1] joint4: cells=24, n per cell min/max=100/100, all cells seeds exactly 1..100: True
+[C1] joint6: cells=24, n per cell min/max=100/100, all cells seeds exactly 1..100: True
+[C1] joint4 per-task vs summary file: cells=24 max|d mean|=1.527e-16 max|d se|=9.378e-17 n_seeds match=True
+[C1] joint4 per-task vs file under test: cells=24 max|d mean|=1.527e-16 max|d se|=9.378e-17 n_seeds match=True
+[C1] joint6 per-task vs summary file: cells=24 max|d mean|=3.331e-16 max|d se|=8.457e-17 n_seeds match=True
+[C1] joint6 per-task vs file under test: cells=24 max|d mean|=3.331e-16 max|d se|=8.457e-17 n_seeds match=True
+CHECK 1: PASS max abs discrepancy 3.331e-16
+[C2] matched pairs total 2400 (expect 2400); unmatched joint4 rows 0, joint6 rows 0
+[C2] joint4 rows compared=24  max|d mean_diff|=9.194e-17 max|d se_diff|=9.709e-17 max|d share|=0.000e+00 max|d n_pairs|=0.0
+[C2] paired columns are NA on all 120 non-joint4 rows: True
+CHECK 2: PASS max abs discrepancy 9.709e-17
+[C3] cells=24 methods per cell=6 ties=0 mismatches=0; total TRUE flags in file=24
+CHECK 3: PASS mismatching cells 0
+[C4] n_seeds: max abs diff 0.000e+00
+[C4] mean_MSE: max abs diff 0.000e+00
+[C4] se_MSE: max abs diff 0.000e+00
+[C4] mean_crossings_neighbor: max abs diff 0.000e+00
+[C4] se_crossings_neighbor: max abs diff 0.000e+00
+[C4] mean_crossings_all: max abs diff 0.000e+00
+[C4] se_crossings_all: max abs diff 0.000e+00
+[C4] rows in file=144 matched to summaries=144; methods=['admm', 'joint4', 'joint6', 'onizuka_hs', 'onizuka_lap', 'pmala']; NA in value columns=0
+CHECK 4: PASS max abs discrepancy 0.000e+00
+[C5] parsed MSE md rows: 36 (expect 36)
+[C5] VS/Mixed/tau=0.98/onizuka_lap: md='0.16917 (0.00567)' csv='0.16917 (0.00567)' bold_md=False best_csv=False bold_in_column=['joint6'] -> OK
+[C5] VS/Mixed/tau=0.98/joint4: md='0.11013 (0.00372)' csv='0.11013 (0.00372)' bold_md=False best_csv=False bold_in_column=['joint6'] -> OK
+[C5] VS/Mixed/tau=0.98/admm: md='0.18448 (0.00759)' csv='0.18448 (0.00759)' bold_md=False best_csv=False bold_in_column=['joint6'] -> OK
+[C5] VS/Normal/tau=0.99/joint6: md='**0.02999 (0.00080)**' csv='0.02999 (0.00080)' bold_md=True best_csv=True bold_in_column=['joint6'] -> OK
+[C5] VS/Normal/tau=0.99/onizuka_lap: md='0.04997 (0.00121)' csv='0.04997 (0.00121)' bold_md=False best_csv=False bold_in_column=['joint6'] -> OK
+[C5] VS/Mixed/tau=0.98/joint6: md='**0.10337 (0.00359)**' csv='0.10337 (0.00359)' bold_md=True best_csv=True bold_in_column=['joint6'] -> OK
+[C5] parsed paired-diff md rows: 6 (expect 6)
+[C5] paired VS/Mixed/tau=0.97: md='0.00645 (0.00106), share 0.24' csv='0.00645 (0.00106), share 0.24' -> OK
+[C5] paired S/Normal/tau=0.96: md='0.00229 (0.00017), share 0.06' csv='0.00229 (0.00017), share 0.06' -> OK
+[C5] paired VS/Normal/tau=0.96: md='0.00338 (0.00032), share 0.10' csv='0.00338 (0.00032), share 0.10' -> OK
+[C5-extra] exhaustive sweep of MSE md cells: 144 cells, mismatches=0
+[C5-extra] exhaustive sweep of paired md cells: 24 cells, mismatches=0
+CHECK 5: PASS
+SUMMARY: {1: 'PASS', 2: 'PASS', 3: 'PASS', 4: 'PASS', 5: 'PASS'}

@@ -1,0 +1,59 @@
+{
+  "changed_or_new": {
+    "Unified_Sampler.R": {
+      "before": "2266fe7e95b3847ffe5d3650605944b61074227306bdd75819bb83a9181cd227",
+      "after": "c95ecabd1660b274f16ea97dbb8b55ef61355fdb758a7a583da9bbdb878d7245"
+    },
+    "bounded_helpers.R": {
+      "before": "5273effc365054aa05be274c1083e645fac6c8faaf961a69cd62e615fe2931af",
+      "after": "b0dd4fda1edb2729aeb122444611398ecfee765efaac6ffd0f29d635b27f6715"
+    },
+    "build_unified.py": {
+      "before": "760bd74a93c1caf6a33af058987b8003eefe2b58b4bee3cdfbf6e69d3360168a",
+      "after": "e9af7bca18be1da5cc1dcb14bffddc3379ebfe64da8a9f0964d189e1db41ad41"
+    },
+    "unified_reporting.R": {
+      "before": null,
+      "after": "89ad834b754d99cc6a8a5c80ddc77e0b1296dcce6b34191241d55d23c5f54077"
+    },
+    "run_unified_example.R": {
+      "before": null,
+      "after": "bcce26a400914acaab472c8d03da63160c4269a16b21ccc12f84725d935f3e3c"
+    },
+    "test_reporting.R": {
+      "before": null,
+      "after": "dbba66e60e3ee32a2ab125615526931b844ae40e5d7076de8714df8de25a9b75"
+    },
+    "verify_reporting_integrity.py": {
+      "before": null,
+      "after": "5539278a31ee14706468bb893e48f610a9ada44b665ddc46c209b81991204d7e"
+    },
+    "verify_reporting_body.R": {
+      "before": null,
+      "after": "bae26941c25a30fe5aa79572cacd7ee2ffd4a85fab878c57209d9cc31f420f03"
+    },
+    "README.txt": {
+      "before": "52bbaf7ee00b45cb1bb9b770adcc1c0a28eb61cf13fd46ff2a5974be7a531d5a",
+      "after": "9989237817ff51893774a914534f1fc812fa0d2607b207832c784e997118bfe8"
+    },
+    "REPORTING_README.txt": {
+      "before": null,
+      "after": "35840d769910f7d6cfc8c2883d73d21cc0a0b9083046892385647b814478cb24"
+    },
+    "reporting_checks.log": {
+      "before": null,
+      "after": "f8aca879dcf7a8d2c34ed1a41cf1f60b94691f9a657ace2a38a44ecacdc3dc32"
+    },
+    "example_output.log": {
+      "before": null,
+      "after": "4e7dae15ba9860b08ea660d773adfd7796fa7cc300690ab55876290dc2cf8bf9"
+    }
+  },
+  "verified_unchanged": [
+    "guarded_reference.R",
+    "prox_admm_metric.cpp",
+    "prox_bounded.cpp"
+  ],
+  "original_and_D_hashes_unchanged": true,
+  "prior_sampler_sha256": "2266fe7e95b3847ffe5d3650605944b61074227306bdd75819bb83a9181cd227"
+}

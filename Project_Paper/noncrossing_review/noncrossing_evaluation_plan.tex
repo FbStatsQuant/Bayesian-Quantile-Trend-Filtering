@@ -1,0 +1,251 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black,citecolor=blue!50!black]{hyperref}
+\usepackage{parskip}
+
+\lstset{basicstyle=\ttfamily\small,columns=fullflexible,keepspaces=true,breaklines=true,frame=single,framerule=0.3pt,xleftmargin=6pt,xrightmargin=6pt}
+
+\newcommand{\btheta}{\bm{\theta}}
+\newcommand{\bhat}{\widehat{\bm{\theta}}}
+\newcommand{\ind}{\mathbb{1}}
+
+
+\title{\textbf{Evaluating the joint non-crossing sampler at extreme lower quantiles}\\[4pt]
+\large Reference plan for the BQTF (P-MALA within Gibbs) paper}
+\author{Prepared for Felipe Bedoya, Rice University}
+\date{8 September 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose}
+
+This document fixes the evaluation design for the joint, non-crossing quantile trend filtering sampler at the quantile levels
+\[
+\tau \in \{0.01,\ 0.02,\ 0.03,\ 0.04\},
+\]
+so that it can be implemented on the server without further design decisions. Two performance measures were decided: mean squared error (MSE), already used in the paper, and the \emph{adjacent-pair crossing rate} with its companion, the any-crossing fraction. Two further crossing-related measures (rearrangement gap, posterior crossing probability) are described as optional extensions in Section~\ref{sec:optional}; they are not required for the main tables.
+
+Section~\ref{sec:assume} lists the assumptions this plan makes about the existing simulation code. Confirm or edit them before running anything.
+
+\section{Assumptions about the existing setup}
+\label{sec:assume}
+
+\begin{enumerate}[leftmargin=*]
+\item The three test signals (piecewise constant, $k=0$; varying smoothness, $k=1$; smooth, $k=2$) and the three noise laws (heteroscedastic Gaussian, Beta$(1,\,11-10\tilde x)$, mixed normal) of Section~4 of the manuscript are reused unchanged, with $n=400$ and $R=100$ replicates per configuration.
+\item The joint sampler runs $6{,}000$ Gibbs iterations with $1{,}000$ burn-in, giving $M=5{,}000$ retained draws; the point estimate is the posterior mean, exactly as in the MSE tables of the manuscript.
+\item The competitors are the two Onizuka variants (horseshoe, Laplace) in MCMC mode, each level fitted separately, and the individual P-MALA sampler (own method, no constraint). The last one is currently absent from the extreme-level tables; it is needed here because it isolates the effect of the constraint from the effect of the prior.
+\item True conditional quantiles $Q_\tau(\tilde x_i)$ are available in closed form (Gaussian, Beta) or by numerical inversion of the mixture CDF (mixed normal), as already implemented.
+\item Sentinel quantiles are used with the joint sampler exactly as in the manuscript (a scaffold of interior levels plus sentinels beyond the target range). The precise sentinel set for the lower tail must be recorded in the results file, because the crossing-related quantities below are computed among the \emph{four target levels only}, not among sentinels.
+\end{enumerate}
+
+\section{Notation}
+
+Index $i=1,\dots,n$ runs over design points, $k=1,\dots,K$ over the $K=4$ target levels $\tau_1<\tau_2<\tau_3<\tau_4$, $r=1,\dots,R$ over replicates, and $m=1,\dots,M$ over retained posterior draws. For method $\mathcal{M}$ and replicate $r$, write
+\[
+\hat\theta^{(r)}_{i}(\tau_k)\quad\text{for the point estimate (posterior mean),}\qquad
+\theta^{(r,m)}_{i}(\tau_k)\quad\text{for the $m$-th retained draw.}
+\]
+The truth is $Q_i(\tau_k) := Q_{\tau_k}(\tilde x_i)$. A valid family of quantile curves satisfies the \emph{weak} ordering
+\begin{equation}
+\theta_i(\tau_1)\le\theta_i(\tau_2)\le\theta_i(\tau_3)\le\theta_i(\tau_4)\qquad\text{for all } i,
+\label{eq:order}
+\end{equation}
+which is the non-crossing constraint of Brantley, Guinness and Chi (2020) and of the joint sampler. Equality is allowed: quantile functions are non-decreasing, not strictly increasing, so curves that touch are valid.
+
+\section{Metrics}
+
+\subsection{Mean squared error}
+
+Per level and replicate,
+\[
+\mathrm{MSE}^{(r)}(\tau_k) \;=\; \frac1n\sum_{i=1}^n\bigl(\hat\theta^{(r)}_i(\tau_k)-Q_i(\tau_k)\bigr)^2,
+\qquad
+\mathrm{MSE}(\tau_k)=\frac1R\sum_{r=1}^R \mathrm{MSE}^{(r)}(\tau_k).
+\]
+Report the four per-level values and their average $\overline{\mathrm{MSE}}=\tfrac14\sum_k\mathrm{MSE}(\tau_k)$. Keep MAD in the appendix as in the current manuscript. Also store the replicate-level values so a Monte Carlo standard error (SD across replicates divided by $\sqrt{R}$) can be reported; at these levels the differences between methods may be within Monte Carlo noise, and the reader should be able to see that.
+
+\subsection{Adjacent-pair crossing rate (decided)}
+\label{sec:cr}
+
+A \emph{crossing event} at index $i$ and adjacent pair $(k,k+1)$ is a violation of \eqref{eq:order}:
+\begin{equation}
+c^{(r)}_{ik} \;=\; \ind\bigl\{\hat\theta^{(r)}_i(\tau_k) \;>\; \hat\theta^{(r)}_i(\tau_{k+1})\bigr\},\qquad k=1,2,3.
+\label{eq:event}
+\end{equation}
+The inequality is \emph{strict}. This is not a different convention from the weak constraint in \eqref{eq:order}: it is its complement. Counting ties ($\ge$) as crossings would declare touching curves invalid and would penalise the joint sampler precisely where the box projection is active, since the clip step produces exact ties $\theta_i(\tau_k)=\theta_i(\tau_{k+1})$ whenever the constraint binds. For competitors fitted level by level, exact ties among posterior means have probability zero, so the choice does not affect their numbers.
+
+The crossing rate for replicate $r$ is the percentage of the $3n$ adjacent checks that fail,
+\begin{equation}
+\mathrm{CR}^{(r)} \;=\; \frac{100}{3n}\sum_{i=1}^n\sum_{k=1}^{3} c^{(r)}_{ik},
+\qquad
+\mathrm{CR} \;=\; \frac1R\sum_{r=1}^R \mathrm{CR}^{(r)}.
+\label{eq:cr}
+\end{equation}
+This is the definition of Park et al.\ (2022, AISTATS, App.~F.3). Only adjacent pairs are checked; non-adjacent crossings imply adjacent ones, and Park et al.\ note that the adjacent-pair count is a lower bound on the all-pairs count. State this in the paper.
+
+Optionally also report CR broken down by pair, $\mathrm{CR}_k = \tfrac{100}{n R}\sum_{r,i} c^{(r)}_{ik}$ for $k=1,2,3$, since the $(0.01,0.02)$ pair is where the true gap is smallest and where competitors will cross most.
+
+\subsection{Any-crossing fraction (companion to CR)}
+
+\begin{equation}
+\mathrm{AC} \;=\; \frac{100}{R}\sum_{r=1}^R \ind\bigl\{\mathrm{CR}^{(r)}>0\bigr\},
+\label{eq:ac}
+\end{equation}
+the percentage of replicate datasets in which the fitted family crosses somewhere. This is what Rodrigues and Fan (2017, JCGS) report (they find 405--500 of 500 datasets crossing for independent ALD fits). Expect AC to be at or near 100\% for all individually fitted competitors at these levels; the informative number is then CR, not AC. Report both anyway; AC answers ``can an individual fit be trusted at all'', CR answers ``how often is it wrong''.
+
+\subsection{Constraint activity rate (joint sampler only)}
+\label{sec:activity}
+
+CR is identically zero for the joint sampler by construction. To show the reader that the constraint is doing work rather than sitting idle, report separately the fraction of adjacent checks at which the constraint binds in the posterior draws:
+\begin{equation}
+\mathrm{ACT} \;=\; \frac{100}{3nMR}\sum_{r,m,i,k}\ind\bigl\{\theta^{(r,m)}_i(\tau_k) = \theta^{(r,m)}_i(\tau_{k+1})\bigr\}.
+\label{eq:act}
+\end{equation}
+Use exact equality if the ADMM output is used directly as the accepted state; if there is any post-processing that could perturb the ties, use $|\theta_i(\tau_k)-\theta_i(\tau_{k+1})|<10^{-10}$ on the standardised scale and say so. Do \emph{not} fold this into CR. It is a diagnostic of the joint sampler, reported in its own column or in the text.
+
+\subsection{Optional extensions}
+\label{sec:optional}
+
+These are not part of the decided design. They are recorded here because they were considered and because the data needed for them (posterior draws, truth) are produced anyway; a later decision to include them should not require re-running the simulations, so \textbf{save the retained draws} (or at least a thinned subset) for every method.
+
+\paragraph{Rearrangement gap.} Let $\mathrm{sort}_\tau$ rearrange the four fitted values at each index into increasing order. Define
+\[
+\mathrm{RG}(\tau_k) = \mathrm{MSE}\bigl(\hat\theta(\tau_k)\bigr) - \mathrm{MSE}\bigl(\mathrm{sort}_\tau(\hat\theta)(\tau_k)\bigr).
+\]
+By Chernozhukov, Fern\'andez-Val and Galichon (2010, Econometrica, Prop.~4) this is $\ge 0$ for any estimator and strictly positive when the fit crosses a strictly increasing truth. It measures crossing in MSE units and gives the decomposition $\mathrm{MSE}=\mathrm{MSE}_{\text{rearranged}}+\mathrm{RG}$. It is zero for the joint sampler. If used, the rearranged-competitor MSE must also appear in the MSE table, because it is the fair comparison: sorting four numbers per index is free.
+
+\paragraph{Posterior crossing probability.} For each method with posterior draws,
+\[
+\mathrm{PCP} = \frac{100}{MR}\sum_{r,m}\ind\Bigl\{\exists\,(i,k):\ \theta^{(r,m)}_i(\tau_k) > \theta^{(r,m)}_i(\tau_{k+1})\Bigr\},
+\qquad
+p_i = \frac{1}{MR}\sum_{r,m}\ind\Bigl\{\exists\,k:\ \theta^{(r,m)}_i(\tau_k) > \theta^{(r,m)}_i(\tau_{k+1})\Bigr\}.
+\]
+For individually fitted competitors the ``joint draw'' is the iteration-wise pairing of the independent chains; this is the correct posterior of an independent-fit model (a product of marginals) and must be stated. The joint sampler is at zero draw by draw. The per-index curve $p_i$ is the informative object (a figure), the scalar PCP will be near 100\% for all independent fits at these levels.
+
+\section{Methods and their roles}
+\label{sec:methods}
+
+\begin{center}
+\begin{tabular}{p{4.6cm}p{2.2cm}p{7.6cm}}
+\toprule
+Method & Draws? & Role \\
+\midrule
+Joint P-MALA + sentinels (target configuration) & yes & The proposed method. CR $=0$ by construction; report ACT. \\
+Joint P-MALA, \emph{no} sentinels & yes & Ablation: separates the constraint from the sentinel scaffold. Run on at least one signal $\times$ noise combination per difference order; all nine if compute allows. \\
+Joint P-MALA + sentinels, coarser spacing & yes & Ablation of the spacing (e.g.\ $0.005$ below and $0.02$ above the target instead of the current values). One or two configurations suffice. \\
+Individual P-MALA (own method, unconstrained) & yes & Isolates the constraint. Currently missing from the extreme-level tables; the manuscript only asserts it drifts. Report its MSE and CR so the claim has a number. \\
+Onizuka horseshoe, individual & yes & Existing Bayesian competitor. \\
+Onizuka Laplace, individual & yes & Existing Bayesian competitor. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+All methods use the same point estimate (posterior mean) for MSE and CR. All methods are evaluated on the same $R$ simulated datasets (same seeds), so that replicate-level differences are paired.
+
+Sentinel bookkeeping: for the joint sampler with sentinels, extract the four target levels from the joint output and compute every metric on those four only. Sentinel estimates are not reported and do not enter CR, AC or ACT.
+
+\section{Computation}
+
+Store, per method, signal, noise, and replicate, the point-estimate array \texttt{theta\_hat[i, k]} of size $n\times 4$ and (thinned if necessary) the draw array \texttt{theta\_draw[m, i, k]}. Then:
+
+\begin{lstlisting}[language=R]
+# theta_hat: n x 4 matrix, columns ordered tau = 0.01, 0.02, 0.03, 0.04
+# Q_true:    n x 4 matrix of true quantiles on the same grid
+
+mse_by_level <- function(theta_hat, Q_true) colMeans((theta_hat - Q_true)^2)
+
+crossing_events <- function(theta_hat) {
+  # strict inequality: violation of the weak constraint theta[,k] <= theta[,k+1]
+  K <- ncol(theta_hat)
+  theta_hat[, 1:(K - 1)] > theta_hat[, 2:K]        # n x (K-1) logical
+}
+
+crossing_rate <- function(theta_hat) 100 * mean(crossing_events(theta_hat))
+crossing_rate_by_pair <- function(theta_hat) 100 * colMeans(crossing_events(theta_hat))
+any_crossing <- function(theta_hat) any(crossing_events(theta_hat))
+
+# joint sampler only: constraint activity across draws
+# theta_draw: M x n x K array
+activity_rate <- function(theta_draw, tol = 0) {
+  K <- dim(theta_draw)[3]
+  d <- theta_draw[, , 1:(K - 1), drop = FALSE] - theta_draw[, , 2:K, drop = FALSE]
+  100 * mean(abs(d) <= tol)
+}
+
+# optional: rearrangement gap and posterior crossing probability
+rearrange_rows <- function(theta_hat) t(apply(theta_hat, 1, sort))
+rearrangement_gap <- function(theta_hat, Q_true)
+  mse_by_level(theta_hat, Q_true) - mse_by_level(rearrange_rows(theta_hat), Q_true)
+posterior_crossing_prob <- function(theta_draw) {
+  K <- dim(theta_draw)[3]
+  viol <- theta_draw[, , 1:(K - 1), drop = FALSE] > theta_draw[, , 2:K, drop = FALSE]
+  100 * mean(apply(viol, 1, any))               # fraction of draws with any crossing
+}
+per_index_crossing_prob <- function(theta_draw) {
+  K <- dim(theta_draw)[3]
+  viol <- theta_draw[, , 1:(K - 1), drop = FALSE] > theta_draw[, , 2:K, drop = FALSE]
+  apply(viol, 2, function(v) mean(apply(v, 1, any)))   # length n
+}
+\end{lstlisting}
+
+Aggregate over replicates as in \eqref{eq:cr}--\eqref{eq:act}: CR and MSE are means of the replicate-level values, AC is the fraction of replicates with \texttt{any\_crossing} true. Save the replicate-level vectors, not just the means.
+
+\section{Reporting}
+
+One table per signal, mirroring the existing extreme-level tables, with noise laws as blocks and methods as rows. Suggested columns:
+
+\begin{center}
+\small
+\begin{tabular}{lcccccccc}
+\toprule
+& \multicolumn{4}{c}{MSE} & \multicolumn{3}{c}{Crossing} & \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-8}
+Method & $0.01$ & $0.02$ & $0.03$ & $0.04$ & CR (\%) & AC (\%) & ACT (\%) & Avg.\ MSE \\
+\midrule
+Onizuka (Horseshoe) & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & -- & $\cdot$ \\
+Onizuka (Laplace) & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & -- & $\cdot$ \\
+Individual P-MALA & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & -- & $\cdot$ \\
+Joint P-MALA, no sentinels & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & 0 & 0 & $\cdot$ & $\cdot$ \\
+Joint P-MALA + sentinels & $\cdot$ & $\cdot$ & $\cdot$ & $\cdot$ & 0 & 0 & $\cdot$ & $\cdot$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Write the zeros for the joint methods as ``0 (by construction)'' in the caption rather than estimating them. Keep MCIW where it currently is, and add empirical coverage of the 95\% pointwise intervals in the same appendix table; the manuscript states coverage is the appropriate criterion and currently does not report it.
+
+\section{Pitfalls}
+
+\begin{itemize}[leftmargin=*]
+\item Use the same point estimate for MSE and CR. If the point estimate is the posterior mean, CR is computed on posterior means. Mixing means for MSE and medians for CR makes the two tables about different objects.
+\item Strict inequality in \eqref{eq:event}; ties are valid. See Section~\ref{sec:cr}.
+\item Compute CR on the raw competitor fits, never on rearranged ones (where it is zero by construction). Rearranged fits belong in the MSE table, if used at all.
+\item CR is scale-invariant, but MSE is not: compute MSE on the original scale of $y$ (or state clearly that everything is on the standardised scale).
+\item Compute all metrics among the four target levels only; exclude sentinels.
+\item Expect AC $\approx 100\%$ for individual fits at these levels; that is not a bug. The true gaps between adjacent levels are of order $0.03$--$0.14$ under the Gaussian design and smaller in places under the others.
+\item Save draws (thinned) for every method so the optional metrics in Section~\ref{sec:optional} can be added without re-running.
+\item Record the sentinel set and spacing used in every run alongside the results; the manuscript's explanation of narrow intervals depends on it.
+\end{itemize}
+
+\section{Real-data extension}
+
+CR and AC need no truth, so they can be reported for the applications. In the SPod analysis, the eBIC-tuned ADMM fit at $\tau=0.01$ crosses the $0.05$ and $0.10$ curves; compute CR on the grid $\{0.01,0.05,0.10\}$ for the individually tuned ADMM, for Brantley et al.'s constrained multi-quantile \texttt{detrendr} fit (which is zero by construction), for the individual P-MALA fits currently in the paper, and for a joint P-MALA fit. This converts a sentence into a number and a figure.
+
+\section*{References used in this plan}
+
+\begin{itemize}[leftmargin=*,itemsep=2pt]
+\item Brantley, H.~L., Guinness, J.\ and Chi, E.~C.\ (2020). Baseline drift estimation for air quality data using quantile trend filtering. \emph{Annals of Applied Statistics} 14(2), 585--604.
+\item Chernozhukov, V., Fern\'andez-Val, I.\ and Galichon, A.\ (2010). Quantile and probability curves without crossing. \emph{Econometrica} 78(3), 1093--1125.
+\item Park, Y., Maddix, D.~C., Aubet, F.-X., Kan, K., Gasthaus, J.\ and Wang, Y.\ (2022). Learning quantile functions without quantile crossing for distribution-free time series forecasting. \emph{AISTATS}, PMLR 151, 8127--8150.
+\item Rodrigues, T.\ and Fan, Y.\ (2017). Regression adjustment for noncrossing Bayesian quantile regression. \emph{Journal of Computational and Graphical Statistics} 26(2), 275--284.
+\item Sangnier, M., Fercoq, O.\ and d'Alch\'e-Buc, F.\ (2016). Joint quantile regression in vector-valued RKHSs. \emph{NeurIPS 29}. (Crossing-loss definition, not adopted here.)
+\end{itemize}
+
+\noindent The full literature review with the wider baseline set and additional metrics is in \texttt{noncrossing\_review/noncrossing\_evaluation\_review.md} in the Tex project folder, with a companion \texttt{.bib}.
+
+\end{document}

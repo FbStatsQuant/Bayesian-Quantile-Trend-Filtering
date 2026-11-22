@@ -1,0 +1,66 @@
+[
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\asis_checks.csv",
+    "Hash": "1596B2A94C5BF97BAA1612A66ECF144D2638FDCB2AA4AF1205BB35A1E2B781D1"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\bounded_helpers.R",
+    "Hash": "B0DD4FDA1EDB2729AEB122444611398ECFEE765EFAAC6FFD0F29D635B27F6715"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\DESIGN.txt",
+    "Hash": "EC68289E4BC12C5F365D8AF2F6A7F2973D2324E4D856C4EDE0CA1AB207BB873E"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\guarded_reference.R",
+    "Hash": "2D8D6AD3260851DF22F580EA1E39E037DB0DD5D429D9058A5320E4766C2C8864"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\independent_review.txt",
+    "Hash": "753251DE0C517692127E9506438FA8D102AC372778152025C562A837DCAC2820"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\joint_checks.csv",
+    "Hash": "8FCEA788CF8321C33C80AE859FFE3342EB4602037C07031549D809B0D728BC7B"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\prox_admm_metric.cpp",
+    "Hash": "ED607632E3518D63AC0D8B87671DE287970E9A5B3BD9F943FB1AE94E5042F766"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\prox_bounded.cpp",
+    "Hash": "19BB7399E65AD3AD93308D39E3C815C1A73F20C2779C0D311DC82E15D1DB06CD"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\prox_checks.csv",
+    "Hash": "6141D1419958584CC56E2A9851E62EB9299C5B8D6C5773D621C259518B5D8AA9"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\RESULTS.txt",
+    "Hash": "4F77F6CCC4B07C3BE9A6487864FC7BBBD613509AAAF5553E905420FF40183196"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\short_chain_diagnostics.csv",
+    "Hash": "8940C4D3C5E0A3C750BC7143506DAD8150B53436791E122C0E40343BB32280F4"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\singleton_parity.csv",
+    "Hash": "9F65655E0FBB3862D8C9DAC09099B87CC2042070EA6DDAB542D53F4D077ABAA3"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\test_bounded.R",
+    "Hash": "AA9BF213225AF6E63F9A1AE52F7AD5F1A388C1FAA74D35E24163CAD7962743D7"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\test_joint.R",
+    "Hash": "8C87CA268AFF884E28D37B98E3ECD35B77C7A4C4CF7C3D8FE449B3AC09E65569"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\test_singleton.R",
+    "Hash": "F992793D1269EA4B35E36552AF3B0BA49C77575D418E8AC5DAF6A6E3A1DEEC95"
+  },
+  {
+    "Path": "C:\\Users\\felip\\OneDrive\\Documents\\Quantile Regression\\PMALA version Tex Project\\notes\\joint_sampler_rewrite_20261001\\source_snapshot\\Unified_Sampler.R",
+    "Hash": "DDBCC9DF864B3A4010D9D9E30C2F490350063BD98F9C2720A4D628AAA50DAC72"
+  }
+]

@@ -1,0 +1,33 @@
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Average number of indices (out of $n=500$) at which the estimate crosses any other reported level, VS signal.}
+\label{tab:ext_vs_crossings_all}
+\begin{tabular}{lrrrr}
+\toprule
+Beta & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 25.25 & 33.47 & 22.47 & 17.65 \\
+Onizuka (Horseshoe) & 11.86 & 15.25 & 10.18 & 7.83 \\
+Bayesian-PMALA & 182.35 & 262.43 & 219.35 & 42.99 \\
+ADMM & 292.81 & 375.09 & 378.28 & 349.82 \\
+Joint sampler (non-crossing) & 0.00 & 0.00 & 0.00 & 0.00 \\
+\midrule
+Mixed normal & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 198.68 & 166.28 & 154.62 & 70.24 \\
+Onizuka (Horseshoe) & 46.11 & 41.55 & 33.72 & 13.74 \\
+Bayesian-PMALA & 203.46 & 267.44 & 285.81 & 157.67 \\
+ADMM & 508.96 & 586.47 & 642.04 & 637.99 \\
+Joint sampler (non-crossing) & 0.00 & 0.00 & 0.00 & 0.00 \\
+\midrule
+Gaussian & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 76.09 & 64.99 & 44.34 & 14.36 \\
+Onizuka (Horseshoe) & 22.40 & 23.89 & 16.21 & 7.56 \\
+Bayesian-PMALA & 180.54 & 255.33 & 245.47 & 110.92 \\
+ADMM & 297.93 & 392.29 & 406.37 & 406.53 \\
+Joint sampler (non-crossing) & 0.00 & 0.00 & 0.00 & 0.00 \\
+\bottomrule
+\end{tabular}
+\end{table}

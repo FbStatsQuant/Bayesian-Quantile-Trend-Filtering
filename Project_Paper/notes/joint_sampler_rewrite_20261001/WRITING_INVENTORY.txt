@@ -1,0 +1,79 @@
+REMAINING MANUSCRIPT WRITING - LOCAL INVENTORY, 2026-10-01
+
+Purpose: finish the methodological narrative over the next two days while
+simulation work continues. Only methodology.tex's joint subsection and the
+supporting appendix text were edited in this task. Items below are a scoped
+follow-up inventory, not new results or a claim of a full paper audit.
+
+CAN BE WRITTEN NOW FROM SETTLED METHOD / EXISTING DOCUMENTED DIFFERENCES
+
+1. Abstract and introduction (abstract.tex:5; introduction.tex:16).
+   Replace the joint-extension TODOs with a concise constrained-product target,
+   latest-neighbor sweep and singleton-reduction description. Do not add claims
+   that joint fitting improves tail estimates, mixes well or calibrates intervals.
+   Audit blanket 'exact posterior sampling' wording against the retained guards.
+
+2. Discussion (discussion.tex:16-19).
+   Replace the obsolete paragraph claiming that sentinels resolve gradient
+   degeneracy and give stable extremes. The new sampler neither adds nor
+   prescribes sentinels; adding supplied levels changes the target. Rewrite the
+   joint extension as implemented methodology, distinguish ideal MH invariance
+   from safeguards, and distinguish historical continuous adaptation from the
+   current burn-in-only schedule. No new experiment is needed for these fixes.
+
+3. Individual implementation description (methodology.tex:117; Algorithm 1;
+   appendix_pmala.tex A.2-A.6, A.8).
+   Establish one explicit version/protocol table for historical experiments
+   versus the unified implementation: 150/300 versus 200 ADMM iterations,
+   continuous versus burn-in-only adaptation, unchanged priors and guards.
+   Correct the sentence suggesting the ADMM factorization also supplies the
+   noise factor L: M and the ADMM system are different matrices. Preserve valid
+   individual prior/conditional mathematics and provenance of old results.
+   A.10 already distinguishes the versions for the joint extension.
+
+4. Computational-cost section's method narrative (scalability.tex:15,19,81).
+   It still describes an older penalty-only, three-prox glmgen implementation,
+   dense D, Gamma(1,1) and IG(.01,.01). The current whole-conditional augmented
+   sampler has two prox maps per accepted-support attempt and different priors.
+   Write the current operation counts now; label old timings as historical
+   until their source/version has been reconciled. Do not relabel old timings
+   as measurements of the unified sampler.
+
+5. Joint-experiment protocol and legacy labeling (simulations.tex:92-104;
+   appendix_simulations.tex:171 onward).
+   Draft target-grid, estimator, MSE/interval definitions, seed/data sharing,
+   warm-up/burn-in and diagnostic requirements now. Remove automatic-sentinel
+   assumptions and 'being run' assertions unless an actual campaign supports
+   them. Explicitly label the retained n=400 sentinel tables as results of the
+   previous implementation, not validation of rewritten Section 2.3. Keep the
+   pending numerical cells pending.
+
+REQUIRES SOURCE / PROTOCOL RECONCILIATION BEFORE FINAL WORDING
+
+6. Applications and special priors (data_application.tex; air_simulation.tex).
+   The rent/growth prose still references grouped observations and different
+   prior rules (including a 'linear-in-n prior' no longer in Section 2.2).
+   Check those application scripts before describing them as the current
+   method. The unified function fixes default hyperpriors internally; it does
+   not expose the stronger air-quality prior used by the separate study.
+   Retain source-specific descriptions until the intended common interface and
+   actual provenance are settled. This audit need not await new simulations.
+
+DEPENDS ON EXPERIMENTS OR UNRESOLVED METHOD CHECKS
+
+7. Current joint upper-tail results (Table 2's pending joint rows), comparison
+   prose, current joint figures and any recommendation about extra quantiles.
+   Require completed runs with adequate convergence/mixing diagnostics. The
+   n=60 smoke checks, especially tau=.99, are insufficient; do not extrapolate
+   their MSE/acceptance/zero-crossing results to n=500 reliability.
+
+8. Current-kernel timing, ESS per second, interval coverage/calibration, guard
+   sensitivity, and superiority/stability claims. These need matched benchmark
+   evidence or numerical/theoretical checks, not just prose replacement.
+
+Suggested writing order for the two-day goal:
+ - First: abstract/introduction, discussion, version/protocol table, current
+   complexity derivation, historical-result labels, and joint study protocol.
+ - Next: application source reconciliation and whole-paper terminology/citation
+   pass. Leave only results tables, final figures and evidence-dependent claims
+   for insertion after the simulation/checking work finishes.

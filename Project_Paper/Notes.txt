@@ -1,0 +1,9 @@
+- 3/5/26: 
+
+We now see clear differences between this work and Brantley et al.. The latter is compeltely frequentist approach and only point estimation is needed over there. We need to clarify this point, and drastically tune down our reliance on that work. 
+
+S 2.3: need a clear transition from Pereyra (2016), the general P-MALA algorithm to our sampling, and clarify why we choose P-MALA.
+
+- Add relevant literature on using Gibbs and why it's not used here. 
+- Add VB and why it's not used here
+- Numerically their VB code is not stable even for n = 400

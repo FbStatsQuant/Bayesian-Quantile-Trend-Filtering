@@ -1,0 +1,174 @@
+% !TeX root = ../main.tex
+\section{Simulation}
+\label{sec:simulations}
+
+We compare Bayesian-PMALA with Bayesian and optimization-based quantile trend filtering on two benchmark signals: the varying-smoothness signal (VS) of \citet{onizuka2024fast}, which adds a localized bump to gradual variation, and the smooth sinusoid (S) of \citet{brantley2020baseline}. Section~\ref{sec:sim:individual} considers interior quantile levels and Section~\ref{sec:sim:extreme} the joint estimation of extreme upper quantiles. Additional tables are in Appendix~\ref{app:simulation_results}.
+
+\paragraph{Data.} With $u_i=i/n$, $i=1,\ldots,n$, and $n=500$, we generate $y_i=f(u_i)+\varepsilon_i$ with
+\begin{align}
+ f_{\mathrm{VS}}(u)&=2+\sin(4u-2)+2\exp\{-30(4u-2)^2\},
+ \label{eq:sim_vs}\\
+ f_{\mathrm{S}}(u)&=\sin(2\pi u),
+ \label{eq:sim_s}
+\end{align}
+and the three noise families of \citet{onizuka2024fast}:
+\begin{itemize}
+ \item Gaussian: $\varepsilon_i\sim\mathcal{N}(0,s(u_i)^2)$, with $s(u)=(1+u^2)/4$;
+ \item Beta: $\varepsilon_i\sim\mathrm{Beta}(1,11-10u_i)$;
+ \item mixed normal: $\varepsilon_i\sim u_i\mathcal{N}(-0.2,0.5)+(1-u_i)\mathcal{N}(0.2,0.5)$, with the component variance as second argument.
+\end{itemize}
+The target is the true conditional quantile $Q_\tau(u)=f(u)+F_u^{-1}(\tau)$, where $F_u$ is the error distribution at $u$.
+
+\subsection{Interior quantiles}
+\label{sec:sim:individual}
+
+\paragraph{Methods.} We compare Bayesian-PMALA with the Laplace and horseshoe Gibbs samplers of \citet{onizuka2024fast} and the ADMM estimator of \citet{brantley2020baseline} at $\tau\in\{0.05,0.25,0.50,0.75,0.95\}$, all fitted to the identical response in each replication. Bayesian-PMALA uses $\sigma\sim\mathrm{IG}(0.1,0.1)$; for the VS signal $\lambda\sim\mathrm{Gamma}(1,10^{-3})$, the interweaving step and $30000$ sweeps of which the first $10000$ are discarded, and for the S signal $\lambda\sim\mathrm{Gamma}(1,5\times10^{-4})$, no interweaving step and $20000$ sweeps of which the first $5000$ are discarded. The Onizuka samplers use $8000$ iterations with $2000$ burn-in and their supplied $\mathrm{IG}(1,1)$ prior on $\sigma^2$. The Bayesian point estimates are posterior means. ADMM selects $\lambda$ by extended BIC over a $25$-point logarithmic grid, and a replication is discarded when any candidate on the grid fails to converge.
+
+\paragraph{Performance measures.} For each fit we compute $\mathrm{MSE}=n^{-1}\sum_i(\widehat\theta_{\tau,i}-Q_\tau(u_i))^2$, $\mathrm{MAD}=n^{-1}\sum_i|\widehat\theta_{\tau,i}-Q_\tau(u_i)|$ and, for the samplers, the mean width MCIW of the pointwise $95\%$ intervals, and average them over valid replications.
+
+\subsubsection{Varying smoothness}
+\label{sec:sim:ind:vs}
+
+Table~\ref{tab:vs_int_mse} reports the MSE; MAD and MCIW are in Appendix~\ref{app:sim:individual:vs}. The three Bayesian samplers perform similarly in every configuration, with the horseshoe slightly ahead under Beta noise, so a single global penalty matches local shrinkage on this signal. ADMM is markedly less accurate in almost every configuration: extended BIC selects a penalty too heavy for the localized bump, whereas the samplers learn a lighter one from the data.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error (MSE) for the varying-smoothness (VS) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:vs_int_mse}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.000513 & 0.001024 & 0.001942 & 0.002994 & 0.007269 \\
+Onizuka (Horseshoe) & 0.000512 & 0.000943 & 0.001802 & 0.002778 & 0.006493 \\
+Bayesian-PMALA & 0.000541 & 0.001032 & 0.001966 & 0.003035 & 0.007911 \\
+ADMM & 0.008055 & 0.004120 & 0.006632 & 0.007613 & 0.014649 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.075391 & 0.031684 & 0.027303 & 0.031800 & 0.077075 \\
+Onizuka (Horseshoe) & 0.073529 & 0.031743 & 0.028090 & 0.033608 & 0.079668 \\
+Bayesian-PMALA & 0.081173 & 0.033267 & 0.026919 & 0.031086 & 0.074781 \\
+ADMM & 0.096462 & 0.092891 & 0.071678 & 0.049944 & 0.068415 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.020916 & 0.008284 & 0.006932 & 0.007558 & 0.018128 \\
+Onizuka (Horseshoe) & 0.019990 & 0.008067 & 0.006651 & 0.007358 & 0.017762 \\
+Bayesian-PMALA & 0.019703 & 0.007962 & 0.006803 & 0.007469 & 0.018675 \\
+ADMM & 0.088108 & 0.025091 & 0.020181 & 0.014800 & 0.022334 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{Smooth signal}
+\label{sec:sim:ind:smooth}
+
+Table~\ref{tab:s_int_mse} reports the MSE; MAD and MCIW are in Appendix~\ref{app:sim:individual:smooth}. On the S signal ADMM is the most accurate method everywhere, as expected for the smooth-baseline setting it was designed for. Bayesian-PMALA is more accurate than both Onizuka samplers at the central levels under every noise family and slightly behind them at most outer levels: without a localized feature the local shrinkage scales have little to exploit.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error (MSE) for the smooth (S) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:s_int_mse}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.000295 & 0.000794 & 0.001592 & 0.002311 & 0.005225 \\
+Onizuka (Horseshoe) & 0.000423 & 0.000812 & 0.001554 & 0.002270 & 0.005342 \\
+Bayesian-PMALA & 0.000251 & 0.000649 & 0.001255 & 0.001832 & 0.006169 \\
+ADMM & 0.000183 & 0.000425 & 0.000789 & 0.001078 & 0.002464 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.071456 & 0.026312 & 0.021974 & 0.027079 & 0.067077 \\
+Onizuka (Horseshoe) & 0.074248 & 0.026449 & 0.021783 & 0.027401 & 0.072335 \\
+Bayesian-PMALA & 0.079543 & 0.022323 & 0.017629 & 0.021790 & 0.072843 \\
+ADMM & 0.030277 & 0.010993 & 0.008228 & 0.010769 & 0.023342 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.014933 & 0.006463 & 0.005581 & 0.006136 & 0.014457 \\
+Onizuka (Horseshoe) & 0.016242 & 0.006414 & 0.005364 & 0.006003 & 0.014982 \\
+Bayesian-PMALA & 0.016324 & 0.005068 & 0.004114 & 0.004793 & 0.015674 \\
+ADMM & 0.006561 & 0.003129 & 0.002456 & 0.002843 & 0.005929 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Joint estimation of extreme upper quantiles}
+\label{sec:sim:extreme}
+
+The joint sampler of Section~\ref{subsec:joint} fits $\tau\in\{0.90,0.93,0.96,0.97,0.98,0.99\}$ together. The competitors, Bayesian-PMALA, the two Onizuka samplers and ADMM, are fitted one level at a time to the same data. Tables~\ref{tab:vs_ext_upper_mse} and \ref{tab:s_ext_upper_mse} report the MSE at all six levels, and Appendix~\ref{app:sim:joint_extreme} counts crossings among the four levels from $0.96$ to $0.99$.
+
+On the VS signal the joint sampler is the most accurate method under Gaussian and mixed-normal noise at every level from $0.93$ upward, and its advantage grows as $\tau$ approaches one, whereas at $\tau=0.90$ the Onizuka samplers are ahead. Under Beta noise the horseshoe leads, as at interior levels, until the most extreme level, where the joint sampler catches up. On the S signal ADMM remains the most accurate method under Beta and Gaussian noise, with the joint sampler second, but under mixed-normal noise the ADMM error grows rapidly with $\tau$, much faster than that of the joint sampler, which becomes the most accurate method. On both signals the joint sampler improves on individual Bayesian-PMALA in every configuration except VS with Gaussian noise at $\tau=0.90$, where the two are equal within Monte Carlo error, although the two runs also differ in length and tuning. Its posterior means never cross, whereas every individually fitted method produces crossing curves at these closely spaced levels.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error at extreme upper quantiles for the VS signal, $n=500$ and $k=2$. The joint sampler fits the six levels together; the other methods fit each level separately.}
+\label{tab:vs_ext_upper_mse}
+\begin{tabular}{lrrrrrr}
+\toprule
+Beta & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0048 & 0.0058 & 0.0087 & 0.0102 & 0.0120 & 0.0156 \\
+Onizuka (Horseshoe) & 0.0044 & 0.0054 & 0.0075 & 0.0088 & 0.0104 & 0.0138 \\
+Bayesian-PMALA & 0.0055 & 0.0068 & 0.0106 & 0.0124 & 0.0154 & 0.0132 \\
+ADMM & 0.0174 & 0.0160 & 0.0169 & 0.0174 & 0.0199 & 0.0183 \\
+Joint sampler (non-crossing) & 0.0052 & 0.0057 & 0.0083 & 0.0113 & 0.0126 & 0.0132 \\
+\midrule
+Mixed normal & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0445 & 0.0562 & 0.0992 & 0.1313 & 0.1692 & 0.2437 \\
+Onizuka (Horseshoe) & 0.0497 & 0.0627 & 0.0940 & 0.1183 & 0.1441 & 0.2123 \\
+Bayesian-PMALA & 0.0541 & 0.0716 & 0.1203 & 0.1468 & 0.1840 & 0.2458 \\
+ADMM & 0.0508 & 0.0570 & 0.0926 & 0.1244 & 0.1845 & 0.2980 \\
+Joint sampler (non-crossing) & 0.0520 & 0.0548 & 0.0760 & 0.0880 & 0.1034 & 0.1240 \\
+\midrule
+Gaussian & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0116 & 0.0144 & 0.0225 & 0.0285 & 0.0350 & 0.0500 \\
+Onizuka (Horseshoe) & 0.0116 & 0.0142 & 0.0212 & 0.0259 & 0.0318 & 0.0453 \\
+Bayesian-PMALA & 0.0134 & 0.0167 & 0.0271 & 0.0328 & 0.0410 & 0.0502 \\
+ADMM & 0.0211 & 0.0224 & 0.0234 & 0.0265 & 0.0321 & 0.0407 \\
+Joint sampler (non-crossing) & 0.0135 & 0.0141 & 0.0188 & 0.0223 & 0.0265 & 0.0300 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error at extreme upper quantiles for the S signal, $n=500$ and $k=2$. The joint sampler fits the six levels together; the other methods fit each level separately.}
+\label{tab:s_ext_upper_mse}
+\begin{tabular}{lrrrrrr}
+\toprule
+Beta & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0036 & 0.0043 & 0.0061 & 0.0079 & 0.0097 & 0.0122 \\
+Onizuka (Horseshoe) & 0.0037 & 0.0045 & 0.0062 & 0.0075 & 0.0091 & 0.0119 \\
+Bayesian-PMALA & 0.0042 & 0.0054 & 0.0088 & 0.0107 & 0.0134 & 0.0121 \\
+ADMM & 0.0022 & 0.0025 & 0.0032 & 0.0033 & 0.0039 & 0.0050 \\
+Joint sampler (non-crossing) & 0.0029 & 0.0030 & 0.0038 & 0.0041 & 0.0049 & 0.0068 \\
+\midrule
+Mixed normal & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0392 & 0.0491 & 0.0906 & 0.1254 & 0.1657 & 0.2409 \\
+Onizuka (Horseshoe) & 0.0433 & 0.0554 & 0.0860 & 0.1102 & 0.1389 & 0.2003 \\
+Bayesian-PMALA & 0.0485 & 0.0629 & 0.1119 & 0.1420 & 0.1765 & 0.2324 \\
+ADMM & 0.0158 & 0.0182 & 0.0346 & 0.0714 & 0.1732 & 0.2911 \\
+Joint sampler (non-crossing) & 0.0280 & 0.0301 & 0.0430 & 0.0512 & 0.0643 & 0.0940 \\
+\midrule
+Gaussian & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0092 & 0.0112 & 0.0177 & 0.0239 & 0.0317 & 0.0435 \\
+Onizuka (Horseshoe) & 0.0096 & 0.0119 & 0.0178 & 0.0229 & 0.0285 & 0.0406 \\
+Bayesian-PMALA & 0.0110 & 0.0143 & 0.0238 & 0.0293 & 0.0378 & 0.0460 \\
+ADMM & 0.0045 & 0.0054 & 0.0071 & 0.0086 & 0.0111 & 0.0216 \\
+Joint sampler (non-crossing) & 0.0072 & 0.0079 & 0.0107 & 0.0121 & 0.0150 & 0.0219 \\
+\bottomrule
+\end{tabular}
+\end{table}

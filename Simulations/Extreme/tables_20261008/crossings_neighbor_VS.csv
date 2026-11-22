@@ -1,0 +1,16 @@
+"baseline","noise","method","0.96","0.97","0.98","0.99"
+"VS","Beta","Onizuka (Laplace)",20.76,28.53,19.23,11.46
+"VS","Beta","Onizuka (Horseshoe)",10.48,13.67,9.12,5.93
+"VS","Beta","Bayesian-PMALA",115.04,248.75,157.53,23.82
+"VS","Beta","ADMM",134.1,266.22,296.32,164.2
+"VS","Beta","Joint sampler (non-crossing)",0,0,0,0
+"VS","Mixed","Onizuka (Laplace)",86.07,147.57,77.52,16.02
+"VS","Mixed","Onizuka (Horseshoe)",28.14,39.46,19.36,8.04
+"VS","Mixed","Bayesian-PMALA",110.92,226.84,213.13,97.21
+"VS","Mixed","ADMM",151.47,371.21,463.51,243.77
+"VS","Mixed","Joint sampler (non-crossing)",0,0,0,0
+"VS","Normal","Onizuka (Laplace)",50.27,62.49,21.3,9.08
+"VS","Normal","Onizuka (Horseshoe)",16.36,22.42,11.16,5.1
+"VS","Normal","Bayesian-PMALA",106.34,225.4,185.66,66.6
+"VS","Normal","ADMM",127.07,265.46,326.8,188.41
+"VS","Normal","Joint sampler (non-crossing)",0,0,0,0

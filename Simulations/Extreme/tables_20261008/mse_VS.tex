@@ -1,0 +1,33 @@
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error at extreme upper quantiles for the VS signal, $n=500$ and $k=2$, averaged over 100 replications.}
+\label{tab:ext_vs_mse}
+\begin{tabular}{lrrrr}
+\toprule
+Beta & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.008704 & 0.010190 & 0.011954 & 0.015642 \\
+Onizuka (Horseshoe) & 0.007479 & 0.008790 & 0.010444 & 0.013843 \\
+Bayesian-PMALA & 0.010588 & 0.012392 & 0.015399 & 0.013241 \\
+ADMM & 0.016921 & 0.017415 & 0.019852 & 0.018345 \\
+Joint sampler (non-crossing) & 0.008336 & 0.011275 & 0.012640 & 0.013170 \\
+\midrule
+Mixed normal & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.099213 & 0.131297 & 0.169168 & 0.243745 \\
+Onizuka (Horseshoe) & 0.093988 & 0.118348 & 0.144101 & 0.212250 \\
+Bayesian-PMALA & 0.120335 & 0.146784 & 0.184038 & 0.245757 \\
+ADMM & 0.092590 & 0.124361 & 0.184480 & 0.298003 \\
+Joint sampler (non-crossing) & 0.076015 & 0.087959 & 0.103372 & 0.124001 \\
+\midrule
+Gaussian & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.022541 & 0.028454 & 0.034980 & 0.049972 \\
+Onizuka (Horseshoe) & 0.021205 & 0.025912 & 0.031785 & 0.045252 \\
+Bayesian-PMALA & 0.027103 & 0.032784 & 0.040975 & 0.050202 \\
+ADMM & 0.023359 & 0.026523 & 0.032114 & 0.040680 \\
+Joint sampler (non-crossing) & 0.018820 & 0.022292 & 0.026460 & 0.029993 \\
+\bottomrule
+\end{tabular}
+\end{table}

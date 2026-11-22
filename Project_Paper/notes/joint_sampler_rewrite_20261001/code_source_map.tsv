@@ -1,0 +1,38 @@
+snapshot_file	line	source_anchor
+Unified_Sampler.R	17	gibbs_unified <- function(y, tau, order=2L, gibbs_iter=30000L, gibbs_burn=10000L,
+Unified_Sampler.R	23	a0 <- 1; b0 <- .001; a_sigma <- b_sigma <- .1
+Unified_Sampler.R	26	offsets <- if(nq==1L) 0 else max(sd(y),.1)*(qnorm(tau)-median(qnorm(tau)))
+Unified_Sampler.R	50	lower <- if(j==1L) rep(-Inf,n) else states[[j-1L]]$theta
+Unified_Sampler.R	54	if (it <= warm) {                                                          # warm start: optimisation step only
+Unified_Sampler.R	60	for (kk in seq_len(K)) {
+Unified_Sampler.R	73	z      <- draw_z(y - theta, tau[j], sigma)                                     # Block 2
+Unified_Sampler.R	76	lambda <- rgamma(1, shape = a0 + m, rate = b0 + SD)  # Block 3 (sufficient parameterisation)
+Unified_Sampler.R	81	as_ <- box_asis_step(theta, lambda, a_, r_, a0, b0, Q, lower, upper); lambda <- as_$lambda; theta <- as_$theta
+Unified_Sampler.R	87	sigma  <- draw_sigma(y, theta, z, cst, a_sigma, b_sigma,                    # Block 4
+Unified_Sampler.R	90	if (adapt && it > warm && it <= gibbs_burn) {                # adapt delta (diminishing gain)
+bounded_helpers.R	35	box_prox <- function(x,a,r,lambda,gamma,d,c,order,lower,upper,rho=NULL,iters=200L,tol=0) {
+bounded_helpers.R	37	if(unbounded_box(lower,upper)) return(.guarded$prox_T(x,a,r,lambda,gamma,d,c,order,rho,iters,tol))
+bounded_helpers.R	41	box_pmala_step <- function(theta,y,z,lambda,sigma,delta,cst,order,metric,c_fixed,rho,iters,mh,kappa,tol,lower,upper) {
+bounded_helpers.R	44	if(unbounded_box(lower,upper)) return(.guarded$pmala_step(theta,y,z,lambda,sigma,delta,cst,order,metric,c_fixed,rho,iters,mh,kappa,tol))
+bounded_helpers.R	48	prop <- p+sqrt(delta)*minv_sqrt_noise(rnorm(length(theta)),M$d,M$c,order)
+bounded_helpers.R	50	if(outside) log_alpha <- -Inf else {
+bounded_helpers.R	51	pstar <- box_prox(prop,a,r,lambda,gamma,M$d,M$c,order,lower,upper,rho,iters,tol)
+bounded_helpers.R	52	log_alpha <- U_cond(theta,a,r,lambda,order)-U_cond(prop,a,r,lambda,order)+
+bounded_helpers.R	59	asis_scale_domain <- function(p,v,lower,upper) {
+bounded_helpers.R	69	box_asis_step <- function(theta,lambda,a,r,a0,b0,Q,lower,upper,w=1,max_steps=30L) {
+bounded_helpers.R	72	if(unbounded_box(lower,upper)) return(.guarded$asis_step(theta,lambda,a,r,a0,b0,Q,w,max_steps))
+bounded_helpers.R	76	eta0 <- log(lambda); eta_lo <- eta0-log(dom[2]); eta_hi <- eta0-log(dom[1])
+bounded_helpers.R	81	a0*eta-b0*lam-sum(a*(th-r)^2)/2
+bounded_helpers.R	92	if(U-L<1e-10) return(unchanged)
+prox_bounded.cpp	7	List bounded_prox(NumericVector x,NumericVector a,NumericVector r,double lambda,double gamma,
+prox_bounded.cpp	19	eta+=(a[i]+d[i]/gamma)/n;
+prox_bounded.cpp	24	for(int i=0;i<n;++i) t[i]=std::max(lower[i],std::min(upper[i],x[i]));
+prox_bounded.cpp	26	for(int q=0;q<=p;++q) for(int i=0;i<n;++i) A.B[q][i]*=c/gamma+rho;
+prox_bounded.cpp	34	for(int i=0;i<n;++i) rhs[i]=a[i]*(r[i]-x[i])+rho*rhs[i]+eta*(t[i]-x[i]-h[i]);
+prox_bounded.cpp	48	t[i]=std::max(lower[i],std::min(upper[i],th[i]+h[i]));
+prox_bounded.cpp	72	return List::create(_["theta"]=wrap(t),_["iterations"]=used,_["primal"]=std::sqrt(primal),
+guarded_reference.R	172	metric_dc <- function(metric, a, lambda, c_fixed, kappa = 1) {
+guarded_reference.R	190	rinvgauss <- function(n, mu, lam) {
+guarded_reference.R	198	draw_z <- function(e, tau, sigma) {
+guarded_reference.R	206	draw_sigma <- function(y, theta, z, cst, a_sigma, b_sigma, lambda_SD = 0, m = 0) {
+guarded_reference.R	280	asis_step <- function(theta, lambda, a, r, a0, b0, Q, w = 1, max_steps = 30L) {

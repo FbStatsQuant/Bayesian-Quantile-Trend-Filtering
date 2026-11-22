@@ -1,0 +1,67 @@
+./audit/nots_readonly_probe.txt: OK
+./audit/static_checks.json: OK
+./common.R: OK
+./config.R: OK
+./environment.sh: OK
+./inspect_nots.py: OK
+./monitor.py: OK
+./operations/predeploy.sh: OK
+./operations/submit_validation.sh: OK
+./paper_reference/appendix_pmala.tex: OK
+./paper_reference/simulations.tex: OK
+./path_guard.sh: OK
+./preflight.R: OK
+./prepare_package.py: OK
+./process_results.R: OK
+./README.md: OK
+./remote_admin.py: OK
+./run_task.sh: OK
+./slurm/array.slurm: OK
+./slurm/process.slurm: OK
+./slurm/validate.slurm: OK
+./source/Individual_Sampler_PMALA_Augmented.R: OK
+./source/prox_admm_metric.cpp: OK
+./start_monitor.sh: OK
+./status.py: OK
+./submit.sh: OK
+./upload_package.py: OK
+./validate.sh: OK
+./validate_outputs.R: OK
+./worker.R: OK
+PREFLIGHT_OK: 3000 independent fits; 15000 sweeps, 3000 burn-in, 12000 retained; lambda shape=1 rate=0.01
+all_cells	1786240
+Submitted /home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z
+Raw draws /scratch/fb31/qr_data/inner_individual/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z
+Processing job 1786241
+3017539
+JobId=1786240 ArrayJobId=1786240 ArrayTaskId=1-3000%400 ArrayTaskThrottle=400 JobName=inner_individual
+   UserId=fb31(71711) GroupId=ml75(2327) MCS_label=N/A
+   Priority=4722 Nice=0 Account=commons QOS=nots_commons
+   JobState=PENDING Reason=None Dependency=(null)
+   Requeue=1 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:00:00 TimeLimit=04:00:00 TimeMin=N/A
+   SubmitTime=2026-10-03T16:41:57 EligibleTime=Unknown
+   AccrueTime=Unknown
+   StartTime=Unknown EndTime=Unknown Deadline=N/A
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-10-03T16:41:57 Scheduler=Main
+   Partition=commons AllocNode:Sid=loginx3.nots.rice.edu:3017405
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=
+   NumNodes=1 NumCPUs=1 NumTasks=1 CPUs/Task=1 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=1,mem=4G,node=1,billing=1
+   AllocTRES=(null)
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:1 CoreSpec=*
+   MinCPUsNode=1 MinMemoryNode=4G MinTmpDiskNode=0
+   Features=(null) DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) LicensesAlloc=(null) Network=(null)
+   Command=/home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z/code/slurm/array.slurm
+   SubmitLine=sbatch --parsable --chdir=/home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z /home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z/code/slurm/array.slurm /home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z
+   WorkDir=/home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z
+   StdErr=/home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z/logs/inner_individual_1786240_4294967294.err
+   StdIn=/dev/null
+   StdOut=/home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z/logs/inner_individual_1786240_4294967294.out
+   TresPerTask=cpu=1
+
+                       JOBID                       NAME        STATE       TIME               NODELIST(REASON)
+                     1786241   inner_individual_process      PENDING       0:00                   (Dependency)
+        1786240_[1-3000%400]           inner_individual      PENDING       0:00                         (None)

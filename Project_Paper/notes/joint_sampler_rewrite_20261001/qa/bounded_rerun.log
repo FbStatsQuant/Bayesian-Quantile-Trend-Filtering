@@ -1,0 +1,46 @@
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+During startup - Warning messages:
+1: Setting LC_COLLATE=C.UTF-8 failed 
+2: Setting LC_CTYPE=C.UTF-8 failed 
+3: Setting LC_MONETARY=C.UTF-8 failed 
+4: Setting LC_TIME=C.UTF-8 failed 
+using C++ compiler: 'G__~1.EXE (GCC) 13.2.0'
+g++ -std=gnu++17  -I"C:/PROGRA~1/R/R-44~1.1/include" -DNDEBUG   -I"C:/Users/felip/AppData/Local/R/win-library/4.4/Rcpp/include" -I"C:/Users/felip/OneDrive/DOCUME~1/QUANTI~1/PMALAV~1/notes/JOINT_~1/qa/KERNEL~1"   -I"C:/RBuildTools/4.4/x86_64-w64-mingw32.static.posix/include"     -O2 -Wall  -mfpmath=sse -msse2 -mstackrealign  -c prox_admm_metric.cpp -o prox_admm_metric.o
+prox_admm_metric.cpp: In function 'void apply_Dt(const std::vector<double>&, const std::vector<double>&, std::vector<double>&)':
+prox_admm_metric.cpp:41:50: warning: unused variable 'n' [-Wunused-variable]
+   41 |   int p = (int)st.size() - 1, m = (int)v.size(), n = m + p;
+      |                                                  ^
+make: basename: No such file or directory
+make: basename: No such file or directory
+make: basename: No such file or directory
+/bin/sh: line 7: sed: command not found
+/bin/sh: line 7: sed: command not found
+/bin/sh: line 7: sed: command not found
+g++ -std=gnu++17 -shared -s -static-libgcc -o sourceCpp_2.dll tmp.def prox_admm_metric.o -LC:/RBuildTools/4.4/x86_64-w64-mingw32.static.posix/lib/x64 -LC:/RBuildTools/4.4/x86_64-w64-mingw32.static.posix/lib -LC:/PROGRA~1/R/R-44~1.1/bin/x64 -lR
+/bin/sh: line 10: rm: command not found
+make: *** [C:/PROGRA~1/R/R-44~1.1/share/make/winshlib.mk:16: sourceCpp_2.dll] Error 127
+
+WARNING: The tools required to build C++ code for R were not found.
+
+Please download and install the appropriate version of Rtools:
+
+http://cran.r-project.org/bin/windows/Rtools/
+
+PASS bounded diagonal quadratic analytic reference
+  budget used max_error_qp objective_gap       primal         dual stationarity
+1    200  200 2.240883e-10             0 1.010816e-10 3.593580e-11 1.565575e-09
+2  50000  222 2.530516e-10             0 9.395032e-12 3.340752e-12 1.425975e-10
+         l1_gap box_normal
+1  1.110223e-16          0
+2 -5.551115e-17          0
+PASS bounded whole-U metric prox vs independent epigraph QP and KKT; 200-budget reported separately
+PASS inverted bounds, endpoints, duplicate, unsorted and nonfinite tau rejection
+PASS numerically collapsed joint initialization rejection
+PASS fixed-box/metric reverse Gaussian density and genuine outside-support rejection
+   mean_eta quadrature_eta    batch_se eta_lower eta_upper
+1 0.9835671      0.9829932 0.004322998 0.3671131   1.29286
+PASS bounded ASIS feasible domain, fixed box, and eta target vs quadrature

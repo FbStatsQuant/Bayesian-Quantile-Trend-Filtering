@@ -1,0 +1,20 @@
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Simulated air-quality results for $n=500$ (100 replications). Entries are means across replications. CL denotes check loss; HS denotes the horseshoe sampler. CAA excludes replications without signal points.}
+\label{tab:air_n500}
+\begin{tabular}{@{}rlrrrrrr@{}}
+\toprule
+ & & & & \multicolumn{4}{c}{CAA at threshold $h$} \\
+\cmidrule(lr){5-8}
+$\tau$ & Method & CL & MSE & $0.5$ & $0.75$ & $1$ & $1.2$ \\
+\midrule
+0.01 & Onizuka (Lap) & 0.005075 & 0.097999 & 0.6329 & 0.6639 & 0.6415 & 0.6129 \\
+\addlinespace[3pt]
+0.05 & Onizuka (Lap) & 0.022582 & 0.084806 & 0.6189 & 0.6191 & 0.5966 & 0.5717 \\
+\addlinespace[3pt]
+0.10 & Onizuka (Lap) & 0.042762 & 0.065150 & 0.6707 & 0.6495 & 0.6091 & 0.5797 \\
+\bottomrule
+\end{tabular}
+\end{table}

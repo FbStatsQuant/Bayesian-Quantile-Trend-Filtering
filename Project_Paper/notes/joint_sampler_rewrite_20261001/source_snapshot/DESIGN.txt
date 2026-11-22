@@ -1,0 +1,152 @@
+UNIFIED GUARDED CANDIDATE — LOCAL DIAGNOSTICS ONLY
+
+Scope and interface
+-------------------
+Source Unified_Sampler.R, call load_unified_cpp() once, then:
+  set.seed(1001)
+  fit <- gibbs_unified(y, tau=c(.10), gibbs_iter=120, gibbs_burn=60, warm=10)
+  fit <- gibbs_unified(y, tau=c(.10,.50,.90), gibbs_iter=1000,
+                       gibbs_burn=500, warm=50)
+No pilot executes when sourcing. Default iteration/burn/warm settings are
+30000/10000/200, ADMM budget=200, tol=0, K=1, ASIS on, metric curv with kappa=3.
+Delta starts at .2, adapts only after warmup through the last burn-in sweep,
+then freezes. No manual delta tuning is used in the supplied tests.
+
+tau must be finite, distinct, strictly increasing and strictly inside (0,1).
+Exact 0% and 100% are unsupported. Unsorted inputs are rejected, not silently
+reordered. Column j always corresponds to tau[j].
+theta is kept-sweep x observation x quantile, including a length-one third
+dimension for singleton inputs; lambda/sigma/delta/acc/SD are sweep x quantile.
+The candidate deliberately exposes only the approved configuration's methods:
+prior_scale='none', MH on, init='y', lambda jump off, no conditional-mode output.
+Shared hyperparameters are fixed; each quantile has its own theta,z,lambda,
+sigma,delta. This is one common sweep implementation for singleton and joint.
+
+Guarded reference and singleton
+-------------------------------
+guarded_reference.R is a byte-for-byte snapshot of approved D_guarded_frozen200/
+Individual_Sampler_PMALA_TEMP_Guarded_Frozen200.R. prox_admm_metric.cpp is an
+unchanged adjacent snapshot. Definitions are evaluated in a private environment
+without running the reference's main simulation. Its unchanged loader provides
+the native primitives. The current loader requires the existing Windows R/Rcpp/
+glmgen and C:/mingw64 toolchain (original Rcpp::sourceCpp fallback retained).
+Native builds go into R's temporary directory.
+
+For one quantile, bounds are (-Inf,Inf), initialization is exactly theta=y,
+sigma=1,z=1,lambda=n-order-1 unless supplied. The bounds-aware helpers dispatch
+to the original native/prox/ASIS functions without additional random draws.
+The common sweep preserves the guarded update arithmetic and draw ordering.
+test_singleton.R compares tau=.10 against that exact snapshot and also verifies
+the snapshot hash against D, including full trajectories and final RNG state.
+
+For multiple quantiles, deterministic offsets are
+ max(sd(y),.1) * [qnorm(tau_j)-median(qnorm(tau))].
+They are added to y to initialize strict ordering without extra RNG. Numerically
+collapsed or nonfinite initialization is rejected. All curves initialized at y
+would create zero-width middle boxes and possibly trap continuous proposals.
+
+Joint target
+------------
+The intended target is the globally constrained product of the existing
+augmented factors for the same observed y, not individually normalized
+truncated priors or a newly normalized joint sampling model for y:
+
+ pi({theta_j,z_j,lambda_j,sigma_j}|y) proportional to
+ I(theta_1 <= ... <= theta_q componentwise) * product_j [
+   product_i N(y_i | theta_ij+psi_j*z_ij, t2_j*sigma_j*z_ij)
+             Exp(z_ij | mean=sigma_j)
+   * lambda_j^m exp(-lambda_j * ||D theta_j||_1)
+   * Gamma(lambda_j | shape=1,rate=.001)
+   * IG(sigma_j | shape=.1,scale=.1) ],
+ m=n-order-1, psi_j=(1-2*tau_j)/(tau_j*(1-tau_j)),
+ t2_j=2/(tau_j*(1-tau_j)). The difference prior has the original flat polynomial
+ nullspace convention. Ordering is enforced only at the observed indices.
+
+The indicator does not depend on lambda or sigma when theta is fixed, hence
+ lambda_j | rest ~ Gamma(1+m, .001+||D theta_j||_1)
+ sigma_j | rest ~ IG(.1+3*n/2,
+   .1+sum_i (y_i-theta_ij-psi_j*z_ij)^2/(2*t2_j*z_ij)+sum_i z_ij).
+An individually normalized truncated prior would introduce a parameter-
+dependent normalizer and generally invalidate these conjugate updates.
+
+The intended density above is distinct from a claim that the entire guarded
+implementation samples it exactly. The inherited residual floor, latent z
+floor/cap, inverse-Gaussian arithmetic and ASIS shrinkage safeguard remain
+unchanged by user choice. There is no stable-IG rewrite here.
+
+Conditional theta proposal
+--------------------------
+Each sweep visits quantiles in ascending order, completing theta,z,lambda,
+ASIS,sigma,delta for j before advancing. Conditional bounds are the current
+lower neighbor L and upper neighbor U, with infinite outside edges. Later
+updates see the newly updated lower neighbor. Bounds do not move during a
+conditional theta or ASIS update.
+
+U_j(theta)=.5*sum a_i(theta_i-r_i)^2+lambda_j*||D theta||_1,
+a_i=1/(t2_j*sigma_j*z_ij), r_i=y_i-psi_j*z_ij.
+M=diag(d)+c D'D is exactly the inherited conditional metric (including c cap).
+The bounded map approximates argmin over L<=t<=U of
+ U_j(t)+(t-x)'M(t-x)/(2*gamma), gamma=delta/2.
+It uses both Gaussian energy and the difference penalty, not a penalty-only
+prox or a clipped unconstrained optimization solution.
+
+Two-block ADMM splits v=Dtheta and t=theta, penalizing lambda|v|+I_box(t).
+The theta increment w=theta-x solves
+ [diag(a)+M/gamma+rho D'D+eta I] w =
+ a*(r-x)+rho D'(v-Dx-u)+eta*(t-x-h),
+ eta=mean(a+d/gamma), rho=.1*(mean(d)+c)/gamma unless explicitly supplied.
+Then v=soft(Dtheta+u,lambda/rho), t=projection_box(theta+h), and the two scaled
+dual variables update. Cold start and finite iteration budget are deterministic.
+The returned map is feasible t. It is an approximate map at budget 200, not a
+proof of the optimizer's exactness. The diagonal ridge retry from the guarded
+solver is inherited. KKT/residual diagnostics assess actual accuracy separately.
+
+Proposal theta*=T(theta)+sqrt(delta)*L_M^{-T}xi is an ordinary unrestricted
+Gaussian. If theta* is outside [L,U], target density is zero and MH rejects it;
+the Gaussian draw is never clipped, truncated, repeatedly sampled or projected.
+For an in-box draw the reverse T(theta*) uses exactly the same bounds and M.
+The Gaussian normalizing constants cancel; the log acceptance ratio is
+ U_j(theta)-U_j(theta*) + [||theta*-T(theta)||_M^2
+                         -||theta-T(theta*)||_M^2]/(2*delta).
+The reverse map need not be computed when the target indicator is zero.
+Any deterministic finite map with this matched Gaussian density supports the
+conditional MH correction; finite iterations do not certify proximal accuracy.
+Warmup uses the bounded map alone at the same ADMM budget and is discarded.
+
+Bounded interweaving
+-------------------
+Let Q span null(D), p=QQ'theta, v=theta-p, and hold p and u=lambda*Dtheta fixed.
+For a new lambda'=exp(eta), theta(eta)=p+(lambda/exp(eta))*v.
+Let s=lambda/lambda'>0. Intersect coordinate inequalities L_i<=p_i+s*v_i<=U_i:
+ v_i>0 gives (L_i-p_i)/v_i <= s <= (U_i-p_i)/v_i;
+ v_i<0 gives the same endpoints in reversed order;
+ v_i=0 requires p_i inside its interval.
+Intersect these with s>0 to get [s_lo,s_hi], and then
+ eta in [log(lambda)-log(s_hi),log(lambda)-log(s_lo)], allowing infinite ends.
+
+The lambda^m difference-prior factor cancels the m-dimensional rescaling
+Jacobian lambda^(-m). In eta coordinates another Jacobian exp(eta) remains:
+ log f(eta)=a0*eta-b0*exp(eta)-.5*sum a_i(theta_i(eta)-r_i)^2
+            + log I(L<=theta(eta)<=U).
+The code checks both the derived interval and the actual reconstructed curve.
+It uses the original stepping-out/shrinkage scheme with infeasible eta assigned
+-Inf. A degenerate feasible interval or a rounding-infeasible reconstruction
+keeps the original state; it never clips theta or bypasses the support factor.
+
+Verification and limits
+-----------------------
+test_singleton.R: FIRST test, exact tau=.10 parity including trajectories/RNG,
+MSE and check loss. Short run estimates are only parity evidence.
+test_bounded.R: analytic diagonal bounded quadratic; independent small full-
+metric epigraph QP; actual KKT and primal/dual residuals; budget-200 versus
+high-budget results; deterministic repeat; reverse density/bounds/metric;
+outside-box rejection; invalid bounds and tau endpoints/order; ASIS feasible
+domain and quadrature of its eta target.
+test_joint.R: central and .96-.99 VS Normal short chains; invariant checks after
+each theta move, theta block, and ASIS, plus retained-chain noncrossing; frozen
+delta; posterior outside rates and actual accepted theta/ASIS movements.
+No short smoke test establishes useful mixing at n=500 or posterior convergence.
+See CSV/RDS/log evidence and RESULTS.txt for actual measurements.
+
+No production adoption, cluster jobs, or modification to originals, D, papers,
+or previous comparison artifacts is part of this candidate.

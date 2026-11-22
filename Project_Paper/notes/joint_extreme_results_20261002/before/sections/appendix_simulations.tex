@@ -1,0 +1,169 @@
+% !TeX root = ../main.tex
+\section{Additional Simulation Results}
+\label{app:simulation_results}
+
+This appendix reports the MAD and MCIW results accompanying the VS and S interior-quantile MSE tables in Section~\ref{sec:sim:individual}. All tables use the $n=500$ comparison.
+
+\subsection{Interior quantiles}
+\label{app:sim:individual}
+
+This appendix reports the measures omitted from Section~\ref{sec:sim:individual}: MAD and MCIW for the varying-smoothness signal, and the complete set of MSE, MAD and MCIW tables for the smooth signal. All entries use the default order $k=2$ and $n=500$, and are averages over valid replications. MCIW is the average width of the $95\%$ pointwise posterior intervals and is not available for the ADMM point estimator.
+
+\subsubsection{Varying smoothness}
+\label{app:sim:individual:vs}
+The MAD comparison (Table~\ref{tab:vs_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:vs}. Bayesian-PMALA's intervals are narrower than those of both Onizuka variants (Table~\ref{tab:vs_int_mciw}); the widths describe different posterior constructions and are not by themselves a measure of calibration.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean absolute deviation (MAD) for the varying-smoothness (VS) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:vs_int_mad}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.012702 & 0.020517 & 0.030557 & 0.040591 & 0.066465 \\
+Onizuka (Horseshoe) & 0.011300 & 0.018849 & 0.028763 & 0.038443 & 0.062328 \\
+Bayesian-PMALA & 0.012715 & 0.020660 & 0.030504 & 0.040769 & 0.069407 \\
+ADMM & 0.027314 & 0.029267 & 0.044214 & 0.052848 & 0.076817 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.215556 & 0.139979 & 0.128822 & 0.138850 & 0.215747 \\
+Onizuka (Horseshoe) & 0.212371 & 0.140284 & 0.129614 & 0.141514 & 0.218726 \\
+Bayesian-PMALA & 0.220872 & 0.138900 & 0.127028 & 0.137998 & 0.213368 \\
+ADMM & 0.218535 & 0.183889 & 0.169139 & 0.157936 & 0.201602 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.109980 & 0.070160 & 0.063856 & 0.067192 & 0.103017 \\
+Onizuka (Horseshoe) & 0.106356 & 0.068189 & 0.061950 & 0.065668 & 0.101007 \\
+Bayesian-PMALA & 0.109211 & 0.069030 & 0.063572 & 0.067651 & 0.105572 \\
+ADMM & 0.141630 & 0.087809 & 0.085612 & 0.081531 & 0.107235 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean 95\% pointwise credible-interval width (MCIW) for the varying-smoothness (VS) signal ($k=2$), $n=500$, at interior quantile levels. MCIW is not available for the ADMM point estimator.}
+\label{tab:vs_int_mciw}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.072159 & 0.100837 & 0.132473 & 0.158571 & 0.168685 \\
+Onizuka (Horseshoe) & 0.067523 & 0.100344 & 0.134284 & 0.161300 & 0.166118 \\
+Bayesian-PMALA & 0.063031 & 0.097296 & 0.128485 & 0.154082 & 0.158217 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.557248 & 0.564334 & 0.569489 & 0.565218 & 0.559566 \\
+Onizuka (Horseshoe) & 0.578243 & 0.613924 & 0.620905 & 0.624492 & 0.599896 \\
+Bayesian-PMALA & 0.536510 & 0.512956 & 0.511147 & 0.512908 & 0.532739 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.289501 & 0.286599 & 0.285566 & 0.284948 & 0.280193 \\
+Onizuka (Horseshoe) & 0.296111 & 0.301798 & 0.301683 & 0.301976 & 0.290053 \\
+Bayesian-PMALA & 0.274518 & 0.273147 & 0.273185 & 0.274772 & 0.269502 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+\subsubsection{Smooth signal}
+\label{app:sim:individual:smooth}
+For the smooth signal, the MSE and MAD comparisons (Tables~\ref{tab:s_int_mse} and \ref{tab:s_int_mad}) agree with Section~\ref{sec:sim:ind:smooth}, and Bayesian-PMALA's intervals are again narrower than those of both Onizuka variants (Table~\ref{tab:s_int_mciw}).
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error (MSE) for the smooth (S) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:s_int_mse}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.000295 & 0.000794 & 0.001592 & 0.002311 & 0.005225 \\
+Onizuka (Horseshoe) & 0.000423 & 0.000812 & 0.001554 & 0.002270 & 0.005342 \\
+Bayesian-PMALA & 0.000273 & 0.000641 & 0.001257 & 0.001817 & 0.006112 \\
+ADMM & 0.000183 & 0.000425 & 0.000789 & 0.001078 & 0.002464 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.071456 & 0.026312 & 0.021974 & 0.027079 & 0.067077 \\
+Onizuka (Horseshoe) & 0.074248 & 0.026449 & 0.021783 & 0.027401 & 0.072335 \\
+Bayesian-PMALA & 0.064536 & 0.018776 & 0.014218 & 0.017926 & 0.060680 \\
+ADMM & 0.030277 & 0.010993 & 0.008228 & 0.010769 & 0.023342 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.014933 & 0.006463 & 0.005581 & 0.006136 & 0.014457 \\
+Onizuka (Horseshoe) & 0.016242 & 0.006414 & 0.005364 & 0.006003 & 0.014982 \\
+Bayesian-PMALA & 0.015384 & 0.004820 & 0.003920 & 0.004512 & 0.014667 \\
+ADMM & 0.006561 & 0.003129 & 0.002456 & 0.002843 & 0.005929 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean absolute deviation (MAD) for the smooth (S) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:s_int_mad}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.009000 & 0.017595 & 0.027191 & 0.035333 & 0.056189 \\
+Onizuka (Horseshoe) & 0.009166 & 0.016903 & 0.026235 & 0.034349 & 0.056422 \\
+Bayesian-PMALA & 0.008614 & 0.015546 & 0.023886 & 0.031183 & 0.060052 \\
+ADMM & 0.007408 & 0.013056 & 0.019253 & 0.024246 & 0.039323 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.209230 & 0.128588 & 0.117542 & 0.129947 & 0.200719 \\
+Onizuka (Horseshoe) & 0.212951 & 0.128772 & 0.116773 & 0.130281 & 0.208177 \\
+Bayesian-PMALA & 0.197194 & 0.106844 & 0.093811 & 0.105936 & 0.189823 \\
+ADMM & 0.134511 & 0.082435 & 0.071963 & 0.081493 & 0.118870 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.093516 & 0.062130 & 0.057391 & 0.060291 & 0.091704 \\
+Onizuka (Horseshoe) & 0.096546 & 0.061044 & 0.055676 & 0.059026 & 0.092177 \\
+Bayesian-PMALA & 0.094548 & 0.053381 & 0.048038 & 0.051596 & 0.091815 \\
+ADMM & 0.060896 & 0.042695 & 0.037518 & 0.040551 & 0.057551 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean 95\% pointwise credible-interval width (MCIW) for the smooth (S) signal ($k=2$), $n=500$, at interior quantile levels. MCIW is not available for the ADMM point estimator.}
+\label{tab:s_int_mciw}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.051618 & 0.086614 & 0.118115 & 0.140828 & 0.144257 \\
+Onizuka (Horseshoe) & 0.055748 & 0.087738 & 0.119125 & 0.144581 & 0.152374 \\
+Bayesian-PMALA & 0.041033 & 0.072119 & 0.098827 & 0.120966 & 0.139223 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.530973 & 0.541054 & 0.546983 & 0.542001 & 0.528167 \\
+Onizuka (Horseshoe) & 0.572392 & 0.581571 & 0.576684 & 0.582025 & 0.573076 \\
+Bayesian-PMALA & 0.497356 & 0.438523 & 0.433109 & 0.435191 & 0.492696 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.250570 & 0.262358 & 0.265880 & 0.262720 & 0.248729 \\
+Onizuka (Horseshoe) & 0.274999 & 0.276615 & 0.274603 & 0.273819 & 0.269150 \\
+Bayesian-PMALA & 0.244342 & 0.218670 & 0.216871 & 0.219620 & 0.240846 \\
+\bottomrule
+\end{tabular}
+\end{table}
+

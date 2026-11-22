@@ -1,0 +1,9 @@
+Extracted 2026-10-03 from PMALA version Tex Project (manuscript compiled 2026-10-02).
+tab:vs_int_mse from sections/simulations.tex
+tab:vs_int_mad from sections/appendix_simulations.tex
+tab:vs_int_mciw from sections/appendix_simulations.tex
+tab:s_int_mse from sections/appendix_simulations.tex
+tab:s_int_mad from sections/appendix_simulations.tex
+tab:s_int_mciw from sections/appendix_simulations.tex
+sha256 sections/simulations.tex 826dca713968e33e0bbdf641116f22dd0284735e73d4f3073148cbb79be60bf0
+sha256 sections/appendix_simulations.tex 1fc522f92dc0168f18ffc84d9e850eae0e9d1a58609bda85d825963fad0a0d05

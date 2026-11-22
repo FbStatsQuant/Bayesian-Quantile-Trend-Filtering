@@ -1,0 +1,4 @@
+This is BibTeX, Version 0.99e (MiKTeX 26.5)
+The top-level auxiliary file: notes/simulation_revision_20260914/build/main.aux
+The style file: apalike.bst
+Database file #1: references.bib

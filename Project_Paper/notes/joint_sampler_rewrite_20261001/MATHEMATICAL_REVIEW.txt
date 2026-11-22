@@ -1,0 +1,78 @@
+JOINT SAMPLER MATHEMATICAL AND SOURCE REVIEW - 2026-10-01
+
+Scope: Section 2.3 and supporting Appendix A.10. Review by the manuscript
+worker, with fresh executable checks on an isolated source copy. No separate
+new independent reviewer is claimed. The prior independent review is preserved
+in source_snapshot/independent_review.txt as historical evidence.
+
+1. Target and conjugacy: PASS.
+   The joint target is an order indicator times the individual augmented
+   posterior factors for the same observations. No separately normalized
+   truncated prior is inserted. Conditional on theta, the indicator is constant
+   in z, lambda and sigma. The Gamma shape/rate remains a0+m, b0+||D theta||_1;
+   the IG shape/rate remains a_sigma+3n/2,
+   b_sigma+sum[z+(y-theta-psi*z)^2/(2*omega^2*z)].
+   Code passes lambda_SD=0 and m=0 to draw_sigma, agreeing with the unscaled prior.
+   This is a working posterior construction, not a new normalized likelihood
+   claiming J independent observations of the same y.
+
+2. Latest-neighbor conditional sweep: PASS.
+   Lower neighbor is the completed current-sweep state, including ASIS; upper
+   neighbor is the previous-sweep state. The box is fixed for all K moves and
+   for the subsequent ASIS update. The next level sees the updated lower curve.
+
+3. ADMM equations: PASS.
+   The smooth gradient is W(theta-r)+M(theta-x)/gamma. Adding the two augmented
+   equality penalties gives A_B=W+M/gamma+rho*D'D+zeta*I. Subtracting A_B*x gives
+   the increment RHS printed in A.10. Soft threshold lambda/rho and componentwise
+   projection solve the two separable auxiliary subproblems. Returned b=t is
+   feasible. Cold starts and fixed budget define a deterministic finite map.
+   Actual bounded implementation does not cache factors across forward/reverse
+   calls; the text explicitly avoids claiming that optimization is implemented.
+
+4. MH ratio: PASS.
+   Gaussian q(y|x) has log density const-||y-T_hat(x)||_M^2/(2*delta).
+   Subtracting forward from reverse gives exactly equation (22)'s norm signs.
+   The determinant and scale constants cancel at the fixed block settings.
+   Target density is zero outside the box; no projected or truncated proposal
+   density is substituted. Deterministic finite solves affect proposal quality,
+   not the conditional MH invariance argument.
+
+5. ASIS transform: PASS.
+   On null(D)'s orthogonal complement, theta_perp -> lambda'*D*theta_perp has
+   Jacobian proportional to lambda'^m. Its inverse cancels the prior lambda'^m.
+   The log-lambda transformation adds eta, leaving a0*eta-b0*exp(eta) plus the
+   Gaussian log likelihood and support indicator. Intersecting coordinate scale
+   intervals and inverting s=lambda/lambda' yields the printed eta endpoints.
+   Reconstructed-support checks are explicitly documented.
+
+6. Adaptation, warm-up, singleton: PASS.
+   Warm-up is optimization and is discarded. Alpha adaptation uses the mean
+   of clipped acceptance probabilities, not the realized accepted fraction;
+   occurs only H<t<=B; retained delta is frozen. One quantile dispatches to the
+   unchanged individual routines. Fresh singleton full trajectory/RNG parity
+   passed on the documented fixture.
+
+7. Qualifications: retained explicitly.
+   Latent clipping/residual flooring change the ideal conditional, and cannot
+   inherit correctness from the trend MH proof. Original inverse-Gaussian
+   arithmetic and slice shrinkage threshold remain numerical limitations.
+   No guard-bias bound, general convergence theorem, calibrated intervals or
+   useful tail mixing has been established here. Small-fixture proximal accuracy
+   does not establish a general 200-iteration error bound. Additional quantile
+   factors change the target; no automatic sentinel procedure is present.
+
+Executable evidence newly rerun (qa/):
+ - bounded_rerun.log: analytic bounded quadratic, full-metric epigraph QP and
+   KKT, deterministic repeat, Gaussian MH ratio, outside-support rejection,
+   input checks, feasible ASIS scale interval and log-lambda quadrature PASS.
+   At budget 200, max coordinate difference from QP 2.240883e-10 and
+   stationarity infinity norm 1.565575e-9 on this fixture.
+ - singleton_rerun.log: n=50, tau=.10, total=120/burn=60/warm=10;
+   theta/lambda/sigma/delta/acceptance/roughness/final RNG/MSE/loss parity PASS.
+   Rcpp sourceCpp's missing-Rtools attempt reports a warning; the existing
+   MinGW fallback builds successfully, and both test processes exit zero.
+ - Previously saved joint tests reviewed, not rerun: n=60, total=1000/burn=500;
+   zero crossings, frozen retained delta, positive movement; descriptive mean-
+   curve ESS about 1-10 and tau=.99 half-chain drift -7.434866. These are smoke
+   checks and an observed mixing problem, not evidence for reliable inference.

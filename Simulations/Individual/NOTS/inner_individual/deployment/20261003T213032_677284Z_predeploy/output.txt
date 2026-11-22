@@ -1,0 +1,41 @@
+2026-10-03T21:30:38+00:00
+total 8
+drwxr-xr-x  2 fb31 ml75 4096 Oct  3 13:40 .
+drwxr-xr-x 10 fb31 ml75 4096 Oct  3 13:41 ..
+Filesystem              Size  Used Avail Use% Mounted on
+nfs1:/export/nots/home   10T  4.9T  4.7T  52% /home
+vast:/scratch           1.1P  936T  142T  87% /scratch
+Disk quotas for user fb31 (uid 71711): 
+     Filesystem   space   quota   limit   grace   files   quota   limit   grace
+nfs1:/export/nots/home
+                  5020M  10240M  10240M           74908       0       0        
+data191.nots.rice.edu:/rhf/allocations/ea14
+                 16384G*     0K  16384G           4021k       0       0        
+                   JOBID                             NAME      STATE       TIME               NODELIST(REASON)
+/opt/apps/software/R/4.5.2-gfbf-2025b/bin/Rscript
+
+Currently Loaded Modules:
+  1) GCCcore/14.3.0       22) X11/20250608      43) gettext/0.25
+  2) zlib/1.3.1           23) libffi/3.5.1      44) PCRE2/10.45
+  3) binutils/2.44        24) XZ/5.8.1          45) GLib/2.85.3
+  4) GCC/14.3.0           25) libxml2/2.14.3    46) cairo/1.18.4
+  5) OpenBLAS/0.3.30      26) OpenSSL/3         47) libjpeg-turbo/3.1.1
+  6) FlexiBLAS/3.4.5      27) Python/3.13.5     48) jbigkit/2.1
+  7) FFTW/3.3.10          28) GMP/6.3.0         49) libdeflate/1.24
+  8) bzip2/1.0.8          29) Z3/4.15.1         50) LibTIFF/4.7.0
+  9) expat/2.7.1          30) gzip/1.14         51) giflib/5.2.2
+ 10) libpng/1.6.50        31) lz4/1.10.0        52) libwebp/1.5.0
+ 11) Brotli/1.1.0         32) zstd/1.5.7        53) Java/21 -> Java/21.0.8
+ 12) freetype/2.13.3      33) LLVM/20.1.8       54) libgit2/1.9.1
+ 13) ncurses/6.5          34) Wayland/1.24.0    55) libidn2/2.3.8
+ 14) libreadline/8.2      35) libarchive/3.8.1  56) libunistring/1.3
+ 15) libtommath/1.3.0     36) elfutils/0.193    57) libpsl/0.21.5
+ 16) Tcl/9.0.1            37) libdrm/2.4.125    58) cURL/8.14.1
+ 17) SQLite/3.50.1        38) libunwind/1.8.2   59) Tk/9.0.1
+ 18) util-linux/2.41      39) nettle/3.10.2     60) ICU/77.1
+ 19) fontconfig/2.17.0    40) OpenGL/2025.09    61) HarfBuzz/11.4.1
+ 20) xorg-macros/1.20.2   41) pixman/0.46.4     62) FriBidi/1.0.16
+ 21) libpciaccess/0.18.1  42) libiconv/1.18     63) R/4.5.2
+
+ 
+

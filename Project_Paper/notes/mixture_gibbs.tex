@@ -1,0 +1,314 @@
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{bm}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\newcommand{\by}{\bm{y}}
+\newcommand{\bz}{\bm{z}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\IG}{\mathrm{IG}}
+\newcommand{\InvGauss}{\mathrm{InvGauss}}
+\newcommand{\GIG}{\mathrm{GIG}}
+\newcommand{\Exp}{\mathrm{Exp}}
+\newcommand{\prox}{\mathrm{prox}}
+\newcommand{\diag}{\mathrm{diag}}
+\newcommand{\tf}{\texttt{trendfilter}}
+\newtheorem{remark}{Remark}
+\newtheorem{proposition}{Proposition}
+
+\title{BQTF with the normal-scale-mixture likelihood:\\ individual-quantile Gibbs sampler with a single proximal step}
+\author{Working note for Felipe Bedoya}
+\date{September 5, 2026}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Scope.} Individual quantile only (no non-crossing box). Model, priors and
+hyperparameters are those of the manuscript. The smoothed check loss is dropped; the ALD is
+written exactly as an exponential-scale mixture of normals (Kozumi and Kobayashi, 2011; Onizuka
+et al., 2024). Conditional on the latent scales the $\theta$-target is
+\emph{one} non-smooth convex function $U$ (weighted $\ell_2$ + $\ell_1$), and the $\theta$-update is a
+proximal Langevin step on $U$ as a whole, with the proximal map computed exactly by
+\texttt{glmgen::}\tf\ with observation weights. The prior on $\sigma$ is unchanged: the manuscript's
+$\sigma\sim\IG(a_\sigma,b_\sigma)$, $a_\sigma=b_\sigma=0.1$, \emph{is} Onizuka's prior, since their scale
+$\sigma^2_{\mathrm{Oni}}$ (density $p(1-p)\sigma^{-2}_{\mathrm{Oni}}e^{-\rho_p/\sigma^2_{\mathrm{Oni}}}$) is our $\sigma$.
+
+\section{Mixture representation in the paper's parametrization}
+
+$\varepsilon_i\sim\mathrm{ALD}(\tau,\sigma)$ with density
+$f(u\mid\tau,\sigma)=\tau(1-\tau)\sigma^{-1}\exp\{-\rho_\tau(u)/\sigma\}$. Let
+\begin{equation}
+    \psi_\tau=\frac{1-2\tau}{\tau(1-\tau)},\qquad
+    t_\tau^2=\frac{2}{\tau(1-\tau)},\qquad
+    \psi_\tau^2+2t_\tau^2=\frac{1}{\tau^2(1-\tau)^2}.
+    \label{eq:constants}
+\end{equation}
+\begin{proposition}[Kozumi--Kobayashi]
+If $z\mid\sigma\sim\Exp(\text{mean }\sigma)$, $p(z\mid\sigma)=\sigma^{-1}e^{-z/\sigma}$, and
+$u\sim N(0,1)$ independently, then
+$\varepsilon=\psi_\tau z+\sqrt{t_\tau^2\sigma z}\,u\sim\mathrm{ALD}(\tau,\sigma)$.
+\end{proposition}
+\noindent(Onizuka's representation with $\sigma^2_{\mathrm{Oni}}\to\sigma$. The alternative
+$z\sim\Exp(1)$, $\varepsilon=\sigma(\psi_\tau z+t_\tau\sqrt z\,u)$ is the same marginal model but puts
+$\sigma$ in the conditional mean and destroys the inverse-Gamma conjugacy; use the mean-$\sigma$
+parametrization.) The augmented likelihood is
+\begin{equation}
+    p(y_i\mid\theta_i,z_i,\sigma)
+    =\left(2\pi t_\tau^2\sigma z_i\right)^{-1/2}
+    \exp\!\left\{-\frac{(y_i-\theta_i-\psi_\tau z_i)^2}{2t_\tau^2\sigma z_i}\right\},
+    \qquad p(z_i\mid\sigma)=\sigma^{-1}e^{-z_i/\sigma},
+    \label{eq:auglik}
+\end{equation}
+and $\int p(y_i\mid\theta_i,z_i,\sigma)p(z_i\mid\sigma)\,dz_i=f(y_i-\theta_i\mid\tau,\sigma)$ exactly.
+
+\section{Augmented posterior}
+
+\begin{align}
+    p(\theta,\bz,\lambda,\sigma\mid\by)\;\propto\;&
+    \prod_{i=1}^n (\sigma z_i)^{-1/2}
+    \exp\!\left\{-\frac{(y_i-\theta_i-\psi_\tau z_i)^2}{2t_\tau^2\sigma z_i}-\frac{z_i}{\sigma}\right\}
+    \;\sigma^{-n}\;
+    \lambda^{m}e^{-\lambda\norm{D\theta}_1}\;
+    \lambda^{a_0-1}e^{-b_0\lambda}\;
+    \sigma^{-a_\sigma-1}e^{-b_\sigma/\sigma}.
+    \label{eq:augpost}
+\end{align}
+Integrating over $\bz$ gives back the manuscript's $p(\theta,\lambda,\sigma\mid\by)$ exactly, so the
+$(\theta,\lambda,\sigma)$-marginal of any Gibbs sampler on \eqref{eq:augpost} is the current target.
+
+\section{Full conditionals}
+
+Write $r_i=y_i-\theta_i$, $\tilde y_i=y_i-\psi_\tau z_i$,
+$\omega_i=1/(t_\tau^2\sigma z_i)$, $\Omega=\diag(\omega_1,\dots,\omega_n)$.
+
+\paragraph{(a) Trend.}
+\begin{equation}
+    p(\theta\mid\bz,\sigma,\lambda,\by)\;\propto\;\exp\{-U(\theta)\},\qquad
+    U(\theta)=\tfrac12(\theta-\tilde y)^\top\Omega(\theta-\tilde y)+\lambda\norm{D\theta}_1 .
+    \label{eq:U}
+\end{equation}
+$U$ is proper, closed, convex, non-differentiable on $\{\theta:(D\theta)_j=0\text{ for some }j\}$,
+and $\mu$-strongly convex with $\mu=\min_i\omega_i>0$. Handled in Section~\ref{sec:prox}.
+
+\paragraph{(b) Latent scales.} Collecting the $z_i$ terms of \eqref{eq:augpost},
+$z_i\mid\cdot\sim\GIG\big(\tfrac12,\;r_i^2/(t_\tau^2\sigma),\;(\psi_\tau^2+2t_\tau^2)/(t_\tau^2\sigma)\big)$
+(Kozumi--Kobayashi convention), which by \eqref{eq:constants} is a reciprocal inverse Gaussian:
+\begin{equation}
+    \frac1{z_i}\;\Big|\;\theta_i,\sigma,y_i\;\sim\;
+    \InvGauss\!\left(\mu_i=\frac{1}{\tau(1-\tau)|r_i|},\;\kappa=\frac{1}{2\tau(1-\tau)\sigma}\right),
+    \label{eq:zupdate}
+\end{equation}
+with $\InvGauss(\mu,\kappa)$ density $\propto x^{-3/2}\exp\{-\kappa(x-\mu)^2/(2\mu^2x)\}$
+(\texttt{statmod::rinvgauss}, \texttt{bayesQR} convention). If $r_i=0$:
+$z_i\sim\mathrm{Gamma}(\tfrac12,\ \text{rate}=1/(4\tau(1-\tau)\sigma))$.
+Since $\mathbb E[1/z_i\mid\cdot]=1/(\tau(1-\tau)|r_i|)$, observations near the current trend get
+very large $\omega_i$; in practice floor $z_i$ at, say, $10^{-10}$.
+
+\paragraph{(c) Scale.} Powers of $\sigma$ in \eqref{eq:augpost}: $\sigma^{-n/2}$ (Gaussian
+normalizers), $\sigma^{-n}$ (exponential mixing), $\sigma^{-a_\sigma-1}$ (prior); the rest is
+$e^{-(\cdot)/\sigma}$:
+\begin{equation}
+    \sigma\mid\theta,\bz,\by\;\sim\;
+    \IG\!\left(\frac{3n}{2}+a_\sigma,\;
+    \sum_{i=1}^n\frac{(y_i-\theta_i-\psi_\tau z_i)^2}{2t_\tau^2 z_i}+\sum_{i=1}^n z_i+b_\sigma\right).
+    \label{eq:sigmaupdate}
+\end{equation}
+Replaces $\IG(n+a_\sigma,S_\rho+b_\sigma)$. It is Onizuka's update without the $n/2$ and
+$\tfrac12\theta^\top D^\top W^{-1}D\theta$ terms, because our $\ell_1$ prior is not $\sigma$-scaled.
+
+\paragraph{(d) Regularization.} Unchanged: $\lambda\mid\theta\sim\mathrm{Gamma}(a_0+m,\,b_0+\norm{D\theta}_1)$.
+
+\section{The $\theta$-step: proximal Langevin on $U$ as a single entity}\label{sec:prox}
+
+\subsection{Proximal map and Moreau envelope of $U$}
+
+For $\gamma>0$ the proximal map and Moreau envelope of $U$ are
+\begin{align}
+    \prox_{\gamma U}(x)&=\arg\min_{\theta\in\R^n}\Big\{U(\theta)+\tfrac1{2\gamma}\norm{\theta-x}_2^2\Big\},
+    \label{eq:proxdef}\\
+    U_\gamma(x)&=\min_{\theta\in\R^n}\Big\{U(\theta)+\tfrac1{2\gamma}\norm{\theta-x}_2^2\Big\}
+    =U\big(\prox_{\gamma U}(x)\big)+\tfrac1{2\gamma}\norm{\prox_{\gamma U}(x)-x}_2^2 .
+    \label{eq:moreau}
+\end{align}
+The minimizer in \eqref{eq:proxdef} exists and is unique because the objective is
+$(\mu+1/\gamma)$-strongly convex. Standard facts (Rockafellar--Wets; Bauschke--Combettes):
+\begin{enumerate}
+\item $U_\gamma$ is convex, finite everywhere, continuously differentiable, with
+\begin{equation}
+    \nabla U_\gamma(x)=\frac{x-\prox_{\gamma U}(x)}{\gamma},
+    \qquad \nabla U_\gamma\ \text{is }\gamma^{-1}\text{-Lipschitz}.
+    \label{eq:gradmoreau}
+\end{equation}
+\item $U_\gamma\le U$, $U_\gamma\uparrow U$ pointwise as $\gamma\downarrow0$, and
+$\arg\min U_\gamma=\arg\min U$ with the same minimum value.
+\item $\nabla U_\gamma(x)\in\partial U\big(\prox_{\gamma U}(x)\big)$: the envelope gradient at $x$ is a
+subgradient of $U$ at the proximal point (\emph{not} at $x$).
+\item $\pi_\gamma(\theta)\propto\exp\{-U_\gamma(\theta)\}$ is a proper density (here $U_\gamma$ grows
+quadratically because $U$ is strongly convex), it is $\gamma^{-1}$-log-smooth, and
+$\pi_\gamma\to\pi\propto e^{-U}$ in total variation as $\gamma\to0$. Durmus, Moulines and Pereyra
+(2018, Prop.~1) give the explicit TV bound in terms of $\gamma$ and the Lipschitz constant of the
+non-smooth part; no smoothing parameter $\varepsilon$ appears anywhere.
+\end{enumerate}
+So the \emph{exact} smooth approximation of $U$ is \eqref{eq:moreau}, and it is computable to
+machine precision as soon as $\prox_{\gamma U}$ is: one proximal evaluation gives both
+$U_\gamma(x)$ (plug the proximal point into \eqref{eq:moreau}) and $\nabla U_\gamma(x)$ (via
+\eqref{eq:gradmoreau}). This is the whole point of treating $U$ as one object: the Gaussian
+part is never differentiated separately, and no Lipschitz constant of $\Omega$ enters the
+step-size constraint (the envelope's Lipschitz constant is $1/\gamma$ regardless of how large
+$\max_i\omega_i$ is).
+
+\subsection{Unifying the two quadratic forms: $\prox_{\gamma U}$ is one weighted trend-filtering problem}
+
+The objective in \eqref{eq:proxdef} has two quadratic forms in $\theta$, both diagonal, so they
+merge into one by completing the square coordinate-wise:
+\begin{align*}
+    U(\theta)+\tfrac1{2\gamma}\norm{\theta-x}^2
+    &=\tfrac12\sum_i\omega_i(\theta_i-\tilde y_i)^2+\tfrac1{2\gamma}\sum_i(\theta_i-x_i)^2+\lambda\norm{D\theta}_1\\
+    &=\tfrac12\sum_i\Big(\omega_i+\tfrac1\gamma\Big)(\theta_i-c_i)^2+\lambda\norm{D\theta}_1+\text{const}(x,\tilde y),
+    \qquad c_i=\frac{\omega_i\tilde y_i+x_i/\gamma}{\omega_i+1/\gamma}.
+\end{align*}
+Multiplying through by $\gamma$ (which does not move the minimizer):
+\begin{equation}
+    \boxed{\;
+    \prox_{\gamma U}(x)=\arg\min_\theta\Big\{\tfrac12\sum_{i=1}^n \tilde w_i\,(c_i-\theta_i)^2+\gamma\lambda\norm{D\theta}_1\Big\},
+    \qquad
+    \tilde w_i=1+\gamma\omega_i,\quad
+    c_i=\frac{x_i+\gamma\omega_i\tilde y_i}{1+\gamma\omega_i}.\;}
+    \label{eq:proxtf}
+\end{equation}
+This is a \emph{weighted} $\ell_1$ trend-filtering problem: response $c$ (a convex combination
+of the current point $x$ and the shifted data $\tilde y$, coordinate-wise), observation weights
+$\tilde w$, penalty $\gamma\lambda$. \texttt{glmgen::trendfilter} minimizes exactly
+$\tfrac12\sum_i w_i(y_i-\beta_i)^2+\lambda\norm{D^{(k+1)}\beta}_1$ (weights multiply the squared
+residuals; verified in \texttt{tf\_admm.c}, whose $\beta$-update solves
+$(\diag(w)+\rho D^\top D)\beta=w\odot y+\rho D^\top(\cdot)$), so the call is
+\begin{verbatim}
+   omega   <- 1 / (t2 * sigma * z)                    # t2 = 2/(tau(1-tau))
+   ytilde  <- y - psi * z                             # psi = (1-2tau)/(tau(1-tau))
+   w_tilde <- 1 + gamma * omega
+   c       <- (x + gamma * omega * ytilde) / w_tilde
+   prox    <- glmgen::trendfilter(x = 1:n, y = c, weights = w_tilde,
+                                  k = k, lambda = gamma * lambda,
+                                  thinning = FALSE)$beta
+\end{verbatim}
+Sanity checks. (i) $\Omega\to0$ gives $\tilde w\equiv1$, $c=x$, and \eqref{eq:proxtf} is the
+manuscript's current $\prox_{\gamma g}(x)=\tf(x,\ \lambda\gamma)$: the new prox nests the old code
+path. (ii) $\lambda\to0$ gives $\theta_i=c_i$, the exact Gaussian conditional mean shrunk toward
+$x$, as it must. (iii) $\gamma\to\infty$ gives $\tilde w_i\propto\omega_i$, $c\to\tilde y$, i.e.\ the
+conditional MAP of $\theta\mid\bz$. Keep \texttt{thinning = FALSE}: thinning changes the design
+and would make the prox inexact. Because $\tilde w_i$ can span many orders of magnitude when
+some $z_i$ are tiny, raise the ADMM iteration cap in \texttt{trendfilter.control.list} and
+monitor the objective; the floor on $z_i$ from Section~3(b) bounds the conditioning.
+
+Given $p=\prox_{\gamma U}(x)$ from \eqref{eq:proxtf}, the Moreau envelope and its gradient are
+\begin{equation}
+    U_\gamma(x)=\tfrac12\sum_i\omega_i(p_i-\tilde y_i)^2+\lambda\norm{Dp}_1+\tfrac1{2\gamma}\norm{p-x}^2,
+    \qquad \nabla U_\gamma(x)=\frac{x-p}{\gamma}.
+    \label{eq:moreau_explicit}
+\end{equation}
+
+\subsection{The Langevin step}
+
+\paragraph{Unadjusted (MYULA-type, Durmus--Moulines--Pereyra 2018).}
+Euler--Maruyama on $\pi_\gamma$ with step $\delta$:
+\begin{equation}
+    \theta^{(t+1)}=\theta^{(t)}-\delta\,\nabla U_\gamma(\theta^{(t)})+\sqrt{2\delta}\,\xi
+    =\Big(1-\frac\delta\gamma\Big)\theta^{(t)}+\frac\delta\gamma\,\prox_{\gamma U}(\theta^{(t)})+\sqrt{2\delta}\,\xi,
+    \qquad \xi\sim N(0,I_n).
+    \label{eq:myula}
+\end{equation}
+Stability needs $\delta\le\gamma$ (this is $\delta<1/L$ with $L=1/\gamma$). Its invariant law is
+a biased approximation of $\pi_\gamma$, which is itself a $\gamma$-controlled approximation of
+$\pi$; both biases vanish as $\gamma,\delta\to0$ at the cost of slower mixing. One
+\tf\ call per iteration. This is the ``not exact'' option.
+
+\paragraph{Metropolis-adjusted (P-MALA, Pereyra 2016).}
+Use \eqref{eq:myula} as the proposal $q(\theta^\star\mid\theta)=N\big(m(\theta),\,2\delta I\big)$ with
+$m(\theta)=(1-\delta/\gamma)\theta+(\delta/\gamma)\prox_{\gamma U}(\theta)$, and accept with
+\begin{equation}
+    \log\alpha=-U(\theta^\star)+U(\theta^{(t)})
+    -\frac{\norm{\theta^{(t)}-m(\theta^\star)}^2-\norm{\theta^\star-m(\theta^{(t)})}^2}{4\delta},
+    \label{eq:mh}
+\end{equation}
+where $U$ is the exact \eqref{eq:U} (no envelope in the ratio). The reverse mean $m(\theta^\star)$
+needs $\prox_{\gamma U}(\theta^\star)$: two \tf\ calls per iteration, as in the current
+implementation. The chain then targets $\pi\propto e^{-U}$ exactly, and the Moreau envelope is
+purely a proposal device. Pereyra's original P-MALA is the special case $\delta=\gamma$:
+\begin{equation}
+    \theta^\star=\prox_{\gamma U}(\theta^{(t)})+\sqrt{2\gamma}\,\xi,\qquad
+    q(\theta^\star\mid\theta^{(t)})=N\big(\prox_{\gamma U}(\theta^{(t)}),\,2\gamma I\big),
+    \label{eq:pmala}
+\end{equation}
+i.e.\ the proposal is centred at the (shrunk) conditional MAP. In the manuscript's variables
+this is the existing proposal with $\nabla\tilde f\equiv0$ and $g\leftarrow U$: the drift is
+absorbed entirely into the prox.
+
+\begin{remark}[What is gained relative to splitting $f$ and $g$]
+If one kept the Gaussian part as an explicit gradient and applied the prox only to
+$\lambda\norm{D\cdot}_1$, the stability condition would be $\delta\lesssim1/\max_i\omega_i$, and
+$\max_i\omega_i=(t_\tau^2\sigma\min_iz_i)^{-1}$ explodes whenever one residual is small,
+which for a quantile fit is the normal state of affairs. Treating $U$ as one entity replaces
+that with $\delta\le\gamma$, where $\gamma$ is a free tuning parameter: the prox handles the stiff
+coordinates implicitly (they are pinned to $c_i\approx\tilde y_i$ by the large $\tilde w_i$).
+The cost is that $\tilde w$ and $c$ change every Gibbs iteration, so \tf\ cannot reuse anything
+across iterations; it does not do so today either, so nothing is lost.
+\end{remark}
+
+\begin{remark}[Tuning]
+Only $\gamma$ (and $\delta\le\gamma$) remain. With $\delta=\gamma$, target an acceptance rate in
+the 0.5--0.6 range typical of MALA-type kernels; adapt $\gamma$ during burn-in as now. Because
+$\pi(\theta\mid\bz)$ changes with $\bz$ every sweep, the relevant scale for $\gamma$ is the
+conditional one, roughly $\gamma\sim c\,/\,\mathrm{median}_i\,\omega_i$ for a constant $c$ found by
+adaptation, rather than a fixed number.
+\end{remark}
+
+\section{Algorithm (individual quantile)}
+
+\begin{algorithm}[h!]
+\caption{Gibbs sampler with mixture likelihood and single proximal step (P-MALA, $\delta=\gamma$)}
+\begin{algorithmic}[1]
+\Require $\by$, $\tau$, order $k$, $(a_0,b_0,a_\sigma,b_\sigma)$, $\gamma$, $T_{\mathrm{gibbs}}$; constants $\psi_\tau,t^2_\tau$ from \eqref{eq:constants}
+\State Initialize $\theta,\lambda,\sigma$; draw $z_i$ from \eqref{eq:zupdate}, $i=1,\dots,n$
+\For{$t=1,\dots,T_{\mathrm{gibbs}}$}
+  \State $\tilde y\leftarrow \by-\psi_\tau\bz$;\quad $\omega\leftarrow 1/(t^2_\tau\sigma\bz)$;\quad $\tilde w\leftarrow1+\gamma\omega$
+  \State $p\leftarrow\tf\big(y=(\theta+\gamma\omega\odot\tilde y)/\tilde w,\ \text{weights}=\tilde w,\ \lambda=\gamma\lambda\big)$ \Comment{$=\prox_{\gamma U}(\theta)$}
+  \State $\theta^\star\leftarrow p+\sqrt{2\gamma}\,\xi$, $\xi\sim N(0,I_n)$
+  \State $p^\star\leftarrow\tf\big(y=(\theta^\star+\gamma\omega\odot\tilde y)/\tilde w,\ \text{weights}=\tilde w,\ \lambda=\gamma\lambda\big)$ \Comment{$=\prox_{\gamma U}(\theta^\star)$}
+  \State $\log\alpha\leftarrow -U(\theta^\star)+U(\theta)-\big(\norm{\theta-p^\star}^2-\norm{\theta^\star-p}^2\big)/(4\gamma)$ with $U$ from \eqref{eq:U}
+  \State With prob.\ $\min(1,e^{\log\alpha})$ set $\theta\leftarrow\theta^\star$
+  \State $1/z_i\sim\InvGauss\big(1/(\tau(1-\tau)|y_i-\theta_i|),\ 1/(2\tau(1-\tau)\sigma)\big)$, $i=1,\dots,n$; floor $z_i$
+  \State $\lambda\sim\mathrm{Gamma}\big(a_0+m,\ b_0+\norm{D\theta}_1\big)$
+  \State $\sigma\sim\IG\Big(\tfrac{3n}2+a_\sigma,\ \sum_i\frac{(y_i-\theta_i-\psi_\tau z_i)^2}{2t^2_\tau z_i}+\sum_iz_i+b_\sigma\Big)$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+\noindent For the unadjusted variant delete lines 6--8 and set $\theta\leftarrow(1-\delta/\gamma)\theta+(\delta/\gamma)p+\sqrt{2\delta}\,\xi$ after line 4.
+
+\section{What to expect}
+
+\begin{itemize}
+\item \textbf{Gained.} No $\varepsilon$ and no smoothed/exact mismatch; the proposal is centred
+at the exact conditional MAP; the step-size constraint no longer depends on the data through
+$\max_i\omega_i$; one existing solver (\tf) does all the work through its weights argument; same
+$(\theta,\lambda,\sigma)$-posterior, so all simulation code and metrics carry over. Per-iteration
+cost: two \tf\ calls (as now) plus $n$ inverse-Gaussian draws.
+\item \textbf{Risk.} The slow direction of $z$-augmented ALD samplers is the $\theta$--$\bz$ coupling,
+worst at extreme $\tau$ ($\tau=0.99$: $\psi_\tau\approx-99$, $t_\tau^2\approx202$). Onizuka's Gibbs
+sampler is the existence proof that it mixes poorly at $\tau\in\{0.05,0.95\}$. The current
+sampler works on the $\bz$-marginal and does not pay that price; it pays the constant-gradient
+price instead. Which dominates is empirical and likely $\tau$-dependent.
+\item \textbf{Test.} PC and VS signals, $n=400$, $\tau\in\{0.5,0.9,0.99\}$, current sampler vs.\ this
+one at matched wall-clock; ESS/sec of $\theta$ (min and median over $i$), acceptance rate, RMSE.
+If it does not win at $\tau=0.5$, where it should be at its best, stop.
+\item \textbf{Joint case later.} The box returns as an indicator inside $U$; \tf\ cannot take it,
+so the prox goes back to the manuscript's ADMM with the diagonal term $\Omega$ added to the
+$\theta$-update matrix (equivalently, run the manuscript's ADMM on the unified weighted problem
+\eqref{eq:proxtf} plus the clip step). Everything else in this note is unchanged.
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,20 @@
+Munich data: 2035 rents at 134 distinct floor sizes
+
+Onizuka MCMC-HS, tau = 0.1 ...
+  done in 4.78 min
+Onizuka MCMC-HS, tau = 0.3 ...
+  done in 4.49 min
+Onizuka MCMC-HS, tau = 0.5 ...
+  done in 4.71 min
+Onizuka MCMC-HS, tau = 0.7 ...
+  done in 4.6 min
+Onizuka MCMC-HS, tau = 0.9 ...
+  done in 4.43 min
+
+=== FINAL RESULTS (one chain per quantile) ===
+  tau frac_below
+1 0.1  0.0982801
+2 0.3  0.2992629
+3 0.5  0.5012285
+4 0.7  0.7027027
+5 0.9  0.9027027

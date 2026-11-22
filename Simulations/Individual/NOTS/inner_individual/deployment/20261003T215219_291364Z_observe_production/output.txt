@@ -1,0 +1,42 @@
+2026-10-03T21:52:20+00:00
+QUEUE_COUNTS
+    814 PENDING
+    400 RUNNING
+ACCOUNTING_COUNTS
+   1788 COMPLETED
+      1 PENDING
+    398 RUNNING
+PROCESS_JOB
+                   JOBID        STATE         TIME                    NODELIST(REASON)
+                 1786241      PENDING         0:00                        (Dependency)
+SUCCESS_COUNT=1788
+FAILURE_COUNT=0
+MONITOR
+  "utc": "20261003T215158_405646Z",
+  "counts": {
+    "complete": 1783,
+    "locked_check_scheduler": 398,
+    "not_started": 819
+  },
+  "jobs": [
+    "1786240",
+    "1786241"
+  ],
+  "note": "SUCCESS records completion, not MCMC convergence. Locks require scheduler inspection.",
+  "squeue_exit_status": 0,
+  "sacct_exit_status": 0
+}
+Saved observations: /home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z/metadata/monitor/20261003T215158_405646Z
+
+SAMPLE_FIT_LOG
+it 14000 | acc 0.489 | delta 9.89e-02 | lambda  1093.85 | sigma 0.0335 | 68s
+it 14500 | acc 0.489 | delta 9.96e-02 | lambda  1007.86 | sigma 0.0317 | 70s
+it 15000 | acc 0.489 | delta 9.99e-02 | lambda  1109.87 | sigma 0.0331 | 73s
+WORKER_SUCCESS 1 2026-10-03T21:43:45Z 
+NONEMPTY_STDERR_COUNT=0
+HOME_QUOTA
+Disk quotas for user fb31 (uid 71711): 
+     Filesystem   space   quota   limit   grace   files   quota   limit   grace
+nfs1:/export/nots/home
+                  4693M  10240M  10240M            109k       0       0        
+data191.nots.rice.edu:/rhf/allocations/ea14

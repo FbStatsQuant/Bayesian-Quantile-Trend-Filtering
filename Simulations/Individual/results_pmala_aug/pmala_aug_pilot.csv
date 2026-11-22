@@ -1,0 +1,2 @@
+"baseline","noise","tau","n","seed","metric","kappa","prior_scale","a0","b0","theta_init","warm_sweeps","admm_iter","mh_correct","adapt_delta","mse","mad","mciw","coverage","acc_post","delta_final","lambda_mean","sigma_mean","seconds"
+"VS","Normal",0.5,1000,100,"curv",3,"none",1,0.001,"y",200,150,TRUE,TRUE,0.0068518592461069,0.0600967136607112,0.23523722750815,0.895,0.547333333333333,0.0503396879984242,509.921655698162,0.135511030153651,135.809999999998

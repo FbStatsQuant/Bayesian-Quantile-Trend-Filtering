@@ -1,0 +1,141 @@
+% !TeX root = ../main.tex
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{Data Model and Likelihood}
+\label{subsec:model}
+
+Let $\by = (y_1, \ldots, y_n)^\top \in \R^n$ denote an observed time series. We model the data as
+\begin{equation}
+    y_i = \theta_i + \varepsilon_i, \quad i = 1, \ldots, n,
+    \label{eq:datamodel}
+\end{equation}
+where $\theta = (\theta_1, \ldots, \theta_n)^\top$ is an unknown trend and the errors $\varepsilon_i$ are independent. For a quantile level $\tau \in (0,1)$ we use the asymmetric Laplace distribution (ALD) with location zero, scale $\sigma > 0$ and skewness $\tau$ as a working likelihood,
+\begin{equation}
+    f(u \mid \tau, \sigma) = \frac{\tau(1-\tau)}{\sigma}
+    \exp\!\left\{-\frac{\rho_\tau(u)}{\sigma}\right\},
+    \label{eq:ald}
+\end{equation}
+where $\rho_\tau(u) = u(\tau - \mathbbm{1}(u < 0))$ is the check function of \citet{koenker1978regression}. The $\tau$-quantile of \eqref{eq:ald} is zero, so $\theta_i$ is the conditional $\tau$-quantile of $y_i$, and maximizing the likelihood in $\theta$ is equivalent to minimizing the check loss $\sum_{i=1}^n \rho_\tau(y_i-\theta_i)$. The scale $\sigma$ is treated as unknown and inferred with the trend.
+
+\paragraph{Normal--exponential representation.} The ALD admits the mixture representation of \citet{kozumi2011gibbs},
+\begin{equation}
+    \varepsilon_i = \psi_\tau z_i + \omega_\tau \sqrt{\sigma z_i}\, u_i, \qquad z_i \sim \mathrm{Exp}(\sigma), \qquad u_i \sim \mathcal{N}(0,1),
+    \label{eq:ald_mixture}
+\end{equation}
+where $\mathrm{Exp}(\sigma)$ denotes the exponential distribution with mean $\sigma$, $z_i$ and $u_i$ are independent, and $\psi_\tau = (1-2\tau)/\{\tau(1-\tau)\}$, $\omega_\tau^2 = 2/\{\tau(1-\tau)\}$. Integrating out the latent variable $z_i$ returns \eqref{eq:ald} exactly, so the representation changes the sampler, not the model. Conditionally on $z = (z_1,\ldots,z_n)^\top$ the likelihood is Gaussian in $\theta$ with weights and pseudo-responses
+\begin{equation}
+    w_i = \frac{1}{\omega_\tau^2\, \sigma z_i}, \qquad r_i = y_i - \psi_\tau z_i, \qquad i = 1,\ldots,n,
+    \label{eq:weights}
+\end{equation}
+and this is what allows the trend update below to treat the full conditional posterior of $\theta$ as a single optimization problem.
+
+\subsection{Posterior Sampler for a Single Quantile Level}
+\label{subsec:individual}
+
+\paragraph{Prior specification.} Let $D = D^{(k+1)} \in \R^{m \times n}$ be the discrete difference operator of order $k+1$, with $m = n - k - 1$ rows. We place independent Laplace distributions with common rate $\lambda$ on the $m$ differences $(D\theta)_j$,
+\begin{equation}
+    p(\theta \mid \lambda) \propto \lambda^{m} \exp\!\left\{-\lambda \norm{D\theta}_1\right\},
+    \label{eq:prior_theta}
+\end{equation}
+which is flat on the $(k+1)$-dimensional null space of $D$ (polynomials of degree at most $k$), a component identified by the likelihood. The $\ell_1$ penalty retains the local adaptivity of trend filtering \citep{tibshirani2014adaptive}, and the single global rate $\lambda$ controls the overall amount of smoothing. The hyperparameters receive conjugate priors,
+\begin{equation}
+    \lambda \sim \mathrm{Gamma}(a_0, b_0), \qquad \sigma \sim \mathrm{IG}(a_\sigma, b_\sigma),
+    \label{eq:hyperpriors}
+\end{equation}
+with shape and rate parameterizations.
+
+\paragraph{Connection to quantile trend filtering.} Integrating out $z$, the conditional posterior of $\theta$ at fixed $(\lambda, \sigma)$ is proportional to $\exp\{-\sigma^{-1}\sum_i \rho_\tau(y_i-\theta_i) - \lambda\norm{D\theta}_1\}$, and its mode is
+\begin{equation}
+    \hat{\theta}(\lambda, \sigma) \in \arg\min_{\theta \in \R^n} \left\{ \sum_{i=1}^n \rho_\tau(y_i-\theta_i) + \lambda\sigma \norm{D\theta}_1 \right\}.
+    \label{eq:map_qtf}
+\end{equation}
+This is the quantile trend filtering problem of \citet{brantley2020baseline}, which they solve by ADMM, with penalty $\lambda\sigma$; the product $\lambda\sigma$ is therefore the effective penalty on the check-loss scale. The equivalence concerns the conditional mode at fixed hyperparameters. The sampler instead infers $\lambda$ and $\sigma$ jointly with $\theta$, and reports posterior means and pointwise intervals, which need not coincide with any single optimizer.
+
+\paragraph{Default difference order and hyperparameters.} Following \citet{brantley2020baseline}, we use $k = 2$ throughout, so the fitted trends are piecewise quadratic. The default hyperparameters are $a_0 = 1$, $b_0 = 10^{-3}$, $a_\sigma = b_\sigma = 0.1$. These values are fixed before any data are seen and are used for every signal, noise distribution and quantile level reported in Section~\ref{sec:simulations}; no hyperparameter is selected by an external criterion, cross-validation or a search over a grid of $\lambda$ values. The small rate $b_0$ keeps the prior on $\lambda$ weak over the range of penalties relevant to trend filtering, and the inverse-Gamma prior on $\sigma$ is proper but carries negligible weight against the $n$ observations; Appendix~\ref{app:pmala:changes} gives the reasons for these choices. For series that combine a smooth baseline with transient bursts, the prior on $\lambda$ is replaced by the stronger prior \eqref{eq:air_prior} of Section~\ref{subsec:air_fitting}, with the sampler unchanged.
+
+\paragraph{Augmented posterior.} Combining \eqref{eq:ald_mixture}--\eqref{eq:hyperpriors}, the joint posterior of $(\theta, z, \lambda, \sigma)$ is
+\begin{equation}
+\begin{aligned}
+    p(\theta, z, \lambda, \sigma \mid \by) \propto{} & \prod_{i=1}^n (\sigma z_i)^{-1/2} \exp\!\left\{-\frac{(y_i-\theta_i-\psi_\tau z_i)^2}{2\omega_\tau^2 \sigma z_i}\right\} \sigma^{-1} e^{-z_i/\sigma} \\
+    & \times \lambda^{a_0 + m - 1} \exp\!\left\{-\lambda\left(b_0 + \norm{D\theta}_1\right)\right\} \sigma^{-a_\sigma - 1} e^{-b_\sigma/\sigma}.
+\end{aligned}
+    \label{eq:posterior}
+\end{equation}
+Its marginal in $(\theta, \lambda, \sigma)$ is the posterior under the ALD likelihood \eqref{eq:ald}.
+
+\paragraph{Gibbs sampler.} We sample \eqref{eq:posterior} by a four-block Gibbs sampler, which we call Bayesian-PMALA. Three blocks are conjugate and one, the trend, is a proximal Metropolis-adjusted Langevin (P-MALA) move:
+\begin{enumerate}
+    \item $\theta \mid z, \lambda, \sigma, \by$ by one P-MALA step, described below.
+    \item $z_i \mid \theta, \sigma, \by$, independently for $i = 1, \ldots, n$, from a generalized inverse Gaussian distribution; equivalently,
+    \begin{equation}
+        z_i^{-1} \mid \theta, \sigma, \by \sim \mathrm{InvGauss}\!\left(\frac{1}{\tau(1-\tau)\,|y_i - \theta_i|},\ \frac{1}{2\tau(1-\tau)\,\sigma}\right),
+        \label{eq:zupdate}
+    \end{equation}
+    where $\mathrm{InvGauss}(\mu, \nu)$ denotes the inverse Gaussian distribution with mean $\mu$ and shape $\nu$.
+    \item $\lambda \mid \theta, \by$ from its Gamma conditional,
+    \begin{equation}
+        \lambda \mid \theta, \by \sim \mathrm{Gamma}\!\left(a_0 + m,\ b_0 + \norm{D\theta}_1\right),
+        \label{eq:lambdaupdate}
+    \end{equation}
+    followed by an interweaving redraw that moves $\lambda$ and $\theta$ jointly while holding the standardized differences $\lambda D\theta$ fixed (Appendix~\ref{app:pmala:asis}).
+    \item $\sigma \mid \theta, z, \by$ from its inverse-Gamma conditional,
+    \begin{equation}
+        \sigma \mid \theta, z, \by \sim \mathrm{IG}\!\left(a_\sigma + \tfrac{3n}{2},\ b_\sigma + \sum_{i=1}^n \left\{ z_i + \frac{(y_i - \theta_i - \psi_\tau z_i)^2}{2\omega_\tau^2 z_i}\right\}\right).
+        \label{eq:sigmaupdate}
+    \end{equation}
+\end{enumerate}
+The derivations are given in Appendix~\ref{app:pmala:conditionals}. Each block leaves \eqref{eq:posterior} invariant, so the sweep does as well. Algorithm~\ref{alg:pmala} states one run of the sampler; the posterior mean of $\theta$ over the retained sweeps is the point estimate, and the $2.5\%$ and $97.5\%$ quantiles of the retained draws give pointwise $95\%$ intervals.
+
+\paragraph{Sampling the trend by P-MALA.} Given $(z, \lambda, \sigma)$, the conditional density of $\theta$ is proportional to $\exp\{-U(\theta)\}$ with
+\begin{equation}
+    U(\theta) = \frac{1}{2}\sum_{i=1}^n w_i (\theta_i - r_i)^2 + \lambda \norm{D\theta}_1,
+    \label{eq:Utheta}
+\end{equation}
+a convex but non-differentiable function built from \eqref{eq:weights}. The P-MALA algorithm of \citet{pereyra2016proximal} handles such targets by running a Langevin proposal on the Moreau--Yosida envelope of the whole negative log-density, rather than on a smoothed version of one part of it. For a symmetric positive definite matrix $M$ and $\gamma > 0$, define the proximal map of $U$ in the $M$-norm,
+\begin{equation}
+    T(x) = \arg\min_{\theta \in \R^n} \left\{ U(\theta) + \frac{1}{2\gamma}\norm{\theta - x}_M^2 \right\}, \qquad \norm{v}_M^2 = v^\top M v .
+    \label{eq:prox}
+\end{equation}
+The envelope $U^\gamma(x) = U(T(x)) + \norm{T(x)-x}_M^2/(2\gamma)$ is continuously differentiable with $M^{-1}\nabla U^\gamma(x) = \{x - T(x)\}/\gamma$, and it approaches $U$ as $\gamma \to 0$. An Euler step of size $\delta$ for the Langevin diffusion preconditioned by $M^{-1}$, taken on $U^\gamma$ with $\gamma = \delta/2$, gives the Gaussian proposal
+\begin{equation}
+    \theta^\star = T(\theta) + \sqrt{\delta}\, L^{-\top} \xi, \qquad \xi \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_n), \qquad M = L L^\top,
+    \label{eq:pmala_proposal}
+\end{equation}
+that is, $\theta^\star \sim \mathcal{N}(T(\theta), \delta M^{-1})$. The proposal is accepted with probability $\min(1,\alpha)$, where
+\begin{equation}
+    \log \alpha = U(\theta) - U(\theta^\star) + \frac{1}{2\delta}\left\{ \norm{\theta^\star - T(\theta)}_M^2 - \norm{\theta - T(\theta^\star)}_M^2 \right\}.
+    \label{eq:pmala_accept}
+\end{equation}
+Three features make this update exact for the stated posterior. First, $U$ in \eqref{eq:pmala_accept} is the exact conditional \eqref{eq:Utheta}; no part of the check loss is smoothed. Second, the noise is added after the proximal map, so the proposal density is an explicit Gaussian and the Metropolis--Hastings ratio is available in closed form. Third, $T$ enters only as a deterministic map of its input; an approximate evaluation of \eqref{eq:prox} changes the efficiency of the proposal, not the invariance of the kernel.
+
+The choice $M = \mathbf{I}_n$ recovers the P-MALA of \citet{pereyra2016proximal}. We use the curvature-matched metric
+\begin{equation}
+    M = W + \kappa\, \frac{\lambda^2}{2}\, D^\top D, \qquad W = \mathrm{diag}(w_1, \ldots, w_n), \qquad \kappa = 3,
+    \label{eq:metric}
+\end{equation}
+which combines the Gaussian precision $W$ of the augmented likelihood with a difference-precision term on the scale of the Laplace prior, so that the proposal covariance $\delta M^{-1}$ reflects both sources of curvature in \eqref{eq:Utheta}: directions that change $D\theta$ are proposed on the scale $1/\lambda$ of the prior differences, and the remaining directions on the scale of the data. $M$ depends on the current $(z, \lambda, \sigma)$ but not on $\theta$, so the move is a valid Metropolis--Hastings kernel for $\theta \mid z, \lambda, \sigma, \by$. Because $W$ is diagonal and $D^\top D$ is banded, \eqref{eq:prox} is a weighted trend filtering problem with a banded quadratic term, which we solve by ADMM with one banded factorization shared by the forward map $T(\theta)$ and the reverse map $T(\theta^\star)$; the same factorization supplies $L$. For a fixed number of ADMM iterations the work per sweep therefore grows linearly with $n$. The step size $\delta$ is adapted toward an acceptance rate of $0.5$. The solver, the initialization, the adaptation and the numerical safeguards are given in Appendix~\ref{app:pmala}.
+
+\begin{algorithm}[h!]
+\caption{Bayesian-PMALA for a single quantile level $\tau$}
+\label{alg:pmala}
+\begin{algorithmic}[1]
+\Require Data $\by$, level $\tau$, order $k$, hyperparameters $a_0, b_0, a_\sigma, b_\sigma$, metric scale $\kappa$, sweeps $T_{\mathrm{gibbs}}$, burn-in $T_{\mathrm{burn}}$.
+\State Initialize $\theta^{(0)} = \by$ and $(z^{(0)}, \lambda^{(0)}, \sigma^{(0)}, \delta^{(0)})$ \Comment{Appendix~\ref{app:pmala:init}}
+\For{$t = 1, \ldots, T_{\mathrm{gibbs}}$}
+    \State Form $w_i, r_i$ from \eqref{eq:weights} and $M = W + \kappa\lambda^2 D^\top D/2$; set $\gamma = \delta/2$
+    \State Compute $T(\theta)$ by ADMM; draw $\theta^\star = T(\theta) + \sqrt{\delta}\,L^{-\top}\xi$; compute $T(\theta^\star)$
+    \State Accept $\theta^\star$ with probability $\min(1,\alpha)$, $\alpha$ from \eqref{eq:pmala_accept}
+    \State Draw $z_i$ from \eqref{eq:zupdate}, $i = 1, \ldots, n$
+    \State Draw $\lambda$ from \eqref{eq:lambdaupdate}; redraw $(\lambda, \theta)$ by the interweaving step
+    \State Draw $\sigma$ from \eqref{eq:sigmaupdate}
+    \State Update $\log\delta$ by a Robbins--Monro step toward acceptance $0.5$
+\EndFor
+\State \Return draws $\{\theta^{(t)}, \lambda^{(t)}, \sigma^{(t)}\}_{t > T_{\mathrm{burn}}}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Joint Quantile Sampler}
+\label{subsec:joint}
+
+% Content removed on 2026-09-26; this subsection will be rewritten for Bayesian-PMALA (Section~\ref{subsec:individual}).

@@ -1,0 +1,218 @@
+% !TeX root = ../main.tex
+\section{Computational Details of Bayesian-PMALA}
+\label{app:pmala}
+
+This appendix gives the derivations of the full conditional distributions of Section~\ref{subsec:individual}, the algorithms that solve the two proximal problems, the unconstrained map \eqref{eq:prox} of the individual sampler and the box-constrained map \eqref{eq:joint_prox} of the joint sampler, the interweaving step for $\lambda$ and its constrained version, the initialization, warm-up and step-size adaptation, and the numerical safeguards, followed by the reason each component was needed and the checks of the implementation.
+
+\subsection{Full conditional distributions}
+\label{app:pmala:conditionals}
+
+Write $e_i = y_i - \theta_i$. The terms of \eqref{eq:posterior} that involve $\theta$ are $\sum_i (e_i - \psi_\tau z_i)^2/(2\omega_\tau^2\sigma z_i) + \lambda\norm{D\theta}_1$, which equals $U(\theta)$ in \eqref{eq:Utheta} up to a constant, with $w_i$ and $r_i$ as in \eqref{eq:weights}.
+
+For $z_i$, expanding the square gives $(e_i - \psi_\tau z_i)^2/(2\omega_\tau^2\sigma z_i) = e_i^2/(2\omega_\tau^2\sigma z_i) - \psi_\tau e_i/(\omega_\tau^2\sigma) + \psi_\tau^2 z_i/(2\omega_\tau^2\sigma)$, and the middle term does not depend on $z_i$. Hence
+\[
+p(z_i \mid \theta, \sigma, \by) \propto z_i^{-1/2} \exp\!\left\{-\frac{1}{2}\left(\frac{\chi_i}{z_i} + \tilde\psi\, z_i\right)\right\},
+\]
+with $\chi_i = e_i^2/(\omega_\tau^2 \sigma)$ and $\tilde\psi = \sigma^{-1}(\psi_\tau^2/\omega_\tau^2 + 2) = 1/\{2\tau(1-\tau)\sigma\}$. This is a generalized inverse Gaussian distribution $\mathrm{GIG}(1/2, \chi_i, \tilde\psi)$. Its reciprocal is inverse Gaussian with mean $(\tilde\psi/\chi_i)^{1/2} = 1/\{\tau(1-\tau)|e_i|\}$ and shape $\tilde\psi$, which is \eqref{eq:zupdate}.
+
+The terms involving $\lambda$ are $\lambda^{a_0+m-1}\exp\{-\lambda(b_0 + \norm{D\theta}_1)\}$, giving \eqref{eq:lambdaupdate}. The terms involving $\sigma$ are $\sigma^{-n/2}$ from the Gaussian factors, $\sigma^{-n}$ from the exponential densities of $z$, and the inverse-Gamma prior; collecting the exponents gives the inverse-Gamma distribution \eqref{eq:sigmaupdate} with shape $a_\sigma + 3n/2$ and rate $b_\sigma + \sum_i\{z_i + (e_i - \psi_\tau z_i)^2/(2\omega_\tau^2 z_i)\}$. The blocks are updated in the order $\theta$, $z$, $\lambda$, $\sigma$, each conditional on the most recent values of the others. In the joint sampler the same derivations apply level by level: the order indicator in \eqref{eq:joint_target} is a function of $\Theta$ alone and is constant in $(z_j, \lambda_j, \sigma_j)$.
+
+\subsection{The proximal map of the individual sampler}
+\label{app:pmala:admm}
+
+Write the metric \eqref{eq:metric} as $M = \mathrm{diag}(d) + cD^\top D$, with $d = w$ and $c = \min(\kappa\lambda^2/2, 10^8)$, the cap being safeguard (ii) of Appendix~\ref{app:pmala:safeguards}. With $v = D\theta$, problem \eqref{eq:prox} becomes
+\[
+\min_{\theta, v}\left\{\frac12\sum_{i=1}^n w_i(\theta_i - r_i)^2 + \lambda\norm{v}_1 + \frac{1}{2\gamma}\norm{\theta - x}_M^2\right\} \quad \text{subject to } v = D\theta .
+\]
+We apply scaled ADMM with penalty parameter $\varrho > 0$ and scaled dual variable $\nu \in \R^m$. Starting from $v^0 = Dx$ and $\nu^0 = 0$, iteration $t$ is
+\begin{align*}
+\theta^{t+1} &= A^{-1}\left\{ W r + \gamma^{-1} M x + \varrho D^\top (v^t - \nu^t) \right\}, \qquad A = W + \gamma^{-1} M + \varrho D^\top D, \\
+v^{t+1} &= \mathcal{S}_{\lambda/\varrho}\!\left(D\theta^{t+1} + \nu^t\right), \\
+\nu^{t+1} &= \nu^t + D\theta^{t+1} - v^{t+1},
+\end{align*}
+where $\mathcal{S}_c(a) = \mathrm{sign}(a)\max(|a| - c, 0)$ acts elementwise and $r = (r_1,\ldots,r_n)^\top$. We use $\varrho = 0.1\,(\bar w + c)/\gamma$ with $\bar w = n^{-1}\sum_i w_i$, about one tenth of the curvature that the metric term contributes, and return $\theta^{150}$: the budget is fixed at $150$ iterations with no data-dependent stopping rule. An early exit on the relative primal and dual residuals is available and also depends only on the iterates, but it is switched off, because it saved no time at this budget (Appendix~\ref{app:pmala:changes}).
+
+The $\theta$-update is computed for the increment $\theta - x$ rather than for $\theta$. Subtracting $Ax$ from both sides of the linear system gives
+\[
+A(\theta^{t+1} - x) = W(r - x) + \varrho D^\top\left(v^t - \nu^t - Dx\right),
+\]
+which has the same solution. Its right-hand side is of the order of the move $T(x) - x$, which vanishes with $\gamma$, whereas the right-hand side $Wr + Mx/\gamma + \varrho D^\top(v - \nu)$ of the original system grows like $1/\gamma$. In floating point the rounding error of the original solve is proportional to $\norm{x}$ and does not decrease with $\gamma$, and it enters the acceptance ratio \eqref{eq:pmala_accept} divided by $\delta$. For long series with a large dynamic range, as in Section~\ref{sec:app:spod}, that error stopped the chains once the adaptation had reduced $\delta$; the increment form removes it. The simulations of Section~\ref{sec:simulations} were run before this change; rerunning replications $1$--$10$ of every configuration with the increment form reproduces them, with no configuration differing significantly (all paired $|t| < 2$, geometric mean of the MSE ratios $1.01$). The application of Section~\ref{sec:app:spod} uses the increment form throughout.
+
+The matrices $A$ and $M$ are symmetric positive definite and banded with half-bandwidth $k+1$ for every $n$, and they are factorized separately. Within one P-MALA move $A$ does not depend on the input $x$, so it is factorized once by a banded Cholesky decomposition, and the factor is shared by the forward map $T(\theta)$ and the reverse map $T(\theta^\star)$; if the factorization fails because of rounding, the ridge retry of safeguard (iii) is applied. The metric is factorized once per move as $M = LL^\top$, and $L$ gives the noise $L^{-\top}\xi$ in \eqref{eq:pmala_proposal}. The two norms in \eqref{eq:pmala_accept} need no factor; they are evaluated directly as $\norm{v}_M^2 = \sum_i d_i v_i^2 + c\norm{Dv}_2^2$. Each factorization costs $O(n(k+1)^2)$ operations, and each ADMM iteration costs one pair of banded triangular solves and one application each of $D$ and $D^\top$, that is $O(n(k+1))$ operations. For the fixed budget the cost of a sweep is therefore linear in $n$.
+
+The Metropolis--Hastings correction requires only that $T$ be a deterministic function of its input, given $(z, \lambda, \sigma, \delta)$. The proposal density is then exactly $\mathcal{N}(\theta^\star; T(\theta), \delta M^{-1})$, and the kernel leaves the conditional invariant whether or not $T(x)$ is the exact minimizer of \eqref{eq:prox}. The cold start from $(Dx, 0)$ and the fixed iteration rule guarantee this, and the forward and reverse maps are computed by the same rule. A solver warm-started from the previous sweep's solution would make $T$ depend on the history of the chain, the reverse density would no longer be the one evaluated in \eqref{eq:pmala_accept}, and the correction would be invalid. In our runs the acceptance rate at a given $\delta$ did not change when the iteration budget was increased, so the budget does not limit the step size.
+
+\subsection{The proximal map of the joint sampler}
+\label{app:pmala:boxsolver}
+
+Fix a level and suppress its index. The box $B = [\ell, u]$ of \eqref{eq:joint_box} has components that may be infinite (at $j = 1$ and $j = J$), and $\ell_i = u_i$ is allowed where two neighbouring curves touch. The constrained map \eqref{eq:joint_prox},
+\[
+T_B(x) = \arg\min_{\theta \in B}\left\{U(\theta) + \frac{1}{2\gamma}\norm{\theta - x}_M^2\right\},
+\]
+is the proximal map of $U + \iota_B$ in the $M$-norm, where $\iota_B$ is zero on $B$ and $+\infty$ outside it. Coordinates with $\ell_i = u_i$ are fixed. The smooth part of the objective has Hessian $Q = W + M/\gamma = \mathrm{diag}(w + d/\gamma) + (c/\gamma)D^\top D$, so on the remaining coordinates the problem is strongly convex with modulus at least
+\[
+q_{\min} = \min_{i:\,\ell_i < u_i}\left(w_i + d_i/\gamma\right),
+\]
+and $T_B(x)$ is unique. We write $\widehat T_B$ for the map actually computed, which is the map used as $T_j$ in \eqref{eq:joint_proposal}--\eqref{eq:joint_accept}; as in the individual case, only its determinism matters for the correction.
+
+\paragraph{Why the box is not split by ADMM.} The natural extension of Appendix~\ref{app:pmala:admm} adds a second splitting $b = \theta$ carrying $\iota_B$, with per-coordinate penalty $\zeta_i = w_i + d_i/\gamma$, a projection onto $B$ for the $b$-update and a scaled dual variable for the box. Under the curvature metric $c/\gamma$ is large (between $6\times10^4$ and $4\times10^9$ on the $72$ realistic problems described at the end of this subsection), and whenever a bound is active the dual ascent of the box multiplier converges very slowly. On those problems, with the $150$-iteration budget, the largest coordinate error relative to the exact constrained minimizer reached $1.9$ times the per-coordinate proposal-noise standard deviation $\sqrt{\delta/w_i}$, and $1.6$ times it after $1000$ iterations; on the worst problem the error was still $2.9\times10^{-4}$ after $30000$ iterations. Over-relaxation and residual-balanced rescaling of $\zeta$ \citep[Sec.~3.4.1]{boyd2011distributed} did not change this ($1.4$ and $1.8$ noise standard deviations at $1000$ iterations). An active-set scheme that pins violating coordinates at their bounds and re-solves cycled on the same problems.
+
+\paragraph{Stage 1: the unbounded map.} The adopted solver first computes the unbounded map of Appendix~\ref{app:pmala:admm}, $\tilde\theta = T(x)$, with the same penalty, cold start and $150$-iteration budget. If $\ell \le \tilde\theta \le u$ componentwise, $\tilde\theta$ is returned. When the unbounded minimizer lies in $B$ it is also the constrained minimizer, by convexity. The test is applied to the computed output $\tilde\theta$, and either way the result is a deterministic function of $x$. Consequently $\widehat T_B$ coincides bitwise with the individual map for a free box ($J = 1$) and whenever the neighbouring curves do not bind.
+
+\paragraph{Stage 2: an interior-point method.} Otherwise $T_B(x)$ is computed from the epigraph quadratic program
+\begin{equation}
+\begin{aligned}
+\min_{\theta \in \R^n,\ \upsilon \in \R^m}\ & \tfrac12\theta^\top Q\theta + q^\top\theta + \lambda\mathbf 1^\top\upsilon \\
+\text{subject to}\ & D\theta - \upsilon \le 0, \quad -D\theta - \upsilon \le 0, \quad \theta_i \le u_i\ (u_i < \infty), \quad -\theta_i \le -\ell_i\ (\ell_i > -\infty),
+\end{aligned}
+\label{eq:box_qp}
+\end{equation}
+with $Q = W + M/\gamma$ and $q = -(Wr + Mx/\gamma)$; at the optimum $\upsilon = |D\theta|$, so \eqref{eq:box_qp} is equivalent to \eqref{eq:joint_prox}. The fixed coordinates are set to their common bound and eliminated. We solve \eqref{eq:box_qp} by Mehrotra's predictor--corrector primal--dual interior-point method \citep{mehrotra1992implementation}. Write the four constraint blocks with slacks $s_1, s_2 \in \R^m$, $s_3, s_4 \in \R^n$ and multipliers $\pi_1, \ldots, \pi_4 \ge 0$ of the same sizes, entries for infinite bounds being omitted. The residuals are
+\begin{align*}
+r_\theta &= Q\theta + q + D^\top(\pi_1 - \pi_2) + \pi_3 - \pi_4, & r_\upsilon &= \lambda\mathbf 1 - \pi_1 - \pi_2, \\
+r_1 &= D\theta - \upsilon + s_1, \quad r_2 = -D\theta - \upsilon + s_2, & r_3 &= \theta - u + s_3, \quad r_4 = \ell - \theta + s_4,
+\end{align*}
+with the dual residual $r_{\mathrm d} = (r_\theta, r_\upsilon)$, the primal residual $r_{\mathrm p} = (r_1, \ldots, r_4)$, and the complementarity measure $\bar\mu = s^\top\pi/N$, where $s^\top\pi = \sum_k s_k^\top\pi_k$ and $N$ is the number of inequality constraints. A Newton step linearizes $r_{\mathrm d} = 0$, $r_{\mathrm p} = 0$ and the complementarity conditions, the latter as $s_k\circ\Delta\pi_k + \pi_k\circ\Delta s_k = g_k$ with right-hand sides $g_k$ given below, and is computed by eliminating $\Delta s_k$, $\Delta\pi_k$ and $\Delta\upsilon$. With $W_k = \mathrm{diag}(\pi_k/s_k)$ and $\hat r_k = r_k + g_k/\pi_k$ (elementwise operations), the slack and multiplier steps are $\Delta\pi_1 = W_1(D\Delta\theta - \Delta\upsilon + \hat r_1)$, $\Delta\pi_2 = W_2(-D\Delta\theta - \Delta\upsilon + \hat r_2)$, $\Delta\pi_3 = W_3(\Delta\theta + \hat r_3)$, $\Delta\pi_4 = W_4(-\Delta\theta + \hat r_4)$ and $\Delta s_k = (g_k - s_k\circ\Delta\pi_k)/\pi_k$. The $\upsilon$-row, $\Delta\pi_1 + \Delta\pi_2 = r_\upsilon$, gives
+\[
+\Delta\upsilon = (W_1 + W_2)^{-1}\left\{(W_1 - W_2)D\Delta\theta + W_1\hat r_1 + W_2\hat r_2 - r_\upsilon\right\},
+\]
+and substituting into the $\theta$-row leaves one linear system in $\Delta\theta$,
+\begin{equation}
+\left(Q + D^\top W_\upsilon D + W_3 + W_4\right)\Delta\theta = -r_\theta - D^\top h - W_3\hat r_3 + W_4\hat r_4,
+\label{eq:box_newton}
+\end{equation}
+where $W_\upsilon = 4W_1W_2(W_1 + W_2)^{-1}$ and $h = W_1\hat r_1 - W_2\hat r_2 - (W_1 - W_2)(W_1 + W_2)^{-1}(W_1\hat r_1 + W_2\hat r_2 - r_\upsilon)$. The matrix in \eqref{eq:box_newton} is symmetric positive definite and banded with half-bandwidth $k+1$, so each Newton system is solved by banded Cholesky (with the ridge retry of safeguard (iii)) in $O(n(k+1)^2)$ operations, and all other quantities in $O(n(k+1))$. Each iteration solves \eqref{eq:box_newton} twice with the same matrix: the predictor uses $g_k = -s_k\circ\pi_k$, and the corrector $g_k = -s_k\circ\pi_k - \Delta s_k^{\mathrm{aff}}\circ\Delta\pi_k^{\mathrm{aff}} + \varsigma\bar\mu\mathbf 1$, with centering parameter $\varsigma = \min\{1, (\bar\mu_{\mathrm{aff}}/\bar\mu)^3\}$ and $\bar\mu_{\mathrm{aff}}$ the complementarity measure after the predictor step. Primal and dual step lengths are chosen separately, each the largest step in $(0, 1]$ that keeps $0.99$ of the distance to the boundary of the nonnegative orthant.
+
+\paragraph{Initialization and stopping.} The method starts from the clipped stage-1 output, $\theta^0 = \min\{\max(\tilde\theta, \ell), u\}$, with fixed coordinates at their bound. Let $s_\theta = \max(1, \norm{\theta^0}_\infty)$ and $s_{\min} = 0.01\,s_\theta$. Then $\upsilon^0 = |D\theta^0| + s_{\min}$, the slacks are $s_1 = \upsilon^0 - D\theta^0$, $s_2 = \upsilon^0 + D\theta^0$, $s_3 = \max(u - \theta^0, s_{\min})$ and $s_4 = \max(\theta^0 - \ell, s_{\min})$, all at least $s_{\min}$, the multipliers of the difference constraints are $\pi_1 = \pi_2 = \lambda/2$ (plus $10^{-8}$, which keeps them positive at $\lambda = 0$), so that the $\upsilon$-block starts dual feasible, and the box multipliers are $1$. The stopping rule is stated in units of $\theta$, with accuracy $\varepsilon = 10^{-8}$:
+\[
+\norm{r_{\mathrm p}}_\infty \le \varepsilon(1 + s_\theta), \qquad \norm{r_{\mathrm d}}_\infty \le \varepsilon\, q_{\min}, \qquad s^\top\pi \le \varepsilon^2 q_{\min}/2 .
+\]
+The last two thresholds are motivated by the strong convexity of \eqref{eq:joint_prox}. At a primal feasible point we have $\norm{\theta - T_B(x)} \le \norm{r_{\mathrm d}}/q_{\min}$ when the complementarity gap vanishes, and $\norm{\theta - T_B(x)}^2 \le 2s^\top\pi/q_{\min}$ when the dual residual vanishes. Let $\phi$ be the largest of the three ratios of a residual to its threshold. The iterate with the smallest $\phi$ after the starting point is retained, and the loop stops when $\phi \le 1$, on stall (after the first $15$ iterations, when $10$ consecutive iterations have not reduced the best $\phi$ by $10\%$), on a non-finite value, or after $100$ iterations. The retained iterate is clipped to $B$, which removes violations at the rounding level, and returned. On the problems met in the sampler $\norm{q}_\infty$ is large, with median $10^7$ and maximum $8\times10^9$ on the realistic problems below, so $\varepsilon q_{\min}$ lies between $10^{-16}$ and $2\times10^{-12}$ of $\norm{q}_\infty$, at or below the rounding level of $Q\theta + q$. The dual residual therefore cannot reach its threshold, and the loop usually ends at its numerical floor through the stall rule. The stopping flag is consequently not used as evidence of accuracy, which is established empirically below.
+
+\paragraph{Determinism and the Metropolis--Hastings correction.} Every rule above (the stage-1 test, the initialization, the step lengths, the choice of the retained iterate and the stopping rules) depends only on the inputs $(x, w, r, \lambda, d, c, \gamma, \ell, u)$ and on the iterates. Hence $\widehat T_B$ is a deterministic function of $x$, and, as in Appendix~\ref{app:pmala:admm}, the correction \eqref{eq:joint_accept} is exact for the computed map whether or not $\widehat T_B(x) = T_B(x)$. Within one move the forward and reverse maps use the same box, metric, step size and rule. A proposal $\theta^\star \notin B$ is rejected without computing the reverse map. The ADMM matrix $A$ is assembled once per move and factorized within each map, and $M$ is factorized once for the noise; the norms in \eqref{eq:joint_accept} are evaluated directly, as in the individual case.
+
+\paragraph{Verification.} The solver was checked by eight tests. With an infinite box, and with a finite box wide enough to contain the unbounded output, $\widehat T_B$ was bitwise identical to the unbounded map. At $\lambda = 0$ and $c = 0$ the problem separates and $T_B(x) = \min[\max\{(w\circ r + d\circ x/\gamma)/(w + d/\gamma), \ell\}, u]$ in closed form, with elementwise operations; with one-sided, two-sided and degenerate bounds the interior-point output agreed with it to $8.5\times10^{-12}$. Repeated calls returned identical output, the returned points satisfied the bounds exactly, and fixed coordinates were returned exactly at their bound. On $108$ small problems ($n = 60$; $k \in \{0, 1, 2\}$; $\lambda \in \{0.5, 5, 50\}$; $\gamma \in \{0.01, 0.1, 1\}$; two-sided, one-sided, partly degenerate and tight boxes) we compared $\widehat T_B$ with the interior-point solver Clarabel \citep{goulart2024clarabel} applied to \eqref{eq:box_qp} with tolerances $10^{-10}$. Clarabel solved all $108$; the interior-point stage was used in $90$ of them, with at most $27$ iterations; the objective of $\widehat T_B(x)$ was never above Clarabel's, and $\widehat T_B(x)$ agreed to $8.7\times10^{-11}$ with a self-reference obtained by the same method with $\varepsilon = 10^{-12}$ and up to $300$ iterations. In a perturbation test, $500$ of $500$ random feasible perturbations of the output increased the objective.
+
+The realistic problems reproduce the conditions of the sampler: $n = 500$, $k = 2$, the varying-smoothness signal with Gaussian noise, augmented weights for $\tau \in \{0.75, 0.95\}$, $\lambda \in \{100, 1000, 5000\}$, $\delta \in \{0.02, 0.1, 0.5\}$ and the curvature metric, with four kinds of box around a smooth curve: a lower bound only, a two-sided band, a tight band of half-width $10^{-3}$, and a band with five degenerate coordinates; $72$ problems in all. The interior-point stage was used in $66$ of them, with a median of $26$ and a maximum of $35$ iterations, and one complete map took at most $0.08$ seconds (median $0.03$ seconds). The stopping threshold was met in only $1$ of the $66$ solves; the others ended through the stall rule, as explained above. The output agreed with the $\varepsilon = 10^{-12}$ self-reference to $5.0\times10^{-10}$, which is $4.0\times10^{-9}$ of the per-coordinate noise standard deviation $\sqrt{\delta/w_i}$. Because Clarabel's iterates are limited by the same scale of $Q$ and $q$, the comparison with it is made on the objective value, measured as $(f - f_{\mathrm{ref}})/(1 + |f_{\mathrm{ref}}|)$: the objective of $\widehat T_B(x)$ was below Clarabel's in $69$ of the $72$ problems and above it in $3$, by at most $1.9\times10^{-9}$. The a posteriori bounds computed from the retained iterates are informative for the complementarity gap but not for the dual residual. Over the $66$ interior-point solves, $\{2s^\top\pi/q_{\min}\}^{1/2}$ had median $1.7\times10^{-7}$ and maximum $5.2\times10^{-5}$, at most $4.8\times10^{-3}$ of the smallest proposal-noise standard deviation, whereas $\norm{r_{\mathrm d}}_\infty/q_{\min}$ had median $2.5\times10^{-4}$ and maximum $0.35$, and exceeded the smallest proposal-noise standard deviation in $9$ problems. The dual residual stalls at the numerical floor described above, also for the $\varepsilon = 10^{-12}$ self-reference, so it does not certify the output; the evidence of accuracy is the objective comparison with Clarabel, together with the agreement with the self-reference, which shows that further iterations do not move the output. As an independent check by a different algorithm, the two-block ADMM described above, which converges for any positive penalty, was run on the $66$ problems for $10^4$, $10^5$ and $10^6$ iterations. Its largest distance to $\widehat T_B(x)$, in units of the per-coordinate noise standard deviation, fell from $0.51$ to $0.11$ and $0.033$ (medians $3.0\times10^{-3}$, $4.1\times10^{-4}$ and $4.2\times10^{-5}$), and its objective was never below that of $\widehat T_B(x)$ by more than $2\times10^{-9}$ relative. On the nine problems where the dual-residual bound exceeded the noise scale, the distance after $10^6$ iterations was at most $0.029$ noise standard deviations and still decreasing. Both methods therefore approach the same minimizer, and the interior-point output attains it to well within the resolution that matters for the proposal. Finally, a complete move computed in one call agreed bitwise with the forward map, noise and reverse map computed separately; proposals outside $B$ were detected and the reverse map skipped, including when the upper bound lay $10^{-9}$ above $\widehat T_B(\theta)$; with a free box the move was bitwise identical to the move of the individual sampler; and the map remained deterministic when the stage-1 early exit was enabled.
+
+\subsection{Interweaving step for the regularization parameter}
+\label{app:pmala:asis}
+
+Posterior draws of the trend satisfy $\norm{D\theta}_1 \approx m/\lambda$; across the simulation configurations of Section~\ref{sec:simulations} the ratio $\norm{D\theta}_1/(m/\lambda)$ was between $1.0$ and $1.1$. The conditional \eqref{eq:lambdaupdate} is therefore concentrated near the current value of $\lambda$, and the conjugate draw alone moves $\lambda$ by a few percent per sweep. We interweave it with a draw in the ancillary parameterization \citep{yu2011center}.
+
+Let $Q \in \R^{n\times(k+1)}$ be an orthonormal basis of the null space of $D$, and decompose $\theta = \theta_\parallel + \theta_\perp$ with $\theta_\parallel = QQ^\top\theta$. Under \eqref{eq:prior_theta}, the standardized differences $\tilde u = \lambda D\theta = \lambda D\theta_\perp$ have independent standard Laplace entries and do not depend on $\lambda$. Holding $(\tilde u, \theta_\parallel, z, \sigma)$ fixed, a new value $\lambda'$ implies the trend $\theta(\lambda') = \theta_\parallel + (\lambda/\lambda')\theta_\perp$. The factor $\lambda'^m$ in \eqref{eq:prior_theta} cancels the Jacobian of the map $\theta_\perp \mapsto \tilde u$, so the conditional density of $\lambda'$ is
+\[
+p(\lambda' \mid \tilde u, \theta_\parallel, z, \sigma, \by) \propto \lambda'^{\,a_0 - 1} e^{-b_0\lambda'} \exp\!\left\{-\frac12 \sum_{i=1}^n w_i\left(\theta_i(\lambda') - r_i\right)^2\right\}.
+\]
+We draw $\eta = \log\lambda'$ by univariate slice sampling with stepping out \citep{neal2003slice}, using the log density $a_0\eta - b_0 e^\eta - \frac12\sum_i w_i(\theta_i(e^\eta) - r_i)^2$ (the change of variables contributes $e^\eta$), an initial interval width of $1$, at most $30$ stepping-out steps divided at random between the two ends, and interval shrinkage; if the shrinking interval falls below width $10^{-10}$ the state is left unchanged. We then set $\theta \leftarrow \theta(\lambda')$. Each density evaluation costs $O(n)$ operations. The sufficient-parameterization draw \eqref{eq:lambdaupdate} and this ancillary draw each leave \eqref{eq:posterior} invariant, so their composition does as well. The step moves $\lambda$ and the rough part of $\theta$ together along the direction in which the conjugate draw is slow.
+
+\paragraph{Constrained version for the joint sampler.} At level $j$, with the box $B_j=[\ell_j,u_j]$ of \eqref{eq:joint_box}, write $p=QQ^\top\theta_j$ and $v=\theta_j-p$ as in \eqref{eq:joint_asis_curve}, and drop the index $j$. For a scale $s=\lambda/\lambda'>0$ the rescaled trend $p+sv$ lies in the box if and only if
+\[
+    \ell_i\leq p_i+s v_i\leq u_i,\qquad i=1,\ldots,n.
+\]
+For $v_i\ne0$ each condition is an interval in $s$ with endpoints $(\ell_i-p_i)/v_i$ and $(u_i-p_i)/v_i$; for $v_i=0$ it requires $p_i\in[\ell_i,u_i]$. Intersecting these intervals with $(0,\infty)$ gives $[s_-,s_+]$, with endpoints at zero or infinity allowed as limits, and in $\eta=\log\lambda'$
+\begin{equation}
+    \log\lambda-\log s_+\ \leq\ \eta\ \leq\ \log\lambda-\log s_-.
+    \label{eq:joint_asis_interval}
+\end{equation}
+The Jacobian argument above is unchanged, so the slice update targets
+\begin{equation}
+    \log f(\eta)= a_0\eta-b_0e^\eta
+       -\frac12\sum_i w_i\left\{p_i+\lambda e^{-\eta}v_i-r_i\right\}^2
+       +\log\mathbbm{1}_{B}\!\left(p+\lambda e^{-\eta}v\right),
+    \label{eq:joint_asis_density}
+\end{equation}
+with the weights and pseudo-responses of the newly drawn $z_j$ and the current $\sigma_j$. The implementation assigns log density $-\infty$ outside \eqref{eq:joint_asis_interval} and also checks the reconstructed trend against the box, so that rounding cannot produce a crossing. If the interval is empty or degenerate, or the current trend's density is not finite, the state is left unchanged. The rescaled trend is never clipped.
+
+\subsection{Initialization and warm-up}
+\label{app:pmala:init}
+
+Every single-level chain starts at the data, $\theta^{(0)} = \by$, with $\sigma^{(0)} = 1$, $z_i^{(0)} = \sigma^{(0)}$, $\lambda^{(0)} = m$ and $\delta^{(0)} = 0.2$. Starting at $\by$ rather than at a smooth preliminary fit is deliberate: a chain started near a good smooth estimate can report a small error without having explored the posterior. The hyperparameters start at these data-free values rather than at their conditional distributions given $\theta = \by$, because at $\theta = \by$ those conditionals place $\sigma$ and $z$ near zero, a nearly degenerate interpolating configuration from which a Gibbs chain does not escape.
+
+An exact Metropolis--Hastings chain also cannot leave $\theta = \by$ directly. Every proposal $\theta^\star$ is close to the output of a proximal map, which is smooth in $D\theta$, while $\by$ is rough; the reverse term $\norm{\by - T(\theta^\star)}_M^2/(2\delta)$ in \eqref{eq:pmala_accept} is then very large and every proposal is rejected. The first $H = 200$ sweeps therefore replace the P-MALA move by the deterministic step
+\[
+\theta \leftarrow \arg\min_{\vartheta}\left\{U(\vartheta) + \frac{1}{2\gamma_{\mathrm{w}}}\norm{\vartheta - \theta}_W^2\right\}, \qquad \gamma_{\mathrm{w}} = 10^4,
+\]
+a proximal-point step toward the conditional mode, computed by the solver of Appendix~\ref{app:pmala:admm} with $M = W$, $\gamma = \gamma_{\mathrm{w}}$, $\varrho = \mathrm{median}(w_i)$ and $300$ iterations. The blocks for $z$, $\lambda$ and $\sigma$ are drawn as usual during these sweeps; the interweaving step and the step-size adaptation start after them. The warm-up sweeps belong to the burn-in period and are discarded.
+
+\paragraph{Joint sampler.} For $J>1$ the trends start at the data shifted apart,
+\[
+    \theta_j^{(0)}=\by+s_y\left\{\Phi^{-1}(\tau_j)
+                -\mathrm{median}_{h}\,\Phi^{-1}(\tau_h)\right\}\mathbf 1,
+    \qquad s_y=\max\{\mathrm{sd}(\by),0.1\},
+\]
+where $\Phi$ is the standard normal distribution function. The levels are strictly ordered from the start without any random initialization; starting all levels at $\by$ would give the middle levels boxes of zero width. For $J=1$ the trend starts exactly at $\by$. The remaining parameters of every level start as in the single-level sampler. The warm-up step is the same proximal-point step restricted to the current box $B_j$, that is, \eqref{eq:joint_prox} with $M_j = W_j$ and $\gamma_{\mathrm{w}} = 10^4$, solved by the method of Appendix~\ref{app:pmala:boxsolver} with the same $300$-iteration ADMM budget. It keeps the levels ordered throughout the warm-up.
+
+\subsection{Step-size adaptation}
+\label{app:pmala:adapt}
+
+After the warm-up, the step size is updated at every sweep by the Robbins--Monro recursion
+\[
+\log\delta_{t+1} = \log\delta_t + t^{-0.6}\left(\alpha_t - 0.5\right), \qquad \alpha_t = \min(1, \alpha),
+\]
+with $\alpha$ from \eqref{eq:pmala_accept}, and $\delta$ is confined to $[10^{-8}, 10^{2}]$. The adaptation continues after burn-in, because $\lambda$ can still drift slowly in the retained sweeps and a frozen step size then lets the acceptance rate drift with it. The gain $t^{-0.6}$ decreases to zero, so the adaptation satisfies the diminishing-adaptation condition of \citet{roberts2007coupling}. In the $3000$ simulation runs of Section~\ref{sec:simulations} the post-burn-in acceptance rate was between $0.47$ and $0.52$. In the joint sampler each level has its own step size $\delta_j$, updated by the same recursion with $\alpha_t$ the acceptance probability of its trend move, counted as zero when the proposal falls outside $B_j$.
+
+\subsection{Numerical safeguards}
+\label{app:pmala:safeguards}
+
+Four safeguards are part of the default algorithm and are applied identically in every run. (i) Each draw $z_i$ is restricted to $[10^{-8}, 10^{4}]$, and $|y_i - \theta_i|$ is floored at $10^{-10}$ in \eqref{eq:zupdate}; this keeps the weights $w_i$ within a range in which $M$ and the solver systems can be factorized, and the upper bound is essentially never active because $z_i$ has an exponential prior with mean $\sigma$. (ii) The difference-precision coefficient $\kappa\lambda^2/2$ in \eqref{eq:metric} is capped at $10^{8}$. (iii) If a banded Cholesky factorization fails because of rounding, a ridge $\epsilon\max_i A_{ii}$ is added to the diagonal, starting from $\epsilon = 10^{-12}$ and multiplying $\epsilon$ by $100$ up to five times; the ridge is part of the solver, so the proximal map remains deterministic. (iv) A non-finite value of $\log\alpha$ is treated as a rejection, and any non-finite state stops the run with an error rather than propagating. None of the $3000$ runs of Section~\ref{sec:simulations} stopped. The joint sampler adds one check: after every update of a level, the trend is verified to lie in its box, and a violation stops the run.
+
+The Metropolis--Hastings argument of Section~\ref{subsec:pmala} covers (ii) and (iii), which change the proposal and not the target, and the box check, which never triggers when the kernels are implemented correctly. It does not cover (i): clipping the latent draws and flooring the residual alter the ideal conditional of $z$ slightly, and clipping is not sampling from a correctly normalized truncated distribution. The exactness of the trend update is therefore a property of that block, not a claim that the whole guarded implementation samples \eqref{eq:posterior} or \eqref{eq:joint_target} exactly.
+
+\subsection{Run length}
+\label{app:pmala:runlength}
+
+Each run uses $30000$ sweeps and discards the first $10000$, which include the $200$ warm-up sweeps, leaving $20000$ retained draws. For the simulations at $n = 500$ the median wall time per run was $152$ seconds on one core of a Linux compute cluster; the median effective sample size over the $20000$ retained draws was $66$ for the trend (median over coordinates) and $9.2$ for $\log\lambda$. From $\lambda^{(0)} = m$ the chain approaches the posterior level of $\lambda$ more slowly as $n$ grows. The application of Section~\ref{sec:app:spod}, with $n = 8640$, therefore uses longer chains.
+
+\subsection{Why each component was needed}
+\label{app:pmala:changes}
+
+The sampler was developed under one rule: a single default configuration, fixed before seeing any data set and identical across signals, noise distributions and quantile levels, with every candidate change evaluated on all $30$ configurations of Section~\ref{sec:simulations} before adoption rather than on the configuration that motivated it.
+
+\paragraph{Proximal map of the whole conditional.} P-MALA requires the proximal map of the entire negative log-density. Under the ALD likelihood that map contains the check loss, and the alternative of smoothing the check loss and applying a proximal map to the penalty alone did not perform well in preliminary experiments. The normal--exponential representation \eqref{eq:ald_mixture} makes the conditional of $\theta$ a weighted quadratic plus the $\ell_1$ penalty, whose proximal map is a weighted trend filtering problem, without approximating the likelihood.
+
+\paragraph{Noise after the proximal map.} Adding the Gaussian noise after $T$, as in \eqref{eq:pmala_proposal}, gives a proposal with an explicit density. If the noise is added before a proximal map, the proposal is the image of a Gaussian under a nonlinear map that concentrates mass on trends that are sparse in $D\theta$; its density is not available, and a Gaussian density evaluated in its place does not give a valid Metropolis--Hastings ratio for the stated posterior.
+
+\paragraph{Curvature-matched metric.} With $M = \mathbf{I}_n$ the noise in \eqref{eq:pmala_proposal} is white, and its $(k+1)$-th differences have standard deviation of order $\sqrt{\delta}$ in each of the $m$ coordinates, each charged by the penalty at rate $\lambda$. For the posterior values of $\lambda$ at $n = 500$ this increases $U$ by far more than the Metropolis--Hastings ratio can absorb: on a pilot configuration (VS signal, Gaussian noise, $\tau = 0.5$) the acceptance rate was zero for every step size tried down to $\delta = 10^{-5}$. The metric \eqref{eq:metric} scales the noise in the rough directions by $1/\lambda$. Values of $\kappa$ between $3$ and $10$ raised the adapted step size three- to tenfold relative to $\kappa = 1$ at the same acceptance rate and increased the effective sample size of $\theta$ several-fold; the default is $\kappa = 3$.
+
+\paragraph{Rate of the Gamma prior.} Because the posterior draws of the trend satisfy $\norm{D\theta}_1 \approx m/\lambda$ (Appendix~\ref{app:pmala:asis}), the data determine the level of $\lambda$ only weakly, and the prior rate $b_0$ must be small relative to $\norm{D\theta}_1$ for $\lambda$ to be learned. A unit rate is far from weak on this scale: $\mathrm{Gamma}(1,1)$ gives $P(\lambda > 100) = e^{-100}$, whereas $\mathrm{Gamma}(1, 10^{-2})$ gives $P(\lambda > 100) = e^{-1} \approx 0.37$. Under $\mathrm{Gamma}(1,1)$ the chain settled at $\lambda$ between $50$ and $75$ on the pilot configuration and returned undersmoothed trends. We therefore use $b_0 = 10^{-2}$. A sensitivity run with $b_0 = 10^{-4}$ on all $30$ configurations with $10$ replications each was not uniformly better: on the smooth signal the geometric-mean MSE ratio to the default was $0.86$, with $7$ of $15$ configurations significantly lower and none higher, but the median coverage of the $95\%$ intervals fell from $0.91$ to $0.84$; on the varying-smoothness signal the ratio was $1.01$, with $1$ configuration significantly lower and $2$ higher. The default was kept. A Laplace prior scaled by $\sigma$ \citep{park2008bayesian}, under which the penalty enters as $\lambda/\sigma$, was also examined and rejected, because in one configuration $\lambda$ and $\sigma$ escalated together to very large values for a long stretch of the chain, a mode the unscaled prior \eqref{eq:prior_theta} does not exhibit.
+
+\paragraph{Prior on the likelihood scale.} The inverse-Gamma parameters enter \eqref{eq:sigmaupdate} next to $3n/2$ and a sum over $n$ observations, so $a_\sigma = b_\sigma = 0.1$ carries negligible information while keeping the prior proper and away from the improper limit $a_\sigma, b_\sigma \to 0$.
+
+\paragraph{Start at the data and warm-up.} The start $\theta^{(0)} = \by$ and the warm-up are explained in Appendix~\ref{app:pmala:init}.
+
+\paragraph{Continuous adaptation.} Adapting $\delta$ only during burn-in left the acceptance rate drifting in configurations where $\lambda$ was still moving after burn-in; the diminishing recursion of Appendix~\ref{app:pmala:adapt} removes this drift.
+
+\paragraph{Interweaving step and other candidate changes.} Table~\ref{tab:pmala_variants} lists the variants evaluated for the last change to the default, each run on all $30$ configurations with one replication. Single-replication MSE differences of this size are within replication noise (the standard deviation of $\log$ MSE across replications within a configuration is about $0.4$), so the decision was made on efficiency at equal wall time. The interweaving step of Appendix~\ref{app:pmala:asis} increased the effective sample size of $\lambda$ per hour from $50$ to $87$ and reduced the median absolute log ratio of the mean of $\lambda$ between the two halves of the retained draws from $0.26$ to $0.10$, and was adopted. An early exit of the ADMM iterations on a residual criterion, which keeps $T$ deterministic, saved no time at the $150$-iteration budget. Several trend moves per sweep increased the effective sample size of $\theta$ but lowered it per hour for both $\theta$ and $\lambda$. A joint Metropolis move on $(\lambda, \theta)$ is exact but its adapted log-step settled near $0.075$, so it also moved $\lambda$ slowly.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Candidate changes to Bayesian-PMALA, evaluated on the $30$ simulation configurations of Section~\ref{sec:simulations} with one replication each ($n = 500$, $30000$ sweeps, $10000$ discarded). MSE ratio: geometric mean over configurations of the MSE relative to the default. ESS: median effective sample size over the $20000$ retained draws, for $\log\lambda$ (also per hour of wall time) and for $\theta$ (median over coordinates). Time: wall time per run.}
+\label{tab:pmala_variants}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrrrrl}
+\toprule
+Variant & MSE ratio & ESS $\lambda$ & per hour & ESS $\theta$ & Time (s) & Adopted \\
+\midrule
+Previous default & 1.000 & 4.9 & 50 & 62 & 352 & -- \\
+ADMM early exit & 1.020 & 5.9 & 53 & 63 & 397 & no \\
+Interweaving for $\lambda$ & 0.963 & 9.8 & 87 & 69 & 404 & yes \\
+$3$ trend moves per sweep & 0.975 & 11.6 & 33 & 173 & 1264 & no \\
+$5$ trend moves per sweep & 0.948 & 15.2 & 26 & 264 & 2089 & no \\
+Interweaving, $3$ moves & 0.938 & 20.3 & 57 & 173 & 1275 & no \\
+Joint $(\lambda,\theta)$ move & 0.955 & 7.4 & 28 & 83 & 960 & no \\
+Joint move, interweaving & 0.959 & 10.4 & 39 & 100 & 963 & no \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Numerical safeguards.} The safeguards of Appendix~\ref{app:pmala:safeguards} were introduced after factorization failures and non-finite states in a few configurations of early multi-replication runs; with them in place no run failed.
+
+
+\subsection{Exactness checks}
+\label{app:pmala:tests}
+
+The single-level implementation is checked by nine tests: the normal--exponential identity \eqref{eq:ald_mixture}; the generalized inverse Gaussian conditional of $z_i$; agreement of the proximal map with the \texttt{glmgen} trend filtering solver \citep{tibshirani2014adaptive} at $M = \mathbf{I}_n$; the minimizing property of the proximal map in the metric \eqref{eq:metric}; the trend move against the closed-form Gaussian conditional at $\lambda = 0$; the trend move against numerical integration on a grid at $n = 4$, with a fixed metric and with the curvature metric; bitwise agreement of the shared-factorization move with separate solves; the interweaving chain against grid integration; and the joint $(\lambda,\theta)$ move against grid integration. All tests pass.
+
+The joint implementation is checked in two groups. The tests of the constrained proximal map are described in Appendix~\ref{app:pmala:boxsolver}. The sampler tests are four. First, with $J=1$ and a common seed, the joint sampler reproduces the single-level sampler exactly: identical trajectories of $\theta$, $\lambda$, $\sigma$ and $\delta$ over $400$ sweeps at $n = 80$, and an identical final state of the random number generator. Second, at $n=4$ with first differences and a box that cuts into the bulk of the conditional, a chain of $60000$ constrained trend moves at fixed $(z, \lambda, \sigma)$ is compared with numerical integration of $\exp\{-U(\theta)\}\mathbbm{1}_B(\theta)$ on an $80^4$ midpoint grid: all draws lie in the box, and the largest batch-means $z$-scores over the four coordinates are $1.9$ for the means and $1.8$ for the standard deviations. Third, adding the conjugate draw of $\lambda$ and the constrained interweaving step and comparing with the $\lambda$-marginalized target on the same box, the largest $z$-scores are $1.9$ and $1.5$, and the chain gives $E(\lambda) = 1.089$ with standard error $0.004$ against the exact $1.090$. Fourth, a three-level run at $n=80$ with $\tau \in \{0.5, 0.9, 0.95\}$ has no crossing in any retained draw. A grid with nodes at the box edges overweights the edges of a truncated density; the midpoint grid avoids that bias, which amounted to about $1\%$ of the standard deviations here.

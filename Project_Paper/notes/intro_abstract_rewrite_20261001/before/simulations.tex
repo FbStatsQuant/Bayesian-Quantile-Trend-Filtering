@@ -1,0 +1,133 @@
+% !TeX root = ../main.tex
+\section{Simulation}
+\label{sec:simulations}
+
+We study two benchmark signals: a varying-smoothness signal (VS), used by \citet{onizuka2024fast}, and a smooth sinusoidal signal (S), used in the first simulation study of \citet{brantley2020baseline}. The former combines gradual variation with a localized feature, whereas the latter represents the smoothly varying baseline that motivates the ADMM approach. Together they assess how Bayesian-PMALA (Section~\ref{subsec:individual}) compares with Bayesian and optimization-based quantile trend filtering under different patterns of smoothness. The interior-quantile experiment uses $n=500$ observations and the five levels $\tau\in\{0.05,0.25,0.50,0.75,0.95\}$. Table~\ref{tab:vs_int_mse} reports VS MSE in the main text; the complete S tables and the MAD and MCIW tables for both signals appear in Appendix~\ref{app:sim:individual}. The extreme-quantile experiment of Section~\ref{sec:sim:extreme} keeps $n=500$, the order $k=2$ and the three noise families, and is run on the varying-smoothness signal at the four upper levels $\tau\in\{0.96,0.97,0.98,0.99\}$; Table~\ref{tab:vs_ext_upper_mse} reports it in the main text.
+
+\paragraph{Benchmark signals.} For equally spaced indices $x_i=i$, $i=1,\ldots,n$, let $u_i=i/n$. We generate $y_i=f(u_i)+\varepsilon_i$ independently across indices, with
+\begin{align}
+ f_{\mathrm{VS}}(u)&=2+\sin(4u-2)+2\exp\{-30(4u-2)^2\},
+ \label{eq:sim_vs}\\
+ f_{\mathrm{S}}(u)&=\sin(2\pi u).
+ \label{eq:sim_s}
+\end{align}
+We fit both signals with the default order $k=2$ of Section~\ref{subsec:individual}, using the penalty on $D^{(k+1)}\theta$ defined there, so the fitted trend is piecewise quadratic in every configuration. The function $f$ is a baseline location curve; it need not equal the conditional mean or any particular conditional quantile when the errors are asymmetric.
+
+\paragraph{Noise distributions.} Both the ADMM study of \citet{brantley2020baseline} and the Bayesian study of \citet{onizuka2024fast} include Gaussian, Beta, and mixed-normal errors. We use these same three noise families, with the parameterization of \citet{onizuka2024fast}:
+\begin{itemize}
+ \item Gaussian: $\varepsilon_i\sim\mathcal{N}(0,s(u_i)^2)$, where $s(u)=(1+u^2)/4$.
+ \item Beta: $\varepsilon_i\sim\mathrm{Beta}(1,11-10u_i)$.
+ \item Mixed normal: $\varepsilon_i\sim u_i\mathcal{N}(-0.2,0.5)+(1-u_i)\mathcal{N}(0.2,0.5)$, where the second argument is the component variance.
+\end{itemize}
+The Gaussian case is heteroscedastic, the Beta distribution changes shape across the design, and the normal mixture has a design-dependent mixing weight. Brantley et al.\ use the same Gaussian and Beta specifications, but their normal mixture has components $\mathcal{N}(-1,1)$ and $\mathcal{N}(1,1)$; our mixed-normal experiment therefore follows Onizuka et al.\ rather than reproducing that parameterization exactly. All methods in our comparison are evaluated under the same noise specification.
+
+For each level $\tau$, the true conditional quantile is $Q_\tau(u)=f(u)+F_u^{-1}(\tau)$, where $F_u$ is the error distribution at $u$. For Gaussian errors this gives $f(u)+s(u)\Phi^{-1}(\tau)$, and for Beta errors we use the corresponding Beta quantile. For mixed-normal errors we numerically invert
+\[
+ F_u(t)=u\Phi\!\left(\frac{t+0.2}{\sqrt{0.5}}\right)
+       +(1-u)\Phi\!\left(\frac{t-0.2}{\sqrt{0.5}}\right).
+\]
+
+\subsection{Interior quantiles}
+\label{sec:sim:individual}
+
+\paragraph{Methods and replications.} We compare Bayesian-PMALA with the Laplace and horseshoe MCMC variants of \citet{onizuka2024fast} and the ADMM quantile trend filtering benchmark of \citet{brantley2020baseline}. The point estimates of Bayesian-PMALA and of the two Onizuka samplers are posterior means. Bayesian-PMALA uses the default configuration of Section~\ref{subsec:individual}, with $k=2$, $\lambda\sim\mathrm{Gamma}(1,10^{-3})$ and $\sigma\sim\mathrm{IG}(0.1,0.1)$ in every configuration, and $30000$ sweeps of which the first $10000$ are discarded; the remaining settings are listed in Appendix~\ref{app:pmala}. The Onizuka samplers use $8000$ iterations with $2000$ burn-in iterations and their supplied $\mathrm{IG}(1,1)$ prior on $\sigma^2$. ADMM returns an optimization-based point estimate, with $\lambda$ selected by extended BIC over a $25$-point logarithmic grid. All four methods are given the identical simulated response in each replication.
+
+Averages are taken over valid replications. ADMM discards a fit whenever any candidate on its $\lambda$ grid fails to converge, including candidates that the selection criterion does not choose.
+
+\paragraph{Performance measures.} For replication $r$, let $\widehat{\theta}_{\tau,i}^{(r)}$ be the point estimate and $[L_{\tau,i}^{(r)},U_{\tau,i}^{(r)}]$ the $95\%$ pointwise posterior interval. We compute
+\begin{align*}
+ \mathrm{MSE}^{(r)}_\tau&=\frac{1}{n}\sum_{i=1}^n
+  \bigl(\widehat{\theta}_{\tau,i}^{(r)}-Q_\tau(u_i)\bigr)^2,\\
+ \mathrm{MAD}^{(r)}_\tau&=\frac{1}{n}\sum_{i=1}^n
+  \bigl|\widehat{\theta}_{\tau,i}^{(r)}-Q_\tau(u_i)\bigr|,\\
+ \mathrm{MCIW}^{(r)}_\tau&=\frac{1}{n}\sum_{i=1}^n
+  \bigl(U_{\tau,i}^{(r)}-L_{\tau,i}^{(r)}\bigr),
+\end{align*}
+and average each measure over the available replications. MCIW is unavailable for the ADMM point estimator. A smaller interval width alone does not establish better uncertainty quantification; calibration must be assessed separately.
+
+\subsubsection{Varying smoothness}
+\label{sec:sim:ind:vs}
+
+Table~\ref{tab:vs_int_mse} reports MSE for the VS signal, and Tables~\ref{tab:vs_int_mad} and \ref{tab:vs_int_mciw} in the appendix report MAD and interval widths. Bayesian-PMALA is comparable in accuracy to the Onizuka samplers across noise families and quantile levels, although it uses a single global penalty where the horseshoe assigns a local shrinkage scale to every difference, and it is more accurate than ADMM. The localized feature of the VS signal calls for a penalty light enough to resolve it; the posterior learns that penalty from the data jointly with the likelihood scale, whereas extended BIC selects a heavier one.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error (MSE) for the varying-smoothness (VS) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:vs_int_mse}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.000513 & 0.001024 & 0.001942 & 0.002994 & 0.007269 \\
+Onizuka (Horseshoe) & 0.000512 & 0.000943 & 0.001802 & 0.002778 & 0.006493 \\
+Bayesian-PMALA & 0.000546 & 0.001035 & 0.001930 & 0.003029 & 0.007953 \\
+ADMM & 0.008055 & 0.004120 & 0.006632 & 0.007613 & 0.014649 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.075391 & 0.031684 & 0.027303 & 0.031800 & 0.077075 \\
+Onizuka (Horseshoe) & 0.073529 & 0.031743 & 0.028090 & 0.033608 & 0.079668 \\
+Bayesian-PMALA & 0.079580 & 0.033127 & 0.026996 & 0.031119 & 0.074788 \\
+ADMM & 0.096462 & 0.092891 & 0.071678 & 0.049944 & 0.068415 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.020916 & 0.008284 & 0.006932 & 0.007558 & 0.018128 \\
+Onizuka (Horseshoe) & 0.019990 & 0.008067 & 0.006651 & 0.007358 & 0.017762 \\
+Bayesian-PMALA & 0.020012 & 0.007919 & 0.006843 & 0.007612 & 0.018994 \\
+ADMM & 0.088108 & 0.025091 & 0.020181 & 0.014800 & 0.022334 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\clearpage
+\subsubsection{Smooth signal}
+\label{sec:sim:ind:smooth}
+
+Results for the S signal are in Appendix Tables~\ref{tab:s_int_mse}, \ref{tab:s_int_mad} and \ref{tab:s_int_mciw}. ADMM is the most accurate method on this signal, as expected for the smooth-baseline setting for which it was designed \citep{brantley2020baseline}, and Bayesian-PMALA is more accurate than both Onizuka samplers in most configurations: without a localized feature the local shrinkage scales have little to exploit, and one global penalty learned from the data suffices.
+
+Across the two signals each competitor is most accurate on the benchmark that suits it, the horseshoe on VS and ADMM on S, while Bayesian-PMALA is competitive on both with one default configuration. It matches the locally adaptive sampler with a simpler hierarchy and banded computations (Section~\ref{sec:scalability}), and it matches the optimizer while returning posterior draws of the trend, the penalty and the likelihood scale instead of a point estimate at a selected penalty. The empirical coverage of its pointwise $95\%$ intervals is $0.86$--$0.94$ at $\tau=0.25$, $0.50$ and $0.75$, and $0.65$--$0.72$ at $\tau=0.05$ and $0.95$ except under Beta noise at $\tau=0.05$, where it is $0.94$.
+
+\subsection{Extreme upper quantiles}
+\label{sec:sim:extreme}
+
+\paragraph{Design.} The extreme-quantile experiment is run on the varying-smoothness signal at the default order $k=2$, with $n=500$, the same three noise families and the four upper levels $\tau\in\{0.96,0.97,0.98,0.99\}$. It shares the generating mechanism, the seeds and the estimator of the interior comparison, so the two tables are read on the same footing; the smooth signal is not part of this design.
+
+\paragraph{Methods.} Five methods are employed: Bayesian-PMALA, the Laplace and horseshoe variants of \citet{onizuka2024fast}, the ADMM benchmark of \citet{brantley2020baseline}, and the joint sequential sampler of Section~\ref{subsec:joint}, augmented with auxiliary sentinel quantiles placed beyond the target range and sampled as full members of the joint posterior so that the box constraints bound each extreme level from both sides; it is the only one of the five that enforces non-crossing across levels. The first four are reported in Table~\ref{tab:vs_ext_upper_mse}; the joint sampler is being run at this design and its row will complete the table. The earlier sentinel experiment at $n=400$ and $\tau\in\{0.01,0.02,0.98,0.99\}$ is retained in Appendix~\ref{app:sim:joint} and is superseded by this design once that run is in. Bayesian-PMALA uses the default configuration of Section~\ref{subsec:individual} without change, including the prior $\lambda\sim\mathrm{Gamma}(1,10^{-3})$; no setting is adapted to the quantile level.
+
+\paragraph{Results.} Fitted one level at a time, Bayesian-PMALA remains within a moderate factor of the best method in every configuration, is competitive with ADMM, and is closest to the locally adaptive samplers under mixed-normal noise. The horseshoe sampler is the most accurate method at most of these levels. The scale $\sigma$ of the asymmetric Laplace likelihood shrinks with $\min(\tau, 1-\tau)$, so the effective penalty $\lambda\sigma$ of a single global penalty decreases toward the extreme levels and the fitted trend follows the few observations above it more closely; this is the setting that the joint sampler, whose sentinel levels bound each extreme curve from both sides, is designed for. The empirical coverage of the pointwise $95\%$ intervals of Bayesian-PMALA decreases from $0.65$ at $\tau=0.96$ to $0.31$ at $\tau=0.99$.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error at the four extreme upper levels, varying-smoothness (VS) signal, order $k=2$, $n=500$. Bayesian-PMALA uses the default configuration of the interior comparison. The joint non-crossing sampler is the fifth method of this comparison; its row is pending.}
+\label{tab:vs_ext_upper_mse}
+\begin{tabular}{lrrrr}
+\toprule
+Beta & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.008654 & 0.010169 & 0.011940 & 0.015717 \\
+Onizuka (Horseshoe) & 0.007482 & 0.008804 & 0.010402 & 0.013855 \\
+Bayesian-PMALA & 0.010106 & 0.012007 & 0.015317 & 0.021983 \\
+ADMM & 0.014286 & 0.014591 & 0.018077 & 0.020546 \\
+Joint sampler (non-crossing) & \multicolumn{4}{c}{pending} \\
+\midrule
+Mixed normal & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.100124 & 0.130825 & 0.169640 & 0.243268 \\
+Onizuka (Horseshoe) & 0.094160 & 0.118591 & 0.144931 & 0.211073 \\
+Bayesian-PMALA & 0.097170 & 0.133098 & 0.172418 & 0.250430 \\
+ADMM & 0.092220 & 0.122047 & 0.172025 & 0.276655 \\
+Joint sampler (non-crossing) & \multicolumn{4}{c}{pending} \\
+\midrule
+Gaussian & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.022456 & 0.028448 & 0.035187 & 0.049916 \\
+Onizuka (Horseshoe) & 0.021206 & 0.026018 & 0.031740 & 0.045289 \\
+Bayesian-PMALA & 0.023881 & 0.030245 & 0.038815 & 0.058112 \\
+ADMM & 0.024218 & 0.026348 & 0.031297 & 0.041895 \\
+Joint sampler (non-crossing) & \multicolumn{4}{c}{pending} \\
+\bottomrule
+\end{tabular}
+\end{table}

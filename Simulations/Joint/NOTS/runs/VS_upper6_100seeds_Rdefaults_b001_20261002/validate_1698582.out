@@ -1,0 +1,12 @@
+PARSE_OK ./check_defaults.R 
+PARSE_OK ./common.R 
+PARSE_OK ./config.R 
+PARSE_OK ./process_results.R 
+PARSE_OK ./source/Individual/Individual_Sampler_PMALA_Augmented.R 
+PARSE_OK ./source/Joint/Joint_Sampler_PMALA_Augmented.R 
+PARSE_OK ./validate_outputs.R 
+PARSE_OK ./worker.R 
+glmgen 0.0.3 
+Rcpp 1.1.2 
+Verified 6 workers, 12 summary rows, arithmetic seed averages, and raw-draw metrics.
+VALIDATION_SUCCESS /home/fb31/projects/Quant_Reg/Joint_Sampler/validation/check_20261002T025450Z_1698582

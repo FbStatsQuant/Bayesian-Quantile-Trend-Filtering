@@ -1,0 +1,23 @@
+Beta & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 20.76 & 28.53 & 19.23 & 11.46 \\
+Onizuka (Horseshoe) & 10.48 & 13.67 & 9.12 & 5.93 \\
+Bayesian-PMALA & 115.04 & 248.75 & 157.53 & 23.82 \\
+ADMM & 134.10 & 266.22 & 296.32 & 164.20 \\
+Joint sampler (non-crossing) & 0.00 & 0.00 & 0.00 & 0.00 \\
+\midrule
+Mixed normal & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 86.07 & 147.57 & 77.52 & 16.02 \\
+Onizuka (Horseshoe) & 28.14 & 39.46 & 19.36 & 8.04 \\
+Bayesian-PMALA & 110.92 & 226.84 & 213.13 & 97.21 \\
+ADMM & 151.47 & 371.21 & 463.51 & 243.77 \\
+Joint sampler (non-crossing) & 0.00 & 0.00 & 0.00 & 0.00 \\
+\midrule
+Gaussian & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 50.27 & 62.49 & 21.30 & 9.08 \\
+Onizuka (Horseshoe) & 16.36 & 22.42 & 11.16 & 5.10 \\
+Bayesian-PMALA & 106.34 & 225.40 & 185.66 & 66.60 \\
+ADMM & 127.07 & 265.46 & 326.80 & 188.41 \\
+Joint sampler (non-crossing) & 0.00 & 0.00 & 0.00 & 0.00 \\

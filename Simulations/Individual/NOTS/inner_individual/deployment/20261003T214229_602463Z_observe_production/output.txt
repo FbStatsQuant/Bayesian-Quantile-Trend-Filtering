@@ -1,0 +1,40 @@
+2026-10-03T21:42:30+00:00
+QUEUE_COUNTS
+   2600 PENDING
+    400 RUNNING
+ACCOUNTING_COUNTS
+      1 PENDING
+    400 RUNNING
+PROCESS_JOB
+                   JOBID        STATE         TIME                    NODELIST(REASON)
+                 1786241      PENDING         0:00                        (Dependency)
+SUCCESS_COUNT=0
+FAILURE_COUNT=0
+MONITOR
+2026-10-03T21:41:57.806322+00:00 STATUS_EXIT 0 {
+  "utc": "20261003T214157_898632Z",
+  "counts": {
+    "not_started": 3000
+  },
+  "jobs": [
+    "1786240",
+    "1786241"
+  ],
+  "note": "SUCCESS records completion, not MCMC convergence. Locks require scheduler inspection.",
+  "squeue_exit_status": 0,
+  "sacct_exit_status": 0
+}
+Saved observations: /home/fb31/projects/Quant_Reg/Inner_Individual/runs/VS_S_inner_100seeds_15k_3k_b001_20261003T213442Z/metadata/monitor/20261003T214157_898632Z
+
+SAMPLE_FIT_LOG
+./upload_package.py: OK
+./validate_outputs.R: OK
+./validate.sh: OK
+./worker.R: OK
+NONEMPTY_STDERR_COUNT=0
+HOME_QUOTA
+Disk quotas for user fb31 (uid 71711): 
+     Filesystem   space   quota   limit   grace   files   quota   limit   grace
+nfs1:/export/nots/home
+                  4480M  10240M  10240M           78341       0       0        
+data191.nots.rice.edu:/rhf/allocations/ea14

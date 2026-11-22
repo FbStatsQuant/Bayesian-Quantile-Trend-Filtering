@@ -1,0 +1,2785 @@
+Bayesian Joint Quantile Trend Filtering via
+ Proximal MCMC with Sequential Gibbs
+                Sampling
+                 Felipe Bedoya*              Meng Li          Eric C. Chi
+                                      October 2, 2026
+
+
+                                            Abstract
+       Quantile trend filtering combines the check loss with an ℓ1 penalty on discrete dif-
+   ferences of the trend. We develop Bayesian-PMALA, a posterior sampler for quantile
+   trend filtering that learns the regularization strength and the likelihood scale jointly
+   with the trend. Augmenting the asymmetric Laplace likelihood with its normal–
+   exponential representation makes the likelihood Gaussian in the trend. Under a global
+   Laplace prior on trend differences, the whole negative log-conditional of the trend
+   is then a weighted quadratic plus an ℓ1 difference penalty. The trend can therefore
+   be updated by an exact proximal Metropolis-adjusted Langevin (P-MALA) step. The
+   Moreau–Yosida envelope is built on the entire conditional posterior, through a weighted
+   trend filtering problem, rather than on a smoothed check loss, and the Metropolis–
+   Hastings correction uses the exact density. The latent variables, the penalty and the
+   scale have conjugate updates. Every linear system is banded, and the proximal map
+   is computed by ADMM with a factorization shared by the forward and reverse maps,
+   so the work per sweep grows linearly with the sample size for a fixed inner iteration
+   budget. For several quantile levels, a joint version samples each trend between its
+   neighbours. Only the proximal map changes, becoming a box-constrained problem
+   solved with banded interior-point steps, and no retained draw crosses. One default
+   configuration is used for every signal, noise distribution and quantile level. For series
+   contaminated by transient bursts, a stronger prior on the penalty is fixed before the
+   data are seen.
+       In simulations with varying-smoothness and smooth signals under Gaussian, Beta,
+   and mixed-normal noise, Bayesian-PMALA attains accuracy comparable to a locally
+   adaptive horseshoe Gibbs sampler with a simpler hierarchy and banded computations,
+   and accuracy comparable to ADMM-based quantile trend filtering while providing
+   posterior inference on the trend, the penalty and the scale. In a peak-detection design
+   for air-quality sensors, it recovers the peak-free baseline far more accurately than the
+   horseshoe sampler and comes close to the ADMM benchmark in baseline recovery
+* Department of Statistics, Rice University. fb31@rice.edu
+ Department of Statistics, Rice University. meng@rice.edu
+ School of Statistics, University of Minnesota. echi@umn.edu
+
+
+                                                1
+     and detection, and an application to fenceline sensor data illustrates the method at
+     n = 8,640.
+
+Keywords: quantile trend filtering, Bayesian inference, proximal MCMC, ADMM, non-
+crossing quantiles, asymmetric Laplace distribution, Gibbs sampling, extreme quantiles.
+
+
+
+
+                                              2
+Contents
+1 Introduction                                                                               4
+
+2 Methodology                                                                                 7
+  2.1 Bayesian quantile trend filtering at a single level . . . . . . . . . . . . . . . .     7
+      2.1.1 Prior distributions . . . . . . . . . . . . . . . . . . . . . . . . . . . .       7
+      2.1.2 Likelihood and its hierarchical representation . . . . . . . . . . . . . .        8
+      2.1.3 Joint posterior distribution . . . . . . . . . . . . . . . . . . . . . . . .      8
+      2.1.4 Full conditional distributions . . . . . . . . . . . . . . . . . . . . . . .      9
+      2.1.5 Sampling the trend by P-MALA . . . . . . . . . . . . . . . . . . . . .           10
+      2.1.6 The sampler . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      11
+  2.2 Joint quantile sampler . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     11
+      2.2.1 Joint target . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     12
+      2.2.2 Sequential conditional bounds . . . . . . . . . . . . . . . . . . . . . .        13
+      2.2.3 Sampling the trend by constrained P-MALA . . . . . . . . . . . . . .             13
+      2.2.4 Constrained interweaving and the remaining blocks . . . . . . . . . .            14
+      2.2.5 The sampler . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      14
+
+3 Simulation                                                                                 14
+  3.1 Interior quantiles . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   16
+      3.1.1 Varying smoothness . . . . . . . . . . . . . . . . . . . . . . . . . . . .       17
+      3.1.2 Smooth signal . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      18
+  3.2 Joint estimation of extreme upper quantiles . . . . . . . . . . . . . . . . . .        18
+
+4 Computational cost                                                                         20
+
+5 Baseline recovery and peak detection in simulated air-quality data                         24
+  5.1 Data-generating mechanism and estimation target . . . . . . . . . . . . . . .          24
+  5.2 Fitting procedures and numerical settings . . . . . . . . . . . . . . . . . . .        25
+  5.3 Evaluation criteria . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    26
+  5.4 Results and interpretation . . . . . . . . . . . . . . . . . . . . . . . . . . . .     27
+
+6 Data Applications                                                                          28
+  6.1 Air Quality Sensor Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      28
+  6.2 Munich Rent Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       29
+  6.3 Growth Centiles for Dutch Children . . . . . . . . . . . . . . . . . . . . . . .       32
+
+7 Discussion                                                                                 33
+
+A Computational Details of Bayesian-PMALA                                                    36
+  A.1 Full conditional distributions . . . . . . . . . . . . . . . . . . . . . . . . . . .   36
+  A.2 The proximal map of the individual sampler . . . . . . . . . . . . . . . . . .         36
+  A.3 The proximal map of the joint sampler . . . . . . . . . . . . . . . . . . . . .        37
+  A.4 Interweaving step for the regularization parameter . . . . . . . . . . . . . . .       41
+  A.5 Initialization and warm-up . . . . . . . . . . . . . . . . . . . . . . . . . . . .     42
+
+
+                                               3
+    A.6 Step-size adaptation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    43
+    A.7 Numerical safeguards . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    43
+    A.8 Run length . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    44
+    A.9 Why each component was needed . . . . . . . . . . . . . . . . . . . . . . . .         44
+    A.10 Exactness checks . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   45
+
+B Additional Simulation Results                                                               46
+  B.1 Interior quantiles . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    47
+      B.1.1 Varying smoothness . . . . . . . . . . . . . . . . . . . . . . . . . . . .        47
+      B.1.2 Smooth signal . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .       49
+  B.2 Joint estimation of extreme upper quantiles . . . . . . . . . . . . . . . . . .         51
+
+C Additional results for the simulated air-quality experiment                                 52
+
+D Additional Real-Data Figures                                                                57
+  D.1 Air Quality Data: ADMM Benchmark Fits . . . . . . . . . . . . . . . . . . .             57
+  D.2 Munich Rent Data: Horseshoe Fit and Interior Quantile Levels . . . . . . . .            58
+  D.3 Growth Centiles . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     58
+
+
+1     Introduction
+Time-varying conditional quantiles describe how the lower tail, center, and upper tail of a
+response evolve across an ordered domain. They are useful when changes in variability or
+asymmetry matter as much as changes in location, as in environmental monitoring, growth
+assessment, and economic time series. Quantile trend filtering combines the check loss of
+Koenker and Bassett (1978) with an ℓ1 penalty on discrete differences, adapting a piecewise
+polynomial fit to local changes in the signal (Tibshirani, 2014; Madrid Padilla and Chatterjee,
+2022).
+     Brantley et al. (2020) developed a quantile trend filtering approach for smoothly varying
+baseline drift, including joint non-crossing estimation, smoothing-parameter selection, and
+an alternating direction method of multipliers (ADMM) algorithm. Their formulation pro-
+vides an effective optimization-based benchmark, especially for the smooth-baseline setting
+that motivates the method. At a selected regularization level, however, the optimizer sup-
+plies point estimates; posterior simulation requires a probabilistic model and an inference
+procedure beyond that optimization step.
+     We develop a Bayesian extension that retains this computational connection. Under an
+asymmetric Laplace working likelihood and a global Laplace prior on trend differences, the
+conditional posterior mode at fixed regularization parameter λ and likelihood scale σ is the
+quantile trend filtering solution with penalty λσ. We infer λ and σ jointly with the trend
+instead of selecting the penalty by an external criterion. The posterior mean need not equal
+the optimizer, but both arise from the same check-loss and difference-penalty structure, and
+Section 2.1 states the connection explicitly.
+     Related methods include Bayesian and calibrated loss-based quantile smoothing. Fasi-
+olo et al. (2021) developed fast calibrated additive quantile regression. For quantile trend
+filtering, Onizuka et al. (2024) combined an asymmetric Laplace likelihood with shrinkage
+
+                                               4
+priors and developed both Gibbs sampling and calibrated variational approximations. Their
+horseshoe prior supports coefficient-specific shrinkage, allowing the amount of regularization
+to vary across the trend. The supplied Gibbs implementation uses latent-variable and local-
+scale updates together with a changing Gaussian precision matrix; its matrix operations
+motivate an alternative computational route for long signals.
+    Proximal Markov chain Monte Carlo provides such a route for nonsmooth models. The
+proximal Metropolis-adjusted Langevin algorithm (P-MALA) of Pereyra (2016) replaces the
+nonsmooth negative log-density by its Moreau–Yosida envelope, whose gradient is given by
+a proximal map, proposes a Langevin step on the envelope, and corrects with the exact
+density through a Metropolis–Hastings step. Its requirement is the proximal map of the
+whole negative log-density. Related schemes split the density into a smooth part handled by
+its gradient and a nonsmooth part handled by a proximal map (Durmus et al., 2018), and
+in mean trend filtering Heng et al. (2023) used proximal Bayesian computation to learn the
+trend, scale, and regularization parameters. Quantile trend filtering is harder because the
+likelihood is nonsmooth as well as the prior. The check loss has no gradient, so a splitting
+scheme must smooth it, which changes the target that the proposal approximates. Combined
+with the difference penalty it does not give a trend filtering problem whose proximal map
+is routinely computable. Being piecewise linear, it also carries no curvature with which to
+precondition a proposal.
+    We resolve this with the normal–exponential representation of the asymmetric Laplace
+distribution (Kozumi and Kobayashi, 2011). Conditionally on one latent variable per obser-
+vation, the likelihood is Gaussian in the trend. Integrating the latent variables out returns
+the asymmetric Laplace likelihood exactly, so the augmentation changes the sampler and not
+the model. Under a global Laplace prior on the differences, the negative log full conditional
+of the trend is then a weighted quadratic plus the ℓ1 difference penalty. Its proximal map is
+a weighted trend filtering problem, which we solve by ADMM with a banded factorization.
+The augmentation is what allows the trend to be updated by P-MALA in its exact form, as
+Pereyra (2016) define it, on the full conditional posterior. The Moreau–Yosida envelope is
+built on the entire negative log-conditional, likelihood and prior together, and its gradient
+costs one proximal map. The Langevin proposal is a Gaussian centred at that proximal
+point, so its density is explicit. The Metropolis–Hastings step is evaluated with the exact
+conditional density. No part of the check loss is smoothed and the target is not split, so the
+chain leaves the stated posterior invariant. The proximal map enters the kernel only as a
+deterministic function of its input, so solving it with a fixed ADMM budget affects the effi-
+ciency of the proposal, not the posterior the chain targets. The augmentation also supplies
+the curvature that the check loss lacks: the precision of the augmented likelihood, together
+with a difference term on the scale of the prior, defines the metric that preconditions the
+proposal.
+    The resulting Gibbs sampler, which we call Bayesian-PMALA, pairs this P-MALA update
+of the trend with conjugate updates for the latent variables, the global penalty λ and the scale
+σ, and with an ancillarity–sufficiency interweaving step (Yu and Meng, 2011) that improves
+the mixing of λ. The hierarchy has one global penalty per quantile rather than a vector of
+local shrinkage scales. Every linear system is banded, and one factorization serves both the
+forward and the reverse proximal maps of each move, so for a fixed ADMM iteration budget
+the work per sweep grows linearly with the sample size. A single default configuration, with
+
+                                               5
+difference order k = 2 and fixed hyperparameters, is used for every signal, noise distribution
+and quantile level.
+    The same construction extends to several quantile levels whose curves must not cross.
+Brantley et al. (2020) impose non-crossing in the optimization; we impose it on the posterior,
+as an ordering constraint on the trends in a joint target formed from the single-level poste-
+riors. Given its neighbours, the trend at each level has its single-level conditional restricted
+to a box. The negative log-density of that conditional is still convex, so P-MALA applies
+unchanged. Only the proximal map changes, and it becomes a box-constrained weighted
+trend filtering problem. A proposal outside the box is rejected, so the Metropolis–Hastings
+correction keeps its single-level form and needs no truncation constant. The constrained
+map is computed by the unconstrained ADMM when that solution respects the bounds, and
+otherwise by a primal–dual interior-point method whose Newton systems are banded, so the
+work per map remains linear in n. The latent-variable, penalty and scale updates are those
+of the single-level sampler, the interweaving step is restricted to the box, and every retained
+draw is ordered at the observed indices.
+    Our simulation study focuses on two established benchmarks: the varying-smoothness
+signal used by Onizuka et al. (2024) and the sinusoidal smooth signal used by Brantley et al.
+(2020), under Gaussian, Beta, and mixed-normal noise with the noise parameterization of
+Onizuka et al. We compare Bayesian-PMALA with the two Onizuka MCMC variants and
+the ADMM point estimator at quantile levels from 0.05 to 0.95, on identical data sets. Each
+competitor is most accurate on the benchmark that suits it, the horseshoe on the varying-
+smoothness signal and ADMM on the smooth signal, while Bayesian-PMALA is competitive
+on both: it attains accuracy comparable to the locally adaptive horseshoe sampler with
+a simpler hierarchy and banded computations, and accuracy comparable to ADMM while
+providing posterior inference on the trend, the penalty and the likelihood scale. A third
+experiment adopts the peak-detection design of Brantley et al. (2020), where the target
+is a peak-free low-quantile baseline of a contaminated series and estimation is followed by
+a classification step. Because the likelihood cannot separate a burst from a movement of
+the trend, this setting uses a stronger prior on the penalty, fixed in advance, with the same
+sampler; Bayesian-PMALA then recovers the baseline far more accurately than the horseshoe
+sampler and comes close to ADMM in both baseline recovery and detection.
+    Bayesian-PMALA thus sits between computationally efficient optimization and a more
+elaborate locally adaptive Bayesian hierarchy. Relative to ADMM, it adds exact posterior
+sampling and learns the regularization and likelihood scales instead of selecting a penalty
+by an information criterion. Relative to the Onizuka Gibbs sampler, it replaces a vector
+of local shrinkage scales with one global penalty per quantile and replaces dense matrix
+computations with banded proximal computations; per sweep it runs 25 to 7,000 times
+faster than the supplied implementation for n between 250 and 4000 (Section 4). Like the
+joint ADMM formulation, its joint version prevents crossing, here on every posterior draw.
+    Section 2 presents the model, Bayesian-PMALA and its joint non-crossing extension.
+Appendix A gives the computational details, including how the unconstrained and the box-
+constrained proximal problems are solved. Section 3 reports the simulation study, with
+additional tables in Appendix B. Section 6 presents the data applications, and Section 7
+discusses the findings and limitations.
+
+
+                                               6
+2       Methodology
+Section 2.1 sets out the model for a single quantile level, its augmented posterior and the
+Gibbs sampler that explores it, in which the trend is updated by a proximal Metropolis-
+adjusted Langevin (P-MALA) step. Section 2.2 extends the sampler to several quantile levels
+whose curves are required not to cross. The extension keeps the model and every conditional
+update of the single-level sampler except one: the trend is now sampled from a conditional
+distribution restricted to a box, so its proximal map becomes a constrained optimization
+problem. How the two proximal problems are solved is described in Appendices A.2 and
+A.3.
+
+2.1     Bayesian quantile trend filtering at a single level
+Let y = (y1 , . . . , yn )⊤ ∈ Rn denote an observed series, and model
+
+                                 yi = θi + εi ,       i = 1, . . . , n,                        (1)
+
+where θ = (θ1 , . . . , θn )⊤ is an unknown trend and the errors εi are independent. For a quantile
+level τ ∈ (0, 1) the target is the trend θ whose i-th entry is the conditional τ -quantile of yi .
+
+2.1.1    Prior distributions
+Let D = D(k+1) ∈ Rm×n be the discrete difference operator of order k + 1, with m = n − k − 1
+rows. We place independent Laplace distributions with common rate λ on the m differences
+(Dθ)j ,
+                            p(θ | λ) ∝ λm exp{−λ ∥Dθ∥1 } .                               (2)
+The prior is flat on the (k +1)-dimensional null space of D, the polynomials of degree at most
+k, a component that the likelihood identifies. The ℓ1 penalty retains the local adaptivity of
+trend filtering (Tibshirani, 2014), and the single global rate λ controls the overall amount of
+smoothing. The rate and the scale σ of the likelihood below receive conjugate priors,
+
+                            λ ∼ Gamma(a0 , b0 ),         σ ∼ IG(aσ , bσ ),                     (3)
+
+in the shape and rate parameterizations.
+
+Default difference order and hyperparameters. Following Brantley et al. (2020), we
+use k = 2 throughout, so the fitted trends are piecewise quadratic. The default hyperpa-
+rameters are a0 = 1, b0 = 10−3 and aσ = bσ = 0.1. They are fixed before any data are seen
+and are used for every signal, noise distribution and quantile level reported in Section 3; no
+hyperparameter is selected by an external criterion, cross-validation or a search over a grid
+of λ values. The small rate b0 keeps the prior on λ weak over the range of penalties relevant
+to trend filtering, and the inverse-Gamma prior on σ is proper but carries negligible weight
+against the n observations; Appendix A.9 gives the reasons for these choices. For series that
+combine a smooth baseline with transient bursts, the prior on λ is replaced by the stronger
+prior (33) of Section 5.2, with the sampler unchanged.
+
+
+                                                  7
+2.1.2    Likelihood and its hierarchical representation
+As a working likelihood we use the asymmetric Laplace distribution (ALD) with location
+zero, scale σ > 0 and skewness τ ,
+                                                       {︃        }︃
+                                         τ (1 − τ )       ρτ (u)
+                          f (u | τ, σ) =            exp −           ,              (4)
+                                             σ              σ
+where ρτ (u) = u{τ − 1(u < 0)} is the check function of Koenker and Bassett (1978). The τ -
+quantile                                                                     maximizing the likelihood
+            of (4) is zero, so θi is the conditional τ -quantile of yi , and∑︁
+∏︁                                                                            n
+   i f (yi − θi | τ, σ) in θ is equivalent to minimizing the check loss       i=1 ρτ (yi − θi ). The scale
+σ is unknown and is inferred with the trend.
+     The check loss is not differentiable, and neither is the negative log-likelihood. We there-
+fore work with the normal–exponential representation of the ALD (Kozumi and Kobayashi,
+2011),
+                                      √
+                      εi = ψτ zi + ωτ σzi ui ,     zi ∼ Exp(σ),          ui ∼ N (0, 1),                (5)
+where Exp(σ) denotes the exponential distribution with mean σ, zi and ui are independent,
+and ψτ = (1−2τ )/{τ (1−τ )}, ωτ2 = 2/{τ (1−τ )}. Equivalently, the model has the hierarchical
+form
+
+        yi | θi , zi , σ ∼ N θi + ψτ zi , ωτ2 σzi ,
+                            (︁                   )︁
+                                                    zi | σ ∼ Exp(σ),  i = 1, . . . , n.
+
+Integrating out the latent variable zi returns (4) exactly, so the representation changes the
+sampler, not the model. Conditionally on z = (z1 , . . . , zn )⊤ the likelihood is Gaussian in θ,
+with weights and pseudo-responses
+                                  1
+                        wi =             ,         ri = yi − ψτ zi ,   i = 1, . . . , n.              (6)
+                               ωτ2 σzi
+This is what allows the trend update below to treat the whole conditional posterior of θ as
+one optimization problem.
+
+2.1.3    Joint posterior distribution
+Combining (2)–(5), the joint posterior of (θ, z, λ, σ) is
+                                 n
+                                                      (yi − θi − ψτ zi )2
+                                ∏︂                 {︃                     }︃
+                                           −1/2
+            p(θ, z, λ, σ | y) ∝     (σzi )      exp −         2 σz
+                                                                             σ −1 e−zi /σ
+                                i=1
+                                                           2ω τ   i                                   (7)
+                                             a0 +m−1                              −aσ −1 −bσ /σ
+                                      ×λ               exp{−λ (b0 + ∥Dθ∥1 )} σ             e      .
+
+Its marginal in (θ, λ, σ) is the posterior under the ALD likelihood (4).
+
+Connection to quantile trend filtering. ∑︁       Integrating out z, the conditional posterior of
+θ at fixed (λ, σ) is proportional to exp{−σ −1 i ρτ (yi − θi ) − λ ∥Dθ∥1 }, and its mode is
+                                           {︄ n                         }︄
+                                             ∑︂
+                       θ̂(λ, σ) ∈ arg minn      ρτ (yi − θi ) + λσ ∥Dθ∥1 .                   (8)
+                                             θ∈R
+                                                     i=1
+
+
+                                                           8
+This is the quantile trend filtering problem of Brantley et al. (2020), which they solve by
+ADMM, with penalty λσ; the product λσ is therefore the effective penalty on the check-
+loss scale. The equivalence concerns the conditional mode at fixed hyperparameters. The
+sampler instead infers λ and σ jointly with θ and reports posterior means and pointwise
+intervals, which need not coincide with any single optimizer.
+
+2.1.4   Full conditional distributions
+We sample (7) by a Gibbs sampler with four blocks, which we call Bayesian-PMALA. Three
+blocks are conjugate; the derivations are in Appendix A.1.
+
+Latent variables. Given (θ, σ), the zi are independent generalized inverse Gaussian vari-
+ables; equivalently,
+                                 (︃                                     )︃
+          −1                                 1                  1
+         zi | θ, σ, y ∼ InvGauss                         ,                 , i = 1, . . . , n, (9)
+                                    τ (1 − τ ) |yi − θi | 2τ (1 − τ ) σ
+
+where InvGauss(µ, ν) denotes the inverse Gaussian distribution with mean µ and shape ν.
+
+Regularization parameter. Given θ,
+
+                           λ | θ, y ∼ Gamma(a0 + m, b0 + ∥Dθ∥1 ) .                                  (10)
+
+Because posterior draws of the trend satisfy ∥Dθ∥1 ≈ m/λ, this draw alone moves λ by a few
+percent per sweep. It is therefore followed by an interweaving redraw (Yu and Meng, 2011)
+that moves λ and the rough part of θ together while holding the standardized differences
+λDθ fixed (Appendix A.4). Both draws leave (7) invariant.
+
+Likelihood scale. Given (θ, z),
+                          (︄                      n {︃                                   }︃)︄
+                                                                                     2
+                                                 ∑︂             (yi − θi − ψτ zi )
+               σ | θ, z, y ∼ IG aσ + 3n
+                                      2
+                                        , bσ +           zi +                                   .   (11)
+                                                 i=1
+                                                                      2ωτ2 zi
+
+Trend. Given (z, λ, σ), the conditional density of θ is proportional to exp{−U (θ)} with
+                                         n
+                                     1 ∑︂
+                             U (θ) =       wi (θi − ri )2 + λ ∥Dθ∥1 ,                               (12)
+                                     2 i=1
+
+built from (6). It is the most important block and the only one that is not available in closed
+form: U is convex but not differentiable wherever a difference (Dθ)j vanishes, which is exactly
+where the posterior concentrates its smoothness. We sample it by P-MALA, described next.
+
+
+
+
+                                                 9
+2.1.5   Sampling the trend by P-MALA
+The proximal Metropolis-adjusted Langevin algorithm of Pereyra (2016) samples a log-
+concave, non-differentiable density in three steps: it replaces the negative log-density by
+its Moreau–Yosida envelope, which is differentiable and whose gradient is given by a prox-
+imal map; it draws a Langevin proposal from that gradient; and it accepts or rejects the
+proposal by a Metropolis–Hastings step against the exact density. We apply it to the whole
+conditional (12), likelihood and penalty together, rather than smoothing one part and han-
+dling the other separately.
+
+Proximal map and Moreau envelope. For a symmetric positive definite matrix M and
+γ > 0, the proximal map of U in the M -norm is
+                               {︃                   }︃
+                                         1        2
+               T (x) = arg minn U (θ) +    ∥θ − x∥M ,  ∥v∥2M = v ⊤ M v,      (13)
+                           θ∈R          2γ
+
+and the Moreau–Yosida envelope of U is the optimal value of the same problem,
+                      {︃                    }︃
+                                1         2                   1
+           γ
+         U (x) = minn U (θ) +     ∥θ − x∥M = U {T (x)} +        ∥T (x) − x∥2M .              (14)
+                 θ∈R           2γ                            2γ
+
+Because U is convex, (13) has a unique solution, and U γ is convex and continuously differ-
+entiable with
+                                          1
+                               ∇U γ (x) = M {x − T (x)}.                              (15)
+                                          γ
+The envelope lies below U , has the same minimizer, and converges to U as γ → 0. Evaluating
+its gradient requires one solution of (13) and nothing else, so the non-differentiability of U
+is handled entirely inside an optimization problem.
+
+Langevin proposal. The Langevin diffusion for exp(−U γ ) preconditioned by M −1 is dθt =
+− 12 M −1 ∇U γ (θt ) dt+M −1/2 dBt . One Euler step of size δ from the current trend θ, with (15),
+gives
+                         δ              √
+            θ⋆ = θ − {θ − T (θ)} + δ L−⊤ ξ,             ξ ∼ N (0, In ),    M = LL⊤ ,
+                        2γ
+where L−⊤ ξ ∼ N (0, M −1 ). Choosing γ = δ/2, as in Pereyra (2016), the drift moves the
+chain exactly to the proximal point, and the proposal is
+                       √
+          θ⋆ = T (θ) + δ L−⊤ ξ,                  θ⋆ ∼ q(· | θ) = N T (θ), δM −1 .
+                                                                  (︁           )︁
+                                      that is,                                     (16)
+
+Metropolis–Hastings correction. The Euler step does not leave exp(−U ) invariant, so
+the proposal is accepted with probability min(1, α), where α = exp{U (θ) − U (θ⋆ )} q(θ |
+θ⋆ )/q(θ⋆ | θ). The two Gaussian densities share the covariance δM −1 , so their normalizing
+constants cancel and
+                                            1 {︁ ⋆
+                log α = U (θ) − U (θ⋆ ) +       ∥θ − T (θ)∥2M − ∥θ − T (θ⋆ )∥2M .
+                                                                               }︁
+                                                                                             (17)
+                                            2δ
+
+                                                 10
+If the proposal is rejected the chain stays at θ. Three features make this update exact for
+the stated posterior. First, U in (17) is the exact conditional (12); no part of the check
+loss is smoothed, because the augmentation (5) has already made the likelihood Gaussian
+given z. Second, the noise is added after the proximal map, so the proposal density is
+an explicit Gaussian and the ratio is available in closed form. Third, T enters only as a
+deterministic map of its input: if (13) is solved approximately, the same computed map
+defines the proposal mean in both directions, and the approximation changes the efficiency
+of the proposal, not the invariance of the kernel.
+
+Curvature-matched metric. The choice M = In recovers the original P-MALA. We use
+                             λ2 ⊤
+                M =W +κ        D D,        W = diag(w1 , . . . , wn ),   κ = 3,          (18)
+                             2
+which combines the Gaussian precision W of the augmented likelihood with a difference-
+precision term on the scale of the Laplace prior. The proposal covariance δM −1 then reflects
+both sources of curvature in (12): directions that change Dθ are proposed on the scale 1/λ
+of the prior differences, and the remaining directions on the scale of the data. M depends
+on the current (z, λ, σ) but not on θ, so the move is a valid Metropolis–Hastings kernel for
+θ | z, λ, σ, y.
+
+Computation. Because W is diagonal and D⊤ D is banded, (13) is a weighted trend
+filtering problem with an additional banded quadratic term. We solve it by ADMM with a
+fixed number of iterations and a cold start, so the computed T is a deterministic function of
+its input (Appendix A.2). Every linear system involved is banded with half-bandwidth k + 1:
+the ADMM system is factorized once per move and shared by the forward map T (θ) and the
+reverse map T (θ⋆ ), M is factorized once to supply the noise L−⊤ ξ, and the two norms in (17)
+are evaluated directly from the banded form of M . For a fixed iteration budget the work
+per sweep therefore grows linearly with n. The step size δ is adapted toward an acceptance
+rate of 0.5 (Appendix A.6).
+
+2.1.6   The sampler
+Algorithm 1 states one run. Each block leaves (7) invariant, so the sweep does as well. The
+posterior mean of θ over the retained sweeps is the point estimate, and the 2.5% and 97.5%
+quantiles of the retained draws give pointwise 95% intervals. The initialization at θ = y,
+the optimization warm-up that precedes the first P-MALA move, the adaptation and the
+numerical safeguards are given in Appendices A.5–A.7.
+
+2.2     Joint quantile sampler
+Quantile curves estimated one level at a time can cross, which no set of conditional quantiles
+can do. The joint sampler estimates several levels together under the constraint that their
+trends are ordered. It is the sampler of Section 2.1 applied level by level, with one change:
+the trend of each level is sampled from its conditional distribution restricted to lie between
+its neighbours, so the proximal map inside the P-MALA step becomes a box-constrained
+
+                                             11
+Algorithm 1 Bayesian-PMALA for a single quantile level τ
+Require: Data y, level τ , order k, hyperparameters a0 , b0 , aσ , bσ , metric scale κ, sweeps
+    Tgibbs , burn-in Tburn .
+ 1: Initialize θ (0) = y and (z (0) , λ(0) , σ (0) , δ (0) )                     ▷ Appendix A.5
+ 2: for t = 1, . . . , Tgibbs do
+ 3:     Form wi , ri from (6) and M = W +            √   κλ2 D⊤ D/2; set γ = δ/2
+ 4:     Compute T (θ); draw θ⋆ = T (θ) + δ L−⊤ ξ; compute T (θ⋆ )                ▷ Appendix A.2
+ 5:     Accept θ⋆ with probability min(1, α), α from (17)
+ 6:     Draw zi from (9), i = 1, . . . , n
+ 7:     Draw λ from (10); redraw (λ, θ) by the interweaving step
+ 8:     Draw σ from (11)
+ 9:     Update log δ by a Robbins–Monro step toward acceptance 0.5
+10: end for
+11: return draws {θ (t) , λ(t) , σ (t) }t>Tburn
+
+
+optimization problem. Everything else, the priors, the hierarchical likelihood, the latent,
+penalty and scale updates and the form of the Metropolis–Hastings correction, carries over
+unchanged.
+
+2.2.1   Joint target
+Let 0 < τ1 < · · · < τJ < 1 be the quantile levels of interest, and write θj , zj , λj and σj for the
+trend, latent variables, regularization parameter and likelihood scale at level τj . Each level
+has the specification of Section 2.1, including the difference prior (2) and the hyperpriors
+(3). The levels are coupled only through the requirement that their trends be ordered at
+every observed index,
+
+                      C = {(θ1 , . . . , θJ ) : θi1 ≤ · · · ≤ θiJ ,     i = 1, . . . , n} .     (19)
+
+The constraint concerns the observation grid; it does not by itself specify an ordering-
+preserving interpolation between observations. Let πj (θj , zj , λj , σj | y) denote the augmented
+posterior (7) with τ = τj . The joint working posterior is
+                                                           J
+                       πC (Θ, Z, λ, σ | y) ∝ 1C (Θ)
+                                                          ∏︂
+                                                                πj (θj , zj , λj , σj | y),     (20)
+                                                          j=1
+
+
+where Θ = (θ1 , . . . , θJ ) and Z = (z1 , . . . , zJ ). This is a constrained product of working
+posteriors for the same data, not a claim that the data are observed independently at each
+level. The factors are not replaced by separately normalized truncated priors: a normalizing
+constant that depended on λj would change its conditional distribution. Because the indica-
+tor in (20) depends only on Θ, the conditional distributions of zj , λj and σj given the trends
+are exactly (9)–(11) with τ = τj . There is one λj and one σj per level, and no additional
+parameter coupling the levels.
+
+
+
+                                                     12
+2.2.2   Sequential conditional bounds
+A sweep visits j = 1, . . . , J in increasing order and completes all updates of level j before
+proceeding to level j + 1. At sweep t, the bounds of level j are
+                           {︄                              {︄
+                               (t)                            (t−1)
+                              θj−1 ,   j > 1,                θj+1 , j < J,
+                    ℓj =                              uj =
+                              −∞1, j = 1,                    +∞1, j = J,                   (21)
+                    Bj = {ϑ ∈ Rn : ℓj ≤ ϑ ≤ uj },
+
+with inequalities componentwise. The lower neighbour has already been updated in the
+current sweep and the upper neighbour has not. The bounds are held fixed throughout the
+trend and interweaving updates of level j, so the ordering (19) holds after every accepted
+move, not only at the end of a sweep. Given the other levels, the conditional density of θj is
+                                                               n
+                                                            1 ∑︂
+   p(θj | rest) ∝ exp{−Uj (θj )} 1Bj (θj ),        Uj (ϑ) =       wij (ϑi − rij )2 + λj ∥Dϑ∥1 ,   (22)
+                                                            2 i=1
+
+with wij and rij given by (6) at level τj . This is the individual conditional (12) restricted to
+the box Bj .
+
+2.2.3   Sampling the trend by constrained P-MALA
+The negative log-density in (22) is Uj + ιBj , where ιBj is zero on Bj and +∞ outside it. It
+is still convex and non-differentiable, so P-MALA applies exactly as in Section 2.1.5 with U
+replaced by Uj + ιBj . The only object that changes is the proximal map: the proximal map
+of Uj + ιBj is the box-constrained problem
+                                    {︃                      }︃
+                                              1          2
+                  Tj (x) = arg min Uj (ϑ) +      ∥ϑ − x∥Mj ,       γj = δj /2,           (23)
+                               ϑ∈Bj          2γj
+
+with the metric Mj = Wj + κ(λ2j /2)D⊤ D of (18) at level j and a separate step size δj per
+level. The Moreau envelope of Uj + ιBj has gradient Mj {x − Tj (x)}/γj , as in (15), and the
+Langevin step with γj = δj /2 gives the Gaussian proposal
+
+                            θj⋆ ∼ qj ( · | θj ) = N Tj (θj ), δj Mj−1 .
+                                                   (︁                )︁
+                                                                                        (24)
+
+The proposal mean always lies in Bj , but the Gaussian noise can leave it. A proposal outside
+Bj has target density zero and is rejected; it is neither projected into the box nor redrawn.
+For a proposal inside Bj , the reverse map Tj (θj⋆ ) is computed with the same bounds, metric
+and step size, and the proposal is accepted with probability min(1, αj ),
+                                              1 {︂⃦                                  ⃦ }︂
+                                                  ⃦θj⋆ − Tj (θj )⃦2 − ⃦θj − Tj (θj⋆ )⃦2
+                                                                 ⃦    ⃦
+           log αj = Uj (θj ) − Uj (θj⋆ ) +                        Mj                  Mj
+                                                                                          .       (25)
+                                             2δj
+
+This is (17) with the constrained map. The Gaussian normalizing constants cancel because
+both directions use the covariance δj Mj−1 , and no truncated-Gaussian normalizer enters
+because the proposal itself is not truncated. Given the other blocks, the move is therefore
+
+                                                    13
+a valid Metropolis–Hastings update for (22), and, as in the individual case, the argument
+requires only that Tj be a deterministic map of its input.
+    The constraint changes how (23) is solved. When the bounds do not bind at the solution,
+Tj coincides with the unconstrained map (13), and the sampler computes it with exactly the
+ADMM of the individual sampler. When a bound binds, the ADMM cannot be extended
+efficiently: splitting off the box constraint makes its convergence intolerably slow under
+the curvature-matched metric. We then solve (23) by a primal–dual interior-point method
+whose Newton systems are banded with the same half-bandwidth k + 1, so each map still
+costs O(n) operations per iteration. Appendix A.3 describes the solver, why the ADMM was
+abandoned, and the checks showing that the constrained problem is solved to high accuracy.
+
+2.2.4    Constrained interweaving and the remaining blocks
+After zj and λj are drawn from (9) and (10), the interweaving step of Appendix A.4 is
+applied within the same box Bj . Write pj = QQ⊤ θj and vj = θj − pj , with Q an orthonormal
+basis of the null space of D. Holding pj and λj Dθj fixed, a new value λ′j > 0 implies the
+trend
+                                 θj (λ′j ) = pj + (λj /λ′j ) vj .                       (26)
+The redraw samples log λ′j from the ancillary conditional restricted to θj (λ′j ) ∈ Bj , which is
+an interval in log λ′j , and replaces λj and θj together. Without the restriction the rescaling
+could undo the ordering enforced by the trend move. The scale σj is then drawn from (11)
+with the updated trend.
+
+2.2.5    The sampler
+Algorithm 2 summarizes one run. The initialization separates the levels deterministically, the
+first sweeps replace the P-MALA move by a constrained optimization warm-up, and each δj is
+adapted toward acceptance 0.5 by the same diminishing recursion as in the individual sampler
+(Appendices A.5 and A.6). Every retained draw satisfies (19) exactly, so the posterior draws
+do not cross at the observed indices, and neither do the pointwise posterior means, which
+are averages of ordered curves. For J = 1 the box is B1 = Rn , (20) reduces to (7), and the
+joint sampler reproduces the individual sampler draw for draw (Appendix A.10). Additional
+quantile levels enter (20) as full factors and therefore change the target; the method does
+not add auxiliary levels automatically.
+
+
+3       Simulation
+We study two benchmark signals: a varying-smoothness signal (VS), used by Onizuka et al.
+(2024), and a smooth sinusoidal signal (S), used in the first simulation study of Brantley et al.
+(2020). The former combines gradual variation with a localized feature, whereas the latter
+represents the smoothly varying baseline that motivates the ADMM approach. Together
+they assess how Bayesian-PMALA (Section 2.1) compares with Bayesian and optimization-
+based quantile trend filtering under different patterns of smoothness. The interior-quantile
+experiment uses n = 500 observations and the five levels τ ∈ {0.05, 0.25, 0.50, 0.75, 0.95}.
+
+
+                                               14
+Algorithm 2 Joint Bayesian-PMALA for ordered quantile levels
+Require: Data y, ordered levels τ1 , . . . , τJ , sweeps Tgibbs , burn-in Tburn , warm-up H ≤ Tburn .
+ 1: Initialize ordered trends and each (zj , λj , σj , δj )                          ▷ Appendix A.5
+ 2: for t = 1, . . . , Tgibbs do
+ 3:     for j = 1, . . . , J do
+ 4:         Fix Bj from the latest neighbours (21); form wij , rij , Mj ; set γj = δj /2
+ 5:         if t ≤ H then
+ 6:             Replace θj by the constrained optimization warm-up step
+ 7:         else
+ 8:             Compute Tj (θj ); draw θj⋆ ∼ N (Tj (θj ), δj Mj−1 )                  ▷ Appendix A.3
+ 9:             if θj⋆ ∈  / Bj then reject; else compute Tj (θj⋆ ) and accept with probability
+    min(1, αj ), (25)
+10:         end if
+11:         Draw zj from (9) and λj from (10)
+12:         if t > H then redraw (λj , θj ) by constrained interweaving in Bj
+13:         Draw σj from (11); update log δj toward acceptance 0.5 if t > H
+14:     end for
+15: end for
+                          (t)  (t) (t)
+16: return draws {θj , λj , σj }t>Tburn , j=1,...,J
+
+
+
+Table 1 reports VS MSE in the main text; the complete S tables and the MAD and MCIW
+tables for both signals appear in Appendix B.1. Section 3.2 evaluates joint estimation of
+upper quantiles on the VS signal, reporting MSE at τ ∈ {0.96, 0.97, 0.98, 0.99} in Table 2
+and joint MAD and MCIW in Appendix B.2.
+
+Benchmark signals. For equally spaced indices xi = i, i = 1, . . . , n, let ui = i/n. We
+generate yi = f (ui ) + εi independently across indices, with
+
+                       fVS (u) = 2 + sin(4u − 2) + 2 exp{−30(4u − 2)2 },                        (27)
+                        fS (u) = sin(2πu).                                                      (28)
+
+We fit both signals with the default order k = 2 of Section 2.1, using the penalty on D(k+1) θ
+defined there, so the fitted trend is piecewise quadratic in every configuration. The function
+f is a baseline location curve; it need not equal the conditional mean or any particular
+conditional quantile when the errors are asymmetric.
+
+Noise distributions. Both the ADMM study of Brantley et al. (2020) and the Bayesian
+study of Onizuka et al. (2024) include Gaussian, Beta, and mixed-normal errors. We use
+these same three noise families, with the parameterization of Onizuka et al. (2024):
+
+    Gaussian: εi ∼ N (0, s(ui )2 ), where s(u) = (1 + u2 )/4.
+
+    Beta: εi ∼ Beta(1, 11 − 10ui ).
+
+
+
+                                                 15
+    Mixed normal: εi ∼ ui N (−0.2, 0.5) + (1 − ui )N (0.2, 0.5), where the second argument
+     is the component variance.
+The Gaussian case is heteroscedastic, the Beta distribution changes shape across the design,
+and the normal mixture has a design-dependent mixing weight. Brantley et al. use the same
+Gaussian and Beta specifications, but their normal mixture has components N (−1, 1) and
+N (1, 1); our mixed-normal experiment therefore follows Onizuka et al. rather than repro-
+ducing that parameterization exactly. All methods in our comparison are evaluated under
+the same noise specification.
+    For each level τ , the true conditional quantile is Qτ (u) = f (u) + Fu−1 (τ ), where Fu is the
+error distribution at u. For Gaussian errors this gives f (u) + s(u)Φ−1 (τ ), and for Beta errors
+we use the corresponding Beta quantile. For mixed-normal errors we numerically invert
+                                     (︃         )︃           (︃         )︃
+                                        t + 0.2                 t − 0.2
+                          Fu (t) = uΦ √            + (1 − u)Φ √            .
+                                           0.5                     0.5
+
+3.1    Interior quantiles
+Methods and replications. We compare Bayesian-PMALA with the Laplace and horse-
+shoe MCMC variants of Onizuka et al. (2024) and the ADMM quantile trend filtering bench-
+mark of Brantley et al. (2020). The point estimates of Bayesian-PMALA and of the two
+Onizuka samplers are posterior means. Bayesian-PMALA uses the default configuration of
+Section 2.1, with k = 2, λ ∼ Gamma(1, 10−3 ) and σ ∼ IG(0.1, 0.1) in every configuration,
+and 30000 sweeps of which the first 10000 are discarded; the remaining settings are listed
+in Appendix A. The Onizuka samplers use 8000 iterations with 2000 burn-in iterations and
+their supplied IG(1, 1) prior on σ 2 . ADMM returns an optimization-based point estimate,
+with λ selected by extended BIC over a 25-point logarithmic grid. All four methods are
+given the identical simulated response in each replication.
+   Averages are taken over valid replications. ADMM discards a fit whenever any candidate
+on its λ grid fails to converge, including candidates that the selection criterion does not
+choose.
+
+                                                          (r)                             (r)   (r)
+Performance measures. For replication r, let θˆ︁τ,i be the point estimate and [Lτ,i , Uτ,i ]
+the 95% pointwise posterior interval. We compute
+                                               n
+                                            1 ∑︂(︁ ˆ︁(r)         )︁2
+                                 MSE(r)
+                                    τ =           θτ,i − Qτ (ui ) ,
+                                            n i=1
+                                               n
+                                       1      ∑︂ ⃓ (r)           ⃓
+                                MAD(r)
+                                   τ =            θτ,i − Qτ (ui )⃓,
+                                                 ⃓ˆ︁
+                                            n i=1
+                                               n
+                                      1       ∑︂       (r)    (r) )︁
+                              MCIW(r)
+                                                 (︁
+                                  τ =                 Uτ,i − Lτ,i ,
+                                            n i=1
+
+and average each measure over the available replications. MCIW is unavailable for the
+ADMM point estimator. A smaller interval width alone does not establish better uncertainty
+quantification; calibration must be assessed separately.
+
+                                                16
+3.1.1   Varying smoothness
+Table 1 reports MSE for the VS signal, and Tables 6 and 7 in the appendix report MAD
+and interval widths. Bayesian-PMALA is comparable in accuracy to the Onizuka samplers
+across noise families and quantile levels, although it uses a single global penalty where the
+horseshoe assigns a local shrinkage scale to every difference, and it is more accurate than
+ADMM. The localized feature of the VS signal calls for a penalty light enough to resolve
+it; the posterior learns that penalty from the data jointly with the likelihood scale, whereas
+extended BIC selects a heavier one.
+
+Table 1: Mean squared error (MSE) for the varying-smoothness (VS) signal (k = 2), n = 500,
+at interior quantile levels.
+
+          Beta                       0.05       0.25       0.50       0.75       0.95
+          Onizuka (Laplace)     0.000513    0.001024   0.001942   0.002994   0.007269
+          Onizuka (Horseshoe)   0.000512    0.000943   0.001802   0.002778   0.006493
+          Bayesian-PMALA        0.000546    0.001035   0.001930   0.003029   0.007953
+          ADMM                  0.008055    0.004120   0.006632   0.007613   0.014649
+          Mixed normal               0.05       0.25       0.50       0.75       0.95
+          Onizuka (Laplace)     0.075391    0.031684   0.027303   0.031800   0.077075
+          Onizuka (Horseshoe)   0.073529    0.031743   0.028090   0.033608   0.079668
+          Bayesian-PMALA        0.079580    0.033127   0.026996   0.031119   0.074788
+          ADMM                  0.096462    0.092891   0.071678   0.049944   0.068415
+          Gaussian                   0.05       0.25       0.50       0.75       0.95
+          Onizuka (Laplace)     0.020916    0.008284   0.006932   0.007558   0.018128
+          Onizuka (Horseshoe)   0.019990    0.008067   0.006651   0.007358   0.017762
+          Bayesian-PMALA        0.020012    0.007919   0.006843   0.007612   0.018994
+          ADMM                  0.088108    0.025091   0.020181   0.014800   0.022334
+
+
+
+
+                                              17
+3.1.2   Smooth signal
+Results for the S signal are in Appendix Tables 8, 9 and 10. ADMM is the most accurate
+method on this signal, as expected for the smooth-baseline setting for which it was designed
+(Brantley et al., 2020), and Bayesian-PMALA is more accurate than both Onizuka samplers
+in most configurations: without a localized feature the local shrinkage scales have little to
+exploit, and one global penalty learned from the data suffices.
+    Across the two signals each competitor is most accurate on the benchmark that suits
+it, the horseshoe on VS and ADMM on S, while Bayesian-PMALA is competitive on both
+with one default configuration. It matches the locally adaptive sampler with a simpler
+hierarchy and banded computations (Section 4), and it matches the optimizer while returning
+posterior draws of the trend, the penalty and the likelihood scale instead of a point estimate
+at a selected penalty. The empirical coverage of its pointwise 95% intervals is 0.86–0.94 at
+τ = 0.25, 0.50 and 0.75, and 0.65–0.72 at τ = 0.05 and 0.95 except under Beta noise at
+τ = 0.05, where it is 0.94.
+
+3.2     Joint estimation of extreme upper quantiles
+We use the joint sampler of Section 2.2 to assess accuracy at extreme upper quantiles
+and to exploit its non-crossing constraint when quantile levels are close together. For the
+VS signal with n = 500, k = 2 and the three noise distributions above, we jointly fit
+τ ∈ {0.90, 0.93, 0.96, 0.97, 0.98, 0.99} and evaluate the four levels 0.96–0.99. The compari-
+son includes the individually fitted Bayesian-PMALA sampler, the Laplace and horseshoe
+samplers of Onizuka et al. (2024), and the ADMM estimator of Brantley et al. (2020).
+    The joint results average 100 replications per noise distribution, using posterior means
+from 30000 sweeps with 10000 discarded as burn-in. We retain the joint implementation’s
+default settings, including λj ∼ Gamma(1, 10−2 ) and σj ∼ IG(0.1, 0.1); the individual
+Bayesian-PMALA results retain the Gamma(1, 10−3 ) prior of the interior comparison. Ta-
+ble 2 reports MSE, while Tables 11 and 12 in Appendix B.2 report joint MAD and MCIW.
+    The joint sampler has the lowest MSE in 9 of the 12 configurations: all Gaussian and
+mixed-normal cases and the Beta case at τ = 0.99; the horseshoe sampler leads in the
+remaining three. It improves on individual Bayesian-PMALA at every reported level, with
+reductions at τ = 0.99 of approximately 40%, 48% and 51% under Beta, Gaussian and
+mixed-normal noise, respectively. These gains accompany non-crossing fits, although the
+different penalty priors mean that the comparison does not isolate the effect of the ordering
+constraint.
+
+
+
+
+                                             18
+Table 2: Mean squared error at extreme upper quantiles for the VS signal, n = 500 and
+k = 2. The joint sampler fits six levels together and its entries average 100 replications per
+noise distribution.
+
+           Beta                               0.96       0.97       0.98       0.99
+           Onizuka (Laplace)              0.008654   0.010169   0.011940   0.015717
+           Onizuka (Horseshoe)            0.007482   0.008804   0.010402   0.013855
+           Bayesian-PMALA                 0.010106   0.012007   0.015317   0.021983
+           ADMM                           0.014286   0.014591   0.018077   0.020546
+           Joint sampler (non-crossing)   0.008338   0.011312   0.012724   0.013280
+           Mixed normal                       0.96       0.97       0.98       0.99
+           Onizuka (Laplace)              0.100124   0.130825   0.169640   0.243268
+           Onizuka (Horseshoe)            0.094160   0.118591   0.144931   0.211073
+           Bayesian-PMALA                 0.097170   0.133098   0.172418   0.250430
+           ADMM                           0.092220   0.122047   0.172025   0.276655
+           Joint sampler (non-crossing)   0.075005   0.086761   0.102676   0.123141
+           Gaussian                           0.96       0.97       0.98       0.99
+           Onizuka (Laplace)              0.022456   0.028448   0.035187   0.049916
+           Onizuka (Horseshoe)            0.021206   0.026018   0.031740   0.045289
+           Bayesian-PMALA                 0.023881   0.030245   0.038815   0.058112
+           ADMM                           0.024218   0.026348   0.031297   0.041895
+           Joint sampler (non-crossing)   0.018715   0.022337   0.026584   0.030111
+
+
+
+
+                                             19
+4    Computational cost
+This section measures how the running time of Bayesian-PMALA grows with the sample size
+and compares it with the Laplace and horseshoe Gibbs samplers of Onizuka et al. (2024).
+Both methods draw the trend from an asymmetric-Laplace working likelihood with the same
+normal–exponential augmentation, and they differ in how the trend is updated: Bayesian-
+PMALA by a P-MALA move built from banded linear algebra (Section 2.1.5), the Onizuka
+samplers by an exact draw from a Gaussian full conditional. The comparison is of running
+time, per Gibbs sweep and per run, for the two samplers as implemented.
+
+What a sweep does. The trend update of Bayesian-PMALA computes the forward and
+reverse proximal maps by ADMM with a fixed budget of 150 iterations each and a cold
+start, on one banded Cholesky factor of the ADMM system shared by both maps, and
+draws the proposal noise from one banded Cholesky factor of the metric M (Appendix A.2);
+the latent-variable, penalty, interweaving and scale updates act elementwise. Because the
+iteration budget is fixed and there is no data-dependent stopping rule, the work of a sweep
+does not depend on the state of the chain.
+    A sweep of the supplied Onizuka code draws θ ∼ N (Ab, σ 2 A) with A = (D⊤ Λ−1 D+C)−1 ,
+where Λ holds the local scales and C the latent-variable weights, and then updates σ 2 , the
+n latent variables and the local and global shrinkage parameters. With its sparse = TRUE
+option, which we use throughout this section, D is stored as a sparse matrix and the precision
+is assembled by sparse products; R’s solve then converts it to a dense matrix and forms
+the full inverse A, and MASS::mvrnorm computes a complete eigendecomposition of σ 2 A and
+forms the draw from the eigenvectors. The default sparse = FALSE, used in Section 3,
+performs the same steps and assembles the precision by dense matrix products in addition.
+
+Protocol. We use the varying-smoothness signal (27) with heteroscedastic Gaussian noise,
+τ = 0.5, k = 2, and n ∈ {250, 500, 1000, 2000, 4000}; at each (n, replicate) all three sam-
+plers receive the same data set. Bayesian-PMALA runs with the default configuration of
+Section 2.1. The Onizuka samplers are the code supplied with that paper, unmodified, with
+sparse = TRUE, the IG(1, 1) prior on σ 2 of Section 3, and the packages that code attaches;
+attaching the Matrix package as well would make solve dispatch to a sparse method, under
+which the supplied code fails. Both samplers are timed with clock reads inserted at the
+boundaries of their updates and no other change. All runs were made on one laptop (Intel
+Core Ultra 7 155U, 32 GB memory, Windows 11, mains power) in R 4.4.1 with its single-
+threaded reference BLAS, one configuration at a time, each in a fresh R process pinned to
+one performance core at high priority. Bayesian-PMALA runs 600 sweeps; the first 300,
+which comprise the 200 optimization warm-up sweeps of Appendix A.5 and 100 sweeps of
+step-size adaptation, are excluded, and the reported time is the mean over the remaining
+300, with acceptance rates of 0.40–0.49 in that window. An Onizuka sweep costs too much
+for windows of that length: we time 30 sweeps after 5 at n = 250, 20 after 3 at n = 500, 8
+after 2 at n = 1000, 3 after 1 at n = 2000, and 2 after 1 at n = 4000. Its time per sweep is
+dominated by dense matrix computations whose work does not depend on the chain state,
+so short windows suffice. Each entry is the median over replicates with distinct data seeds,
+three for every configuration except the Onizuka samplers at n = 2000 (two) and n = 4000
+
+                                             20
+(one). One-time setup is excluded from the time per sweep and included in the wall time of
+a run. Between replicates the time per sweep of the same configuration varied by up to a
+factor of 2.5 on this machine, through changes in its turbo and thermal state; that variation
+is small against the differences reported below.
+
+Table 3: Running time, varying-smoothness signal with Gaussian noise, τ = 0.5, k = 2.
+Time per complete Gibbs sweep in milliseconds: the upper line is the median over replicates
+and the lower line the range across them, with † marking a single replicate. The ratio
+columns divide the median Onizuka time per sweep by the median Bayesian-PMALA time
+per sweep. The wall time of one run uses the settings of Section 3: for Bayesian-PMALA,
+200 warm-up sweeps at their measured cost and 29 800 P-MALA sweeps; for the Onizuka
+samplers, 8 000 sweeps; both include setup. The Onizuka samplers use sparse = TRUE. All
+runs on one laptop core with R’s reference BLAS, protocol in the text.
+
+                        Time per sweep (ms)                 Ratio to PMALA      Wall time of one run
+     n      PMALA              Laplace        Horseshoe Laplace Horseshoe PMALA Laplace Horseshoe
+   250            2.0              48.4              47.2      25       24     1 min   6 min      6 min
+            (1.9–2.8)       (42.4–52.6)       (37.7–72.1)
+   500            4.2              314               318       75       76    2 min 42 min       42 min
+            (3.6–4.9)        (246–401)         (265–329)
+  1 000           9.2             3 650           2 918       398      318     5 min    8.1 h      6.5 h
+           (6.7–12.0)     (1 840–4 648)   (2 183–3 657)
+  2 000          16.1          21 857          32 543        1 360    2 025    8 min     2d            3d
+          (15.7–23.8) (20 633–23 081) (22 905–42 180)
+  4 000          36.6          257 660           241 459     7 035    6 593   18 min    24 d       22 d
+                                      †                 †
+          (26.7–38.1)
+
+
+
+Results. Table 3 and Figure 1 report the measurements. The time per sweep of Bayesian-
+PMALA is proportional to n: it costs between 7.8 and 9.2 microseconds per observation
+at every n, from 2.0 ms per sweep at n = 250 to 36.6 ms at n = 4000. A sweep of either
+Onizuka sampler takes about 48 ms at n = 250, 0.3 s at n = 500, 3 s at n = 1000, 22–33 s
+at n = 2000 and 4 minutes at n = 4000 (258 s for the Laplace and 241 s for the horseshoe
+prior). The two priors differ only in their scalar and local-scale updates and take the same
+time to within the replicate variation. The gap therefore widens with every doubling of n:
+an Onizuka sweep takes about 25 times a Bayesian-PMALA sweep at n = 250, 75 times at
+n = 500, 320–400 times at n = 1000, 1 400–2 000 times at n = 2000 and 6 600–7 000 times
+at n = 4000.
+    The difference carries over to complete runs, although Bayesian-PMALA runs 30 000
+sweeps against 8 000 for the Onizuka samplers. At n = 500, the size of the simulations
+of Section 3, a run takes 2 minutes against 42 minutes. At n = 1000 it takes 5 minutes
+against 6.5–8 hours, and at n = 4000 18 minutes against 22–24 days. Setup is negligible
+for Bayesian-PMALA and, for the Onizuka code, which builds its difference operator with
+interpreted loops and dense products, about 3 minutes at n = 4000, still small against a
+
+                                                       21
+                        (a)                                                                                                (b)
+                                                 Bayesian-PMALA                                                            1 month
+
+                                100 s            Onizuka, Laplace
+                                                                                                                            1 week
+                                                 Onizuka, horseshoe
+ Time per Gibbs sweep
+
+
+
+
+                                                                                                    Wall time of one run
+                                    10 s
+
+                                                                                                                           10 hours
+                                     1s
+
+                                                                                                                             1 hour
+                              100 ms
+
+                                                                                                                            10 min
+                               10 ms
+
+                                                                                                                             1 min
+
+                                           250         500          1,000       2,000      4,000                                         250         500        1,000   2,000       4,000
+                                                                Sample size n                                                                               Sample size n
+
+
+
+Figure 1: (a) Median time per complete Gibbs sweep against sample size, log–log axes, with
+vertical bars spanning the range across replicates. (b) Wall time of one run at the settings
+of Section 3 (30 000 sweeps for Bayesian-PMALA, 8 000 for the Onizuka samplers, sparse
+= TRUE). Values in Table 3.
+
+
+single sweep.
+
+                                     Bayesian-PMALA                                                 Onizuka, Laplace
+                              100
+Share of time per sweep (%)
+
+
+
+
+                               80
+
+
+                               60
+
+
+                               40
+
+
+                               20
+
+
+                                0
+                                           250        500         1,000       2,000      4,000                             250           500        1,000       2,000   4,000
+                                                              Sample size n                                                                     Sample size n
+                                            σ draw, storage                 latent z                                         σ 2, z, local scales                           dense inverse
+                                            λ draw + interweaving           trend: P-MALA move                               mvrnorm: eigendecomposition + products         assemble precision
+
+
+
+
+Figure 2: Share of the time per sweep spent in each update, median over replicates. Left:
+Bayesian-PMALA, where the P-MALA move comprises both proximal maps, the factoriza-
+tions of the ADMM system and of the metric, the proposal noise and the acceptance ratio.
+Right: the Onizuka Laplace sampler with sparse = TRUE; the shares of the horseshoe sam-
+pler agree with these to within three percentage points at every n.
+
+
+Where the time goes. Figure 2 shows where the time of a sweep is spent. In Bayesian-
+PMALA the P-MALA move takes 90% of the sweep at n = 250 and 96% at n = 4000; the
+latent variables, the penalty with its interweaving step, and the scale take the rest, and the
+shares change little with n. In the Onizuka samplers the dense inverse takes 28–38% of the
+
+
+                                                                                                   22
+sweep and mvrnorm 57–66%, together 85% at n = 250 and 95–99% for n ≥ 500. Sparse
+assembly of the precision falls from 10% of the sweep at n = 250 to under 1% at n = 4000,
+and the updates of σ 2 , the latent variables and the shrinkage parameters from 5% to below
+0.1%. Timed in isolation at n = 2000, the three dense steps of the trend draw take 12.0 s
+for the inverse, 15.8 s for the eigendecomposition and 4.4 s for the product that forms the
+draw, consistent with the 22–42 s per sweep in Table 3.
+
+Implications for larger series. Because its time per observation is constant, the running
+time of Bayesian-PMALA can be projected directly. At the n = 8,640 of the application in
+Section 6.1, roughly 9 microseconds per observation give about 80 ms per sweep, or some
+40 minutes for 30 000 sweeps. The supplied Onizuka code already needs more than three
+weeks for one run at n = 4000, and a single sweep at n = 4000 takes longer than a complete
+Bayesian-PMALA run at n = 500. Fitting several quantile levels multiplies the running
+time of either method by the number of levels; the joint sampler of Section 2.2 uses the same
+banded computations, with interior-point steps only when a neighbouring curve binds.
+
+Scope. The difference in running time belongs to the supplied implementation, not to the
+hierarchy of Onizuka et al. (2024). Its precision matrix is banded with half-bandwidth k + 1,
+so the Gaussian draw could be obtained from a banded Cholesky factorization. Even a dense
+Cholesky draw from the same precision, without the explicit inverse and the eigendecompo-
+sition, took 1.1 s at n = 2000 in the profile above, against 32 s for the three steps of the
+supplied code. The comparison here is between Bayesian-PMALA and the implementation
+used in Section 3, run in the setting that does less work. It concerns running time per sweep
+and per run, on one data set, one quantile level and one difference order; the efficiency of
+the chains per sweep is a separate question.
+
+
+
+
+                                             23
+5     Baseline recovery and peak detection in simulated
+      air-quality data
+We next consider a setting in which the observed series combines a drifting baseline with
+short-lived peaks. This experiment follows the peak-detection design in Section 4.2 of Brant-
+ley et al. (2020), motivated by air-quality sensors whose slowly varying background can ob-
+scure transient pollution events. The objective is to estimate a low-quantile baseline and
+then identify peaks in the detrended observations, so the experiment examines both curve
+estimation and a downstream classification task. We compare Bayesian-PMALA with the
+horseshoe Gibbs sampler of Onizuka et al. (2024) and the optimization benchmark labeled
+ADMM. Each quantile level is fitted separately.
+
+5.1    Data-generating mechanism and estimation target
+For each n ∈ {500, 1000, 2000, 4000}, we generate 100 series at observation indices ti = i,
+i = 1, . . . , n, according to
+                                                          iid
+                           yi = bi + si + ei ,          ei ∼ N (0, 0.252 ).             (29)
+
+Here bi is the baseline drift and si is the superposition of transient peaks. Both components
+are regenerated for each replication. For the baseline, let ui = (i−0.5)/n and draw d = 1+Z,
+where Z ∼ Poisson(n/100). Using the natural cubic spline basis returned by splines::ns
+with d degrees of freedom and its default knot placement, set
+                                    d
+                                                                iid
+                                   ∑︂
+                            bi =         aℓ Bℓ (ui ),     aℓ ∼ Exp(1).                  (30)
+                                   ℓ=1
+
+The 1+ offset in d follows the supplied generator. The number of basis functions, and hence
+baseline complexity, varies across replications and increases on average with n.
+   Independently, draw the number of peaks K ∼ Binomial(n, 0.005). For j = 1, . . . , K,
+generate Uj ∼ Unif(0, 1), peak centers cj = round{1 + (n − 2)Uj }, widths wj ∼ Unif(2, 12),
+and amplitudes Aj ∼ N (20, 42 ). The peak component is
+                                         K      (︃        )︃
+                                        ∑︂  Aj     i − cj
+                                   si =        ϕ             ,                          (31)
+                                        j=1
+                                            wj       wj
+
+where ϕ is the standard normal density and an empty sum equals zero. Thus Aj multiplies
+a Gaussian density and controls its area, rather than its height. The amplitudes are used
+without truncation. Peak widths are measured in observation-index units, whereas the spline
+is constructed on the normalized grid ui . The expected peak counts are 2.5, 5, 10, and 20
+for the four sample sizes, respectively. Peaks may overlap, and some small-sample replica-
+tions contain no points above the signal threshold defined below. Since both the baseline
+complexity and expected peak count change with n, this is not a fixed-curve experiment in
+which only the observation grid becomes denser.
+
+
+                                                   24
+   We fit the levels τ ∈ {0.01, 0.05, 0.10}. Conditional on the generated baseline, the refer-
+ence curve is the quantile of the peak-free process yi − si :
+                                      0
+                                     qτ,i = bi + 0.25Φ−1 (τ ),                                (32)
+
+where Φ is the standard normal distribution function. The methods receive the contam-
+inated observations yi , without access to bi or si . The true components are used only for
+evaluation. The target in (32) differs from the conditional quantile bi + si + 0.25Φ−1 (τ ) of the
+contaminated series with its realized peaks held fixed. Low-quantile fitting is used to recover
+the background despite that contamination, rather than to track the peaks themselves.
+    The same generated series is used by all methods and all three quantiles for a given sample
+size and replication. The completed comparison therefore contains 1200 fitted configurations
+per method, arising from 400 generated datasets and three quantiles. Summary results use
+one completed campaign per method.
+
+5.2    Fitting procedures and numerical settings
+All methods use trend-filtering order k = 2, corresponding to a third-difference penalty and
+piecewise-quadratic fitted trends. Bayesian-PMALA is the sampler of Section 2.1 with the
+configuration used in Section 3: σ ∼ IG(0.1, 0.1), a chain started at θ = y, 30000 sweeps
+of which the first 10000 are discarded, and the numerical settings of Appendix A. The only
+difference is the prior on λ.
+    The data model of this experiment, yi = bi +si +ei , differs from yi = θi +εi of Section 3 in a
+way that the likelihood cannot resolve. The target is the baseline beneath the bursts, and the
+asymmetric Laplace likelihood at a low quantile level does not distinguish a burst from a rapid
+movement of the trend. Under the weak prior Gamma(1, 10−3 ) the posterior accommodates
+the bursts in θ: the effective penalty λσ settles well below the penalty that extended BIC
+selects for the same fits, and the posterior mean follows the peaks. The separation between
+a smooth background and transient excursions is a structural assumption about the data,
+and in a Bayesian analysis it enters through the prior. For series with bursts we therefore
+use
+                         λ ∼ Gamma(m, m/λ∗ ) ,          m = n − k − 1,                        (33)
+with the same sampler. The prior mean is the constant λ∗ , which does not depend on n or
+on the data. The shape m gives the prior the same weight as the m difference terms in the
+conditional update λ | θ ∼ Gamma(a + m, b + ∥D(k+1) θ∥1 ), so the penalty remains random,
+with posterior coefficient of variation near (2m)−1/2 . We set λ∗ = 5000 at the extreme level
+τ = 0.01 and λ∗ = 30000 at the inner levels τ ∈ {0.05, 0.10}. The extreme level requires the
+smaller value because a penalty that is too strong for the few observations below the curve
+inflates σ, which raises the effective penalty λσ further until the trend move stops accepting.
+Each constant is the largest value in a screening grid for which no chain stopped moving
+at any n ∈ {500, . . . , 4000}; the screening used replications 1–3 at every sample size and
+replications 1–20 at n = 1000. Because λ has the units of 1/y, the constants refer to the
+scale of this design, whose noise standard deviation is 0.25; Section 6.1 applies the prior to
+data on another scale.
+
+
+                                                25
+    The horseshoe competitor uses the Gibbs sampler of Onizuka et al. (2024), retaining its
+difference-operator scaling, initialization, conditional updates, and numerical bounds on scale
+parameters. The campaign does not run the supplied code itself but a re-implementation
+of those conditionals, in which the trend is drawn through a sparse Cholesky factorization
+of its banded precision matrix and the observation-level latent variables are drawn in a
+vectorized manner; the re-implementation was checked against the supplied code before use.
+The completed campaign uses 40000 iterations with 10000 burn-in iterations, increased from
+an 8000-iteration pilot after longer-chain checks revealed sensitivity to run length. Its point
+estimate averages all 30000 retained draws. Both Bayesian procedures are summarized by
+posterior means.
+    The ADMM-labeled benchmark selects a penalty from
+
+                              Λ = {exp(−4 + j/2) : j = 0, . . . , 24}
+                                                                             ∑︁
+by the implemented extended BIC criterion. For a candidate fit, let Lτ = i ρτ (yi − θˆ︁τ,i )
+and let ν count third differences whose absolute values exceed 10−4 . The selection score is
+                                                                (︃     )︃
+                                   2Lτ                             n−3
+                      eBIC =                  + ν log n + 2 log          .              (34)
+                               min(τ, 1 − τ )                       ν
+
+The fitting code minimizes the sum of check losses plus λ∥D(3) θ∥1 . Its configured window
+size is 4000, so every series here is solved as a single sparse linear program using PIQP;
+the multi-window ADMM branch is not invoked. The solver checks a feasible dual bound
+against a relative objective tolerance of 10−5 . We retain the source label ADMM in the tables
+to identify this benchmark, but it denotes the independently fitted quantile trend-filtering
+estimator in this campaign. It is not the jointly constrained, noncrossing detrend eBIC
+comparison reported in the original paper.
+
+5.3    Evaluation criteria
+                      (r)
+For a fitted curve θˆ︁τ,i in replication r, we compute
+                                               n
+                                        1     ∑︂ (︁ (r)      0,(r) )︁2
+                                 MSE(r)
+                                    τ =            θˆ︁τ,i − qτ,i       ,                  (35)
+                                             n i=1
+                                               n
+                                         1    ∑︂   (︁ (r)   (r) )︁
+                                   CL(r)
+                                     τ =         ρτ yi − θˆ︁τ,i .                         (36)
+                                             n i=1
+
+MSE measures recovery of the peak-free quantile curve. Check loss (CL) measures in-sample
+fit to the contaminated observations. Consequently, a lower CL need not imply more accurate
+baseline recovery: a procedure can reduce the observed-data loss while absorbing transient
+structure that should remain after detrending. Comparisons of CL are made within a quantile
+level.
+     For peak detection, define the true and estimated signal indicators by
+
+                            = 1{si > 0.5},       zˆ︁τ,h,i = 1{yi − θˆ︁τ,i > h},
+                      (r)        (r)                 (r)         (r)       (r)
+                     zi                                                                   (37)
+
+                                                26
+using h ∈ {0.5, 0.75, 1, 1.2}. These are the thresholds used in the completed campaigns; the
+design is adapted from Section 4.2 of Brantley et al. (2020) without asserting that all four
+threshold values reproduce its original comparison. We subtract the fitted low-quantile curve
+directly, without an additional Gaussian quantile-offset correction. Thus the quantile and
+classification threshold jointly determine the detector.
+    Because signal points are relatively rare, we summarize classification by class-averaged
+accuracy,                        {︄ ∑︁ (r) (r)                 (r)          (r)
+                                                   ∑︁                               }︄
+                          (r)  1       z
+                                      i i  z
+                                           ˆ︁τ,h,i    i (1 − z i   )(1 −  z
+                                                                          ˆ︁τ,h,i )
+                    CAAτ,h =          ∑︁ (r) +                        (r)
+                                                                                       . (38)
+                               2
+                                                          ∑︁
+                                      i   zi              i  (1 − zi )
+CAA weights sensitivity and specificity equally. A perfect classifier attains one; predicting
+no signal everywhere gives 0.5 when both classes are present. We first calculate each metric
+within a replication and then take its arithmetic mean across replications. Undefined values
+are omitted only from the affected metric. In particular, some n = 500 datasets contain
+no points with si > 0.5, and CAA is undefined for them. No fit is excluded from the
+averages because of a mixing diagnostic. The main tables report replication means; the
+standard errors across replications, and the paired differences between methods that the
+shared datasets permit, are given in Table 16.
+
+5.4    Results and interpretation
+Table 4 reports the results for n = 1000. The remaining sample sizes are given in Ap-
+pendix C (Tables 13, 14, and 15), together with standard errors and paired comparisons on
+the shared datasets (Table 16), finite-chain and interval diagnostics (Table 17), and penalty
+levels (Table 18).
+
+Table 4: Simulated air-quality results for n = 1000. Entries are means across replications.
+CL denotes check loss; HS denotes the horseshoe sampler.
+
+                                                               CAA at threshold h
+            τ Method                      CL        MSE       0.5   0.75     1      1.2
+          0.01 Bayesian-PMALA 0.005652 0.045406 0.6975 0.7805 0.7641 0.7137
+          0.01 Onizuka (HS)   0.005227 0.100689 0.5872 0.6272 0.6136 0.5909
+          0.01 ADMM           0.006652 0.018925 0.6950 0.8364 0.8701 0.8125
+          0.05 Bayesian-PMALA 0.028083 0.012385 0.7936 0.8605 0.8076 0.7336
+          0.05 Onizuka (HS)   0.023669 0.099941 0.5736 0.5779 0.5517 0.5347
+          0.05 ADMM           0.028930 0.009350 0.8014 0.8849 0.8400 0.7610
+          0.10 Bayesian-PMALA 0.049294 0.011511 0.8358 0.8495 0.7688 0.7025
+          0.10 Onizuka (HS)   0.041807 0.100682 0.5705 0.5570 0.5324 0.5222
+          0.10 ADMM           0.050643 0.009270 0.8478 0.8761 0.7986 0.7238
+
+
+   Bayesian-PMALA recovers the peak-free baseline far more accurately than the locally
+adaptive horseshoe sampler, in every configuration and in most replications, and it detects
+
+
+
+                                               27
+the peaks correspondingly better. The local shrinkage scales that made the horseshoe com-
+petitive on the varying-smoothness signal of Section 3 allow its fitted curve to bend toward
+each peak; this lowers the check loss on the contaminated observations but raises the error
+against the peak-free target, and the detector, which subtracts the fitted curve, then removes
+part of the signal it is meant to find. A single global penalty cannot bend locally in this
+way, and in this design that rigidity is the appropriate behaviour. The ADMM benchmark,
+designed for this problem, remains the most accurate method, and Bayesian-PMALA comes
+close to it in both baseline recovery and detection while providing posterior inference on
+the baseline, the penalty and the likelihood scale. Its penalty is set by a prior fixed before
+the data are seen, whereas the ADMM penalty is chosen by extended BIC over a fixed grid
+and attains the largest grid value in a substantial fraction of the fits at τ = 0.05 and 0.10
+(Table 18). The acceptance rate of the trend move is close to its target of 0.5 in every
+configuration, and the pointwise 95% bands of both samplers cover the peak-free target less
+often than nominal, since the posterior conditions on the contaminated series (Table 17).
+
+
+6     Data Applications
+6.1    Air Quality Sensor Data
+Data. Our first application revisits the fenceline air-quality monitoring problem that mo-
+tivated quantile trend filtering in Brantley et al. (2020). The U.S. Environmental Protection
+Agency deploys low-cost SPod sensors on the perimeter of industrial facilities to detect fugi-
+tive emissions of volatile organic compounds (VOCs). Each SPod records, once per second,
+the raw signal of a photoionization detector (PID): a UV lamp ionizes VOC molecules in
+the sampled air and the resulting current, reported in uncalibrated counts, is proportional
+to the total concentration of ionizable compounds. The series has three components with
+sharply different time scales. Emission plumes crossing the sensor produce large one-sided
+spikes lasting seconds to a few minutes; the electronic baseline drifts slowly over hours with
+temperature, humidity, and lamp condition; and high-frequency instrument noise rides on
+top of both. The scientific interest lies exclusively in the spikes, but because each unit’s
+baseline drifts idiosyncratically and the counts are not calibrated across units, the drifting
+baseline must be estimated and removed before events can be flagged or compared across
+sensors. Since the plumes are strictly one-sided excursions above the baseline, the baseline
+is identified by a low conditional quantile of the series, making this a natural quantile trend
+filtering problem in which, in contrast to the usual convention, the trend is the nuisance and
+the residual carries the signal. We analyze one day of data, June 15, 2018, from sensor d
+of the two collocated SPods in the EPA Rubbertown dataset accompanying Brantley et al.
+(2020), aggregating the 86,400 raw 1-Hz observations into 10-second block means, which
+yields n = 8,640 observations and attenuates the strong serial correlation of the 1-Hz noise
+that the ALD working likelihood does not model.
+
+Model and settings. We estimate the baseline at the three levels τ ∈ {0.01, 0.05, 0.1}
+with k = 2, so the prior favours piecewise quadratic trends, each level fitted independently
+by the individual sampler of Section 2.1 on the standardized series. The sampler is run
+
+
+                                              28
+for 6,000 Gibbs iterations with a burn-in of 1,000, proximal parameter γ = 0.1, smoothing
+parameter ϵ = 0.01, priors λ ∼ Gamma(1, 10) and σ ∼ IG(0.01, 0.01), and a step size
+adapted during burn-in toward acceptance rate 0.5. Because SD (θ) is small for the smooth
+baselines supported by these data, the rate parameter of the Gamma prior effectively pins
+the posterior of λ near (n − k − 1)/10 ≈ 864, so the prior acts as a smoothness dial; we
+return to this point below. As the frequentist benchmark we use the ADMM solver of the
+detrendr package of Brantley et al. (2020) with the smoothing parameter selected by eBIC
+over the grid λ ∈ exp{−2, . . . , 12}, which selects λ = 54.6 at τ = 0.01 and λ = 1096.6 at
+τ ∈ {0.05, 0.1}. Following Brantley et al. (2020), event detection after baseline removal is a
+threshold rule on the detrended series y − θ: ˆ︁ a point is classified as signal when it exceeds
+the empirical 90th, 95th, or 99th percentile of the detrended data themselves, so that no
+absolute calibration of the counts is required.
+
+Results. Figure 3 overlays the three fitted baselines on the data for the proposed sam-
+pler; the corresponding ADMM fits, and the detrended series they produce, are reported in
+Appendix D.1. Both methods track the overnight rise, the large morning excursion around
+05:00, and the slow afternoon decline, and both leave the plume spikes untouched above
+the fit. The empirical calibration of the posterior median baselines is close to nominal: the
+fraction of observations below the fitted curve is 0.005, 0.044, and 0.092 at τ = 0.01, 0.05, 0.1,
+against 0.000, 0.043, and 0.092 for ADMM. The comparison at τ = 0.01 favours the Bayesian
+fit: eBIC selects a twenty-fold smaller penalty at this level than at the other two, and the
+resulting ADMM curve bends upward into the 05:00 plume and crosses the τ = 0.05 and
+τ = 0.1 curves, whereas the posterior medians, whose smoothness is governed by the same
+prior at all three levels, remain ordered and essentially parallel throughout the day. Figure 4
+shows the detrended series with the three detection thresholds, and Figure 7b its ADMM
+counterpart; with the τ = 0.05 baseline removed, the 95% threshold sits at 109 counts for the
+proposed method (92 for ADMM) while the largest plumes exceed 400 counts, so the events
+of interest separate cleanly from the noise floor under either baseline. Each level required
+44–53 minutes of computation at n = 8,640 (6,000 iterations), against roughly four minutes
+for the ADMM fit including the eBIC grid search; acceptance rates were 0.16, 0.39, and
+0.50 at τ = 0.01, 0.05, 0.1. Mixing degrades at the most extreme level: the median effective
+sample size of θ is 67 at τ = 0.1 and 39 at τ = 0.05, but drops to 3.5 at τ = 0.01, where
+fewer than one observation in a hundred lies below the trend and the smoothed check-loss
+gradient is nearly flat, so pointwise credible statements at τ = 0.01 carry substantial Monte
+Carlo error at this chain length.
+
+6.2    Munich Rent Data
+Data. The Munich rent data come from the 2003 Munich rental guide (Mietspiegel ), a
+survey used by the city to publish reference rents, and are a standard example in the re-
+gression literature (Fahrmeir et al., 2013); they are also the real-data illustration in Onizuka
+et al. (2024), which makes them a natural test bed for comparing the two Bayesian sam-
+plers. We use the N = 2,035 apartments in the version distributed with the spmrf package.
+The response y is the net rent per square metre (EUR per month) and the covariate x is
+
+
+                                               29
+Figure 3: Air quality data: baseline trends at τ ∈ {0.01, 0.05, 0.1} estimated by the individual
+P-MALA/Gibbs sampler with k = 2 on the 10-second means (n = 8,640) of SPod d, June
+15, 2018. Curves are posterior medians; the grey line is the observed PID series.
+
+
+
+
+Figure 4: Air quality data: detrended series y − θˆ︁ for the P-MALA baselines of Figure 3,
+one panel per quantile level. Horizontal lines mark the 90th (dashed), 95th (solid), and 99th
+(dotted) empirical percentiles of the detrended data, the thresholds used to classify emission
+events.
+
+
+
+
+                                              30
+the floor size in square metres. The design has two features that the simulation study of
+Section 3 does not exercise. First, floor size is recorded to the square metre, so the 2,035
+apartments occupy only n = 134 distinct sizes between 17 and 185 m2 , with a median of
+13 apartments per size, up to 57 at 65 m2 , and one or two per size above roughly 130 m2 .
+Second, the observed sizes skip integers, with gaps of up to 5 m2 in the upper range, so the
+grid is irregular. The scatter of rent against size (grey circles in Figure 5) shows a steep
+decline in rent per square metre for small apartments, a long plateau between about 50 and
+120 m2 , and a sparse, noisier upper tail.
+
+Model and settings. Both features are accommodated without changing the samplers.
+The trend θ ∈ Rn is indexed by the 134 distinct sizes, and the ALD likelihood sums the check
+loss over all apartments sharing a size, so that each θj is informed by every rent recorded
+at xj . Unequal spacing enters only through the difference operator: following Onizuka
+et al. (2024), the equally spaced D(k+1) is replaced by the recursively weighted operator
+D(k+1) = D(1) diag{k/(xj+k − xj )} D(k) , which reduces to the usual operator when the xj
+are equally spaced. We fit k = 2, so the prior favours piecewise quadratic trends in floor
+size, at the five quantile levels τ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, each estimated independently by
+the individual sampler of Section 2.1. The sampler is run for 6,000 Gibbs iterations with
+a burn-in of 1,000, with proximal parameter γ = 0.1, smoothing parameter ϵ = 0.01, and
+priors λ ∼ Gamma(1, 1) and σ ∼ IG(0.01, 0.01). The P-MALA step size is not set by hand:
+starting from δ = 0.01, it is adapted during the burn-in by a Robbins–Monro recursion on
+log δ toward a target acceptance rate of 0.45 and then frozen, so that every retained draw
+comes from a single fixed kernel. The adapted step sizes settle between 0.08 and 0.11 across
+the five levels and the post-burn-in acceptance rates lie between 0.45 and 0.49. Because the
+fitted curves are smooth, SD (θ) is small, between 0.04 and 0.06 at the posterior mean, so
+the rate parameter b = 1 of the Gamma prior dominates the posterior rate b + SD (θ) and
+the posterior mean of λ is close to (a + m)/b = 132 at every level (123–126); as in the air
+quality application, the prior acts as a smoothness dial here. As the point of comparison
+we run the horseshoe sampler of Onizuka et al. (2024) in MCMC mode using the authors’
+own code, which handles repeated observations and irregular grids natively, with the same
+k, the same quantile levels, and the same number of iterations and retained draws. For both
+methods the point estimate is the posterior mean of θ and the bands are 95% pointwise
+credible intervals computed from the 5,000 retained draws.
+
+Results. Figure 5 displays the fitted 10% and 90% quantile curves of the individual sam-
+pler, and Figure 8 in Appendix D.2 the corresponding horseshoe fit; the two curves together
+bracket the central 80% of the conditional rent distribution at every floor size. In both cases
+the fraction of rents below each fitted curve matches its nominal level to within 0.005: 0.100,
+0.304, 0.501, 0.700 and 0.902 for the individual sampler and 0.098, 0.299, 0.501, 0.703 and
+0.903 for the horseshoe sampler at τ = 0.1, 0.3, 0.5, 0.7, 0.9. Although each level is fitted
+independently and nothing enforces non-crossing, the five posterior-mean curves are ordered
+at all 134 floor sizes for both methods. The two samplers agree closely over the whole range:
+the 10% curve falls steeply from about 12 EUR/m2 at 17 m2 to about 5.4 EUR/m2 near 45 m2
+and then declines slowly to about 3.2 EUR/m2 at 185 m2 , and the 90% curve runs from about
+
+
+                                              31
+18 to 11.7 to 8.4 EUR/m2 over the same sizes, with the two methods within 0.1 EUR/m2
+of each other beyond 45 m2 . The only visible difference is at the left boundary, where one
+or two apartments are observed per size and the horseshoe fit places the 90% curve about
+0.7 EUR/m2 higher, at 18.4 against 17.7 EUR/m2 , with a correspondingly wider band. With
+k = 2, both priors therefore produce essentially the same smooth conditional quantiles; the
+contrast is with the cost of obtaining them, since the five levels took 3.1 minutes in total for
+the individual sampler against 4.7 minutes for the horseshoe sampler on the same n = 134
+grid. The fits at the interior levels τ ∈ {0.3, 0.5, 0.7}, which are nearly indistinguishable
+between the two methods, are reported there as well.
+
+                                                10%       90%
+
+
+
+                                20
+
+
+
+
+                                15
+            rent (EUR per m2)
+
+
+
+
+                                10
+
+
+
+
+                                5
+
+
+
+
+                                0
+                                     50           100             150
+                                             floor size (m2)
+
+
+Figure 5: Munich rent data: 10% and 90% conditional quantiles of rent per square metre
+as a function of floor size, estimated by the individual P-MALA/Gibbs sampler with k = 2
+and burn-in-adapted step size. Solid curves are posterior means, coloured ribbons are 95%
+pointwise credible intervals, and the grey band between the two curves marks the central
+80% of the fitted conditional distribution. Grey circles are the 2,035 apartments.
+
+
+
+6.3    Growth Centiles for Dutch Children
+Growth charts are the canonical use of quantile curves: a child’s height is read against the
+population centiles at the same age, so the chart itself is a family of quantile curves indexed
+by age. We use the Fifth Dutch Growth Study (Schönbeck et al., 2013), a nationwide cross-
+sectional sample collected in 2009 and distributed with the mice package (van Buuren and
+Groothuis-Oudshoorn, 2011). After removing records without a height measurement the
+data contain 4,817 boys and 5,190 girls aged 0 to 22 years, each measured once. Boys and
+girls are analysed separately.
+    As with the Munich rents, many children share a covariate value. We round age to the
+nearest tenth of a year, which gives G = 220 equally spaced age slots for boys and G = 221 for
+girls, and index the trend θ ∈ RG by slot; the likelihood sums the check loss over all children
+
+
+                                               32
+in a slot exactly as in Section 6.2, and because the grid is equally   √ spaced the difference
+operator needs no reweighting. We fit k = 2 with λ ∼ Gamma(1, G), one independent run
+per level τ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, each for 6,000 iterations with 1,000 burn-in, and report
+the posterior mean. The linear-in-n prior of Section 2.1 is calibrated to one observation per
+design point; with some twenty children per slot the likelihood is far more concentrated,√ and
+a prior centred near 2G leaves the P-MALA step unable to move, so we use the n rule
+instead.
+     As a benchmark we fit the LMS method (Cole and Green, 1992), the standard tool for
+growth references. At each age, height is assumed to follow a Box–Cox Cole–Green distribu-
+tion whose median, coefficient of variation and Box–Cox power are smooth functions of age;
+all centiles are read off this one fitted distribution, so they cannot cross by construction, at
+the price of a parametric shape assumption at every age. We use the lms function of the
+gamlss package (Rigby and Stasinopoulos, 2005).
+     Figure 6 shows the five fitted quantile curves for boys. The curves follow the fast growth
+in infancy, the near-linear childhood phase, the pubertal spurt and the adult plateau, and
+they fan out with age as the height distribution widens. In-sample calibration is close to
+nominal: the fraction of boys below the fitted curve is 0.098, 0.300, 0.498, 0.699 and 0.903 at
+τ = 0.1, 0.3, 0.5, 0.7, 0.9. Although the five fits are independent and nothing in the individual
+sampler enforces non-crossing, the posterior-mean curves for girls never cross, and those for
+boys cross at a single grid point (age 0.1 years, where the 0.5 and 0.7 curves invert by
+0.6 cm), out of 880 adjacent comparisons. The girls’ fit and the LMS centiles for both sexes
+are reported in Appendix D.3 (Figures 11–13). The two methods agree closely between
+roughly one and eighteen years of age and differ at the ends of the age range, where few
+children are observed: the LMS centiles follow the local data more closely, whereas the trend-
+filtering curves extrapolate the piecewise-quadratic trend, sitting slightly above the newborn
+measurements and bending at the oldest ages.
+
+
+7     Discussion
+Bayesian-PMALA brings exact posterior sampling to quantile trend filtering while keeping
+the proximal structure of the optimization problem. Under the normal–exponential repre-
+sentation, the proximal map of the whole conditional posterior of the trend is a weighted
+trend filtering problem, so no part of the check loss is smoothed and the Metropolis–Hastings
+correction is exact. In the simulation study each competitor is most accurate on the bench-
+mark that suits it, and Bayesian-PMALA is competitive with both on both signals, with one
+default configuration for every signal, noise family and quantile level. It matches the locally
+adaptive horseshoe sampler with a single global penalty per quantile, and it matches ADMM
+while learning the penalty and the likelihood scale from the posterior instead of selecting a
+penalty by an information criterion.
+    The computational structure is the second difference from the Gibbs sampler of Onizuka
+et al. (2024). Its supplied implementation forms a dense inverse and uses dense Gaussian
+simulation at each iteration, also with its sparse option. Every linear system in Bayesian-
+PMALA is banded, with bandwidth k +1 for every n. The metric M and the ADMM system
+matrix change with (z, λ, σ) and are therefore factorized at each sweep, but one factorization
+
+
+                                               33
+                          200
+
+
+
+
+                          150
+            Height (cm)
+
+
+
+
+                          100
+
+
+
+
+                           50
+
+                                0   2   4    6         8         10         12     14     16    18   20   22
+                                                                 Age (years)
+
+                                            Quantile       10%        30%    50%    70%   90%
+
+
+
+
+Figure 6: Individual P-MALA/Gibbs fits for the height of 4,817 Dutch boys (Fifth Dutch
+Growth Study, 2009) at τ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, k = 2. Curves are posterior means on
+the 0.1-year age grid; grey circles are the individual measurements. Each level is fitted
+independently.
+
+
+of each serves the forward and reverse proximal maps and the proposal noise, and for a fixed
+ADMM iteration budget the work per sweep grows linearly with n. The measured running
+times differ accordingly (Section 4): a run at the settings of Section 3 takes 2 minutes against
+42 minutes at n = 500, and 18 minutes against more than three weeks at n = 4000. Running
+time per effective posterior draw also depends on mixing, which we do not compare here.
+    The experiment of Section 5 clarifies what the global penalty buys. There the estimand
+is a peak-free baseline at a low quantile and the observed series is contaminated by transient
+peaks, so local adaptivity is a liability: the horseshoe’s coefficient-specific scales let the fit
+follow each peak, which lowers the check loss on the contaminated data, raises the error
+against the peak-free target, and removes from the detrended residuals part of the signal the
+downstream detector is meant to find. A single penalty cannot bend locally, and Bayesian-
+PMALA is far more accurate than the horseshoe sampler on that design and close to ADMM.
+The design also shows the limit of what the likelihood can identify: the separation between
+a smooth background and transient bursts is not in the data model y = θ + ε, so it has to
+enter through the prior on λ. We use a second prior, fixed in advance and shared across
+sample sizes, for data of this kind, and keep the weak default elsewhere; a hierarchy that
+learns the separation itself, for instance by modelling the burst component explicitly, is a
+natural extension.
+    Treating the ALD scale σ as unknown is a substantive modeling choice. At fixed (λ, σ)
+the conditional mode is the quantile trend filter with penalty λσ (8), so the posterior learns
+the effective penalty through two parameters, the scale adapting to the noise level and λ to
+the roughness of the trend, rather than asking one tuning parameter to absorb both roles.
+Learning σ does not by itself guarantee frequentist coverage when the asymmetric Laplace
+
+
+                                                                  34
+likelihood is misspecified, a point also recognized by the calibration approach of Onizuka
+et al. (2024).
+    A single global penalty is a deliberate simplification relative to coefficient-specific shrink-
+age, and the experiments do not establish a universally preferred prior or difference or-
+der. The pointwise intervals are below nominal coverage at the outer quantile levels (Sec-
+tion 3.1.2), and their calibration there requires further study.
+    The joint sampler of Section 2.2 enforces non-crossing on every posterior draw at the
+observed indices, and it does so without leaving the P-MALA framework: the order constraint
+adds the indicator of a box to the negative log-conditional of each trend, which keeps it
+convex, so only the proximal map changes and the Metropolis–Hastings correction keeps its
+single-level form. The joint target is a constrained product of working posteriors for the
+same data, not a joint likelihood for several quantiles, and how the constraint shifts each
+level’s posterior relative to its single-level fit, in location and in interval width, remains to
+be studied.
+    Several extensions follow from the present work. Locally adaptive priors can be com-
+bined with the same proximal update, since the conditional of the trend remains a weighted
+quadratic plus a weighted ℓ1 penalty. Extension to spatially indexed signals requires gener-
+alizing the difference operator to graphs, for which the systems are no longer banded and
+sparse or multigrid solvers may serve a similar role. Finally, the convergence properties of
+the full Gibbs sampler with continuous step-size adaptation remain to be established.
+
+
+
+
+                                                35
+A      Computational Details of Bayesian-PMALA
+This appendix gives the derivations of the full conditional distributions of Section 2.1, the
+algorithms that solve the two proximal problems, the unconstrained map (13) of the indi-
+vidual sampler and the box-constrained map (23) of the joint sampler, the interweaving step
+for λ and its constrained version, the initialization, warm-up and step-size adaptation, and
+the numerical safeguards, followed by the reason each component was needed and the checks
+of the implementation.
+
+A.1      Full conditional distributions
+Write ei = yi − θi . The terms of (7) that involve θ are i (ei − ψτ zi )2 /(2ωτ2 σzi ) + λ ∥Dθ∥1 ,
+                                                             ∑︁
+which equals U (θ) in (12) up to a constant, with wi and ri as in (6).
+     For zi , expanding the square gives (ei − ψτ zi )2 /(2ωτ2 σzi ) = e2i /(2ωτ2 σzi ) − ψτ ei /(ωτ2 σ) +
+ψτ2 zi /(2ωτ2 σ), and the middle term does not depend on zi . Hence
+                                                      {︃  (︃            )︃}︃
+                                              −1/2       1 χi
+                           p(zi | θ, σ, y) ∝ zi    exp −        + ψ̃ zi      ,
+                                                         2 zi
+
+with χi = e2i /(ωτ2 σ) and ψ̃ = σ −1 (ψτ2 /ωτ2 + 2) = 1/{2τ (1 − τ )σ}. This is a generalized
+inverse Gaussian distribution GIG(1/2, χi , ψ̃). Its reciprocal is inverse Gaussian with mean
+(ψ̃/χi )1/2 = 1/{τ (1 − τ )|ei |} and shape ψ̃, which is (9).
+    The terms involving λ are λa0 +m−1 exp{−λ(b0 +∥Dθ∥1 )}, giving (10). The terms involving
+σ are σ −n/2 from the Gaussian factors, σ −n from the exponential densities of z, and the
+inverse-Gamma prior; collecting the∑︁     exponents gives the inverse-Gamma distribution (11)
+with shape aσ + 3n/2 and rate bσ + i {zi + (ei − ψτ zi )2 /(2ωτ2 zi )}. The blocks are updated
+in the order θ, z, λ, σ, each conditional on the most recent values of the others. In the joint
+sampler the same derivations apply level by level: the order indicator in (20) is a function
+of Θ alone and is constant in (zj , λj , σj ).
+
+A.2      The proximal map of the individual sampler
+Write the metric (18) as M = diag(d) + cD⊤ D, with d = w and c = min(κλ2 /2, 108 ), the
+cap being safeguard (ii) of Appendix A.7. With v = Dθ, problem (13) becomes
+               {︄ n                                          }︄
+                 1 ∑︂                             1        2
+          min          wi (θi − ri )2 + λ ∥v∥1 +    ∥θ − x∥M    subject to v = Dθ.
+           θ,v   2 i=1                           2γ
+
+We apply scaled ADMM with penalty parameter ϱ > 0 and scaled dual variable ν ∈ Rm .
+Starting from v 0 = Dx and ν 0 = 0, iteration t is
+
+        θt+1 = A−1 W r + γ −1 M x + ϱD⊤ (v t − ν t ) , A = W + γ −1 M + ϱD⊤ D,
+                     {︁                             }︁
+
+        v t+1 = Sλ/ϱ Dθt+1 + ν t ,
+                     (︁          )︁
+
+        ν t+1 = ν t + Dθt+1 − v t+1 ,
+
+
+                                                   36
+where Sc (a) = sign(a) max(|a|  − c, 0) acts elementwise and r = (r1 , . . . , rn )⊤ . We use ϱ =
+0.1 (w̄ + c)/γ with w̄ = n−1 i wi , about one tenth of the curvature that the metric term
+                              ∑︁
+contributes, and return θ150 : the budget is fixed at 150 iterations with no data-dependent
+stopping rule. An early exit on the relative primal and dual residuals is available and also
+depends only on the iterates, but it is switched off, because it saved no time at this budget
+(Appendix A.9).
+    The θ-update is computed for the increment θ − x rather than for θ. Subtracting Ax
+from both sides of the linear system gives
+
+                       A(θt+1 − x) = W (r − x) + ϱD⊤ v t − ν t − Dx ,
+                                                       (︁             )︁
+
+
+which has the same solution. Its right-hand side is of the order of the move T (x) − x, which
+vanishes with γ, whereas the right-hand side W r +M x/γ +ϱD⊤ (v −ν) of the original system
+grows like 1/γ. In floating point the rounding error of the original solve is proportional to
+∥x∥ and does not decrease with γ, and it enters the acceptance ratio (17) divided by δ.
+For long series with a large dynamic range, as in Section 6.1, that error stopped the chains
+once the adaptation had reduced δ; the increment form removes it. The simulations of
+Section 3 were run before this change; rerunning replications 1–10 of every configuration
+with the increment form reproduces them, with no configuration differing significantly (all
+paired |t| < 2, geometric mean of the MSE ratios 1.01). The experiments of Sections 5 and
+6.1 use the increment form throughout.
+    The matrices A and M are symmetric positive definite and banded with half-bandwidth
+k + 1 for every n, and they are factorized separately. Within one P-MALA move A does not
+depend on the input x, so it is factorized once by a banded Cholesky decomposition, and the
+factor is shared by the forward map T (θ) and the reverse map T (θ⋆ ); if the factorization fails
+because of rounding, the ridge retry of safeguard (iii) is applied. The metric is factorized
+once per move as M = LL⊤ , and L gives the noise L∑︁      −⊤
+                                                             ξ in (16). The two norms in (17)
+need no factor; they are evaluated directly as ∥v∥M = i di vi2 + c ∥Dv∥22 . Each factorization
+                                                    2
+
+costs O(n(k + 1)2 ) operations, and each ADMM iteration costs one pair of banded triangular
+solves and one application each of D and D⊤ , that is O(n(k + 1)) operations. For the fixed
+budget the cost of a sweep is therefore linear in n.
+    The Metropolis–Hastings correction requires only that T be a deterministic function of
+its input, given (z, λ, σ, δ). The proposal density is then exactly N (θ⋆ ; T (θ), δM −1 ), and the
+kernel leaves the conditional invariant whether or not T (x) is the exact minimizer of (13).
+The cold start from (Dx, 0) and the fixed iteration rule guarantee this, and the forward
+and reverse maps are computed by the same rule. A solver warm-started from the previous
+sweep’s solution would make T depend on the history of the chain, the reverse density would
+no longer be the one evaluated in (17), and the correction would be invalid. In our runs the
+acceptance rate at a given δ did not change when the iteration budget was increased, so the
+budget does not limit the step size.
+
+A.3     The proximal map of the joint sampler
+Fix a level and suppress its index. The box B = [ℓ, u] of (21) has components that may be
+infinite (at j = 1 and j = J), and ℓi = ui is allowed where two neighbouring curves touch.
+
+
+                                                37
+The constrained map (23),
+                                           {︃                  }︃
+                                                    1        2
+                          TB (x) = arg min U (θ) +    ∥θ − x∥M ,
+                                       θ∈B         2γ
+is the proximal map of U + ιB in the M -norm, where ιB is zero on B and +∞ outside
+it. Coordinates with ℓi = ui are fixed. The smooth part of the objective has Hessian
+Q = W + M/γ = diag(w + d/γ) + (c/γ)D⊤ D, so on the remaining coordinates the problem
+is strongly convex with modulus at least
+
+                                  qmin = min (wi + di /γ) ,
+                                         i: ℓi <ui
+
+
+and TB (x) is unique. We write Tˆ︁B for the map actually computed, which is the map used as
+Tj in (24)–(25); as in the individual case, only its determinism matters for the correction.
+
+Why the box is not split by ADMM. The natural extension of Appendix A.2 adds a
+second splitting b = θ carrying ιB , with per-coordinate penalty ζi = wi + di /γ, a projection
+onto B for the b-update and a scaled dual variable for the box. Under the curvature metric
+c/γ is large (between 6 × 104 and 4 × 109 on the 72 realistic problems described at the end
+of this subsection), and whenever a bound is active the dual ascent of the box multiplier
+converges very slowly. On those problems, with the 150-iteration budget, the largest coordi-
+nate error relative to the exact constrained
+                                    √︁        minimizer reached 1.9 times the per-coordinate
+proposal-noise standard deviation δ/wi , and 1.6 times it after 1000 iterations; on the worst
+problem the error was still 2.9 × 10−4 after 30000 iterations. Over-relaxation and residual-
+balanced rescaling of ζ (Boyd et al., 2011, Sec. 3.4.1) did not change this (1.4 and 1.8 noise
+standard deviations at 1000 iterations). An active-set scheme that pins violating coordinates
+at their bounds and re-solves cycled on the same problems.
+
+Stage 1: the unbounded map. The adopted solver first computes the unbounded map
+of Appendix A.2, θ̃ = T (x), with the same penalty, cold start and 150-iteration budget. If
+ℓ ≤ θ̃ ≤ u componentwise, θ̃ is returned. When the unbounded minimizer lies in B it is
+also the constrained minimizer, by convexity. The test is applied to the computed output θ̃,
+and either way the result is a deterministic function of x. Consequently Tˆ︁B coincides bitwise
+with the individual map for a free box (J = 1) and whenever the neighbouring curves do
+not bind.
+
+Stage 2: an interior-point method. Otherwise TB (x) is computed from the epigraph
+quadratic program
+             1 ⊤
+    min        θ Qθ + q ⊤ θ + λ1⊤ υ
+ θ∈Rn , υ∈Rm 2
+                                                                                          (39)
+ subject to Dθ − υ ≤ 0,     −Dθ − υ ≤ 0,      θi ≤ ui (ui < ∞),   −θi ≤ −ℓi (ℓi > −∞),
+
+with Q = W + M/γ and q = −(W r + M x/γ); at the optimum υ = |Dθ|, so (39) is
+equivalent to (23). The fixed coordinates are set to their common bound and eliminated. We
+solve (39) by Mehrotra’s predictor–corrector primal–dual interior-point method (Mehrotra,
+
+                                                38
+1992). Write the four constraint blocks with slacks s1 , s2 ∈ Rm , s3 , s4 ∈ Rn and multipliers
+π1 , . . . , π4 ≥ 0 of the same sizes, entries for infinite bounds being omitted. The residuals are
+
+      rθ = Qθ + q + D⊤ (π1 − π2 ) + π3 − π4 ,            rυ = λ1 − π1 − π2 ,
+      r1 = Dθ − υ + s1 , r2 = −Dθ − υ + s2 ,             r3 = θ − u + s3 , r4 = ℓ − θ + s4 ,
+
+with the dual residual rd = (rθ , rυ ), the primal∑︁residual rp = (r1 , . . . , r4 ), and the comple-
+mentarity measure µ̄ = s⊤ π/N , where s⊤ π = k s⊤       k πk and N is the number of inequality
+constraints. A Newton step linearizes rd = 0, rp = 0 and the complementarity conditions,
+the latter as sk ◦ ∆πk + πk ◦ ∆sk = gk with right-hand sides gk given below, and is com-
+puted by eliminating ∆sk , ∆πk and ∆υ. With Wk = diag(πk /sk ) and r̂k = rk + gk /πk
+(elementwise operations), the slack and multiplier steps are ∆π1 = W1 (D∆θ − ∆υ + r̂1 ),
+∆π2 = W2 (−D∆θ − ∆υ + r̂2 ), ∆π3 = W3 (∆θ + r̂3 ), ∆π4 = W4 (−∆θ + r̂4 ) and ∆sk =
+(gk − sk ◦ ∆πk )/πk . The υ-row, ∆π1 + ∆π2 = rυ , gives
+
+                 ∆υ = (W1 + W2 )−1 {(W1 − W2 )D∆θ + W1 r̂1 + W2 r̂2 − rυ } ,
+
+and substituting into the θ-row leaves one linear system in ∆θ,
+
+                 Q + D⊤ Wυ D + W3 + W4 ∆θ = −rθ − D⊤ h − W3 r̂3 + W4 r̂4 ,
+               (︁                        )︁
+                                                                                                (40)
+
+where Wυ = 4W1 W2 (W1 + W2 )−1 and h = W1 r̂1 − W2 r̂2 − (W1 − W2 )(W1 + W2 )−1 (W1 r̂1 +
+W2 r̂2 −rυ ). The matrix in (40) is symmetric positive definite and banded with half-bandwidth
+k +1, so each Newton system is solved by banded Cholesky (with the ridge retry of safeguard
+(iii)) in O(n(k + 1)2 ) operations, and all other quantities in O(n(k + 1)). Each iteration
+solves (40) twice with the same matrix: the predictor uses gk = −sk ◦ πk , and the corrector
+gk = −sk ◦ πk − ∆saff          aff                                                      3
+                      k ◦ ∆πk + ς µ̄1, with centering parameter ς = min{1, (µ̄aff /µ̄) } and
+µ̄aff the complementarity measure after the predictor step. Primal and dual step lengths
+are chosen separately, each the largest step in (0, 1] that keeps 0.99 of the distance to the
+boundary of the nonnegative orthant.
+
+Initialization and stopping. The method starts from the clipped stage-1 output, θ0 =
+min{max(θ̃, ℓ), u}, with fixed coordinates at their bound. Let sθ = max(1, ∥θ0 ∥∞ ) and
+smin = 0.01 sθ . Then υ 0 = |Dθ0 | + smin , the slacks are s1 = υ 0 − Dθ0 , s2 = υ 0 + Dθ0 ,
+s3 = max(u − θ0 , smin ) and s4 = max(θ0 − ℓ, smin ), all at least smin , the multipliers of the
+difference constraints are π1 = π2 = λ/2 (plus 10−8 , which keeps them positive at λ = 0),
+so that the υ-block starts dual feasible, and the box multipliers are 1. The stopping rule is
+stated in units of θ, with accuracy ε = 10−8 :
+
+                 ∥rp ∥∞ ≤ ε(1 + sθ ),      ∥rd ∥∞ ≤ ε qmin ,      s⊤ π ≤ ε2 qmin /2.
+
+The last two thresholds are motivated by the strong convexity of (23). At a primal feasi-
+ble point we have ∥θ − TB (x)∥ ≤ ∥rd ∥ /qmin when the complementarity gap vanishes, and
+∥θ − TB (x)∥2 ≤ 2s⊤ π/qmin when the dual residual vanishes. Let ϕ be the largest of the three
+ratios of a residual to its threshold. The iterate with the smallest ϕ after the starting point
+is retained, and the loop stops when ϕ ≤ 1, on stall (after the first 15 iterations, when 10
+
+                                                 39
+consecutive iterations have not reduced the best ϕ by 10%), on a non-finite value, or after
+100 iterations. The retained iterate is clipped to B, which removes violations at the round-
+ing level, and returned. On the problems met in the sampler ∥q∥∞ is large, with median
+107 and maximum 8 × 109 on the realistic problems below, so εqmin lies between 10−16 and
+2 × 10−12 of ∥q∥∞ , at or below the rounding level of Qθ + q. The dual residual therefore
+cannot reach its threshold, and the loop usually ends at its numerical floor through the stall
+rule. The stopping flag is consequently not used as evidence of accuracy, which is established
+empirically below.
+
+Determinism and the Metropolis–Hastings correction. Every rule above (the stage-
+1 test, the initialization, the step lengths, the choice of the retained iterate and the stopping
+rules) depends only on the inputs (x, w, r, λ, d, c, γ, ℓ, u) and on the iterates. Hence Tˆ︁B is
+a deterministic function of x, and, as in Appendix A.2, the correction (25) is exact for the
+computed map whether or not Tˆ︁B (x) = TB (x). Within one move the forward and reverse
+maps use the same box, metric, step size and rule. A proposal θ⋆ ∈       / B is rejected without
+computing the reverse map. The ADMM matrix A is assembled once per move and factorized
+within each map, and M is factorized once for the noise; the norms in (25) are evaluated
+directly, as in the individual case.
+
+Verification. The solver was checked by eight tests. With an infinite box, and with a
+finite box wide enough to contain the unbounded output, Tˆ︁B was bitwise identical to the
+unbounded map. At λ = 0 and c = 0 the problem separates and TB (x) = min[max{(w ◦
+r + d ◦ x/γ)/(w + d/γ), ℓ}, u] in closed form, with elementwise operations; with one-sided,
+two-sided and degenerate bounds the interior-point output agreed with it to 8.5 × 10−12 .
+Repeated calls returned identical output, the returned points satisfied the bounds exactly,
+and fixed coordinates were returned exactly at their bound. On 108 small problems (n = 60;
+k ∈ {0, 1, 2}; λ ∈ {0.5, 5, 50}; γ ∈ {0.01, 0.1, 1}; two-sided, one-sided, partly degenerate and
+tight boxes) we compared Tˆ︁B with the interior-point solver Clarabel (Goulart and Chen,
+2024) applied to (39) with tolerances 10−10 . Clarabel solved all 108; the interior-point stage
+was used in 90 of them, with at most 27 iterations; the objective of Tˆ︁B (x) was never above
+Clarabel’s, and Tˆ︁B (x) agreed to 8.7×10−11 with a self-reference obtained by the same method
+with ε = 10−12 and up to 300 iterations. In a perturbation test, 500 of 500 random feasible
+perturbations of the output increased the objective.
+    The realistic problems reproduce the conditions of the sampler: n = 500, k = 2, the
+varying-smoothness signal with Gaussian noise, augmented weights for τ ∈ {0.75, 0.95},
+λ ∈ {100, 1000, 5000}, δ ∈ {0.02, 0.1, 0.5} and the curvature metric, with four kinds of box
+around a smooth curve: a lower bound only, a two-sided band, a tight band of half-width
+10−3 , and a band with five degenerate coordinates; 72 problems in all. The interior-point
+stage was used in 66 of them, with a median of 26 and a maximum of 35 iterations, and one
+complete map took at most 0.08 seconds (median 0.03 seconds). The stopping threshold was
+met in only 1 of the 66 solves; the others ended through the stall rule, as explained above.
+The output agreed with the ε = 10−12 self-reference
+                                            √︁          to 5.0 × 10−10 , which is 4.0 × 10−9 of the
+per-coordinate noise standard deviation δ/wi . Because Clarabel’s iterates are limited by
+the same scale of Q and q, the comparison with it is made on the objective value, measured
+
+                                                40
+as (f − fref )/(1 + |fref |): the objective of Tˆ︁B (x) was below Clarabel’s in 69 of the 72 problems
+and above it in 3, by at most 1.9×10−9 . The a posteriori bounds computed from the retained
+iterates are informative for the complementarity gap but not for the dual residual. Over the
+66 interior-point solves, {2s⊤ π/qmin }1/2 had median 1.7 × 10−7 and maximum 5.2 × 10−5 , at
+most 4.8 × 10−3 of the smallest proposal-noise standard deviation, whereas ∥rd ∥∞ /qmin had
+median 2.5 × 10−4 and maximum 0.35, and exceeded the smallest proposal-noise standard
+deviation in 9 problems. The dual residual stalls at the numerical floor described above, also
+for the ε = 10−12 self-reference, so it does not certify the output; the evidence of accuracy is
+the objective comparison with Clarabel, together with the agreement with the self-reference,
+which shows that further iterations do not move the output. As an independent check by a
+different algorithm, the two-block ADMM described above, which converges for any positive
+penalty, was run on the 66 problems for 104 , 105 and 106 iterations. Its largest distance to
+Tˆ︁B (x), in units of the per-coordinate noise standard deviation, fell from 0.51 to 0.11 and
+0.033 (medians 3.0 × 10−3 , 4.1 × 10−4 and 4.2 × 10−5 ), and its objective was never below that
+of Tˆ︁B (x) by more than 2×10−9 relative. On the nine problems where the dual-residual bound
+exceeded the noise scale, the distance after 106 iterations was at most 0.029 noise standard
+deviations and still decreasing. Both methods therefore approach the same minimizer, and
+the interior-point output attains it to well within the resolution that matters for the proposal.
+Finally, a complete move computed in one call agreed bitwise with the forward map, noise
+and reverse map computed separately; proposals outside B were detected and the reverse
+map skipped, including when the upper bound lay 10−9 above Tˆ︁B (θ); with a free box the
+move was bitwise identical to the move of the individual sampler; and the map remained
+deterministic when the stage-1 early exit was enabled.
+
+A.4     Interweaving step for the regularization parameter
+Posterior draws of the trend satisfy ∥Dθ∥1 ≈ m/λ; across the simulation configurations of
+Section 3 the ratio ∥Dθ∥1 /(m/λ) was between 1.0 and 1.1. The conditional (10) is therefore
+concentrated near the current value of λ, and the conjugate draw alone moves λ by a few
+percent per sweep. We interweave it with a draw in the ancillary parameterization (Yu and
+Meng, 2011).
+   Let Q ∈ Rn×(k+1) be an orthonormal basis of the null space of D, and decompose θ =
+θ∥ + θ⊥ with θ∥ = QQ⊤ θ. Under (2), the standardized differences ũ = λDθ = λDθ⊥ have
+independent standard Laplace entries and do not depend on λ. Holding (ũ, θ∥ , z, σ) fixed,
+a new value λ′ implies the trend θ(λ′ ) = θ∥ + (λ/λ′ )θ⊥ . The factor λ′m in (2) cancels the
+Jacobian of the map θ⊥ ↦→ ũ, so the conditional density of λ′ is
+                                                            {︄    n
+                                                                                          }︄
+                                                        ′      1 ∑︂                     2
+              p(λ′ | ũ, θ∥ , z, σ, y) ∝ λ′ a0 −1 e−b0 λ exp −       wi (θi (λ′ ) − ri ) .
+                                                               2 i=1
+
+We draw η = log λ′ by univariate   slice sampling with stepping out (Neal, 2003), using the
+                           1
+                       η
+log density a0 η − b0 e − 2 i wi (θi (eη ) − ri )2 (the change of variables contributes eη ), an
+                             ∑︁
+initial interval width of 1, at most 30 stepping-out steps divided at random between the
+two ends, and interval shrinkage; if the shrinking interval falls below width 10−10 the state
+is left unchanged. We then set θ ← θ(λ′ ). Each density evaluation costs O(n) operations.
+
+                                                 41
+The sufficient-parameterization draw (10) and this ancillary draw each leave (7) invariant,
+so their composition does as well. The step moves λ and the rough part of θ together along
+the direction in which the conjugate draw is slow.
+
+Constrained version for the joint sampler. At level j, with the box Bj = [ℓj , uj ]
+of (21), write p = QQ⊤ θj and v = θj − p as in (26), and drop the index j. For a scale
+s = λ/λ′ > 0 the rescaled trend p + sv lies in the box if and only if
+                              ℓi ≤ pi + svi ≤ ui ,     i = 1, . . . , n.
+For vi ̸= 0 each condition is an interval in s with endpoints (ℓi − pi )/vi and (ui − pi )/vi ; for
+vi = 0 it requires pi ∈ [ℓi , ui ]. Intersecting these intervals with (0, ∞) gives [s− , s+ ], with
+endpoints at zero or infinity allowed as limits, and in η = log λ′
+                             log λ − log s+ ≤ η ≤ log λ − log s− .                            (41)
+The Jacobian argument above is unchanged, so the slice update targets
+                                   1 ∑︂ {︁
+                                       wi pi + λe−η vi − ri + log 1B p + λe−η v ,
+                                                           }︁2
+        log f (η) = a0 η − b0 eη −
+                                                                    (︁         )︁
+                                                                                              (42)
+                                   2 i
+
+with the weights and pseudo-responses of the newly drawn zj and the current σj . The
+implementation assigns log density −∞ outside (41) and also checks the reconstructed trend
+against the box, so that rounding cannot produce a crossing. If the interval is empty or
+degenerate, or the current trend’s density is not finite, the state is left unchanged. The
+rescaled trend is never clipped.
+
+A.5     Initialization and warm-up
+                                                                            (0)
+Every single-level chain starts at the data, θ(0) = y, with σ (0) = 1, zi = σ (0) , λ(0) = m
+and δ (0) = 0.2. Starting at y rather than at a smooth preliminary fit is deliberate: a
+chain started near a good smooth estimate can report a small error without having explored
+the posterior. The hyperparameters start at these data-free values rather than at their
+conditional distributions given θ = y, because at θ = y those conditionals place σ and z
+near zero, a nearly degenerate interpolating configuration from which a Gibbs chain does
+not escape.
+   An exact Metropolis–Hastings chain also cannot leave θ = y directly. Every proposal
+ ⋆
+θ is close to the output of a proximal map, which is smooth in Dθ, while y is rough; the
+reverse term ∥y − T (θ⋆ )∥2M /(2δ) in (17) is then very large and every proposal is rejected.
+The first H = 200 sweeps therefore replace the P-MALA move by the deterministic step
+                                 {︃                      }︃
+                                            1          2
+                    θ ← arg min U (ϑ) +        ∥ϑ − θ∥W ,       γw = 104 ,
+                              ϑ            2γw
+a proximal-point step toward the conditional mode, computed by the solver of Appendix A.2
+with M = W , γ = γw , ϱ = median(wi ) and 300 iterations. The blocks for z, λ and σ are
+drawn as usual during these sweeps; the interweaving step and the step-size adaptation start
+after them. The warm-up sweeps belong to the burn-in period and are discarded.
+
+                                                42
+Joint sampler. For J > 1 the trends start at the data shifted apart,
+         (0)
+        θj = y + sy Φ−1 (τj ) − medianh Φ−1 (τh ) 1,
+                   {︁                            }︁
+                                                        sy = max{sd(y), 0.1},
+
+where Φ is the standard normal distribution function. The levels are strictly ordered from the
+start without any random initialization; starting all levels at y would give the middle levels
+boxes of zero width. For J = 1 the trend starts exactly at y. The remaining parameters of
+every level start as in the single-level sampler. The warm-up step is the same proximal-point
+step restricted to the current box Bj , that is, (23) with Mj = Wj and γw = 104 , solved by
+the method of Appendix A.3 with the same 300-iteration ADMM budget. It keeps the levels
+ordered throughout the warm-up.
+
+A.6     Step-size adaptation
+After the warm-up, the step size is updated at every sweep by the Robbins–Monro recursion
+
+                     log δt+1 = log δt + t−0.6 (αt − 0.5) ,     αt = min(1, α),
+
+with α from (17), and δ is confined to [10−8 , 102 ]. The adaptation continues after burn-in,
+because λ can still drift slowly in the retained sweeps and a frozen step size then lets the
+acceptance rate drift with it. The gain t−0.6 decreases to zero, so the adaptation satisfies the
+diminishing-adaptation condition of Roberts and Rosenthal (2007). In the 3000 simulation
+runs of Section 3 the post-burn-in acceptance rate was between 0.47 and 0.52. In the joint
+sampler each level has its own step size δj , updated by the same recursion with αt the
+acceptance probability of its trend move, counted as zero when the proposal falls outside Bj .
+
+A.7     Numerical safeguards
+Four safeguards are part of the default algorithm and are applied identically in every run.
+(i) Each draw zi is restricted to [10−8 , 104 ], and |yi − θi | is floored at 10−10 in (9); this keeps
+the weights wi within a range in which M and the solver systems can be factorized, and
+the upper bound is essentially never active because zi has an exponential prior with mean
+σ. (ii) The difference-precision coefficient κλ2 /2 in (18) is capped at 108 . (iii) If a banded
+Cholesky factorization fails because of rounding, a ridge ϵ maxi Aii is added to the diagonal,
+starting from ϵ = 10−12 and multiplying ϵ by 100 up to five times; the ridge is part of the
+solver, so the proximal map remains deterministic. (iv) A non-finite value of log α is treated
+as a rejection, and any non-finite state stops the run with an error rather than propagating.
+None of the 3000 runs of Section 3 stopped. The joint sampler adds one check: after every
+update of a level, the trend is verified to lie in its box, and a violation stops the run.
+    The Metropolis–Hastings argument of Section 2.1.5 covers (ii) and (iii), which change
+the proposal and not the target, and the box check, which never triggers when the kernels
+are implemented correctly. It does not cover (i): clipping the latent draws and flooring the
+residual alter the ideal conditional of z slightly, and clipping is not sampling from a correctly
+normalized truncated distribution. The exactness of the trend update is therefore a property
+of that block, not a claim that the whole guarded implementation samples (7) or (20) exactly.
+
+
+                                                  43
+A.8     Run length
+Each run uses 30000 sweeps and discards the first 10000, which include the 200 warm-up
+sweeps, leaving 20000 retained draws. For the simulations at n = 500 the median wall time
+per run was 152 seconds on one core of a Linux compute cluster; the median effective sample
+size over the 20000 retained draws was 66 for the trend (median over coordinates) and 9.2
+for log λ. From λ(0) = m the chain approaches the posterior level of λ more slowly as n
+grows. In the design of Section 5, λ is stationary over the retained draws for n ≤ 2000,
+with a median relative change below 1% between the two halves of the retained sweeps, and
+a residual median change of 3–5% at n = 4000 for τ = 0.05 and 0.10. The application of
+Section 6.1, with n = 8640, therefore uses longer chains.
+
+A.9     Why each component was needed
+The sampler was developed under one rule: a single default configuration, fixed before seeing
+any data set and identical across signals, noise distributions and quantile levels, with every
+candidate change evaluated on all 30 configurations of Section 3 before adoption rather than
+on the configuration that motivated it.
+
+Proximal map of the whole conditional. P-MALA requires the proximal map of the
+entire negative log-density. Under the ALD likelihood that map contains the check loss, and
+the alternative of smoothing the check loss and applying a proximal map to the penalty alone
+did not perform well in preliminary experiments. The normal–exponential representation (5)
+makes the conditional of θ a weighted quadratic plus the ℓ1 penalty, whose proximal map is
+a weighted trend filtering problem, without approximating the likelihood.
+
+Noise after the proximal map. Adding the Gaussian noise after T , as in (16), gives a
+proposal with an explicit density. If the noise is added before a proximal map, the proposal
+is the image of a Gaussian under a nonlinear map that concentrates mass on trends that are
+sparse in Dθ; its density is not available, and a Gaussian density evaluated in its place does
+not give a valid Metropolis–Hastings ratio for the stated posterior.
+
+Curvature-matched metric. With M = √          In the noise in (16) is white, and its (k + 1)-th
+differences have standard deviation of order δ in each of the m coordinates, each charged
+by the penalty at rate λ. For the posterior values of λ at n = 500 this increases U by far
+more than the Metropolis–Hastings ratio can absorb: on a pilot configuration (VS signal,
+Gaussian noise, τ = 0.5) the acceptance rate was zero for every step size tried down to
+δ = 10−5 . The metric (18) scales the noise in the rough directions by 1/λ. Values of κ
+between 3 and 10 raised the adapted step size three- to tenfold relative to κ = 1 at the same
+acceptance rate and increased the effective sample size of θ several-fold; the default is κ = 3.
+
+Rate of the Gamma prior. Because the posterior draws of the trend satisfy ∥Dθ∥1 ≈
+m/λ (Appendix A.4), the data determine the level of λ only weakly, and the prior rate b0
+must be small relative to ∥Dθ∥1 for λ to be learned. A unit rate is far from weak on this scale:
+Gamma(1, 1) gives P (λ > 500) = e−500 , whereas Gamma(1, 10−3 ) gives P (λ > 500) ≈ 0.61.
+
+                                              44
+Under Gamma(1, 1) the chain settled at λ between 50 and 75 on the pilot configuration
+and returned undersmoothed trends. We therefore use b0 = 10−3 . A sensitivity run with
+b0 = 10−4 on all 30 configurations with 10 replications each was not uniformly better: on
+the smooth signal the geometric-mean MSE ratio to the default was 0.86, with 7 of 15
+configurations significantly lower and none higher, but the median coverage of the 95%
+intervals fell from 0.91 to 0.84; on the varying-smoothness signal the ratio was 1.01, with 1
+configuration significantly lower and 2 higher. The default was kept. A Laplace prior scaled
+by σ (Park and Casella, 2008), under which the penalty enters as λ/σ, was also examined
+and rejected, because in one configuration λ and σ escalated together to very large values
+for a long stretch of the chain, a mode the unscaled prior (2) does not exhibit.
+
+Prior on the likelihood scale. The inverse-Gamma parameters enter (11) next to 3n/2
+and a sum over n observations, so aσ = bσ = 0.1 carries negligible information while keeping
+the prior proper and away from the improper limit aσ , bσ → 0.
+
+Start at the data and warm-up. The start θ(0) = y and the warm-up are explained in
+Appendix A.5.
+
+Continuous adaptation. Adapting δ only during burn-in left the acceptance rate drift-
+ing in configurations where λ was still moving after burn-in; the diminishing recursion of
+Appendix A.6 removes this drift.
+
+Interweaving step and other candidate changes. Table 5 lists the variants evaluated
+for the last change to the default, each run on all 30 configurations with one replication.
+Single-replication MSE differences of this size are within replication noise (the standard
+deviation of log MSE across replications within a configuration is about 0.4), so the decision
+was made on efficiency at equal wall time. The interweaving step of Appendix A.4 increased
+the effective sample size of λ per hour from 50 to 87 and reduced the median absolute log
+ratio of the mean of λ between the two halves of the retained draws from 0.26 to 0.10, and
+was adopted. An early exit of the ADMM iterations on a residual criterion, which keeps
+T deterministic, saved no time at the 150-iteration budget. Several trend moves per sweep
+increased the effective sample size of θ but lowered it per hour for both θ and λ. A joint
+Metropolis move on (λ, θ) is exact but its adapted log-step settled near 0.075, so it also
+moved λ slowly.
+
+Numerical safeguards. The safeguards of Appendix A.7 were introduced after factor-
+ization failures and non-finite states in a few configurations of early multi-replication runs;
+with them in place no run failed.
+
+A.10     Exactness checks
+The single-level implementation is checked by nine tests: the normal–exponential identity
+(5); the generalized inverse Gaussian conditional of zi ; agreement of the proximal map with
+the glmgen trend filtering solver (Tibshirani, 2014) at M = In ; the minimizing property
+
+                                              45
+Table 5: Candidate changes to Bayesian-PMALA, evaluated on the 30 simulation configura-
+tions of Section 3 with one replication each (n = 500, 30000 sweeps, 10000 discarded). MSE
+ratio: geometric mean over configurations of the MSE relative to the default. ESS: median
+effective sample size over the 20000 retained draws, for log λ (also per hour of wall time) and
+for θ (median over coordinates). Time: wall time per run.
+
+       Variant                    MSE ratio ESS λ per hour ESS θ Time (s) Adopted
+       Previous default               1.000    4.9        50     62       352   –
+       ADMM early exit                1.020    5.9        53     63       397   no
+       Interweaving for λ             0.963    9.8        87     69       404   yes
+       3 trend moves per sweep        0.975   11.6        33    173      1264   no
+       5 trend moves per sweep        0.948   15.2        26    264      2089   no
+       Interweaving, 3 moves          0.938   20.3        57    173      1275   no
+       Joint (λ, θ) move              0.955    7.4        28     83       960   no
+       Joint move, interweaving       0.959   10.4        39    100       963   no
+
+
+of the proximal map in the metric (18); the trend move against the closed-form Gaussian
+conditional at λ = 0; the trend move against numerical integration on a grid at n = 4, with
+a fixed metric and with the curvature metric; bitwise agreement of the shared-factorization
+move with separate solves; the interweaving chain against grid integration; and the joint
+(λ, θ) move against grid integration. All tests pass.
+    The joint implementation is checked in two groups. The tests of the constrained proximal
+map are described in Appendix A.3. The sampler tests are four. First, with J = 1 and
+a common seed, the joint sampler reproduces the single-level sampler exactly: identical
+trajectories of θ, λ, σ and δ over 400 sweeps at n = 80, and an identical final state of the
+random number generator. Second, at n = 4 with first differences and a box that cuts
+into the bulk of the conditional, a chain of 60000 constrained trend moves at fixed (z, λ, σ)
+is compared with numerical integration of exp{−U (θ)}1B (θ) on an 804 midpoint grid: all
+draws lie in the box, and the largest batch-means z-scores over the four coordinates are
+1.9 for the means and 1.8 for the standard deviations. Third, adding the conjugate draw
+of λ and the constrained interweaving step and comparing with the λ-marginalized target
+on the same box, the largest z-scores are 1.9 and 1.5, and the chain gives E(λ) = 1.089
+with standard error 0.004 against the exact 1.090. Fourth, a three-level run at n = 80 with
+τ ∈ {0.5, 0.9, 0.95} has no crossing in any retained draw. A grid with nodes at the box edges
+overweights the edges of a truncated density; the midpoint grid avoids that bias, which
+amounted to about 1% of the standard deviations here.
+
+
+B     Additional Simulation Results
+This appendix supplements the interior-quantile comparisons of Section 3.1 and the joint
+extreme-quantile experiment of Section 3.2. All tables use n = 500 and order k = 2.
+
+
+
+
+                                              46
+B.1     Interior quantiles
+This appendix reports the measures omitted from Section 3.1: MAD and MCIW for the
+varying-smoothness signal, and the complete set of MSE, MAD and MCIW tables for the
+smooth signal. All entries use the default order k = 2 and n = 500, and are averages over
+valid replications. MCIW is the average width of the 95% pointwise posterior intervals and
+is not available for the ADMM point estimator.
+
+B.1.1   Varying smoothness
+The MAD comparison (Table 6) agrees with the MSE comparison of Section 3.1.1. Bayesian-
+PMALA’s intervals are narrower than those of both Onizuka variants (Table 7); the widths
+describe different posterior constructions and are not by themselves a measure of calibration.
+
+Table 6: Mean absolute deviation (MAD) for the varying-smoothness (VS) signal (k = 2),
+n = 500, at interior quantile levels.
+
+          Beta                       0.05       0.25       0.50       0.75       0.95
+          Onizuka (Laplace)     0.012702    0.020517   0.030557   0.040591   0.066465
+          Onizuka (Horseshoe)   0.011300    0.018849   0.028763   0.038443   0.062328
+          Bayesian-PMALA        0.012715    0.020660   0.030504   0.040769   0.069407
+          ADMM                  0.027314    0.029267   0.044214   0.052848   0.076817
+          Mixed normal               0.05       0.25       0.50       0.75       0.95
+          Onizuka (Laplace)     0.215556    0.139979   0.128822   0.138850   0.215747
+          Onizuka (Horseshoe)   0.212371    0.140284   0.129614   0.141514   0.218726
+          Bayesian-PMALA        0.220872    0.138900   0.127028   0.137998   0.213368
+          ADMM                  0.218535    0.183889   0.169139   0.157936   0.201602
+          Gaussian                   0.05       0.25       0.50       0.75       0.95
+          Onizuka (Laplace)     0.109980    0.070160   0.063856   0.067192   0.103017
+          Onizuka (Horseshoe)   0.106356    0.068189   0.061950   0.065668   0.101007
+          Bayesian-PMALA        0.109211    0.069030   0.063572   0.067651   0.105572
+          ADMM                  0.141630    0.087809   0.085612   0.081531   0.107235
+
+
+
+
+                                              47
+Table 7: Mean 95% pointwise credible-interval width (MCIW) for the varying-smoothness
+(VS) signal (k = 2), n = 500, at interior quantile levels. MCIW is not available for the
+ADMM point estimator.
+
+         Beta                      0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.072159   0.100837   0.132473   0.158571   0.168685
+         Onizuka (Horseshoe)   0.067523   0.100344   0.134284   0.161300   0.166118
+         Bayesian-PMALA        0.063031   0.097296   0.128485   0.154082   0.158217
+         Mixed normal              0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.557248   0.564334   0.569489   0.565218   0.559566
+         Onizuka (Horseshoe)   0.578243   0.613924   0.620905   0.624492   0.599896
+         Bayesian-PMALA        0.536510   0.512956   0.511147   0.512908   0.532739
+         Gaussian                  0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.289501   0.286599   0.285566   0.284948   0.280193
+         Onizuka (Horseshoe)   0.296111   0.301798   0.301683   0.301976   0.290053
+         Bayesian-PMALA        0.274518   0.273147   0.273185   0.274772   0.269502
+
+
+
+
+                                            48
+B.1.2   Smooth signal
+For the smooth signal, the MSE and MAD comparisons (Tables 8 and 9) agree with Sec-
+tion 3.1.2, and Bayesian-PMALA’s intervals are again narrower than those of both Onizuka
+variants (Table 10).
+
+Table 8: Mean squared error (MSE) for the smooth (S) signal (k = 2), n = 500, at interior
+quantile levels.
+
+         Beta                      0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.000295   0.000794   0.001592   0.002311   0.005225
+         Onizuka (Horseshoe)   0.000423   0.000812   0.001554   0.002270   0.005342
+         Bayesian-PMALA        0.000273   0.000641   0.001257   0.001817   0.006112
+         ADMM                  0.000183   0.000425   0.000789   0.001078   0.002464
+         Mixed normal              0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.071456   0.026312   0.021974   0.027079   0.067077
+         Onizuka (Horseshoe)   0.074248   0.026449   0.021783   0.027401   0.072335
+         Bayesian-PMALA        0.064536   0.018776   0.014218   0.017926   0.060680
+         ADMM                  0.030277   0.010993   0.008228   0.010769   0.023342
+         Gaussian                  0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.014933   0.006463   0.005581   0.006136   0.014457
+         Onizuka (Horseshoe)   0.016242   0.006414   0.005364   0.006003   0.014982
+         Bayesian-PMALA        0.015384   0.004820   0.003920   0.004512   0.014667
+         ADMM                  0.006561   0.003129   0.002456   0.002843   0.005929
+
+
+
+
+                                            49
+Table 9: Mean absolute deviation (MAD) for the smooth (S) signal (k = 2), n = 500, at
+interior quantile levels.
+
+         Beta                      0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.009000   0.017595   0.027191   0.035333   0.056189
+         Onizuka (Horseshoe)   0.009166   0.016903   0.026235   0.034349   0.056422
+         Bayesian-PMALA        0.008614   0.015546   0.023886   0.031183   0.060052
+         ADMM                  0.007408   0.013056   0.019253   0.024246   0.039323
+         Mixed normal              0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.209230   0.128588   0.117542   0.129947   0.200719
+         Onizuka (Horseshoe)   0.212951   0.128772   0.116773   0.130281   0.208177
+         Bayesian-PMALA        0.197194   0.106844   0.093811   0.105936   0.189823
+         ADMM                  0.134511   0.082435   0.071963   0.081493   0.118870
+         Gaussian                  0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.093516   0.062130   0.057391   0.060291   0.091704
+         Onizuka (Horseshoe)   0.096546   0.061044   0.055676   0.059026   0.092177
+         Bayesian-PMALA        0.094548   0.053381   0.048038   0.051596   0.091815
+         ADMM                  0.060896   0.042695   0.037518   0.040551   0.057551
+
+
+
+
+Table 10: Mean 95% pointwise credible-interval width (MCIW) for the smooth (S) signal
+(k = 2), n = 500, at interior quantile levels. MCIW is not available for the ADMM point
+estimator.
+
+         Beta                      0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.051618   0.086614   0.118115   0.140828   0.144257
+         Onizuka (Horseshoe)   0.055748   0.087738   0.119125   0.144581   0.152374
+         Bayesian-PMALA        0.041033   0.072119   0.098827   0.120966   0.139223
+         Mixed normal              0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.530973   0.541054   0.546983   0.542001   0.528167
+         Onizuka (Horseshoe)   0.572392   0.581571   0.576684   0.582025   0.573076
+         Bayesian-PMALA        0.497356   0.438523   0.433109   0.435191   0.492696
+         Gaussian                  0.05       0.25       0.50       0.75       0.95
+         Onizuka (Laplace)     0.250570   0.262358   0.265880   0.262720   0.248729
+         Onizuka (Horseshoe)   0.274999   0.276615   0.274603   0.273819   0.269150
+         Bayesian-PMALA        0.244342   0.218670   0.216871   0.219620   0.240846
+
+
+
+
+                                            50
+B.2     Joint estimation of extreme upper quantiles
+Tables 11 and 12 supplement the MSE comparison in Section 3.2. Entries are averages over
+the same 100 replications per noise distribution, with all six quantile levels fitted jointly.
+MAD uses the posterior mean, and MCIW is the average width of the equal-tail 95% point-
+wise posterior intervals.
+
+Table 11: Mean absolute deviation (MAD) of the joint sampler at extreme upper quantiles
+for the VS signal, n = 500 and k = 2.
+
+                  Noise                0.96        0.97       0.98       0.99
+                  Beta            0.069827    0.078203    0.083454   0.086303
+                  Mixed normal    0.216601    0.231148    0.252701   0.281013
+                  Gaussian        0.106217    0.115347    0.126330   0.135471
+
+
+
+Table 12: Mean 95% pointwise credible-interval width (MCIW) of the joint sampler at
+extreme upper quantiles for the VS signal, n = 500 and k = 2.
+
+                  Noise                0.96        0.97       0.98       0.99
+                  Beta            0.092457    0.094888    0.102766   0.160270
+                  Mixed normal    0.272515    0.255024    0.263300   0.346896
+                  Gaussian        0.135701    0.134360    0.143599   0.207714
+
+
+
+
+                                              51
+C     Additional results for the simulated air-quality ex-
+      periment
+Tables 13, 14, and 15 give the remaining sample sizes for the experiment in Section 5.
+They use the same posterior-mean summaries, independently fitted ADMM benchmark, and
+replication-wise averaging as Table 4. Undefined CAA values are omitted. CL and MSE are
+smaller-is-better measures; larger CAA indicates better classification.
+    Three further tables complete the record. Table 16 gives the standard error of each
+method’s mean MSE across replications and, since the three methods fit identical datasets,
+the paired differences between Bayesian-PMALA and each competitor. Table 17 collects the
+finite-chain diagnostics of the two samplers and the coverage and width of their pointwise 95%
+bands for the target (32). Table 18 records the penalty levels reached by Bayesian-PMALA
+under the prior (33) and by the eBIC selection, together with the number of ADMM fits
+whose selected penalty was the largest grid value.
+
+Table 13: Simulated air-quality results for n = 500. Entries are means across replications.
+CL denotes check loss; HS denotes the horseshoe sampler. CAA excludes undefined cases.
+
+                                                           CAA at threshold h
+             τ Method                   CL        MSE    0.5    0.75      1     1.2
+          0.01 Bayesian-PMALA 0.005670 0.045318 0.6953 0.7771 0.7488 0.6903
+          0.01 Onizuka (HS)   0.005409 0.084943 0.6211 0.6729 0.6583 0.6285
+          0.01 ADMM           0.006454 0.025415 0.6906 0.8246 0.8423 0.7813
+          0.05 Bayesian-PMALA 0.028247 0.014059 0.7911 0.8534 0.7921 0.7158
+          0.05 Onizuka (HS)   0.023725 0.100832 0.5852 0.5898 0.5665 0.5451
+          0.05 ADMM           0.029033 0.012435 0.7948 0.8727 0.8171 0.7339
+          0.10 Bayesian-PMALA 0.049553 0.013446 0.8335 0.8346 0.7508 0.6780
+          0.10 Onizuka (HS)   0.041748 0.103128 0.5764 0.5565 0.5354 0.5204
+          0.10 ADMM           0.050729 0.010944 0.8438 0.8652 0.7797 0.6949
+
+
+
+
+                                             52
+Table 14: Simulated air-quality results for n = 2000. Entries are means across replications.
+CL denotes check loss; HS denotes the horseshoe sampler.
+
+                                                         CAA at threshold h
+            τ Method                   CL        MSE    0.5    0.75      1     1.2
+          0.01 Bayesian-PMALA 0.005698 0.039902 0.7012 0.7862 0.7634 0.7065
+          0.01 Onizuka (HS)   0.005164 0.102222 0.5729 0.6077 0.6004 0.5816
+          0.01 ADMM           0.006744 0.013823 0.6984 0.8493 0.8859 0.8323
+          0.05 Bayesian-PMALA 0.028054 0.011567 0.7983 0.8669 0.8055 0.7286
+          0.05 Onizuka (HS)   0.023631 0.100248 0.5666 0.5692 0.5472 0.5320
+          0.05 ADMM           0.028935 0.007766 0.8063 0.8942 0.8444 0.7626
+          0.10 Bayesian-PMALA 0.049143 0.010889 0.8397 0.8526 0.7655 0.6931
+          0.10 Onizuka (HS)   0.041597 0.101549 0.5656 0.5488 0.5266 0.5167
+          0.10 ADMM           0.050560 0.007371 0.8527 0.8863 0.8023 0.7207
+
+
+
+Table 15: Simulated air-quality results for n = 4000. Entries are means across replications.
+CL denotes check loss; HS denotes the horseshoe sampler.
+
+                                                         CAA at threshold h
+            τ Method                   CL        MSE    0.5    0.75      1     1.2
+          0.01 Bayesian-PMALA 0.006155 0.029525 0.6786 0.7820 0.7758 0.7178
+          0.01 Onizuka (HS)   0.005129 0.102225 0.5684 0.6005 0.5927 0.5748
+          0.01 ADMM           0.006748 0.014661 0.6960 0.8428 0.8763 0.8188
+          0.05 Bayesian-PMALA 0.027957 0.012798 0.7937 0.8558 0.7895 0.7135
+          0.05 Onizuka (HS)   0.023695 0.096366 0.5672 0.5705 0.5465 0.5308
+          0.05 ADMM           0.028987 0.007729 0.8034 0.8890 0.8377 0.7548
+          0.10 Bayesian-PMALA 0.049030 0.011869 0.8333 0.8399 0.7506 0.6796
+          0.10 Onizuka (HS)   0.041736 0.097465 0.5678 0.5518 0.5276 0.5169
+          0.10 ADMM           0.050719 0.007566 0.8514 0.8801 0.7936 0.7127
+
+
+
+
+                                            53
+Table 16: Mean MSE with its standard error across replications (in parentheses), and paired
+comparisons of Bayesian-PMALA with each competitor on the shared datasets. 103 ∆ is the
+mean per-replication difference in MSE between Bayesian-PMALA and the competitor, with
+its standard error, multiplied by 103 ; negative values favor Bayesian-PMALA. “Lower” is
+the percentage of replications in which Bayesian-PMALA has the lower MSE.
+
+                                                                 vs. Onizuka (HS)       vs. ADMM
+  τ      n Bayesian-PMALA      Onizuka (HS)            ADMM             103 ∆ Lower        103 ∆ Lower
+0.01    500   0.0453 (0.0027) 0.0849 (0.0099) 0.0254 (0.0032)   −39.63 (8.31)    72 19.90 (3.12)    12
+       1000   0.0454 (0.0020) 0.1007 (0.0053) 0.0189 (0.0013)   −55.28 (4.58)    97 26.48 (1.67)     0
+       2000   0.0399 (0.0012) 0.1022 (0.0047) 0.0138 (0.0006)   −62.32 (4.09)   100 26.08 (1.12)     0
+       4000   0.0295 (0.0008) 0.1022 (0.0037) 0.0147 (0.0005)   −72.70 (3.18)   100 14.86 (0.69)     0
+0.05    500   0.0141 (0.0011) 0.1008 (0.0114) 0.0124 (0.0010) −86.77 (10.98)     96   1.62 (0.77)   42
+       1000   0.0124 (0.0006) 0.0999 (0.0061) 0.0093 (0.0006) −87.56 (6.02)     100   3.04 (0.46)   22
+       2000   0.0116 (0.0005) 0.1002 (0.0045) 0.0078 (0.0004) −88.68 (4.27)     100   3.80 (0.36)   11
+       4000   0.0128 (0.0004) 0.0964 (0.0032) 0.0077 (0.0003) −83.57 (3.04)     100   5.07 (0.30)    2
+0.10    500   0.0134 (0.0012) 0.1031 (0.0109) 0.0109 (0.0013) −89.68 (10.27)     97   2.50 (0.75)   28
+       1000   0.0115 (0.0007) 0.1007 (0.0060) 0.0093 (0.0006) −89.17 (5.84)     100   2.24 (0.51)   25
+       2000   0.0109 (0.0005) 0.1015 (0.0046) 0.0074 (0.0004) −90.66 (4.34)     100   3.52 (0.38)   13
+       4000   0.0119 (0.0004) 0.0975 (0.0032) 0.0076 (0.0003) −85.60 (3.08)     100   4.30 (0.30)    6
+
+
+
+
+                                                  54
+Table 17: Finite-chain diagnostics and pointwise 95% interval summaries for the two samplers
+over replications. For Bayesian-PMALA: mean acceptance rate of the trend move, number
+of chains that stopped moving (acceptance rate below 0.05), median effective sample size of
+θ over the 20000 retained sweeps, empirical coverage of the target (32) by the pointwise 95%
+band, and mean band width. For the horseshoe sampler: coverage and width of the same
+band, the median over fits of the minimum monitored effective sample size (column “Min
+ESS”), and the number of fits with a mixing warning (monitored ESS below 100 or split R    ˆ︁
+above 1.05). Coverage is the proportion of the n grid points at which the band contains the
+target, averaged over replications.
+
+                             Bayesian-PMALA                        Onizuka (HS)
+          τ     n Accept. Frozen ESS Cover. Width Cover. Width Min ESS Warned
+       0.01    500   0.500       0 33.1   0.294    0.139   0.373   0.194   106.9    48
+              1000   0.500       0 21.9   0.286    0.133   0.332   0.180    41.6    91
+              2000   0.500       0 14.9   0.330    0.143   0.317   0.170    28.5    96
+              4000   0.500       0 7.8    0.689    0.337   0.301   0.164    14.9   100
+       0.05    500   0.500       0 11.5   0.514    0.131   0.626   0.226   121.3   50
+              1000   0.500       0 9.6    0.481    0.114   0.619   0.214    61.9   79
+              2000   0.499       0 8.6    0.431    0.101   0.620   0.206    36.0   90
+              4000   0.494       0 8.0    0.386    0.092   0.606   0.203    18.7   99
+       0.10    500   0.500       0 12.8   0.589    0.139   0.711   0.227   151.1   40
+              1000   0.500       0 10.3   0.565    0.123   0.707   0.217   101.2   57
+              2000   0.499       0 8.9    0.513    0.110   0.705   0.211    48.8   88
+              4000   0.496       0 8.3    0.458    0.099   0.696   0.209    28.9   96
+
+
+
+
+                                                  55
+Table 18: Penalty levels of the two penalized procedures. For Bayesian-PMALA, λ̄ and λσ
+are the posterior means of λ and of the effective penalty λσ, averaged over replications. For
+ADMM, λ̄ is the mean eBIC-selected penalty and “At bound” counts the fits whose selected
+value is the largest grid point e8 ≈ 2981. The quantity comparable with the ADMM penalty
+is λσ (Section 5.2).
+
+                                    Bayesian-PMALA          ADMM
+                         τ     n       λ̄          λσ      λ̄   At bound
+                      0.01    500   4872          29.0   242           0
+                             1000   4860          28.4   317           0
+                             2000   4879          28.4   326           0
+                             4000   4939          30.8   274           0
+                      0.05    500   29368      844.0      983          4
+                             1000   29521      839.5     1368         16
+                             2000   29506      835.6     1376         13
+                             4000   28757      809.1     1455         14
+                      0.10    500   29379     1476.8     1476         20
+                             1000   29578     1473.2     1859         33
+                             2000   29604     1466.2     2056         39
+                             4000   29137     1437.9     2371         55
+
+
+
+
+                                             56
+D     Additional Real-Data Figures
+D.1    Air Quality Data: ADMM Benchmark Fits
+The ADMM benchmark fits of Section 6.1, and the detrended series they produce, are
+collected here for comparison with Figures 3 and 4.
+
+
+
+
+            (a) Baseline trends. Note the crossing of the τ = 0.01 curve above the
+            others at the 05:00 plume, induced by the small eBIC penalty at that
+            level.
+
+
+
+
+            (b) Detrended series y − θ,
+                                      ˆ︁ with the 90th (dashed), 95th (solid), and
+            99th (dotted) empirical percentiles of the detrended data.
+
+Figure 7: Air quality data: ADMM benchmark fits (Brantley et al., 2020), λ selected by
+eBIC, laid out as Figures 3 and 4.
+
+
+
+                                             57
+D.2     Munich Rent Data: Horseshoe Fit and Interior Quantile Lev-
+        els
+Figure 8 gives the horseshoe counterpart of Figure 5 at τ ∈ {0.1, 0.9}, and Figures 9 and 10
+complete the Munich analysis of Section 6.2 with the fits at τ ∈ {0.3, 0.5, 0.7}. All are
+obtained under exactly the settings described there (k = 2; 6,000 iterations, 1,000 burn-in;
+one independent chain per level; step size adapted during burn-in for the individual sampler).
+
+                                               10%       90%
+
+
+                                25
+
+
+
+
+                                20
+            rent (EUR per m2)
+
+
+
+
+                                15
+
+
+
+
+                                10
+
+
+
+
+                                5
+
+
+
+
+                                     50          100             150
+                                            floor size (m2)
+
+
+Figure 8: Munich rent data: 10% and 90% conditional quantiles estimated by the horseshoe
+sampler of Onizuka et al. (2024) (MCMC mode) with k = 2, under the same layout as
+Figure 5.
+
+
+
+D.3     Growth Centiles
+This appendix completes the growth-chart fits of Section 6.3 with the individual sampler for
+girls and the LMS centiles (Cole and Green, 1992)√for boys and girls. The P-MALA settings
+are those of Section 6.3 (k = 2, λ ∼ Gamma(1, G), 6,000 iterations, 1,000 burn-in, one
+independent run per level). The LMS curves are the 10th, 30th, 50th, 70th and 90th centiles
+of the fitted Box–Cox Cole–Green distribution evaluated on the same 0.1-year age grid.
+
+
+
+
+                                              58
+                                         30%        50%     70%
+
+
+
+                               20
+
+
+
+
+                               15
+           rent (EUR per m2)
+
+
+
+
+                               10
+
+
+
+
+                               5
+
+
+
+
+                               0
+                                    50          100               150
+                                          floor size (m2)
+
+
+Figure 9: Munich rent data: 30%, 50%, and 70% conditional quantiles estimated by the
+individual P-MALA/Gibbs sampler with k = 2. Solid curves are posterior means and ribbons
+are 95% pointwise credible intervals; grey circles are the observations.
+
+
+
+
+                                         30%        50%     70%
+
+
+
+                               20
+
+
+
+
+                               15
+           rent (EUR per m2)
+
+
+
+
+                               10
+
+
+
+
+                               5
+
+
+
+
+                                    50          100               150
+                                          floor size (m2)
+
+
+Figure 10: Munich rent data: 30%, 50%, and 70% conditional quantiles estimated by the
+horseshoe sampler of Onizuka et al. (2024) (MCMC mode) with k = 2, under the same
+layout as Figure 9.
+
+
+
+
+                                               59
+                          160
+            Height (cm)
+
+
+
+
+                          120
+
+
+
+
+                           80
+
+
+
+
+                           40
+                                0   2   4    6         8         10         12     14    16    18   20   22
+                                                                 Age (years)
+
+                                            Quantile       10%        30%    50%   70%   90%
+
+
+
+
+Figure 11: Individual P-MALA/Gibbs fits for the height of 5,190 Dutch girls (Fifth Dutch
+Growth Study, 2009) at τ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, k = 2. Curves are posterior means; grey
+circles are the individual measurements.
+
+
+
+
+                          200
+
+
+
+
+                          150
+            Height (cm)
+
+
+
+
+                          100
+
+
+
+
+                           50
+
+                                0   2   4    6         8         10         12     14    16    18   20   22
+                                                                 Age (years)
+
+                                            Centile        10%    30%       50%    70%   90%
+
+
+
+
+Figure 12: LMS centiles for the height of Dutch boys: the 10th to 90th centiles of the fitted
+Box–Cox Cole–Green distribution, with smooth median, coefficient of variation and Box–
+Cox power in age.
+
+
+
+                                                                  60
+               160
+ Height (cm)
+
+
+
+
+               120
+
+
+
+
+                80
+
+
+
+
+                40
+                     0   2   4   6         8         10      12     14    16    18   20   22
+                                                     Age (years)
+
+                                 Centile       10%    30%     50%   70%   90%
+
+
+
+
+Figure 13: LMS centiles for the height of Dutch girls, as in Figure 12.
+
+
+
+
+                                                      61
+References
+Boyd, S., Parikh, N., Chu, E., Peleato, B., and Eckstein, J. (2011). Distributed optimization
+  and statistical learning via the alternating direction method of multipliers. Foundations
+  and Trends in Machine Learning, 3(1):1–122.
+
+Brantley, H. L., Guinness, J., and Chi, E. C. (2020). Baseline drift estimation for air quality
+  data using quantile trend filtering. The Annals of Applied Statistics, 14(2):585–604.
+
+Cole, T. J. and Green, P. J. (1992). Smoothing reference centile curves: the LMS method
+  and penalized likelihood. Statistics in Medicine, 11(10):1305–1319.
+
+Durmus, A., Moulines, É., and Pereyra, M. (2018). Efficient Bayesian computation by
+ proximal Markov chain Monte Carlo: when Langevin meets Moreau. SIAM Journal on
+ Imaging Sciences, 11(1):473–506.
+
+Fahrmeir, L., Kneib, T., Lang, S., and Marx, B. (2013). Regression: Models, Methods and
+  Applications. Springer, Berlin.
+
+Fasiolo, M., Wood, S. N., Zaffran, M., Nedellec, R., and Goude, Y. (2021). Fast calibrated ad-
+  ditive quantile regression. Journal of the American Statistical Association, 116(535):1402–
+  1412.
+
+Goulart, P. J. and Chen, Y. (2024). Clarabel: An interior-point solver for conic programs
+ with quadratic objectives. arXiv:2405.12762.
+
+Heng, Q., Zhou, H., and Chi, E. C. (2023). Bayesian trend filtering via proximal Markov
+  chain Monte Carlo. Journal of Computational and Graphical Statistics, 32(3):938–949.
+
+Koenker, R. and Bassett, Jr., G. (1978). Regression quantiles. Econometrica, 46(1):33–50.
+
+Kozumi, H. and Kobayashi, G. (2011). Gibbs sampling methods for Bayesian quantile re-
+ gression. Journal of Statistical Computation and Simulation, 81(11):1565–1578.
+
+Madrid Padilla, O. H. and Chatterjee, S. (2022). Risk bounds for quantile trend filtering.
+ Biometrika, 109(3):751–768.
+
+Mehrotra, S. (1992). On the implementation of a primal-dual interior point method. SIAM
+ Journal on Optimization, 2(4):575–601.
+
+Neal, R. M. (2003). Slice sampling. The Annals of Statistics, 31(3):705–767.
+
+Onizuka, T., Hashimoto, S., and Sugasawa, S. (2024). Fast and locally adaptive bayesian
+ quantile smoothing using calibrated variational approximations. Statistics and Computing,
+ 34(1):15.
+
+Park, T. and Casella, G. (2008). The Bayesian lasso. Journal of the American Statistical
+  Association, 103(482):681–686.
+
+
+
+                                              62
+Pereyra, M. (2016). Proximal Markov chain Monte Carlo algorithms. Statistics and Com-
+  puting, 26(4):745–760.
+
+Rigby, R. A. and Stasinopoulos, D. M. (2005). Generalized additive models for location,
+  scale and shape. Journal of the Royal Statistical Society: Series C (Applied Statistics),
+  54(3):507–554.
+
+Roberts, G. O. and Rosenthal, J. S. (2007). Coupling and ergodicity of adaptive Markov
+  chain Monte Carlo algorithms. Journal of Applied Probability, 44(2):458–475.
+
+Schönbeck, Y., Talma, H., van Dommelen, P., Bakker, B., Buitendijk, S. E., HiraSing,
+  R. A., and van Buuren, S. (2013). The world’s tallest nation has stopped growing taller:
+  the height of Dutch children from 1955 to 2009. Pediatric Research, 73(3):371–377.
+
+Tibshirani, R. J. (2014). Adaptive piecewise polynomial estimation via trend filtering. The
+  Annals of Statistics, 42(1):285–323.
+
+van Buuren, S. and Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by
+  chained equations in R. Journal of Statistical Software, 45(3):1–67.
+
+Yu, Y. and Meng, X.-L. (2011). To center or not to center: That is not the question—an
+  ancillarity–sufficiency interweaving strategy (ASIS) for boosting MCMC efficiency. Journal
+  of Computational and Graphical Statistics, 20(3):531–570.
+
+
+
+
+                                            63
+

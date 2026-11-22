@@ -1,0 +1,1901 @@
+Bayesian Joint Quantile Trend Filtering via
+ Proximal MCMC with Sequential Gibbs
+                Sampling
+                 Felipe Bedoya*              Meng Li          Eric C. Chi
+                                   September 14, 2026
+
+
+                                            Abstract
+       Quantile trend filtering estimates time-varying conditional quantiles through a
+   check loss and an ℓ1 difference penalty, with efficient frequentist estimation available
+   via ADMM (Brantley et al., 2020). We develop an adaptive, fully Bayesian extension of
+   this estimator. Under an asymmetric Laplace likelihood and a global Laplace difference
+   prior, the conditional posterior mode at unit likelihood scale and fixed regularization
+   parameter coincides with the frequentist ADMM solution. Assigning priors to both pa-
+   rameters allows the regularization strength and likelihood scale to be inferred jointly
+   with the trend. A three-block Gibbs scheme combines their conjugate updates with
+   a proximal Metropolis-adjusted Langevin (P-MALA) trend update (Pereyra, 2016),
+   using ADMM to solve the required trend filtering subproblems. The hierarchy uses
+   one global regularization parameter per quantile, without observation-level likelihood
+   augmentation or separate random scales for the trend differences. In the constrained
+   proximal formulation, a fixed banded system permits factorization reuse and linear
+   work in the sample size for a fixed number of inner ADMM iterations.
+       The framework extends to joint estimation of multiple quantiles under exact non-
+   crossing constraints, enforced through box projections embedded in the ADMM prox-
+   imal operator, with each quantile updated sequentially by its own P-MALA step. For
+   extreme probability levels, where the near-constant gradient of the asymmetric Laplace
+   likelihood causes gradient-based samplers to drift, we introduce a sentinel quantile
+   strategy: auxiliary quantiles placed beyond the target range whose box constraints
+   confine the target within a dynamically updating interval, preventing drift while pre-
+   serving exploration.
+       Simulation studies spanning piecewise constant, varying smoothness, and smooth
+   signals under Gaussian, Beta, and mixed normal noise examine estimation accuracy
+   at interior and extreme quantile levels, with posterior uncertainty summaries obtained
+   from the sampled trends. The results show competitive estimation relative to the
+* Department of Statistics, Rice University. fb31@rice.edu
+ Department of Statistics, Rice University. meng@rice.edu
+ School of Statistics, University of Minnesota. echi@umn.edu
+
+
+
+                                                1
+     Bayesian approach of Onizuka et al. (2024). The simpler hierarchy and ADMM com-
+     putation provide a practical route to extending the frequentist benchmark to joint
+     Bayesian inference.
+
+Keywords: quantile trend filtering, Bayesian inference, proximal MCMC, ADMM, non-
+crossing quantiles, asymmetric Laplace distribution, Gibbs sampling, extreme quantiles.
+
+
+Contents
+1 Introduction                                                                             4
+
+2 Methodology                                                                               6
+  2.1 Data Model and Likelihood . . . . . . . . . . . . . . . . . . . . . . . . . . .       6
+  2.2 Individual Quantile Sampler . . . . . . . . . . . . . . . . . . . . . . . . . . .     7
+  2.3 Joint Quantile Sampler . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   11
+  2.4 ADMM Proximal Operator for the Constrained Subproblem . . . . . . . . .              12
+  2.5 Sentinel Quantile Strategy for Extreme Quantile Estimation . . . . . . . . .         13
+  2.6 Summary of the Algorithm . . . . . . . . . . . . . . . . . . . . . . . . . . . .     14
+
+3 Simulation                                                                               14
+  3.1 Individual Sampler . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   16
+      3.1.1 Piecewise Constant . . . . . . . . . . . . . . . . . . . . . . . . . . . .     16
+      3.1.2 Varying Smoothness . . . . . . . . . . . . . . . . . . . . . . . . . . .       16
+      3.1.3 Smooth Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      16
+  3.2 Joint Sampler for Extreme Quantiles . . . . . . . . . . . . . . . . . . . . . .      19
+      3.2.1 Piecewise Constant . . . . . . . . . . . . . . . . . . . . . . . . . . . .     20
+      3.2.2 Varying Smoothness . . . . . . . . . . . . . . . . . . . . . . . . . . .       20
+      3.2.3 Smooth Function . . . . . . . . . . . . . . . . . . . . . . . . . . . . .      21
+
+4 Data Applications                                                                        23
+  4.1 Air Quality Sensor Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    23
+  4.2 Munich Rent Data . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .     26
+  4.3 Growth Centiles for Dutch Children . . . . . . . . . . . . . . . . . . . . . . .     27
+
+5 Discussion                                                                               28
+
+A Additional Simulation Results                                                            32
+  A.1 Individual sampler at interior quantiles . . . . . . . . . . . . . . . . . . . . .   32
+      A.1.1 MAD for the piecewise constant and varying-smoothness signals . . .            32
+      A.1.2 Smooth signal at difference order k = 2 . . . . . . . . . . . . . . . . .      32
+  A.2 Joint sampler at extreme quantiles . . . . . . . . . . . . . . . . . . . . . . .     35
+      A.2.1 MAD for the piecewise constant and varying-smoothness signals . . .            35
+      A.2.2 Smooth signal at difference order k = 2 . . . . . . . . . . . . . . . . .      35
+
+
+
+
+                                              2
+B Additional Real-Data Figures                                                              38
+  B.1 Air Quality Data: ADMM Benchmark Fits . . . . . . . . . . . . . . . . . . .           38
+  B.2 Munich Rent Data: Interior Quantile Levels . . . . . . . . . . . . . . . . . .        39
+  B.3 Growth Centiles . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   39
+
+
+
+
+                                              3
+1    Introduction
+The estimation of a time-varying conditional quantile from a single observed time series
+is a fundamental problem in nonparametric statistics, arising in environmental monitoring,
+biomedical signal processing, finance, and astrophysics, among other fields. Unlike mean
+regression, quantile estimation provides a direct view of the upper or lower tails of the
+response distribution, which are often of greater scientific interest than the central tendency.
+When the underlying trend is believed to be piecewise polynomial—constant level shifts,
+piecewise linear behavior, or piecewise quadratic curvature—trend filtering provides a flexible
+and computationally tractable framework, producing estimates that adapt automatically to
+abrupt changes while remaining smooth in regions of slow variation.
+     The frequentist approach to quantile trend filtering was developed by Brantley et al.
+(2020), who combined the check loss of Koenker and Bassett Jr (1978) with the discrete
+difference penalty of Tibshirani (2014) and solved the resulting nonsmooth convex program
+via the alternating direction method of multipliers (ADMM). Their estimator scales well
+to large signals and inherits the locally adaptive properties of ℓ1 trend filtering. Theoreti-
+cal properties, including risk bounds, have been studied by Madrid Padilla and Chatterjee
+(2022). This approach provides a natural benchmark for estimation, but its output is a
+point estimate at a selected penalty level. Regularization selection, for example through an
+extended Bayesian information criterion, and uncertainty quantification require procedures
+beyond the ADMM optimization itself.
+     We develop an adaptive, fully Bayesian extension of quantile trend filtering computed
+by ADMM. The connection is exact: under an asymmetric Laplace likelihood and a global
+Laplace prior on the trend differences, the conditional posterior mode at σ = 1 and fixed
+λ coincides with the frequentist estimator. We extend this formulation by learning the
+regularization strength and likelihood scale jointly with the trend, and use ADMM within
+posterior sampling to retain its useful computational structure. This retains a posterior
+distribution over the trend while avoiding the growing collection of latent-scale updates and
+repeated matrix computations that make conventional augmented Gibbs implementations
+costly for long time series. Section 2.2 establishes the mode equivalence.
+     Related progress on Bayesian quantile regression in additive and spline settings has been
+made by Fasiolo et al. (2021), though their approach targets smooth additive models rather
+than piecewise polynomial trends of arbitrary order. The analogous trajectory for mean trend
+filtering has been traced by Heng, Zhou, and Chi, who placed the ℓ1 trend filtering problem
+of Tibshirani (2014) in a Bayesian framework using proximal Markov chain Monte Carlo
+techniques (Pereyra, 2016). The quantile setting introduces an additional computational
+difficulty: both the check loss and the difference penalty are nonsmooth. The challenge is
+therefore to preserve the useful optimization structure while making joint posterior inference
+computationally practical.
+     The Bayesian quantile trend filtering method of Onizuka et al. (2024) illustrates this
+computational challenge. Its Gibbs sampler uses latent-variable representations of the like-
+lihood and shrinkage prior, requiring observation-level latent updates, local-scale updates
+for the trend differences, and a Gaussian trend update with a precision matrix that changes
+each iteration. These updates support flexible local shrinkage, especially under the horse-
+shoe prior, but impose substantial computational overhead. In the supplied implementation,
+
+                                               4
+dense inversion and Gaussian simulation remain a bottleneck even with the tested sparse op-
+tion enabled. Our formulation instead uses one global regularization parameter per quantile
+and an ADMM proximal system that permits factorization reuse.
+    The same authors also propose a faster mean-field variational Bayes (VB) approximation,
+together with a calibration procedure for its uncertainty summaries (Onizuka et al., 2024). In
+exploratory runs beyond the n = 100 reference setting, we encountered numerical failures in
+the public VB implementation. This implementation-specific observation provides additional
+motivation for a sampling alternative; our comparisons focus on estimation accuracy and
+computational performance rather than a quantitative assessment of uncertainty calibration.
+    The present paper combines the mode connection with a computational use of ADMM:
+the same class of ℓ1 trend filtering subproblems becomes the engine of posterior simula-
+tion. We construct a three-block Gibbs scheme that updates the single global regularization
+parameter λ and the likelihood scale σ from conjugate full conditionals, and updates the
+trend through a proximal Metropolis-adjusted Langevin (P-MALA) step (Pereyra, 2016).
+This formulation retains the local adaptation induced by the ℓ1 difference penalty without
+introducing a separate random shrinkage scale for every difference or a latent variable for
+every observation. For each quantile, only two scalar hyperparameters are sampled in addi-
+tion to the trend. The proximal subproblems are solved using ADMM. In the constrained
+formulation, their coefficient matrix depends only on the difference operator and fixed algo-
+rithmic parameters, permitting reuse of a banded factorization. With sparse operations and
+a bounded number of inner ADMM iterations, the work per outer iteration is linear in the
+sample size. The advantage is thus a simpler hierarchy and reusable optimization structure,
+together with posterior inference for the trend and its regularization strength.
+    The framework extends naturally to joint inference across multiple quantile levels under
+the standard non-crossing constraint. The single-quantile P-MALA step is replaced by a
+sequential update in which the proximal map is solved under box constraints determined
+by the most recent values of the neighboring quantile trends. The required modification
+to the ADMM solver introduces a single auxiliary variable and an elementwise projection
+step, leaving its overall structure and computational profile intact. This joint construction,
+however, also exposes a difficulty intrinsic to gradient-based samplers under the asymmetric
+Laplace likelihood at extreme quantile levels. For τ close to zero or one, nearly all residuals
+share the same sign and the gradient of the smoothed check loss approaches a constant vector,
+so the P-MALA proposal carries negligible directional information and the chain develops
+a persistent drift away from the data. The locally adaptive prior of Onizuka et al. (2024)
+partially mitigates this pathology, and their sampler produces degraded but not catastrophic
+estimates at extreme quantile levels. We instead resolve it through a strategy that exploits
+the box-constraint structure of the joint sampler: we augment the set of inferential quantile
+levels with auxiliary sentinel quantiles placed beyond the target range, whose role is purely
+structural. The sentinels are sampled as ordinary members of the joint posterior and provide
+a dynamically updating upper or lower bound on the extreme target quantile through the
+non-crossing constraint, confining its exploration to a statistically sensible region at every
+iteration. The mechanism is computationally cheap and, in our simulation study, allows
+the proposed sampler to match or slightly improve upon the extreme-quantile accuracy of
+Onizuka et al. (2024) while using a globally penalized prior that is structurally simpler than
+the per-coefficient horseshoe.
+
+                                              5
+    The main contributions of this work are as follows.
+    1. We develop an adaptive Bayesian extension of the frequentist quantile trend filtering
+       estimator: its conditional posterior mode recovers the ADMM solution at σ = 1 and
+       fixed λ, while the full hierarchy learns both parameters jointly with the trend and
+       propagates their uncertainty into posterior summaries.
+    2. We use ADMM within proximal posterior sampling, with one global regularization
+       parameter per quantile and no observation-level likelihood augmentation. The con-
+       strained proximal system permits reuse of a banded factorization; sparse operations
+       give linear work in n for a fixed inner iteration budget, avoiding the dense inverse and
+       Gaussian simulation used by the supplied Gibbs benchmark.
+    3. We extend the sampler to the joint estimation of multiple quantile levels under non-
+       crossing constraints, incorporating the constraints exactly through a box-projection
+       step inside the inner ADMM solver rather than through approximate or penalty-based
+       enforcement.
+    4. We introduce the sentinel quantile strategy, a structurally minimal device that resolves
+       the gradient degeneracy of proximal MALA at extreme quantile levels and recovers
+       competitive accuracy at the tails of the response distribution. The mechanism is generic
+       and applies to any gradient-based sampler for quantile trend filtering, not only the one
+       developed here.
+    5. Through a comprehensive simulation study spanning four signal structures, three noise
+       distributions, three difference orders, and both interior and extreme quantile levels, we
+       demonstrate that the proposed sampler delivers accuracy comparable to or better than
+       the competitive Bayesian approach of Onizuka et al. (2024), with posterior uncertainty
+       summaries and reduced computational overhead relative to the supplied dense Gibbs
+       implementation, and that it does so using a single global penalty parameter rather than
+       the per-coordinate local shrinkage employed by competing priors, which simplifies the
+       prior specification and the resulting sampler.
+   The remainder of the paper is organized as follows. Section 2 develops the methodology,
+presenting the data model and likelihood, the individual-quantile sampler with its three
+conjugate and proximal updates, the joint sampler with non-crossing constraints and the
+associated ADMM proximal operator, and the sentinel quantile strategy. Section 3 reports
+the simulation study comparing the proposed sampler with the relevant frequentist and
+Bayesian competitors across interior and extreme quantile levels. Section 5 discusses the
+results, limitations, and avenues for extension.
+
+
+2     Methodology
+2.1     Data Model and Likelihood
+Let y = (y1 , . . . , yn )⊤ ∈ Rn denote an observed time series. We model the data as
+                                  yi = θi + εi ,       i = 1, . . . , n,                    (1)
+
+                                                   6
+where θ = (θ1 , . . . , θn )⊤ is an unknown smooth trend and εi are independent errors. For
+a given quantile level τ ∈ (0, 1), we model the errors as following an asymmetric Laplace
+distribution (ALD). The ALD with location zero, scale σ > 0, and skewness parameter τ
+has density                                                  {︃        }︃
+                                               τ (1 − τ )       ρτ (u)
+                                f (u | τ, σ) =            exp −           ,             (2)
+                                                   σ              σ
+where ρτ (u) = u(τ − 1(u < 0)) is the asymmetric check function. This choice of likelihood
+connects the Bayesian framework directly to frequentist quantile regression: the maximum a
+posteriori (MAP) estimate of θ under a flat prior coincides with the solution to the standard
+quantile regression problem. Rather than fixing σ, we treat it as an unknown parameter
+and assign it a prior, so that the scale of the likelihood adapts to the data within the Gibbs
+scheme.
+   The log-likelihood for θ given y at quantile level τ and scale σ is
+                                            [︃            ]︃      n
+                                               τ (1 − τ )      1 ∑︂
+                     ℓ(θ | y, τ, σ) = n log                  −       ρτ (yi − θi ).
+                                                   σ           σ i=1
+
+2.2    Individual Quantile Sampler
+We first describe the sampler that targets a single quantile level τ . The joint sampler of
+Section 2.3 builds directly on this construction.
+
+Prior specification. To encourage smoothness of the estimated trend, we place a penalty
+on the (k + 1)-th order discrete differences of θ. Let D = D(k+1) ∈ Rm×n denote the discrete
+difference operator of order k+1, where m = n−k −1 is its row rank. We use the hierarchical
+prior
+
+                                 p(θ | λ) ∝ exp{−λ ∥Dθ∥1 } ,
+
+which corresponds to placing independent Laplace distributions on the m differences (Dθ)j ,
+all sharing the common rate parameter λ (Laplace scale 1/λ). Thus, the ℓ1 penalty retains
+the local adaptation of trend filtering, while λ controls the overall regularization strength.
+
+Connection to frequentist quantile trend filtering. For σ = 1 and fixed λ > 0, the
+conditional posterior mode satisfies
+                                           {︄ n                        }︄
+                                             ∑︂
+                      θ̂MAP (λ) ∈ arg minn      ρτ (yi − θi ) + λ ∥Dθ∥1 .      (3)
+                                    θ∈R
+                                           i=1
+
+The optimization problem on the right is the frequentist quantile trend filtering problem of
+Brantley et al. (2020), solved by ADMM. The equivalence concerns the conditional mode
+at fixed hyperparameters; posterior means and summaries obtained by integrating over λ
+and σ need not coincide with that estimate. Our Bayesian extension assigns priors to both
+parameters and infers them jointly with θ, making regularization and likelihood scale data-
+adaptive while retaining the same check-loss and difference-penalty structure.
+
+                                              7
+   Rather than treating λ as a fixed tuning parameter selected by an external criterion, we
+place a Gamma hyperprior on λ,
+                                     λ ∼ Gamma(a0 , b0 ),
+with shape a0 > 0 and rate b0 > 0. For the ALD scale, we place an inverse-Gamma prior
+                                        σ ∼ IG(aσ , bσ ),
+with shape aσ > 0 and rate bσ > 0. In our implementation we set aσ = bσ = 0.1, a weakly
+informative choice that lets the data dominate the posterior for σ. Both hyperpriors are
+conjugate given θ, yielding closed-form full conditionals that are sampled as part of the
+inference.
+
+Hyperparameter scaling by difference order. The conjugate full conditional for λ
+is Gamma(a0 + m, b0 + SD ) with posterior mean (a0 + m)/(b0 + SD ), where SD = ∥Dθ∥1 .
+Because m = n−k−1 grows linearly with n, the appropriate scaling of (a0 , b0 ) depends on the
+difference order k, and the qualitative consequences of misspecification differ markedly across
+orders. The guiding principle is that the posterior mean of λ should scale appropriately with
+the complexity of the signal class being fit.
+    For k = 0, the estimator is piecewise constant and an unbounded posterior mean of λ
+obliterates the jump structure of the signal by shrinking the first differences of θ toward zero.
+The required scaling is a0 = c1 n and b0 = n, yielding posterior mean approximately c1 + 1
+independent of n, with prior variance c1 /n that shrinks with sample size. We use c1 = 1 as
+the default and recommend the posterior mode as the point estimate. Alternative scalings
+of the form a0 = 1, b0 = c2 nα with α < 1 produce a posterior mean of order n1−α , which
+diverges and is not viable for piecewise constant signals.
+    For k = 1, the estimator is piecewise linear, and slow growth of λ with n is appropriate:
+more data warrant stronger regularization, but excessive penalization suppresses√local fea-
+tures such as spikes or sharp curvature
+                                √          transitions. We set a0 = 1 and b0 = c2 n, giving
+posterior mean approximately n/c2 . The shape parameter a0 = 1 is nearly noninformative,
+so the posterior mean of λ is driven by m and the sufficient statistic SD . We use c2 = 1 as
+the default, with the range [0.5, 2] providing a reasonable operating window, and recommend
+the posterior mean as the point estimate.                                               ⃦      ⃦
+    For k = 2, the estimator is piecewise quadratic and the sufficient statistic SD = ⃦D(3) θ⃦1
+remains small regardless of n for signals well approximated by piecewise quadratics. Lin-
+ear growth of λ in n is then appropriate: we set a0 = cn and b0 = 1, yielding posterior
+mean approximately (c + 1)n. We use c = 1 as the default and the posterior mean as the
+point estimate. This order exhibits a degree of robustness that lower orders do not share:
+misspecification of c produces gradual degradation in mean squared error rather than the
+catastrophic structural collapse observed for k = 0.
+    We adopt k = 2 as the default difference order in the absence of prior knowledge about
+signal structure. It does not require commitment to a specific signal class, exhibits the
+lowest sensitivity to hyperparameter misspecification among the three orders, and degrades
+gracefully under it. Lower orders may outperform k = 2 when the signal class matches the
+estimator structure exactly and the hyperparameters are well-tuned, but the gain is modest
+relative to the additional tuning effort required.
+
+                                               8
+Posterior. The joint posterior over (θ, λ, σ) is
+                           {︄     n
+                                                            }︄
+                       −n      1 ∑︂
+     p(θ, λ, σ | y) ∝ σ exp −        ρτ (yi − θi ) − λ ∥Dθ∥1 λa0 −1 e−b0 λ σ −aσ −1 e−bσ /σ .   (4)
+                               σ i=1
+
+Direct sampling from (4) is intractable due to the non-smooth ALD likelihood and the
+ℓ1 penalty. We construct a three-block Gibbs sampler that alternates between sampling
+θ | λ, σ, y via proximal MALA, λ | θ, y from its Gamma conjugate update, and σ | θ, y from
+its inverse-Gamma conjugate update.
+
+Sampling the trend via P-MALA. Sampling θ | λ, σ, y requires drawing from a distri-
+bution with a non-smooth log-density. The P-MALA algorithm of Pereyra (2016) handles
+this by incorporating the proximal operator of the non-smooth component into the Langevin
+proposal, yielding proposals that respect the geometry      ∑︁nof the posterior. The negative log-
+                                                         −1
+likelihood contribution from the ALD is f (θ) = σ             i=1 ρτ (yi − θi ), which depends on σ
+both as a multiplicative scale and through the residual magnitude. To compute the gradient
+required by P-MALA, we use a smooth approximation of the check function evaluated on
+the standardized residual ui = (yi − θi )/σ,
+
+                               ρ̃τ (u, ε) = τ u + ε log 1 + e−u/ε ,
+                                                       (︁          )︁
+
+
+for a small smoothing     parameter ε > 0. The gradient of the smoothed negative log-likelihood
+ ˜        −1
+             ∑︁n
+f (θ) = σ      i=1 ρ̃τ ((yi − θi )/σ, ε) σ with respect to θi is
+                                                (︃                        )︃
+                                    ˜         1              1
+                               ∇θi f (θ) = −       τ−                        .
+                                              σ       1 + e(yi −θi )/(σε)
+
+The factor σ −1 means that smaller values of σ produce sharper gradients and stronger drift
+toward the quantile, while larger values flatten the gradient; this is the mechanism by which
+the scale parameter actively shapes the P-MALA proposal rather than acting as an inert
+nuisance.
+   The non-smooth component of the log-posterior is g(θ) = λ ∥Dθ∥1 . Its proximal operator
+with step size γ > 0 is
+                                            {︃                         }︃
+                                                          1          2
+                       proxγg (z) = arg minn λ ∥Dθ∥1 +      ∥θ − z∥2 ,
+                                        θ∈R              2γ
+
+which is the ℓ1 trend filtering problem with response z and penalty γλ. In the individual
+sampler this proximal map is unconstrained and we solve it directly using the trendfilter
+function of the glmgen package (Tibshirani, 2014), which provides an efficient ADMM-based
+solver for the standard trend filtering problem.
+    Given the current state θ(t) , the P-MALA proposal is
+                                        (︂                √    )︂
+                             ⋆             (t)   ˜ (t)
+                           θ = proxγg θ − δ∇f (θ ) + 2δ ξ ,
+
+
+
+                                                 9
+where ξ ∼ N (0, In ) and δ > 0 is the P-MALA step size. The proposal is accepted with the
+Metropolis-Hastings probability min(1, α), where
+       log α = log p(θ⋆ | λ, σ, y) − log p(θ(t) | λ, σ, y) + log q(θ(t) | θ⋆ ) − log q(θ⋆ | θ(t) ),
+and the proposal log-density is
+                                         1 ⃦⃦θ⋆ − µ(t) ⃦2 ,
+                                                       ⃦
+                 log q(θ⋆ | θ(t) ) = −                  2
+                                                              µ(t) = θ(t) − δ∇ψ(θ(t) ),
+                                         4δ
+with ∇ψ(θ) = (θ−proxγg (θ−γ∇f˜(θ)))/γ the gradient of the Moreau envelope. The posterior
+log-density in the acceptance ratio uses the exact (non-smoothed) check function, evaluated
+with the current value of σ.
+
+Sampling the regularization parameter. Given θ, the conditional posterior for λ fol-
+lows directly from (4). Because the prior places independent Laplace distributions on each
+of the m entries (Dθ)j with shared scale λ, the likelihood contribution of θ to λ is
+                                  p(θ | λ) ∝ λm exp{−λ ∥Dθ∥1 } .
+Combining with the Gamma hyperprior,
+                          p(λ | θ, y) ∝ λa0 +m−1 exp{−(b0 + ∥Dθ∥1 ) λ} ,
+which is the kernel of a Gamma distribution,
+                     λ | θ, y ∼ Gamma(a0 + m, b0 + SD ) ,            SD = ∥Dθ∥1 .                     (5)
+The sufficient statistic SD measures the total variation of the current trend estimate. When
+the sampled θ is rough, SD is large and the posterior for λ shifts toward larger values, in-
+creasing regularization in the next iteration; when θ is smooth, λ is drawn from a distribution
+with smaller mean. This self-regulating behavior is a principal advantage of the Bayesian
+formulation over a fixed eBIC-selected penalty.
+
+Sampling the ALD scale. Given (θ, λ), only the likelihood and the inverse-Gamma prior
+on σ contribute to its full conditional. From (4),
+                                              {︄   (︄ n                    )︄}︄
+                                                 1   ∑︂
+                p(σ | θ, y) ∝ σ −(n+aσ +1) exp −        ρτ (yi − θi ) + bσ      ,
+                                                 σ i=1
+which is the kernel of an inverse-Gamma distribution,
+                                                                      n
+                                                                     ∑︂
+                     σ | θ, y ∼ IG(n + aσ , Sρ + bσ ) ,       Sρ =         ρτ (yi − θi ).             (6)
+                                                                     i=1
+
+The sufficient statistic Sρ is the total check loss at the current trend estimate. When the
+residuals are large, Sρ is large and the posterior for σ concentrates at larger values, which
+flattens the likelihood gradient at the next P-MALA step; when the trend fits the data well,
+σ is drawn from a distribution with smaller mean, sharpening the gradient. The three blocks
+of the Gibbs sampler therefore interact: σ calibrates the effective noise level seen by θ, λ
+calibrates the effective smoothness penalty seen by θ, and θ in turn determines the sufficient
+statistics for both scale parameters.
+
+                                                    10
+2.3    Joint Quantile Sampler
+We now extend the individual sampler to target K quantile levels simultaneously. Let
+τ1 < τ2 < · · · < τK denote the quantile levels of interest. Each quantile inherits its
+own copy of the full parameter set from the individual construction: a trend θτk , a reg-
+ularization parameter λτk , and an ALD scale στk . We seek joint posterior inference on
+(θτ1 , . . . , θτK , λτ1 , . . . , λτK , στ1 , . . . , στK ) subject to the non-crossing constraint
+
+                                  θτ1 ,i ≤ θτ2 ,i ≤ · · · ≤ θτK ,i ,      i = 1, . . . , n.
+
+The joint posterior is
+                                                                               K
+                                                                                     [︄
+                                                                               ∏︂
+          p(θτ1 , . . . , θτK , λτ1 , . . . , λτK , στ1 , . . . , στK | y) ∝              στ−(n+a
+                                                                                             k
+                                                                                                 σ +1) a0 −1 −b0 λτk
+                                                                                                      λ τk e
+                                                                               k=1
+                                   {︄           n
+                                                                                                       }︄ ]︄
+                                   1                                          bσ
+                                                                                                               · 1(C),
+                                               ∑︂
+                          × exp −         ρτk (yi − θτk ,i ) − λτk ∥Dθτk ∥1 −
+                                  στk i=1                                     στk
+
+where C denotes the non-crossing feasible set.
+   We sample from this posterior using a fixed-scan Gibbs sampler. Each full Gibbs iteration
+proceeds as follows.
+
+Sequential trend updates. For k = 1, . . . , K, sample θτk via a single P-MALA step of
+the form described in Section 2.2, using the current values of λτk and στk in the gradient and
+acceptance ratio, with the non-crossing constraint enforced as a box constraint. At step k,
+the constraint reduces to
+
+                                        ℓτk ,i ≤ θτk ,i ≤ uτk ,i ,   i = 1, . . . , n,
+
+where ℓτk ,i = θτk−1 ,i (or −∞ if k = 1) and uτk ,i = θτk+1 ,i (or +∞ if k = K), using the most
+recently updated values of adjacent trends. The box constraint at each step is exact: it is
+fully determined by the current values of the neighboring quantile trends, which are updated
+sequentially so that the lower bound always reflects the most recent sample of θτk−1 .
+    The presence of the box constraint changes the proximal subproblem. The unconstrained
+glmgen::trendfilter solver used in the individual sampler no longer applies, and we in-
+stead solve the constrained proximal map via ADMM; see Section 2.4.
+
+Sequential scale and regularization updates. For k = 1, . . . , K, sample λτk and στk
+from their conditional posteriors given θτk . The derivations are identical to the individual
+case in (5) and (6) applied quantile-by-quantile, so
+                                            (︁                           )︁
+                     λτk | θτk , y ∼ Gamma a0 + m, b0 + ∥Dθτk ∥1 ,
+                                                 ∑︁n
+                     στk | θτk , y ∼ IG(n + aσ ,   i=1 ρτk (yi − θτk ,i ) + bσ ) ,
+
+for k = 1, . . . , K. Each λτk and στk is updated independently, so that each quantile’s degree
+of smoothing and its effective noise scale adapt to the fit of its own estimated trend.
+
+                                                             11
+Parameter structure. Each quantile τk has its own P-MALA step size δk , allowing the
+proposal to adapt to the differing curvatures of the conditional posteriors across quantile
+levels. The smoothing parameter ε for the check loss approximation, the proximal step size
+γ, and the ADMM penalty parameter ρ are shared across all quantiles. The Gamma prior
+hyperparameters (a0 , b0 ) and the inverse-Gamma hyperparameters (aσ , bσ ) are also shared,
+encoding a common prior belief about the scale of regularization and the noise level.
+
+2.4    ADMM Proximal Operator for the Constrained Subproblem
+At each Gibbs step of the joint sampler, the P-MALA proposal for θτk requires solving the
+constrained proximal problem
+                     {︃                         }︃
+                                    1         2
+                min λτk ∥Dθ∥1 +       ∥θ − z∥2     subject to ℓ ≤ θ ≤ u,              (7)
+                θ∈Rn               2γ
+
+where z is the P-MALA input and [ℓ, u] is the box defined by the neighboring quantile trends.
+We solve (7) via ADMM by introducing auxiliary variables v = Dθ and w = θ, yielding the
+equivalent problem
+              {︃                    }︃
+                        1         2
+        min λτk ∥v∥1 +    ∥θ − z∥2       subject to v = Dθ, w = θ, ℓ ≤ w ≤ u.
+        θ,v,w          2γ
+The augmented Lagrangian is
+                                          1                          ρ
+          Lρ (θ, v, w, α, β) = λτk ∥v∥1 +   ∥θ − z∥22 + α⊤ (Dθ − v) + ∥Dθ − v∥22
+                                         2γ                          2
+                                             ρ          2
+                             + β ⊤ (θ − w) + ∥θ − w∥2 ,
+                                             2
+where ρ > 0 is the ADMM penalty parameter and α, β are dual variables. The ADMM
+updates at iteration t are:
+
+θ-update (linear system). Minimizing over θ gives
+              (︃                )︃
+                 1                     1
+                         T
+                   I + ρD D + ρI θt+1 = z + DT (ρv t − αt ) + (ρwt − β t ).
+                 γ                     γ
+
+The system matrix A = γ1 I + ρDT D + ρI depends only on γ, ρ, and D, all of which are fixed
+within a Gibbs iteration. Exploiting this, we factorize A once at the beginning of each Gibbs
+step and reuse the factorization across all ADMM iterations. Combined with sparse storage
+of D and DT D, this constitutes the primary computational optimization of the algorithm.
+
+v-update (soft-thresholding). Minimizing over v decouples elementwise and yields the
+soft-threshold operator,
+
+                          vjt+1 = Sλτk /ρ (Dθt+1 )j + αjt /ρ ,
+                                         (︁                 )︁
+
+where Sκ (x) = sign(x) max(|x| − κ, 0) is the soft-thresholding operator.
+
+                                             12
+w-update (box projection). Minimizing over w subject to ℓ ≤ w ≤ u yields the elemen-
+twise projection onto the box,
+
+                             wit+1 = clip θit+1 + βit /ρ, ℓi , ui ,
+                                         (︁                      )︁
+
+
+where clip(x, ℓ, u) = max(ℓ, min(u, x)). This is the step that enforces the non-crossing con-
+straint: the box [ℓ, u] is defined by the current values of the neighboring quantile trends,
+and the projection is exact and elementwise.
+
+Dual updates.
+
+                                 αt+1 = αt + ρ(Dθt+1 − v t+1 ),
+                                 β t+1 = β t + ρ(θt+1 − wt+1 ).
+
+All three subproblem updates have exact closed-form solutions, and the algorithm converges
+to the global optimum of (7) as the number of ADMM iterations grows. In practice, we run
+a fixed number of ADMM iterations per Gibbs step, with convergence monitored via primal
+and dual residuals.
+
+2.5    Sentinel Quantile Strategy for Extreme Quantile Estimation
+A fundamental difficulty in Bayesian sampling for extreme quantile trend filtering arises
+from the behavior of the ALD likelihood gradient. For a quantile level τ close to zero or
+one, nearly all residuals yi − θi have the same sign, and the gradient of the smoothed check
+loss ∇f˜(θ) approaches a constant vector. The P-MALA proposal then carries negligible
+gradient information and degenerates toward a random walk. Because the posterior at
+extreme quantile levels has a heavy tail in the direction away from the bulk of the data, the
+Markov chain occasionally accepts large moves in that direction, causing persistent upward
+or downward drift. For the 0.99 quantile with n = 400, this pathology produces large RMSE
+values under individual estimation, rendering the estimate essentially useless. Onizuka et al.
+(2024) document degraded coverage at τ ∈ {0.05, 0.95} across their full simulation suite,
+which spans two signal structures—piecewise constant (PC) and varying smoothness (VS)—
+under three noise distributions: Gaussian, Beta, and mixed normal.
+    The sentinel quantile strategy resolves this by exploiting the sequential box constraint
+structure of the joint sampler. We augment the set of quantiles of inferential interest with
+auxiliary sentinel quantiles placed beyond the target range. The sentinels are treated as full
+members of the joint posterior: they are sampled by the same Gibbs scheme, receive their
+own regularization and scale parameters, and their estimates are computable. However they
+are not primary targets of inference; their role is structural.
+    Concretely, to estimate the 0.99 quantile stably, we include sentinel quantiles at 0.995
+and 0.999. The 0.995 sentinel provides a dynamic upper wall for the 0.99 quantile through
+the box constraint θ0.99,i ≤ θ0.995,i , and is itself controlled from above by the 0.999 sentinel
+through θ0.995,i ≤ θ0.999,i . A stable scaffold of lower quantiles (e.g., 0.3, 0.5, 0.7, 0.9, 0.95,
+0.97, 0.98) anchors the structure from below, preventing downward drift of the 0.99 quantile.
+The result is that the 0.99 quantile is sandwiched within a dynamically updating interval at
+
+
+                                                13
+every Gibbs iteration, which confines its exploration to a statistically sensible region without
+imposing any fixed constraint on its value. The strategy is computationally free in the sense
+that adding sentinel quantiles increases the number of sequential Gibbs steps by the number
+of sentinels, which is small, without changing the per-step cost.
+
+2.6     Summary of the Algorithm
+Algorithm 1 summarizes the full sequential Gibbs sampler for joint quantile trend filtering.
+
+Algorithm 1 Sequential Gibbs Sampler for Joint Bayesian Quantile Trend Filtering
+Require: Data y, quantile levels τ1 < · · · < τK (including sentinels), difference order k,
+    prior hyperparameters a0 , b0 , aσ , bσ , ADMM iterations Tadmm , Gibbs iterations Tgibbs ,
+    burn-in Tburn .
+                (0)     (0)   (0)
+ 1: Initialize θτk , λτk , στk for k = 1, . . . , K
+ 2: for t = 1, . . . , Tgibbs do
+ 3:     for k = 1, . . . , K do                                                   ▷ Sequential trend updates
+                                                  (·)         (t−1)
+ 4:         Set box [ℓk , uk ] using current θτk−1 and θτk+1
+                                         (t−1)            (t−1)
+ 5:         Compute gradient ∇f˜k (θτk ) using στk
+                                            (t−1)                √
+ 6:         Form proposal input z = θτk − δk ∇f˜k + 2δk ξ, ξ ∼ N (0, I)
+ 7:         Solve (7) via ADMM (Algorithm 2) to get θ⋆
+                                                                             (t−1)   (t−1)
+ 8:         Accept/reject θ⋆ via Metropolis-Hastings using (λτk , στk )
+                   (t)
+ 9:         Set θτk ← accepted state
+10:     end for
+11:     for k = 1, . . . , K do                         ⃦         ⃦ ▷ Sequential regularization updates
+                         (t)                            ⃦ (t) ⃦
+12:         Sample λτk ∼ Gamma(a0 + m, b0 + ⃦Dθτk ⃦ )
+                                                                     1
+13:     end for
+14:     for k = 1, . . . , K do                                                    ▷ Sequential scale updates
+                         (t)               ∑︁n                 (t)
+15:         Sample στk ∼ IG(n + aσ ,               ρ  (y
+                                               i=1 τk i   −  θ τk ,i ) + b σ )
+16:     end for
+17: end for
+                                     (t)   (t)   (t)
+18: return posterior samples {θτk , λτk , στk }t>Tburn for k = 1, . . . , K
+
+
+
+
+3     Simulation
+We evaluate the proposed samplers on three test signals of increasing smoothness, each
+observed under three error distributions, across a common grid of quantile levels. Throughout
+we take n = 400 equally spaced design points xi = i, i = 1, . . . , n, and write x̃i = i/n ∈ (0, 1]
+for the rescaled index. Every configuration is replicated over 100 independent data sets, and
+all reported figures are averages over these replications. The individual sampler is run for
+6000 Gibbs iterations with a burn-in of 1000, and its point estimate is the posterior mean of
+θ unless stated otherwise. Performance is measured by mean squared error (MSE) and mean
+absolute deviation (MAD) of the point estimate against the true conditional quantile Qτ , and
+
+                                                     14
+Algorithm 2 ADMM for Constrained Proximal Subproblem
+Require: Input z, box [ℓ, u], λ, γ, ρ, D, iterations Tadmm
+ 1: Factorize A = γ1 I + ρD T D + ρI                                            ▷ Once per Gibbs step
+ 2: Initialize v 0 , w 0 , α0 , β 0
+ 3: for t = 0, . . . , Tadmm
+                          (︂     − 1 do                            )︂
+          t+1        −1 1             ⊤     t     t        t     t
+ 4:     θ     ←A             γ
+                               z +  D   (ρv   − α   ) + ρw   − β
+ 5:    v t+1 ← Sλ/ρ (Dθt+1 + αt /ρ)
+ 6:    wt+1 ← clip(θt+1 + β t /ρ, ℓ, u)
+ 7:    αt+1 ← αt + ρ(Dθt+1 − v t+1 )
+ 8:    β t+1 ← β t + ρ(θt+1 − wt+1 )
+ 9: end for
+10: return θ Tadmm
+
+
+by the mean credible interval width (MCIW) of the 95% pointwise posterior intervals. To
+keep the main presentation focused, this section reports MSE and MCIW for the piecewise
+constant and varying-smoothness signals. All MAD results, together with the complete MSE,
+MAD, and MCIW results for the smooth signal fit at k = 2, are reported in Appendix A.
+
+Baseline signals. The mean function f is one of the following, indexed by the difference
+order k at which it is fit:
+
+    (a) Piecewise constant (k = 0) :          f (x̃) = 2.5 1{x̃ ∈ (0, 0.2]} + 1.0 1{x̃ ∈ (0.2, 0.4]}
+                                                       + 3.5 1{x̃ ∈ (0.4, 0.6]} + 1.5 1{x̃ ∈ (0.6, 1]},
+                                                                                                       (8)
+                                              f (x̃) = 2 + sin(4x̃ − 2) + 2 exp − 30(4x̃ − 2)2 , (9)
+                                                                                (︁                )︁
+   (b) Varying smoothness (k = 1) :
+                 (c) Smooth (k = 2) :         f (x̃) = sin(2πx̃).                                    (10)
+
+Signal (a) is piecewise constant with three change points, signal (b) combines a slowly varying
+sinusoid with a sharply localized bump, and signal (c) is globally smooth.
+
+Noise distributions. Observations are generated as yi = f (x̃i ) + εi , with a design-
+dependent error εi drawn from one of:
+
+    Gaussian (heteroscedastic): εi ∼ N 0, s(x̃i )2 with s(x̃) = (1 + x̃2 )/4, so that Qτ (x̃) =
+                                        (︁         )︁
+
+     f (x̃) + s(x̃) Φ−1 (τ ).
+
+    Beta: εi ∼ Beta 1, 11 − 10x̃i , so that Qτ (x̃) = f (x̃) + FBeta(1,
+                                                                 −1
+                         (︁       )︁
+                                                                         11−10x̃) (τ ); the error is
+     right-skewed and its shape varies with the design.
+
+     Mixed normal (location mixture): εi ∼ x̃i N (−0.2, 0.5) + (1 − x̃i ) N (0.2, 0.5), a two-
+      component mixture whose mixing weight drifts with the design. The true quantile
+      Qτ (x̃) = f (x̃) + G−1
+                                                                                          (︁
+                             (τ ) is obtained by inverting the mixture CDF Gx̃ (t) = x̃ Φ (t +
+            √ )︁          x̃   (︁         √ )︁
+      0.2)/ 0.5 + (1 − x̃) Φ (t − 0.2)/ 0.5 .
+
+                                                     15
+The Gaussian case is symmetric but heteroscedastic, the Beta case is skewed, and the mixed
+normal case is the most adversarial to the asymmetric Laplace working likelihood because
+its shape—not merely its scale—changes across the domain.
+
+3.1     Individual Sampler
+This subsection reports the single-quantile sampler at the interior levels
+
+                                 τ ∈ {0.05, 0.25, 0.5, 0.75, 0.95}
+
+against the two Onizuka variants (Laplace and Horseshoe), both run in MCMC mode.
+
+3.1.1   Piecewise Constant
+On the piecewise constant signal all three methods recover the trend accurately: the MSE
+values in Table 1 are small relative to the scale of the signal, whose segment levels range
+from 1.0 to 3.5, so the differences among methods, while systematic, are minor in practical
+terms. Within these margins the horseshoe prior of Onizuka is the strongest competitor, as
+its local adaptivity is well matched to a mean function that is flat almost everywhere with a
+few abrupt jumps. The individual sampler improves uniformly on the Laplace variant, which
+shares its single-scale prior structure, and is strongest at the near-tail levels τ ∈ {0.05, 0.95},
+where under the mixed normal design it records the lowest MSE of the three methods; it also
+leads across the Beta design at the lower levels. The corresponding MAD results are reported
+in Appendix Table 9. Interval widths (Table 2) are shaped in part by the exploration range
+of the chain: the P-MALA step size is tuned to an acceptance rate of 40–60%, and this
+tuning constrains how far the sampler travels per iteration and hence the dispersion of the
+resulting posterior sample. The widths reported here and in the analogous tables below
+should be read with this mechanism in mind.
+
+3.1.2   Varying Smoothness
+On the varying smoothness signal the individual sampler is broadly competitive with the
+horseshoe and improves on the Laplace variant across most levels and noise distributions.
+Under Gaussian noise it sits between the two Onizuka variants and overtakes the horseshoe
+at the upper level τ = 0.95; under mixed normal noise the horseshoe retains a modest edge
+while the individual sampler remains ahead of the Laplace variant throughout. Under Beta
+noise the individual sampler attains the lowest MSE among the three methods at every level
+(Table 3). The corresponding MAD comparison is given in Appendix Table 10, while Table 4
+reports interval widths in the main text.
+
+3.1.3   Smooth Function
+For compactness, all individual-sampler results for the smooth signal fit at k = 2 are deferred
+to Appendix A.1.2. Tables 11–13 there report MSE, MAD, and MCIW, respectively. These
+results provide the smooth-signal evidence used in the cross-signal summary below.
+
+
+
+                                                16
+Table 1: Mean squared error (MSE) for the piecewise constant signal (k = 0) at interior
+quantile levels, across noise distributions.
+
+                                                     MSE
+             (I) Gauss              0.05     0.25     0.5     0.75    0.95
+             Onizuka (Horseshoe) 0.0248 0.0043 0.0027 0.0044 0.0246
+             Onizuka (Laplace)   0.0570 0.0257 0.0201 0.0254 0.0587
+             Individual Sampler  0.0426 0.0161 0.0127 0.0153 0.0398
+             (II) Beta              0.05     0.25     0.5     0.75    0.95
+             Onizuka (Horseshoe) 0.0146 0.0020 0.0018 0.0033 0.0103
+             Onizuka (Laplace)   0.0085 0.0048 0.0063 0.0112 0.0169
+             Individual Sampler  0.0024 0.0015 0.0027 0.0062 0.0093
+             (III) Mixed normal     0.05     0.25     0.5     0.75    0.95
+             Onizuka (Horseshoe) 0.1273 0.0256 0.0190 0.0228 0.1230
+             Onizuka (Laplace)   0.2679 0.0812 0.0655 0.0793 0.2754
+             Individual Sampler  0.1089 0.0813 0.0725 0.0792 0.1051
+
+
+
+
+Table 2: Mean credible interval width (MCIW) for the piecewise constant signal (k = 0) at
+interior quantile levels, across noise distributions.
+
+                                                    MCIW
+             (I) Gauss              0.05     0.25     0.5     0.75    0.95
+             Onizuka (Horseshoe) 0.4277 0.2085 0.1908 0.2055 0.4269
+             Onizuka (Laplace)   0.6691 0.6326 0.6139 0.6343 0.6684
+             Individual Sampler  0.2796 0.3596 0.3542 0.3603 0.2811
+             (II) Beta              0.05     0.25     0.5     0.75    0.95
+             Onizuka (Horseshoe) 0.0593 0.0758 0.1105 0.1519 0.2836
+             Onizuka (Laplace)   0.3029 0.2756 0.3081 0.3353 0.4031
+             Individual Sampler  0.0111 0.0940 0.1164 0.1407 0.0569
+             (III) Mixed normal     0.05     0.25     0.5     0.75    0.95
+             Onizuka (Horseshoe) 0.9432 0.4489 0.4180 0.4372 0.9177
+             Onizuka (Laplace)   1.2988 1.1193 1.0561 1.1161 1.3020
+             Individual Sampler  0.6274 0.5738 0.5703 0.5710 0.6341
+
+
+
+
+                                           17
+Table 3: Mean squared error (MSE) for the varying smoothness signal (k = 1) at interior
+quantile levels, across noise distributions.
+
+                                                        MSE
+            (I) Gauss               0.05         0.25    0.5   0.75    0.95
+            Onizuka (Horseshoe)    0.0165    0.0065 0.0055 0.0063 0.0155
+            Onizuka (Laplace)      0.0276    0.0099 0.0082 0.0095 0.0262
+            Individual Sampler     0.0231    0.0080 0.0066 0.0069 0.0149
+            (II) Beta               0.05         0.25    0.5   0.75    0.95
+            Onizuka (Horseshoe) 0.0146 0.0020 0.0018 0.0033 0.0103
+            Onizuka (Laplace)    0.0085 0.0048 0.0063 0.0112 0.0169
+            Individual Sampler  0.00696 0.0012 0.0018 0.0034 0.0067
+            (III) Mixed normal      0.05         0.25    0.5   0.75    0.95
+            Onizuka (Horseshoe)    0.0575    0.0262 0.0218 0.0242 0.0576
+            Onizuka (Laplace)      0.1124    0.0366 0.0311 0.0346 0.1119
+            Individual Sampler     0.0778    0.0319 0.0280 0.0318 0.0756
+
+
+
+
+Table 4: Mean credible interval width (MCIW) for the varying smoothness signal (k = 1) at
+interior quantile levels, across noise distributions.
+
+                                                        MCIW
+             (I) Gauss              0.05     0.25        0.5   0.75   0.95
+             Onizuka (Horseshoe) 0.3007 0.2595 0.2551 0.2555 0.2928
+             Onizuka (Laplace)   0.3849 0.3489 0.3430 0.3460 0.3805
+             Individual Sampler  0.2423 0.2677 0.2692 0.2696 0.2344
+             (II) Beta              0.05     0.25        0.5   0.75   0.95
+             Onizuka (Horseshoe) 0.0593 0.0758 0.1105 0.1519 0.2836
+             Onizuka (Laplace)   0.3029 0.2756 0.3081 0.3353 0.4031
+             Individual Sampler  0.0974 0.0845 0.1160 0.1260 0.1051
+             (III) Mixed normal     0.05     0.25        0.5   0.75   0.95
+             Onizuka (Horseshoe) 0.5875 0.5147 0.5158 0.5177 0.5940
+             Onizuka (Laplace)   0.7676 0.6475 0.6369 0.6493 0.7671
+             Individual Sampler  0.5453 0.5757 0.5728 0.5741 0.5446
+
+
+
+
+                                            18
+Summary across signals. The three-block sampler of Section 2.2 regularizes θ through
+a single Laplace prior on Dθ with one shared scale λ, and calibrates the effective noise level
+through a single scale σ; both parameters admit closed-form conjugate full conditionals—
+Gamma for λ, inverse-Gamma
+                   ∑︁              for σ—driven respectively by the sufficient statistics SD =
+∥Dθ∥1 and Sρ = i ρτ (yi −θi ), so that the amount of smoothing and the assumed noise scale
+both self-adjust to the current fit of θ without any external tuning step. This is a substantially
+thinner hierarchy than the horseshoe construction of Onizuka (Horseshoe), which places a
+local shrinkage parameter on every one of the n coordinates of Dθ in addition to a global
+scale, and it is this added hierarchy, not a fundamentally different fitting principle, that gives
+the horseshoe its local adaptivity to jumps and its edge on the piecewise constant signal.
+The simulation results are consistent with this trade-off. Against the Laplace variant, which
+shares the individual sampler’s single-scale prior but fixes λ by an external criterion rather
+than adapting it within the chain, the individual sampler is on par or ahead at essentially
+every level, signal, and noise distribution, indicating that the conjugate self-tuning of λ
+and σ is doing real work. Against the horseshoe, the individual sampler trails by small
+absolute margins on the piecewise constant signal, where isolated jumps reward coordinate-
+specific shrinkage; is closely competitive on the varying smoothness signal; and surpasses the
+horseshoe at nearly every level on the smooth signal, whose complete results are reported
+in Appendix A.1.2. In no configuration does either method fail to recover the signal: the
+comparison is one of fine-grained ordering among estimators that all fit well, not of success
+against failure. Because the horseshoe’s advantage is concentrated in signals with strong local
+heterogeneity, and because it is bought with n additional per-coordinate parameters sampled
+at every Gibbs iteration against the individual sampler’s two, the individual sampler offers a
+favorable accuracy-to-complexity trade-off: it recovers most of the horseshoe’s benefit where
+that benefit exists, exceeds it where it does not, and does so with a model that is easier to
+specify, easier to diagnose, and cheaper to update per iteration.
+
+Default difference order. When the smoothness of the underlying trend is not known
+in advance, our default recommendation is the difference order k = 2. A penalty on second
+differences fits piecewise linear trends and thereby provides a reasonable local approximation
+to a wide variety of quantile functions, from globally smooth curves to signals with localized
+features, degrading gracefully when the truth departs from the assumed order. The lower
+orders are more specialized: k = 0 is well matched only when the trend is genuinely piecewise
+constant, while k = 1 occupies an intermediate position. Accordingly, the order-specific fits
+reported in this section and Appendix A should be read as each order evaluated on its
+best-case signal, with k = 2 the sensible choice absent prior structural knowledge.
+
+3.2    Joint Sampler for Extreme Quantiles
+This subsection reports the joint sequential sampler at the extreme levels
+
+                                   τ ∈ {0.01, 0.02, 0.98, 0.99}
+
+equipped with the sentinel construction described above. As before, the two Onizuka variants
+estimate each quantile in isolation and serve as the point of comparison.
+
+                                               19
+3.2.1   Piecewise Constant
+Tables 5 and 6 report MSE and MCIW for the piecewise constant signal at the extreme
+quantile levels, fit at difference order k = 0. At these levels the comparison with the horse-
+shoe, already close at the interior of this signal, tilts toward the Joint Sequential Sampler.
+It improves on Onizuka (Laplace) in MSE at every level and noise distribution. Against
+Onizuka (Horseshoe) the comparison splits by tail and by error distribution: under Beta
+noise the Joint Sequential Sampler attains the lowest MSE at all four levels; under mixed
+normal noise it leads at τ ∈ {0.02, 0.98, 0.99}, with the horseshoe retaining an advantage
+only at the deepest lower level τ = 0.01; and under Gaussian noise the horseshoe remains
+more accurate at the lower levels {0.01, 0.02} while the Joint Sequential Sampler records the
+lowest MSE at the upper levels {0.98, 0.99}. The corresponding MAD results, including the
+distinct ranking at the lower Beta tail, are reported in Appendix Table 14. As elsewhere,
+the credible intervals of the Joint Sequential Sampler are far narrower than those of both
+competitors (Table 6); the origin of this contraction is discussed at the end of the section.
+
+Table 5: Mean squared error (MSE) for the piecewise constant signal at extreme quantile
+levels, difference order k = 0, across noise distributions. The Joint Sequential Sampler is the
+sequential joint sampler equipped with sentinel quantiles.
+
+                                                            MSE
+                (I) Gauss                     0.01     0.02      0.98    0.99
+                Onizuka (Horseshoe)      0.0676 0.0544 0.0496 0.0655
+                Onizuka (Laplace)        0.1217 0.1024 0.1002 0.1187
+                Joint Sequential Sampler 0.1061 0.0826 0.0296 0.0484
+                (II) Beta                     0.01     0.02      0.98    0.99
+                Onizuka (Horseshoe)      0.0283 0.0114 0.0164 0.0224
+                Onizuka (Laplace)        0.0166 0.0076 0.0325 0.0363
+                Joint Sequential Sampler 0.0028 0.0011 0.0110 0.0154
+                (III) Mixed normal            0.01     0.02      0.98    0.99
+                Onizuka (Horseshoe)      0.3788 0.2715 0.2819 0.3887
+                Onizuka (Laplace)        0.5896 0.4673 0.4811 0.6037
+                Joint Sequential Sampler 0.4092 0.2103 0.1276 0.2630
+
+
+
+3.2.2   Varying Smoothness
+Tables 7 and 8 report MSE and MCIW for the varying smoothness signal at the extreme
+quantile levels
+
+                                  τ ∈ {0.01, 0.02, 0.98, 0.99}
+
+fit at difference order k = 1 and estimated with the joint sequential sampler under the
+sentinel construction described above. In point estimation the Joint Sequential Sampler
+
+                                              20
+Table 6: Mean credible interval width (MCIW) for the piecewise constant signal at extreme
+quantile levels, difference order k = 0, across noise distributions.
+
+                                                          MCIW
+                (I) Gauss                     0.01     0.02     0.98     0.99
+                Onizuka (Horseshoe)      0.3938 0.4140 0.4024 0.3824
+                Onizuka (Laplace)        0.6919 0.6627 0.6595 0.6862
+                Joint Sequential Sampler 0.0167 0.0538 0.0652 0.0210
+                (II) Beta                     0.01     0.02     0.98     0.99
+                Onizuka (Horseshoe)      0.0433 0.0363 0.2304 0.2115
+                Onizuka (Laplace)        0.3656 0.3084 0.4111 0.4675
+                Joint Sequential Sampler 0.0530 0.0235 0.0162 0.0465
+                (III) Mixed normal            0.01     0.02     0.98     0.99
+                Onizuka (Horseshoe)      0.8976 0.9257 0.9297 0.9064
+                Onizuka (Laplace)        1.2581 1.2601 1.2553 1.2487
+                Joint Sequential Sampler 0.0271 0.0830 0.1145 0.0474
+
+
+improves on Onizuka (Laplace) at essentially all levels and is competitive with Onizuka
+(Horseshoe). The advantage is clearest under mixed normal noise, where it attains the
+lowest MSE at every extreme level, including the upper tail {0.98, 0.99} where the location
+mixture is most adversarial to the asymmetric Laplace working likelihood. Under Gaussian
+noise it sits between the two Onizuka variants, retaining the per-coordinate advantage of the
+horseshoe at these tails, and under Beta noise the three methods are close. The corresponding
+MAD results are given in Appendix Table 15. Across all noise distributions the credible
+intervals produced by the Joint Sequential Sampler are substantially narrower than those of
+both competitors, by a factor of three to five under Gaussian and mixed normal noise; this
+contraction is a direct consequence of the box-constraint geometry discussed at the end of
+the section.
+
+3.2.3   Smooth Function
+All extreme-quantile results for the smooth signal fit at k = 2 are deferred to Appendix A.2.2.
+Tables 16–18 there report MSE, MAD, and MCIW. The appendix also discusses the stronger
+competition from the Onizuka variants on this signal and the interaction between Beta-tail
+spacing and the sentinel construction.
+    The interval widths of the Joint Sequential Sampler reported throughout this subsection
+(Tables 6, 8, and 18) are determined largely by how the inferential set is constructed. Under
+the sentinel mechanism the target quantile is bracketed at every index by the innermost
+sentinels on either side, and the non-crossing constraint forces the target trend to remain
+between these neighbours throughout the chain. With the compressed spacing used near the
+boundary—0.003 below the target and 0.01 above it for τ = 0.01, and analogously for the
+other extreme levels—the admissible vertical band for the target is narrow by construction,
+
+                                              21
+Table 7: Mean squared error (MSE) for the varying smoothness signal at extreme quantile
+levels, difference order k = 1, across noise distributions. The Joint Sequential Sampler is the
+sequential joint sampler equipped with sentinel quantiles.
+
+                                                           MSE
+                  (I) Gauss                    0.01    0.02    0.98    0.99
+                  Onizuka (Horseshoe)      0.043 0.032 0.030 0.041
+                  Onizuka (Laplace)        0.068 0.051 0.046 0.065
+                  Joint Sequential Sampler 0.051 0.036 0.032 0.049
+                  (II) Beta                    0.01    0.02    0.98    0.99
+                  Onizuka (Horseshoe)      0.002 0.001 0.010 0.012
+                  Onizuka (Laplace)        0.001 0.001 0.016 0.020
+                  Joint Sequential Sampler 0.002 0.001 0.013 0.019
+                  (III) Mixed normal           0.01    0.02    0.98    0.99
+                  Onizuka (Horseshoe)      0.197 0.132 0.144 0.212
+                  Onizuka (Laplace)        0.317 0.221 0.238 0.336
+                  Joint Sequential Sampler 0.197 0.128 0.124 0.192
+
+
+
+
+Table 8: Mean credible interval width (MCIW) for the varying smoothness signal at extreme
+quantile levels, difference order k = 1, across noise distributions.
+
+                                                          MCIW
+                  (I) Gauss                    0.01    0.02    0.98    0.99
+                  Onizuka (Horseshoe)      0.268 0.269 0.267 0.254
+                  Onizuka (Laplace)        0.362 0.357 0.340 0.348
+                  Joint Sequential Sampler 0.069 0.063 0.070 0.070
+                  (II) Beta                    0.01    0.02    0.98    0.99
+                  Onizuka (Horseshoe)      0.079 0.070 0.158 0.154
+                  Onizuka (Laplace)        0.146 0.118 0.212 0.227
+                  Joint Sequential Sampler 0.041 0.006 0.032 0.053
+                  (III) Mixed normal           0.01    0.02    0.98    0.99
+                  Onizuka (Horseshoe)      0.507 0.536 0.553 0.525
+                  Onizuka (Laplace)        0.674 0.696 0.720 0.705
+                  Joint Sequential Sampler 0.128 0.153 0.157 0.126
+
+
+
+                                              22
+which mechanically limits the dispersion of its posterior and hence the width of its credible
+intervals. The small MCIW values reported in these tables are therefore largely a conse-
+quence of this geometric confinement, and are not directly comparable to the widths of the
+unconstrained Onizuka samplers, which estimate each quantile in isolation. Empirical cov-
+erage remains the appropriate criterion for judging the calibration of all intervals reported
+in this section, for the competitors as much as for the proposed samplers.
+
+
+4     Data Applications
+4.1    Air Quality Sensor Data
+Data. Our first application revisits the fenceline air-quality monitoring problem that mo-
+tivated quantile trend filtering in Brantley et al. (2020). The U.S. Environmental Protection
+Agency deploys low-cost SPod sensors on the perimeter of industrial facilities to detect fugi-
+tive emissions of volatile organic compounds (VOCs). Each SPod records, once per second,
+the raw signal of a photoionization detector (PID): a UV lamp ionizes VOC molecules in
+the sampled air and the resulting current, reported in uncalibrated counts, is proportional
+to the total concentration of ionizable compounds. The series has three components with
+sharply different time scales. Emission plumes crossing the sensor produce large one-sided
+spikes lasting seconds to a few minutes; the electronic baseline drifts slowly over hours with
+temperature, humidity, and lamp condition; and high-frequency instrument noise rides on
+top of both. The scientific interest lies exclusively in the spikes, but because each unit’s
+baseline drifts idiosyncratically and the counts are not calibrated across units, the drifting
+baseline must be estimated and removed before events can be flagged or compared across
+sensors. Since the plumes are strictly one-sided excursions above the baseline, the baseline
+is identified by a low conditional quantile of the series, making this a natural quantile trend
+filtering problem in which, in contrast to the usual convention, the trend is the nuisance and
+the residual carries the signal. We analyze one day of data, June 15, 2018, from sensor d
+of the two collocated SPods in the EPA Rubbertown dataset accompanying Brantley et al.
+(2020), aggregating the 86,400 raw 1-Hz observations into 10-second block means, which
+yields n = 8,640 observations and attenuates the strong serial correlation of the 1-Hz noise
+that the ALD working likelihood does not model.
+
+Model and settings. We estimate the baseline at the three levels τ ∈ {0.01, 0.05, 0.1}
+with k = 2, so the prior favours piecewise quadratic trends, each level fitted independently
+by the individual sampler of Section 2.2 on the standardized series. The sampler is run
+for 6,000 Gibbs iterations with a burn-in of 1,000, proximal parameter γ = 0.1, smoothing
+parameter ϵ = 0.01, priors λ ∼ Gamma(1, 10) and σ ∼ IG(0.01, 0.01), and a step size
+adapted during burn-in toward acceptance rate 0.5. Because SD (θ) is small for the smooth
+baselines supported by these data, the rate parameter of the Gamma prior effectively pins
+the posterior of λ near (n − k − 1)/10 ≈ 864, so the prior acts as a smoothness dial; we
+return to this point below. As the frequentist benchmark we use the ADMM solver of the
+detrendr package of Brantley et al. (2020) with the smoothing parameter selected by eBIC
+over the grid λ ∈ exp{−2, . . . , 12}, which selects λ = 54.6 at τ = 0.01 and λ = 1096.6 at
+
+
+                                              23
+τ ∈ {0.05, 0.1}. Following Brantley et al. (2020), event detection after baseline removal is a
+threshold rule on the detrended series y − θ:ˆ︁ a point is classified as signal when it exceeds
+the empirical 90th, 95th, or 99th percentile of the detrended data themselves, so that no
+absolute calibration of the counts is required.
+
+Results. Figure 1 overlays the three fitted baselines on the data for the proposed sam-
+pler; the corresponding ADMM fits, and the detrended series they produce, are reported in
+Appendix B.1. Both methods track the overnight rise, the large morning excursion around
+05:00, and the slow afternoon decline, and both leave the plume spikes untouched above
+the fit. The empirical calibration of the posterior median baselines is close to nominal: the
+fraction of observations below the fitted curve is 0.005, 0.044, and 0.092 at τ = 0.01, 0.05, 0.1,
+against 0.000, 0.043, and 0.092 for ADMM. The comparison at τ = 0.01 favours the Bayesian
+fit: eBIC selects a twenty-fold smaller penalty at this level than at the other two, and the
+resulting ADMM curve bends upward into the 05:00 plume and crosses the τ = 0.05 and
+τ = 0.1 curves, whereas the posterior medians, whose smoothness is governed by the same
+prior at all three levels, remain ordered and essentially parallel throughout the day. Figure 2
+shows the detrended series with the three detection thresholds, and Figure 6b its ADMM
+counterpart; with the τ = 0.05 baseline removed, the 95% threshold sits at 109 counts for the
+proposed method (92 for ADMM) while the largest plumes exceed 400 counts, so the events
+of interest separate cleanly from the noise floor under either baseline. Each level required
+44–53 minutes of computation at n = 8,640 (6,000 iterations), against roughly four minutes
+for the ADMM fit including the eBIC grid search; acceptance rates were 0.16, 0.39, and
+0.50 at τ = 0.01, 0.05, 0.1. Mixing degrades at the most extreme level: the median effective
+sample size of θ is 67 at τ = 0.1 and 39 at τ = 0.05, but drops to 3.5 at τ = 0.01, where
+fewer than one observation in a hundred lies below the trend and the smoothed check-loss
+gradient is nearly flat, so pointwise credible statements at τ = 0.01 carry substantial Monte
+Carlo error at this chain length.
+
+
+
+
+Figure 1: Air quality data: baseline trends at τ ∈ {0.01, 0.05, 0.1} estimated by the individual
+P-MALA/Gibbs sampler with k = 2 on the 10-second means (n = 8,640) of SPod d, June
+15, 2018. Curves are posterior medians; the grey line is the observed PID series.
+
+
+
+
+                                               24
+Figure 2: Air quality data: detrended series y − θˆ︁ for the P-MALA baselines of Figure 1,
+one panel per quantile level. Horizontal lines mark the 90th (dashed), 95th (solid), and 99th
+(dotted) empirical percentiles of the detrended data, the thresholds used to classify emission
+events.
+
+
+
+
+                                             25
+4.2    Munich Rent Data
+Data. The Munich rent data come from the 2003 Munich rental guide (Mietspiegel ), a
+survey used by the city to publish reference rents, and are a standard example in the re-
+gression literature (Fahrmeir et al., 2013); they are also the real-data illustration in Onizuka
+et al. (2024), which makes them a natural test bed for comparing the two Bayesian samplers.
+We use the N = 2,035 apartments in the version distributed with the spmrf package. The
+response y is the net rent per square metre (EUR per month) and the covariate x is the floor
+size in square metres. The design has two features that the simulation study of Section 3
+does not exercise. First, floor size is recorded to the square metre, so the 2,035 apartments
+occupy only n = 134 distinct sizes between 17 and 185 m2 , with a median of 13 apartments
+per size, up to 57 at 65 m2 , and one or two per size above roughly 130 m2 . Second, the ob-
+served sizes skip integers, with gaps of up to 5 m2 in the upper range, so the grid is irregular.
+The scatter of rent against size (grey circles in Figures 3 and 4) shows a steep decline in rent
+per square metre for small apartments, a long plateau between about 50 and 120 m2 , and a
+sparse, noisier upper tail.
+
+Model and settings. Both features are accommodated without changing the samplers.
+The trend θ ∈ Rn is indexed by the 134 distinct sizes, and the ALD likelihood sums the check
+loss over all apartments sharing a size, so that each θj is informed by every rent recorded
+at xj . Unequal spacing enters only through the difference operator: following Onizuka
+et al. (2024), the equally spaced D(k+1) is replaced by the recursively weighted operator
+D(k+1) = D(1) diag{k/(xj+k − xj )} D(k) , which reduces to the usual operator when the xj are
+equally spaced. We fit k = 1, so the prior favours piecewise linear trends in floor size, at the
+five quantile levels τ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, each estimated independently by the individual
+sampler of Section 2.2. The sampler is run for 6,000 Gibbs iterations with a burn-in of 1,000,
+with proximal parameter γ = 0.1, smoothing parameter ϵ = 0.01, priors λ ∼ Gamma(1, 1)
+and σ ∼ IG(0.01, 0.01), and a single P-MALA step size δ = 0.1 for all levels, which gives
+acceptance rates between 0.42 and 0.61 across the five levels. As the point of comparison
+we run the horseshoe sampler of Onizuka et al. (2024) in MCMC mode using the authors’
+own code, which handles repeated observations and irregular grids natively, with the same
+k, the same quantile levels, and the same number of iterations and retained draws. For both
+methods the point estimate is the posterior mean of θ and the bands are 95% pointwise
+credible intervals computed from the 5,000 retained draws.
+
+Results. Figures 3 and 4 display the fitted 10% and 90% quantile curves, which together
+bracket the central 80% of the conditional rent distribution at every floor size; in both cases
+the fraction of rents below each fitted curve matches its nominal level to within 0.005. The
+two samplers agree closely over the well-populated range: both place a kink near 42–45 m2
+in the 10% curve, after which the lower quantile is nearly flat at about 5 EUR/m2 , and both
+show the 90% curve declining gently from about 11 to 9 EUR/m2 beyond 120 m2 . The visible
+difference is at the left boundary, where only one or two apartments are observed per size:
+the horseshoe fit lets the 90% curve rise to about 21 EUR/m2 at 17 m2 , chasing two isolated
+high rents, with a correspondingly wide band, whereas the single-scale Laplace prior of the
+individual sampler keeps it near 14.5 EUR/m2 . The corresponding fits at the interior levels
+
+                                               26
+τ ∈ {0.3, 0.5, 0.7}, which are nearly indistinguishable between the two methods, are reported
+in Appendix B.2.
+
+                                                 10%       90%
+
+
+
+                                20
+
+
+
+
+                                15
+            rent (EUR per m2)
+
+
+
+
+                                10
+
+
+
+
+                                5
+
+
+
+
+                                     50            100             150
+                                              floor size (m2)
+
+
+Figure 3: Munich rent data: 10% and 90% conditional quantiles of rent per square metre
+as a function of floor size, estimated by the individual P-MALA/Gibbs sampler with k = 1.
+Solid curves are posterior means, coloured ribbons are 95% pointwise credible intervals,
+and the grey band between the two curves marks the central 80% of the fitted conditional
+distribution. Grey circles are the 2,035 apartments.
+
+
+
+4.3    Growth Centiles for Dutch Children
+Growth charts are the canonical use of quantile curves: a child’s height is read against the
+population centiles at the same age, so the chart itself is a family of quantile curves indexed
+by age. We use the Fifth Dutch Growth Study (Schönbeck et al., 2013), a nationwide cross-
+sectional sample collected in 2009 and distributed with the mice package (van Buuren and
+Groothuis-Oudshoorn, 2011). After removing records without a height measurement the
+data contain 4,817 boys and 5,190 girls aged 0 to 22 years, each measured once. Boys and
+girls are analysed separately.
+    As with the Munich rents, many children share a covariate value. We round age to the
+nearest tenth of a year, which gives G = 220 equally spaced age slots for boys and G = 221 for
+girls, and index the trend θ ∈ RG by slot; the likelihood sums the check loss over all children
+in a slot exactly as in Section 4.2, and because the grid is equally   √ spaced the difference
+operator needs no reweighting. We fit k = 2 with λ ∼ Gamma(1, G), one independent run
+per level τ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, each for 6,000 iterations with 1,000 burn-in, and report
+the posterior mean. The linear-in-n prior of Section 2.2 is calibrated to one observation per
+design point; with some twenty children per slot the likelihood is far more concentrated,√ and
+a prior centred near 2G leaves the P-MALA step unable to move, so we use the n rule
+instead.
+
+
+                                                27
+                                                 10%       90%
+
+
+
+
+                                20
+            rent (EUR per m2)
+
+
+
+
+                                10
+
+
+
+
+                                     50            100             150
+                                              floor size (m2)
+
+
+Figure 4: Munich rent data: 10% and 90% conditional quantiles estimated by the horseshoe
+sampler of Onizuka et al. (2024) (MCMC mode) with k = 1, under the same layout as
+Figure 3.
+
+
+     As a benchmark we fit the LMS method (Cole and Green, 1992), the standard tool for
+growth references. At each age, height is assumed to follow a Box–Cox Cole–Green distribu-
+tion whose median, coefficient of variation and Box–Cox power are smooth functions of age;
+all centiles are read off this one fitted distribution, so they cannot cross by construction, at
+the price of a parametric shape assumption at every age. We use the lms function of the
+gamlss package (Rigby and Stasinopoulos, 2005).
+     Figure 5 shows the five fitted quantile curves for boys. The curves follow the fast growth
+in infancy, the near-linear childhood phase, the pubertal spurt and the adult plateau, and
+they fan out with age as the height distribution widens. In-sample calibration is close to
+nominal: the fraction of boys below the fitted curve is 0.098, 0.300, 0.498, 0.699 and 0.903 at
+τ = 0.1, 0.3, 0.5, 0.7, 0.9. Although the five fits are independent and nothing in the individual
+sampler enforces non-crossing, the posterior-mean curves for girls never cross, and those for
+boys cross at a single grid point (age 0.1 years, where the 0.5 and 0.7 curves invert by
+0.6 cm), out of 880 adjacent comparisons. The girls’ fit and the LMS centiles for both
+sexes are reported in Appendix B.3 (Figures 9–11). The two methods agree closely between
+roughly one and eighteen years of age and differ at the ends of the age range, where few
+children are observed: the LMS centiles follow the local data more closely, whereas the trend-
+filtering curves extrapolate the piecewise-quadratic trend, sitting slightly above the newborn
+measurements and bending at the oldest ages.
+
+
+5     Discussion
+Summary of findings. The simulation study establishes that the Single Quantile Sam-
+pler is a competitive Bayesian estimator for quantile trend filtering across a range of signal
+
+
+                                                28
+                          200
+
+
+
+
+                          150
+            Height (cm)
+
+
+
+
+                          100
+
+
+
+
+                           50
+
+                                0   2   4    6         8         10         12     14     16    18   20   22
+                                                                 Age (years)
+
+                                            Quantile       10%        30%    50%    70%   90%
+
+
+
+
+Figure 5: Individual P-MALA/Gibbs fits for the height of 4,817 Dutch boys (Fifth Dutch
+Growth Study, 2009) at τ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, k = 2. Curves are posterior means on
+the 0.1-year age grid; grey circles are the individual measurements. Each level is fitted
+independently.
+
+
+structures, noise distributions, and quantile levels. It consistently improves on Onizuka et al.
+(2024) under the Laplace prior in both MSE and MAD, and matches or approaches the horse-
+shoe variant at interior quantile levels under all three noise distributions. The advantage of
+the globally penalized P-MALA approach is most pronounced on the smooth signal, where
+the global prior’s implicit bias toward a homogeneous degree of smoothness is well matched
+to the truth and the sampler attains the lowest errors at nearly every interior level. The
+ordering reverses, as expected, on the piecewise constant signal under Gaussian and mixed
+normal noise at interior quantiles, where the per-coefficient horseshoe prior’s local adaptivity
+gives it the edge. The margins in that setting are small in absolute terms—all three methods
+recover the signal accurately—but their direction is systematic, consistent with the general
+principle that local adaptivity benefits estimation when the target signal has genuinely het-
+erogeneous smoothness, with the associated computational and modeling complexity being
+the price paid for that benefit.
+
+Scalability. A central motivation for the proposed approach is to make Bayesian inference
+practical while retaining the optimization structure of frequentist quantile trend filtering.
+The supplied Gibbs implementation of Onizuka et al. (2024) forms a dense inverse and
+uses dense Gaussian simulation at each iteration. Our audit found that its sparse option
+still enters this dense computational path in the benchmark environment, so enabling that
+option does not remove the principal bottleneck. The augmented hierarchy also updates
+observation-level latent variables and local prior scales, whereas our formulation samples
+one global regularization parameter and one likelihood scale per quantile in addition to the
+trend.
+
+
+                                                                  29
+    This distinction should be separated from an asymptotic claim about all Gibbs implemen-
+tations. At fixed difference order, a Gaussian draw based directly on the banded precision
+can be computed in O(n) work without forming an inverse, although the changing weights
+generally require a new numerical factorization each iteration. For our constrained proxi-
+mal system, A = γ −1 I + ρD⊤ D + ρI is independent of the sampled parameters, allowing
+factor reuse when D, γ, and ρ remain fixed. Sparse operations give O(nJ) work for J inner
+ADMM sweeps, plus linear setup and sufficient-statistic calculations. Practical comparisons
+must account for the inner iteration count, factorization reuse in the actual implementation,
+and mixing of the complete chain. Timing per outer iteration alone does not establish cost
+per effective posterior draw.
+
+Role of the scale parameter. Treating the ALD scale σ as an unknown parameter rather
+than fixing it at the optimization convention of unity is a substantive modeling decision with
+several consequences. Within the Gibbs scheme, σ and λ interact with the trend estimate
+in complementary ways: σ calibrates the effective likelihood temperature, controlling how
+sharply the gradient of the smoothed check loss responds to residuals, while λ calibrates the
+effective smoothness penalty. Decoupling these two sources of regularization allows each to
+adapt to a different aspect of the data — noise level and signal roughness respectively — and
+prevents the single tuning parameter of the frequentist formulation from having to absorb
+both roles simultaneously. Learning σ allows the likelihood scale to respond to the data, but
+does not by itself guarantee frequentist coverage when the asymmetric Laplace likelihood is
+misspecified. Posterior sampling avoids the additional mean-field approximation used by VB;
+coverage remains a separate question, as recognized by the calibration approach of Onizuka
+et al. (2024). A practical caveat is that σ and λ are not fully separable in their effects on
+the posterior for θ: both appear in the effective curvature seen by the P-MALA proposal,
+and under severe misspecification their joint posterior may exhibit a soft ridge. The weakly
+informative prior σ ∼ IG(0.1, 0.1) is sufficient to regularize this in all settings considered,
+but sensitivity of the posterior to this prior choice warrants attention in applications where
+the noise distribution is far from symmetric or unimodal.
+
+Limitations. The globally penalized prior is the principal structural limitation of the
+proposed approach. By placing a single shared penalty λ on all entries of Dθ, the model
+encodes a homogeneous prior belief about the smoothness of the trend. This is appropriate
+when the signal is globally smooth or when the difference order k is chosen to match the signal
+class, as in the varying smoothness experiments, but it is a deliberate simplification relative
+to the per-coefficient shrinkage of the horseshoe prior. On piecewise constant signals, the
+globally penalized model must use a single λ to accommodate both flat segments and jump
+locations, a bias-variance tradeoff that the horseshoe prior resolves more cleanly through
+local adaptivity. The edge of Onizuka (Horseshoe) on the PC signal under Gaussian and
+mixed normal noise is a direct consequence of this structural difference: it is systematic and
+should not be expected to vanish with larger samples or better tuning, though in the settings
+considered here it amounts to small absolute differences between estimators that both recover
+the signal well. Users whose signals are known to be piecewise constant, and for whom these
+margins matter, may prefer the locally adaptive prior at its higher computational cost.
+
+
+                                              30
+The sentinel strategy as a heuristic. The sentinel quantile construction introduced
+in Section 2.5 resolves the gradient degeneracy of P-MALA at extreme quantile levels and
+produces stable estimates in the simulation study. It is, however, a practical device rather
+than a formally justified procedure. The specific recommendations — up to five sentinels per
+side, equally spaced within each side, with spacings chosen to fill the available probability
+room — are motivated by empirical experience and by the requirement that the sentinels
+be close enough to the target to provide a tight dynamic bound while remaining far enough
+apart to avoid degeneracy among themselves.
+
+Extensions. Several directions for extension follow naturally from the present work. The
+P-MALA framework accommodates non-Euclidean preconditioning through the proximal
+operator, and a preconditioned variant exploiting the banded structure of D⊤ D may improve
+mixing at higher difference orders without increasing per-iteration cost. The sentinel strategy
+is applicable to any gradient-based sampler for quantile estimation and could be combined
+with locally adaptive priors, potentially recovering the accuracy advantages of the horseshoe
+prior at extreme quantile levels while retaining the computational structure of the present
+approach. Extension to multivariate or spatially indexed signals requires generalization of
+the difference operator D to non-chain graph structures, for which the banded linear system
+no longer applies directly; spectral or multigrid solvers may serve a similar role in those
+settings. Finally, the theoretical properties of the P-MALA approximation under the non-
+smooth ALD likelihood — including mixing time bounds and the effect of the smoothing
+parameter ε on the approximation error in the acceptance ratio — remain to be established.
+
+
+
+
+                                              31
+A       Additional Simulation Results
+This appendix collects the simulation results omitted from the main text for compactness.
+It reports mean absolute deviation (MAD) for all three baseline signals and all three per-
+formance measures—MSE, MAD, and MCIW—for the smooth signal fit at difference order
+k = 2. The organization follows the interior-quantile and extreme-quantile simulation sub-
+sections in Section 3.
+
+A.1     Individual sampler at interior quantiles
+A.1.1    MAD for the piecewise constant and varying-smoothness signals
+Tables 9 and 10 provide the MAD results corresponding to the MSE and MCIW comparisons
+retained in the main text. The MAD rankings broadly follow the MSE rankings: the horse-
+shoe is strongest on the piecewise constant signal, while the individual sampler improves
+on the Laplace variant across most configurations and is especially competitive under Beta
+noise.
+
+Table 9: Mean absolute deviation (MAD) for the piecewise constant signal (k = 0) at interior
+quantile levels, across noise distributions.
+
+                                                        MAD
+             (I) Gauss                0.05     0.25      0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.1149 0.0393 0.0344 0.0411 0.1151
+             Onizuka (Laplace)   0.1894 0.1212 0.1069 0.1213 0.1928
+             Individual Sampler  0.1300 0.0867 0.0779 0.0832 0.1250
+             (II) Beta                0.05     0.25      0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.0680 0.0161 0.0240 0.0353 0.0751
+             Onizuka (Laplace)   0.0752 0.0466 0.0564 0.0768 0.0969
+             Individual Sampler  0.0287 0.0225 0.0337 0.0512 0.0669
+             (III) Mixed normal       0.05     0.25      0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.2802 0.0944 0.0837 0.0945 0.2751
+             Onizuka (Laplace)   0.4328 0.2189 0.1937 0.2162 0.4417
+             Individual Sampler  0.2440 0.1981 0.1876 0.1949 0.2380
+
+
+
+A.1.2    Smooth signal at difference order k = 2
+For the smooth signal, the individual sampler attains the lowest MSE and MAD under
+Gaussian and mixed normal noise at every interior quantile level. Under Beta noise it is best
+at all levels except τ = 0.05, where the Laplace variant is marginally better. Its credible
+intervals are also the narrowest across all three noise distributions and all reported levels.
+The complete MSE, MAD, and MCIW results appear in Tables 11–13.
+
+
+                                             32
+Table 10: Mean absolute deviation (MAD) for the varying smoothness signal (k = 1) at
+interior quantile levels, across noise distributions.
+
+                                                       MAD
+             (I) Gauss                0.05     0.25     0.5      0.75    0.95
+             Onizuka (Horseshoe) 0.0950 0.0583 0.0552 0.0584 0.0920
+             Onizuka (Laplace)   0.1273 0.0756 0.0692 0.0748 0.1242
+             Individual Sampler  0.1055 0.0686 0.0617 0.0644 0.0921
+             (II) Beta                0.05     0.25     0.5      0.75    0.95
+             Onizuka (Horseshoe) 0.0680 0.0161 0.0240 0.0353 0.0751
+             Onizuka (Laplace)   0.0752 0.0466 0.0564 0.0768 0.0969
+             Individual Sampler  0.0823 0.0216 0.0292 0.0406 0.0610
+             (III) Mixed normal       0.05     0.25     0.5      0.75    0.95
+             Onizuka (Horseshoe) 0.1804 0.1212 0.1114 0.1173 0.1822
+             Onizuka (Laplace)   0.2639 0.1479 0.1368 0.1445 0.2658
+             Individual Sampler  0.2197 0.1412 0.1304 0.1396 0.2164
+
+
+
+
+Table 11: Mean squared error (MSE) for the smooth signal (k = 2) at interior quantile levels,
+across noise distributions.
+
+                                                       MSE
+             (I) Gauss                0.05     0.25     0.5      0.75    0.95
+             Onizuka (Horseshoe) 0.0177 0.0068 0.0056 0.0060 0.0148
+             Onizuka (Laplace)   0.0169 0.0070 0.0059 0.0061 0.0145
+             Individual Sampler  0.0099 0.0042 0.0033 0.0035 0.0083
+             (II) Beta                0.05     0.25     0.5      0.75    0.95
+             Onizuka (Horseshoe) 0.0005 0.0011 0.0017 0.0023 0.0052
+             Onizuka (Laplace)   0.0004 0.0011 0.0017 0.0023 0.0053
+             Individual Sampler  0.0005 0.0007 0.0010 0.0014 0.0030
+             (III) Mixed normal       0.05     0.25     0.5      0.75    0.95
+             Onizuka (Horseshoe) 0.0749 0.0263 0.0225 0.0283 0.0761
+             Onizuka (Laplace)   0.0756 0.0262 0.0228 0.0279 0.0776
+             Individual Sampler  0.0527 0.0203 0.0168 0.0202 0.0487
+
+
+
+
+                                             33
+Table 12: Mean absolute deviation (MAD) for the smooth signal (k = 2) at interior quantile
+levels, across noise distributions.
+
+                                                     MAD
+             (I) Gauss               0.05    0.25     0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.0993 0.0629 0.0569 0.0591 0.0928
+             Onizuka (Laplace)   0.0986 0.0644 0.0585 0.0604 0.0924
+             Individual Sampler  0.0737 0.0487 0.0436 0.0454 0.0693
+             (II) Beta               0.05    0.25     0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.0097 0.0182 0.0266 0.0343 0.0557
+             Onizuka (Laplace)   0.0095 0.0189 0.0276 0.0355 0.0561
+             Individual Sampler  0.0116 0.0147 0.0207 0.0271 0.0433
+             (III) Mixed normal      0.05    0.25     0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.2131 0.1281 0.1181 0.1319 0.2143
+             Onizuka (Laplace)   0.2136 0.1281 0.1194 0.1315 0.2154
+             Individual Sampler  0.1788 0.1114 0.1011 0.1118 0.1733
+
+
+
+
+Table 13: Mean credible interval width (MCIW) for the smooth signal (k = 2) at interior
+quantile levels, across noise distributions.
+
+                                                    MCIW
+             (I) Gauss               0.05    0.25     0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.2799 0.2791 0.2783 0.2760 0.2731
+             Onizuka (Laplace)   0.2591 0.2649 0.2694 0.2655 0.2555
+             Individual Sampler  0.1886 0.1918 0.1922 0.1922 0.1866
+             (II) Beta               0.05    0.25     0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.0592 0.0902 0.1208 0.1453 0.1551
+             Onizuka (Laplace)   0.0546 0.0888 0.1201 0.1420 0.1481
+             Individual Sampler  0.0147 0.0630 0.0840 0.0992 0.1003
+             (III) Mixed normal      0.05    0.25     0.5     0.75     0.95
+             Onizuka (Horseshoe) 0.5771 0.5873 0.5840 0.5862 0.5827
+             Onizuka (Laplace)   0.5357 0.5483 0.5543 0.5472 0.5523
+             Individual Sampler  0.4422 0.4577 0.4545 0.4543 0.4433
+
+
+
+
+                                            34
+A.2     Joint sampler at extreme quantiles
+A.2.1   MAD for the piecewise constant and varying-smoothness signals
+Tables 14 and 15 supplement the extreme quantile MSE and MCIW results reported in the
+main text. For the piecewise constant signal, the MAD rankings generally follow the MSE
+rankings, except at the lower Beta tail, where the horseshoe has smaller MAD while the
+Joint Sequential Sampler has smaller MSE. For the varying-smoothness signal, the Joint
+Sequential Sampler is competitive with the horseshoe and improves on the Laplace variant
+in nearly every configuration.
+
+Table 14: Mean absolute deviation (MAD) for the piecewise constant signal at extreme
+quantile levels, difference order k = 0, across noise distributions.
+
+                                                          MAD
+                (I) Gauss                    0.01     0.02     0.98     0.99
+                Onizuka (Horseshoe)      0.2139 0.1864 0.1815 0.2126
+                Onizuka (Laplace)        0.2979 0.2691 0.2681 0.2968
+                Joint Sequential Sampler 0.2523 0.1901 0.1315 0.1765
+                (II) Beta                    0.01     0.02     0.98     0.99
+                Onizuka (Horseshoe)      0.0194 0.0107 0.1028 0.1078
+                Onizuka (Laplace)        0.0757 0.0539 0.1504 0.1572
+                Joint Sequential Sampler 0.0238 0.0178 0.0828 0.0997
+                (III) Mixed normal           0.01     0.02     0.98     0.99
+                Onizuka (Horseshoe)      0.5469 0.4485 0.4567 0.5561
+                Onizuka (Laplace)        0.6957 0.6052 0.6140 0.7041
+                Joint Sequential Sampler 0.5697 0.3818 0.2752 0.4404
+
+
+
+A.2.2   Smooth signal at difference order k = 2
+At the extreme levels the Onizuka variants are more competitive on the smooth signal than
+at the interior levels. The horseshoe has the lowest MSE under Gaussian and mixed normal
+noise, with modest margins over the Joint Sequential Sampler, while both Onizuka variants
+lead under Beta noise. The Joint Sequential Sampler nevertheless improves on the Laplace
+variant at every mixed-normal level. Its intervals are much narrower under all three noise
+distributions, reflecting the sentinel-induced geometric confinement discussed in Section 3.2.
+Complete results appear in Tables 16–18.
+
+
+
+
+                                             35
+Table 15: Mean absolute deviation (MAD) for the varying smoothness signal at extreme
+quantile levels, difference order k = 1, across noise distributions.
+
+                                                     MAD
+                 (I) Gauss                 0.01   0.02    0.98   0.99
+                 Onizuka (Horseshoe)      0.163 0.137 0.134 0.160
+                 Onizuka (Laplace)        0.214 0.180 0.174 0.211
+                 Joint Sequential Sampler 0.183 0.150 0.142 0.182
+                 (II) Beta                 0.01   0.02    0.98   0.99
+                 Onizuka (Horseshoe)      0.024 0.018 0.078 0.086
+                 Onizuka (Laplace)        0.028 0.021 0.103 0.117
+                 Joint Sequential Sampler 0.021 0.023 0.093 0.114
+                 (III) Mixed normal        0.01   0.02    0.98   0.99
+                 Onizuka (Horseshoe)      0.369 0.292 0.300 0.378
+                 Onizuka (Laplace)        0.482 0.390 0.404 0.495
+                 Joint Sequential Sampler 0.368 0.290 0.284 0.364
+
+
+
+
+Table 16: Mean squared error (MSE) for the smooth signal at extreme quantile levels,
+difference order k = 2, across noise distributions. The Joint Sequential Sampler is the
+sequential joint sampler equipped with sentinel quantiles.
+
+                                                      MSE
+               (I) Gauss                  0.01    0.02    0.98    0.99
+               Onizuka (Horseshoe)      0.0422 0.0310 0.0283 0.0396
+               Onizuka (Laplace)        0.0445 0.0347 0.0317 0.0424
+               Joint Sequential Sampler 0.0491 0.0319 0.0305 0.0476
+               (II) Beta                  0.01    0.02    0.98    0.99
+               Onizuka (Horseshoe)      0.0004 0.0005 0.0088 0.0114
+               Onizuka (Laplace)        0.0003 0.0004 0.0096 0.0115
+               Joint Sequential Sampler 0.0015 0.0018 0.0160 0.0231
+               (III) Mixed normal         0.01    0.02    0.98    0.99
+               Onizuka (Horseshoe)      0.2017 0.1402 0.1445 0.2027
+               Onizuka (Laplace)        0.2376 0.1652 0.1726 0.2414
+               Joint Sequential Sampler 0.2338 0.1509 0.1486 0.2310
+
+
+
+                                          36
+Table 17: Mean absolute deviation (MAD) for the smooth signal at extreme quantile levels,
+difference order k = 2, across noise distributions.
+
+                                                       MAD
+               (I) Gauss                   0.01    0.02     0.98    0.99
+               Onizuka (Horseshoe)      0.1608 0.1351 0.1316 0.1590
+               Onizuka (Laplace)        0.1672 0.1440 0.1403 0.1660
+               Joint Sequential Sampler 0.1788 0.1400 0.1382 0.1780
+               (II) Beta                   0.01    0.02     0.98    0.99
+               Onizuka (Horseshoe)      0.0119 0.0096 0.0742 0.0860
+               Onizuka (Laplace)        0.0105 0.0090 0.0773 0.0863
+               Joint Sequential Sampler 0.0211 0.0231 0.1025 0.1272
+               (III) Mixed normal          0.01    0.02     0.98    0.99
+               Onizuka (Horseshoe)      0.3698 0.3009 0.2995 0.3679
+               Onizuka (Laplace)        0.4035 0.3283 0.3322 0.4057
+               Joint Sequential Sampler 0.4043 0.3155 0.3093 0.4010
+
+
+
+
+Table 18: Mean credible interval width (MCIW) for the smooth signal at extreme quantile
+levels, difference order k = 2, across noise distributions.
+
+                                                      MCIW
+               (I) Gauss                   0.01    0.02     0.98    0.99
+               Onizuka (Horseshoe)      0.2439 0.2501 0.2466 0.2415
+               Onizuka (Laplace)        0.2345 0.2495 0.2448 0.2374
+               Joint Sequential Sampler 0.0584 0.0612 0.0611 0.0584
+               (II) Beta                   0.01    0.02     0.98    0.99
+               Onizuka (Horseshoe)      0.0703 0.0599 0.1442 0.1455
+               Onizuka (Laplace)        0.0606 0.0529 0.1405 0.1358
+               Joint Sequential Sampler 0.0115 0.0024 0.0197 0.0374
+               (III) Mixed normal          0.01    0.02     0.98    0.99
+               Onizuka (Horseshoe)      0.4815 0.5122 0.5172 0.4909
+               Onizuka (Laplace)        0.5027 0.5253 0.5370 0.5167
+               Joint Sequential Sampler 0.1074 0.1244 0.1262 0.1084
+
+
+
+
+                                           37
+B     Additional Real-Data Figures
+B.1    Air Quality Data: ADMM Benchmark Fits
+The ADMM benchmark fits of Section 4.1, and the detrended series they produce, are
+collected here for comparison with Figures 1 and 2.
+
+
+
+
+            (a) Baseline trends. Note the crossing of the τ = 0.01 curve above the
+            others at the 05:00 plume, induced by the small eBIC penalty at that
+            level.
+
+
+
+
+            (b) Detrended series y − θ,
+                                      ˆ︁ with the 90th (dashed), 95th (solid), and
+            99th (dotted) empirical percentiles of the detrended data.
+
+Figure 6: Air quality data: ADMM benchmark fits (Brantley et al., 2020), λ selected by
+eBIC, laid out as Figures 1 and 2.
+
+
+
+                                             38
+B.2     Munich Rent Data: Interior Quantile Levels
+Figures 7 and 8 complete the Munich analysis of Section 4.2 with the fits at τ ∈ {0.3, 0.5, 0.7},
+obtained under exactly the settings described there (k = 1; 6,000 iterations, 1,000 burn-in;
+one independent chain per level).
+
+                                             30%         50%    70%
+
+
+
+                                20
+
+
+
+
+                                15
+            rent (EUR per m2)
+
+
+
+
+                                10
+
+
+
+
+                                5
+
+
+
+
+                                     50            100                150
+                                              floor size (m2)
+
+
+Figure 7: Munich rent data: 30%, 50%, and 70% conditional quantiles estimated by the
+individual P-MALA/Gibbs sampler with k = 1. Solid curves are posterior means and ribbons
+are 95% pointwise credible intervals; grey circles are the observations.
+
+
+
+B.3     Growth Centiles
+The remaining growth-chart fits of Section 4.3 are collected here: the individual P-MALA/Gibbs
+fit for girls, and the LMS centiles (Cole and Green, 1992)√ for boys and girls. The P-MALA
+settings are those of Section 4.3 (k = 2, λ ∼ Gamma(1, G), 6,000 iterations, 1,000 burn-in,
+one independent run per level). The LMS curves are the 10th, 30th, 50th, 70th and 90th
+centiles of the fitted Box–Cox Cole–Green distribution evaluated on the same 0.1-year age
+grid.
+
+
+
+
+                                                39
+                                                                            30%           50%         70%
+
+
+
+                                20
+
+
+
+
+                                15
+            rent (EUR per m2)
+
+
+
+
+                                10
+
+
+
+
+                                5
+
+
+
+
+                                                  50                                100                                 150
+                                                                             floor size (m2)
+
+
+Figure 8: Munich rent data: 30%, 50%, and 70% conditional quantiles estimated by the
+horseshoe sampler of Onizuka et al. (2024) (MCMC mode) with k = 1, under the same
+layout as Figure 7.
+
+
+
+
+                                160
+            Height (cm)
+
+
+
+
+                                120
+
+
+
+
+                                 80
+
+
+
+
+                                 40
+                                      0   2   4         6         8           10            12              14    16          18   20   22
+                                                                              Age (years)
+
+                                                       Quantile       10%          30%          50%         70%   90%
+
+
+
+
+Figure 9: Individual P-MALA/Gibbs fits for the height of 5,190 Dutch girls (Fifth Dutch
+Growth Study, 2009) at τ ∈ {0.1, 0.3, 0.5, 0.7, 0.9}, k = 2. Curves are posterior means; grey
+circles are the individual measurements.
+
+
+
+                                                                               40
+                          200
+
+
+
+
+                          150
+            Height (cm)
+
+
+
+
+                          100
+
+
+
+
+                           50
+
+                                0   2   4   6         8         10      12     14    16    18   20   22
+                                                                Age (years)
+
+                                            Centile       10%    30%     50%   70%   90%
+
+
+
+
+Figure 10: LMS centiles for the height of Dutch boys: the 10th to 90th centiles of the fitted
+Box–Cox Cole–Green distribution, with smooth median, coefficient of variation and Box–
+Cox power in age.
+
+
+
+
+                          160
+            Height (cm)
+
+
+
+
+                          120
+
+
+
+
+                           80
+
+
+
+
+                           40
+                                0   2   4   6         8         10      12     14    16    18   20   22
+                                                                Age (years)
+
+                                            Centile       10%    30%     50%   70%   90%
+
+
+
+
+          Figure 11: LMS centiles for the height of Dutch girls, as in Figure 10.
+
+
+
+
+                                                                 41
+References
+Brantley, H. L., Guinness, J., and Chi, E. C. (2020). Baseline drift estimation for air quality
+  data using quantile trend filtering. The Annals of Applied Statistics, 14(2):585–604.
+
+Cole, T. J. and Green, P. J. (1992). Smoothing reference centile curves: the LMS method
+  and penalized likelihood. Statistics in Medicine, 11(10):1305–1319.
+
+Fahrmeir, L., Kneib, T., Lang, S., and Marx, B. (2013). Regression: Models, Methods and
+  Applications. Springer, Berlin.
+
+Fasiolo, M., Wood, S. N., Zaffran, M., Nedellec, R., and Goude, Y. (2021). Fast calibrated ad-
+  ditive quantile regression. Journal of the American Statistical Association, 116(535):1402–
+  1412.
+
+Koenker, R. and Bassett Jr, G. (1978). Regression quantiles. Econometrica: journal of the
+ Econometric Society, pages 33–50.
+
+Madrid Padilla, O. H. and Chatterjee, S. (2022). Risk bounds for quantile trend filtering.
+ Biometrika, 109(3):751–768.
+
+Onizuka, T., Hashimoto, S., and Sugasawa, S. (2024). Fast and locally adaptive bayesian
+ quantile smoothing using calibrated variational approximations. Statistics and Computing,
+ 34(1):15.
+
+Pereyra, M. (2016). Proximal markov chain monte carlo algorithms. Statistics and Comput-
+  ing, 26(4):745–760.
+
+Rigby, R. A. and Stasinopoulos, D. M. (2005). Generalized additive models for location,
+  scale and shape. Journal of the Royal Statistical Society: Series C (Applied Statistics),
+  54(3):507–554.
+
+Schönbeck, Y., Talma, H., van Dommelen, P., Bakker, B., Buitendijk, S. E., HiraSing,
+  R. A., and van Buuren, S. (2013). The world’s tallest nation has stopped growing taller:
+  the height of Dutch children from 1955 to 2009. Pediatric Research, 73(3):371–377.
+
+Tibshirani, R. J. (2014). Adaptive piecewise polynomial estimation via trend filtering. The
+  Annals of Statistics, 42(1):285–323.
+
+van Buuren, S. and Groothuis-Oudshoorn, K. (2011). mice: Multivariate imputation by
+  chained equations in R. Journal of Statistical Software, 45(3):1–67.
+
+
+
+
+                                              42
+

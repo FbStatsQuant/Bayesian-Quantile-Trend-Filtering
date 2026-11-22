@@ -1,0 +1,6 @@
+"tau","proposed_mean_credible_interval_width","onizuka_mcmc_hs_mean_credible_interval_width","proposed_min_bulk_ess_per_second","onizuka_reported_ess_per_second"
+0.1,0.32765278842797,0.98,4.13460225173112,4
+0.3,0.31524652275088,0.88,4.9105744655205,7
+0.5,0.313437485832765,0.93,5.24543363081,7
+0.7,0.318290087640999,0.9,5.66403562800537,6
+0.9,0.312577756402482,0.95,5.9269986768713,5

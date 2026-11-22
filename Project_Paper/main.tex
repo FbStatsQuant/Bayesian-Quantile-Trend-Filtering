@@ -1,0 +1,88 @@
+\documentclass[12pt]{article}
+% ============================================================
+% PACKAGES
+% ============================================================
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\hypersetup{hidelinks}
+\usepackage{natbib}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+\usepackage{bm}
+\usepackage{bbm}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{lineno}
+\usepackage{bbold}
+\usepackage[OT1]{fontenc}
+
+% ============================================================
+% CUSTOM COMMANDS
+% ============================================================
+\newcommand{\btheta}{\bm{\theta}}
+\newcommand{\blambda}{\bm{\lambda}}
+\newcommand{\bdelta}{\bm{\delta}}
+\newcommand{\by}{\bm{y}}
+\newcommand{\bD}{\mathbf{D}}
+\newcommand{\bI}{\mathbf{I}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\rhotau}{\rho_\tau}
+\newcommand{\ALD}{\mathrm{ALD}}
+% ============================================================
+% THEOREM ENVIRONMENTS
+% ============================================================
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+% ============================================================
+% TITLE
+% ============================================================
+\title{\textbf{Bayesian Joint Quantile Trend Filtering via\\
+Proximal MCMC with Sequential Gibbs Sampling}}
+\author{Felipe Bedoya\thanks{Department of Statistics, Rice University.
+\texttt{fb31@rice.edu}} \and
+Meng Li\thanks{Department of Statistics, Rice University.
+\texttt{meng@rice.edu}} \and
+Eric C. Chi\thanks{School of Statistics, University of Minnesota.
+\texttt{echi@umn.edu}}}
+\date{\today}
+% ============================================================
+% DOCUMENT
+% ============================================================
+\begin{document}
+\maketitle
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+\noindent\textbf{Keywords:} quantile trend filtering, Bayesian inference,
+proximal MCMC, ADMM, non-crossing quantiles, asymmetric Laplace distribution,
+Gibbs sampling, extreme quantiles.
+\clearpage
+\tableofcontents
+%\newpage
+% ============================================================
+% SECTIONS
+% ============================================================
+\input{sections/introduction}
+\input{sections/methodology}
+\input{sections/simulations}
+\newpage
+\input{sections/scalability}
+\input{sections/air_simulation}
+\input{sections/data_application}
+\input{sections/discussion}
+\clearpage
+\appendix
+\input{sections/appendix_pmala}
+\input{sections/appendix_simulations}
+\input{sections/appendix_data_application_plots}
+\clearpage
+%\nocite{*}
+\bibliographystyle{apalike}
+\bibliography{references}
+\end{document}
