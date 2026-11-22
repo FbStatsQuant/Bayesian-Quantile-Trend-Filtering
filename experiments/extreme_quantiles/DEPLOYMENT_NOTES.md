@@ -12,7 +12,7 @@ Everything else stays as planned unless discussed.
 | `Extreme_Joint_Sampler/runs/extreme_joint_VS_S_10k3k_20261007` | complete, processed; **superseded** (chains not settled), kept on disk |
 | `Extreme_Joint_Sampler/runs/extreme_joint_VS_S_30k10k_20261007` | complete, processed (`summary/attempt_20261008T013010_3687001`, SUCCESS 01:34 UTC); **used for the tables** |
 
-Tables: NOTS `Extreme_Individual/tables_20261008` (local copy `Simulations/Extreme/tables_20261008`), built 2026-10-08.
+Tables: NOTS `Extreme_Individual/tables_20261008` (local copy `experiments/extreme_quantiles/tables_20261008`), built 2026-10-08.
 
 ## Issues
 

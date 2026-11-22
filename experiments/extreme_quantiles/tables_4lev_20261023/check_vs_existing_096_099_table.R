@@ -1,9 +1,9 @@
-new <- read.csv("Simulations/Extreme/tables_4lev_20261023/comparison_4lev_6lev_individual.csv"); new$tau <- round(new$tau, 2)
+new <- read.csv("experiments/extreme_quantiles/tables_4lev_20261023/comparison_4lev_6lev_individual.csv"); new$tau <- round(new$tau, 2)
 map <- c("Onizuka (Laplace)"="onizuka_lap","Onizuka (Horseshoe)"="onizuka_hs","Bayesian-PMALA"="pmala","ADMM"="admm","Joint sampler (non-crossing)"="joint6")
-old <- do.call(rbind, lapply(c("VS","S"), function(b) {x <- read.csv(sprintf("Simulations/Extreme/tables_20261008/mse_%s.csv", b), check.names=FALSE)
+old <- do.call(rbind, lapply(c("VS","S"), function(b) {x <- read.csv(sprintf("experiments/extreme_quantiles/tables_20261008/mse_%s.csv", b), check.names=FALSE)
   do.call(rbind, lapply(c("0.96","0.97","0.98","0.99"), function(t) data.frame(baseline=x$baseline, noise=x$noise, method=map[x$method], tau=as.numeric(t), old=x[[t]])))}))
 m <- merge(old, new[c("baseline","noise","tau","method","mean_MSE")]); cat("csv rows", nrow(m), "max diff", max(abs(m$old-m$mean_MSE)), "\n")
-tex <- readLines("PMALA version Tex Project/sections/simulations.tex")
+tex <- readLines("paper/sections/simulations.tex")
 s <- c(grep("label{tab:vs_ext_upper_mse}", tex, fixed=TRUE)[1], grep("label{tab:s_ext_upper_mse}", tex, fixed=TRUE)[1])
 nz <- c("Beta"="Beta","Mixed normal"="Mixed","Gaussian"="Normal"); bad <- 0; n <- 0
 for (k in seq_along(s)) { b <- c("VS","S")[k]; cur <- NA

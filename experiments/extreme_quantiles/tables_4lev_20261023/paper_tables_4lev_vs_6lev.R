@@ -2,7 +2,7 @@
 #   option 4: joint fitted at 0.96-0.99 (2026-10-23 run), columns 0.96-0.99;
 #   option 6: joint fitted at 0.90-0.99 (2026-10-07 run), columns 0.90-0.99 (the paper's current tables).
 # Benchmarks: individual runs of 2026-10-07 (0.96-0.99) and 2026-10-21 (0.90/0.93), via mse_all_levels_all_methods.csv.
-# Run from Simulations/Extreme/. Writes paper_tables_{4lev,6lev}.{md,tex} into tables_4lev_20261023/.
+# Run from experiments/extreme_quantiles/. Writes paper_tables_{4lev,6lev}.{md,tex} into tables_4lev_20261023/.
 all6 <- read.csv("tables_20261023/mse_all_levels_all_methods.csv")
 j4 <- read.csv("tables_4lev_20261023/inputs/joint4_summary.csv")
 all6 <- all6[all6$method != "joint_b0005_15k3k", ]
@@ -44,7 +44,7 @@ build(d4, c(0.96, 0.97, 0.98, 0.99), "4lev", "The joint sampler fits the four le
 tex6 <- build(d6, c(0.90, 0.93, 0.96, 0.97, 0.98, 0.99), "6lev", "The joint sampler fits the six levels together; the other methods fit each level separately.")
 
 # Check 1: option-6 table body equals the paper's current tables (numeric rows).
-paper <- readLines("../../PMALA version Tex Project/sections/simulations.tex")
+paper <- readLines("../../paper/sections/simulations.tex")
 num_rows <- function(x) trimws(grep("^(Onizuka|Bayesian|ADMM|Joint)", trimws(x), value = TRUE))
 p <- num_rows(paper[grep("label{tab:vs_ext_upper_mse}", paper, fixed = TRUE):(grep("label{tab:s_ext_upper_mse}", paper, fixed = TRUE) + 30)])
 cat("6-level rows vs paper: identical =", identical(p, num_rows(tex6)), "(", length(p), "rows )\n")

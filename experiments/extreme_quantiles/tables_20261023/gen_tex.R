@@ -1,5 +1,5 @@
 # Rebuild the two extreme-quantile MSE tables of sections/simulations.tex with all six levels (Oct 7 runs).
-d <- read.csv("C:/Users/felip/OneDrive/Documents/Quantile Regression/Simulations/Extreme/tables_20261023/mse_consolidated_oct7.csv")
+d <- read.csv(file.path(dirname(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)[1])), "mse_consolidated_oct7.csv"))
 meth <- c("Onizuka Laplace", "Onizuka HS", "Indiv. PMALA", "ADMM (eBIC)", "Joint PMALA")
 lab  <- c("Onizuka (Laplace)", "Onizuka (Horseshoe)", "Bayesian-PMALA", "ADMM", "Joint sampler (non-crossing)")
 nzs <- c(Beta = "Beta", Mixed = "Mixed normal", Normal = "Gaussian")

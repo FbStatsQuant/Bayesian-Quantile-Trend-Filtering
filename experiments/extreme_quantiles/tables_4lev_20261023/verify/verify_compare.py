@@ -1,7 +1,7 @@
 import os, re, random
 import pandas as pd, numpy as np
 
-D = r"C:\Users\felip\OneDrive\Documents\Quantile Regression\Simulations\Extreme\tables_4lev_20261023"
+D = os.path.dirname(os.path.abspath(__file__)) + "/.."
 I = os.path.join(D, "inputs")
 TAUS = [0.96, 0.97, 0.98, 0.99]
 TOL = 1e-10
