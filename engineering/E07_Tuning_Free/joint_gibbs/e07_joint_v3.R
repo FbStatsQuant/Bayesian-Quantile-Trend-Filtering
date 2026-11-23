@@ -20,7 +20,7 @@
 # =============================================================================
 .e07j_dir <- Sys.getenv("E07_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E07_Tuning_Free/sampler")
 source(file.path(.e07j_dir, "e07_sampler.R"))
-.e07v3_dir <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E07_Tuning_Free/joint_gibbs"
+.e07v3_dir <- Sys.getenv("E07V3_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E07_Tuning_Free/joint_gibbs")
 e07v3_load <- function(cache = Sys.getenv("E07_CACHE", file.path(tempdir(), "e07cache"))) {
   e07_load(cache = cache)
   Rcpp::sourceCpp(file.path(.e07v3_dir, "e07_banded_v3.cpp"), cacheDir = cache, env = globalenv())
