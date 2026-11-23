@@ -53,3 +53,21 @@ Neither prior is a demonstrated fix. Use the shape–rate convention, set L(n) =
 2. **Concentration test — a = 4, b = 4/L(n).** Same prior mean, half the relative SD. At 500 the log-scale slopes at 2k and 15k are +2.55 and −6.91. This should pull low starts upward more strongly while leaving substantial separation possible. The main risk is oversmoothing VS. **Kill** if faster agreement comes with a material curve-MSE shift on either signal, or if log-λ ESS/s fails to improve at 1000 and 2000.
 
 Use the fast exact sampler under each prior to separate changed posterior means from Felipe’s finite-run bias. Compare Felipe at equal seconds from common dispersed starts, recording time to sustained split R̂ ≤ 1.01 and ESS/s. For MSE equivalence, a proposed pilot gate is a paired 90% interval inside [0.95,1.05] per cell for converged candidate/prior-paper truth-MSE ratios. Wide intervals leave equivalence unresolved. Also check equal-time MSE against Felipe as run. Calibrate on separate seeds from the final assessment.
+
+## Joint design
+
+**First pilot — keep Felipe’s box-prox P-MALA and add a common rescaling of all six curves and penalties.** Attempt 1 had zero collapsed-block acceptances at every level. Moving neighbouring curves together removes that particular rejection mechanism. A shared move can still fail through the likelihood or leave relative penalties stuck. This is a design hypothesis.
+
+After the usual box-prox sweep, draw each λⱼ from its Gamma conditional. Discard z and σ for the following move. Let Q be a fixed orthonormal coarse spline basis of rank d (quadratics plus 15 equally spaced third-difference knots). Compute the common anchor p = QQᵀ meanⱼ(θⱼ). Draw h ∼ N(0,s²), and propose simultaneously
+
+    λ′ⱼ = exp(h) λⱼ,       θ′ⱼ = p + exp(−h)(θⱼ − p).
+
+Every neighbouring gap is multiplied by the same positive number. The anchor recomputed at the proposal is identical, so −h reverses the move. Write Rⱼ(x)=Σᵢρτⱼ(yᵢ−xᵢ), m=n−3 and Vⱼ(x,l)=l(b₀+‖Dx‖₁)+(aσ+n)log[bσ+Rⱼ(x)]. For common Gamma shape a, accept with log ratio
+
+    [J(a+m) − (Jn−d)]h + Σⱼ[Vⱼ(θⱼ,λⱼ) − Vⱼ(θ′ⱼ,λ′ⱼ)].
+
+This uses the marginal target in log λ. The common coarse component is fixed and the remaining Jn−d trend coordinates contract by exp(−h), giving its Jacobian. After either outcome redraw each σⱼ from IG(aσ+n,bσ+Rⱼ), then each zⱼ clamp-free. Freeze s after burn-in. Keep per-level constrained ASIS after this refresh to move log-λ contrasts. The common move preserves those contrasts exactly. Away from the anchor’s knot rows, λ′ⱼDθ′ⱼ = λⱼDθⱼ. This limits the prior penalty for a large coherent move. Cost guess is near one Felipe sweep plus O(Jn+nd) work, with no second box solve.
+
+**Alternatives.** Single-site truncated Gibbs is cheap but conditions on six nearby coordinates that strongly constrain a third-difference trend. Window Gibbs can move interior curvature together. Use the exact Gaussian conditional given the exterior and latent scales, take one Gaussian proposal and hold on a box violation. Short windows still pin the smooth modes at their ends, while long windows risk the observed whole-curve rejection. Keep windows as the fallback if per-level shape ESS is limiting.
+
+**Kill test.** Repeat the failed VS setup (n=500, b₀=.01, six levels) with dispersed starts and equal core-seconds against Felipe. Track R̂ and ESS/s for mean log λ, all five adjacent log-λ contrasts, and gaps at close contacts. Drop the hybrid if the common scale moves but contrasts or gaps remain stuck, or if its worst-level λ and curve ESS/s fail to match Felipe’s. Require paired truth-MSE gains and zero crossings before claiming a joint win.
