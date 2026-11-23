@@ -75,3 +75,24 @@ Here $\Pi_s$ is the conditional trend posterior with the same deterministic tuni
 Take expectations and suprema over laws. U and §2 give (H), hence §1 gives Lemma S. The same implication holds whenever some other independent compact-containment argument gives the second term on the very interval for which U holds. The random mixing weights explain the order of expectation and scale supremum. No optimal rate is needed.
 
 **CONJECTURE — outstanding fixed-scale input.** For the smooth benchmark truths and noise families, U at oracle tuning over the full coarse interval in §2 remains to be established. Theorem B's EM-based numerator bound covers only eligible scales. A result on a narrower neighborhood of $s_n$ would need containment on that narrower neighborhood or another argument for its complement. The IG update alone uses (H) to reach that neighborhood and cannot supply the missing independent premise. Section 1 itself needs neither (A3) nor a tuning window. Section 2 uses both the truth restriction and growing tuning for the noncircular route. No conclusion here mixes over a learned roughness parameter.
+
+---
+
+## Theory Department: verification and response to the audit (Opus, `reviews/AUDIT_opus_S.md`, 2026-11-23)
+
+**Status: advisor-checked.**
+- Theory verified every step before the audit.
+- Opus verdicts: §1 ACCEPT WITH FIXES (wording), §2 ACCEPT WITH FIXES (wording plus an optional strengthening), §3 ACCEPT. No mathematical error, no circularity.
+- Theory checked each finding.
+
+| # | Finding | Ruling | Theory's check / change |
+|---|---|---|---|
+| 1 | s_n ≥ d is never verified for the paper designs | HOLDS | The independent gap-ratio check (`../T05_Proofs/checks/gap_ratio_check.out`) gives σ₀ ∈ [0.0046, 0.29] over all designs and levels, so d > 0 at each fixed design and level. |
+| 2 | (A3) can be replaced by a bounded truth in §2 | HOLDS | ‖P⊥θ\*‖ₙ ≤ ‖θ\*‖∞, and T_j ≤ 8‖θ\*‖∞ + 8 max|Z|; the UI argument is unchanged. §2 therefore also covers the bounded PC baseline. (C1 still needs (A3) through L6's prior mass.) |
+| 3 | Lower tail: the s³ factor uses l < 1; l ≤ q/2 is needed | HOLDS | Added as hypotheses on l. |
+| 4 | Order of constants | HOLDS | (k, d, B, V) → q = kd/32 → C → H₀ = e^{C+1} ∨ B → l. |
+| 5 | L3 states (log m)^{1/5}; n ≥ 5 | HOLDS | Citation corrected. |
+| 6 | The penalty must not involve σ | HOLDS | The paper's posterior is λ^m e^{−λ‖Dθ‖₁} with no σ (paper methodology; the default prior_scale = "none"). The σ-scaled option is out of scope. |
+| 7 | Not uniform as σ₀ → 0 or ∞ | HOLDS (scope) | The statement is at each fixed design and level, as written. |
+| 8 | Hypothesis U on Theorem B's route needs (EM) at 1/l, which fails for every design | HOLDS | U must come from the local-margin fixed-σ result **C1** (`C1_any_sigma.md`, Astra-audited), not from Theorem B. That is the route used. |
+| 9 | §2 uses only λ/log n → ∞ | HOLDS | Header noted. |

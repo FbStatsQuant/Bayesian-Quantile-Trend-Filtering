@@ -101,7 +101,12 @@ Here Π_σ is the θ-posterior at fixed σ (λ fixed, or learned and mixed over)
    - σ/σ₀,ₙ → 1 in posterior probability;
    - moment-free apart from uniform integrability, and with **no condition σ > σ̄**.
 
-   **Status: W advisor-checked (Astra: ACCEPT). C1 audited by Astra: REJECT as first written; all six findings verified and applied (the TV restriction Vλ = o(n³) and the uniform L6 hypotheses); the oracle conclusion is confirmed. S verified by Theory; Opus audit pending.** If these hold, this is a **σ-aligned theorem**: it covers the method's actual σ treatment, at a suboptimal rate.
+   **Status: ALL THREE PIECES ADVISOR-CHECKED.**
+   - **W:** Astra, ACCEPT.
+   - **C1:** Astra, REJECT as first written; all six findings verified and applied (the TV restriction Vλ = o(n³), the uniform L6 hypotheses); the oracle conclusion is confirmed.
+   - **S:** verified by Theory; Opus, ACCEPT WITH FIXES (wording only; nine findings, all held and applied).
+
+   **The combined theorem (C1 + S, learned σ, deterministic oracle λ) is therefore PROVED and cross-audited**, modulo the final assembly statement written up below. Opus #8 also confirms that it has to go through C1: Theorem B's route cannot give Hypothesis U. If these hold, this is a **σ-aligned theorem**: it covers the method's actual σ treatment, at a suboptimal rate.
 
 ---
 
@@ -157,4 +162,4 @@ Theorem B, with uniformity in σ as in (c)(1), needs:
 
 - VP consultation on C1, C2 and (c)(2): due 16:30 CT.
 - Engineering R-A1-post + R-A2 (≈ 5.5 core-h; awaiting HQ's compute OK): σ and λ concentration against n, and fixed σ ≈ σ₀.
-- Audit of the P2 uniformity proof in (c)(1): to be requested from HQ.
+- Audit of the P2 uniformity proof in (c)(1): to be requested from HQ (low priority: it only covers the (EM) range).
