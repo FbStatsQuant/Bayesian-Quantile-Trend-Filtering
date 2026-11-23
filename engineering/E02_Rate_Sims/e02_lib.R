@@ -301,7 +301,7 @@ run_gibbs_frozen <- function(y, theta_star, tau, lambda, sigma, theta0, burn = 1
                 clamp_rate_z = hits_z / ((burn + keep) * n), clamp_rate_iw = hits_iw / ((burn + keep) * m),
                 seconds = secs),
        bands = list(lo = lo, hi = hi), draws = if (return_draws) TH else NULL,
-       trace = list(d2 = d2, pen = pen, lambda = if (learn_lambda) lam_tr else NULL, sigma = if (learn_sigma) sig_tr else NULL, theta3 = th3))
+       trace = list(d2 = d2, ms = ms, pen = pen, lambda = if (learn_lambda) lam_tr else NULL, sigma = if (learn_sigma) sig_tr else NULL, theta3 = th3))
 }
 
 # ---- one cell replicate: data -> MAP -> chain -> summary row --------------------------------
