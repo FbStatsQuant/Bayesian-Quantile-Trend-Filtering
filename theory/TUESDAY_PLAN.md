@@ -28,7 +28,7 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 | L4b | (III-c) λ ∈ [n^{3/2}, C·n^{2.30}]: LO extension via truncation (Fable A today) | OPEN; one new lemma (a posterior bound on high-amplitude energy) | Fable A | Astra | named assumption |
 | L5 | (III-c) λ ∈ [C·n^{2.30}, Λ₋] | **DONE: Theorem U-σ, audited** (f5f05de) | — | — | — |
 | L6 | L1–L5 ⇒ (LT) at Λ₋ = c₋n^{5/2}(log n)^{−1/2} | assembly (lowertail §5, PROVED given its inputs) | Fable | Astra | — |
-| L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | **PROVED today, unaudited** (`FABLE_A_V0Tstar_nfloor.md`, 4a6dddb; rate n^{−5/6}(log n)^{1/3} confirmed); Astra audit running | Fable A | Astra | the rate keeps an extra log |
+| L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | **DONE: PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES; `FABLE_A_V0Tstar_nfloor.md`) | — | — | the rate keeps an extra log |
 | L8 | Rate n^{−5/6}(log n)^{1/3}, with LB matching up to logs | follows from L7 + Theorem LB | — | — | — |
 
 **L4a, the named assumption (Felipe's assumptions-vs-empirics rule):** see `T06_Alignment/L4a_assumption.md`.

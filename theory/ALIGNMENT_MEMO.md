@@ -89,7 +89,7 @@
       - **Zero mass below n^{3/2} is NOT shown,** and with medians only it cannot be. At paper n, VS sits there legitimately, because its oracle is below n^{3/2} while n < V.
       - **Watch item:** S at τ = 0.95 (one seed).
       - **Draws check:** proposed for Tuesday.
-  - **L7, V0T\* with an n-dependent floor** (Fable A, `T06_Alignment/FABLE_A_V0Tstar_nfloor.md`): PROVED, unaudited (Astra audit running). It gives the rate n^{−5/6}(log n)^{1/3} once (LT) holds.
+  - **L7, V0T\* with an n-dependent floor** (Fable A, `T06_Alignment/FABLE_A_V0Tstar_nfloor.md`): **PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES). It gives the rate n^{−5/6}(log n)^{1/3} once (LT) holds.
   - **Sign reduction** (Fable B, `T06_Alignment/FABLE_B_Arule_gauss.md`, 5fb5e67; identities verified by Theory). The λ lower tail reduces to the sign of a posterior mean, κ(ℓ) = m − ℓ·E_ℓ‖Dθ‖₁. At τ = ½ no diverging floor is proved; this is a negative result.
   - **MEASURED, internal (κ̂ pilot):** Engineering 75ad1a4, 0.29 core-h; Theory's reading is `T06_Alignment/kappa_pilot_reading.md`, 3c4562a.
     - On the Gaussian design, one seed, κ̂ > 0 at τ = 0.05, 0.25 and 0.5.
