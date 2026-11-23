@@ -321,3 +321,26 @@ and U-σ holds under t·S₋/(S₊·(1 − ϵ)d) < 6. **For the paper's designs 
 These match §8. Lemma S's learned σ concentrates at σ₀ (σ/σ₀ → 1), so U-σ's near-scale interval |s/σ₀ − 1| < ϵ fits inside the margin for ϵ < 0.14.
 
 **New hypothesis:** fᵢ = f(i/n), with f of bounded variation and bounded away from 0 and ∞. It holds for the paper's three designs.
+
+## Cross-family audit response (Astra, `reviews/AUDIT_astra_avgbeta.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** The fixed-pair LO and the U / U-σ band conclusions hold with the averaged condition β̄ < 6. Nine findings are CONFIRMED and one is PLAUSIBLE. Theory rules that all **HOLD**.
+
+Theory's checks:
+- Astra's independent quadrature reproduces the design values: Gaussian 4.43021, Beta 5.12268, Mixed 4.46339.
+- These agree with Theory's own Gaussian factor of 0.99208.
+
+| # | Fix (applied by reference; written in full in Tuesday's clean rewrite) |
+|---|---|
+| 1 | Fix the upper envelope before expanding; lower envelope only for the determinant. The resolvent trace drops a term ≤ 3/w_min. |
+| 2 | Correct the first Remark in §4: the retained block cost *underestimates* the full cost. Use integer gain-tail cutoffs J_b = ⌊ηn_b⌋. |
+| 3 | The BV error is h/n with h = ⌈n/B⌉ (not 1/B), using balanced blocks. Order of choices: slack → B → η, γ → K₀. |
+| 4 | **Delete the false Loewner bound M(X+E) ≤ M(X)+E in §5.2 item 5.** Use BEB and the inverse-tangent inequality (§7's version is correct). |
+| 5 | m_i ≥ f_iδ_i²/2 throughout the body; keep full (A2) for the inherited cones; rank-three flat event counted once. |
+| 6 | Explicit C₂ = β′_max(π²/6 + 4 + K/2 + 1/(2t)); η ≤ ½; finite cone inequality at the endpoint. |
+| 7 | **(REG) must be stated as a deterministic secant profile valid on all frozen panel bodies**, with **a class-uniform margin inf(6 − β̄(ω₂)) > 0**; one common F gives one flat-score event. For the paper designs a valid profile is (1 − o(1)) × the point-density profile. |
+| 8 | Restore the missing π in §8's κ_min. U-σ inherits U's audit fixes 8–9; the reciprocal near-scale interval must lie strictly inside the margin. |
+| 9 | Update the status lines in §§0, 5, 6. **The crossing at τ ≈ 0.96–0.97 concerns the sufficient comparison, not evidence behaviour beyond 6.** |
+| 10 | (PLAUSIBLE) The matching converse stays CONJECTURE; LO and U do not need it. |
+
+**Status: LO and U / U-σ with the averaged β̄ < 6 are PROVED and cross-family audited**, under the uniform-profile hypothesis (REG). On the paper's designs β̄ ≤ 5.12 at every τ ∈ [0.05, 0.95]. **So the middle-band exclusion covers the whole paper grid τ ∈ [0.05, 0.95].**
