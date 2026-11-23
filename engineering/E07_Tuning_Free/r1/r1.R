@@ -25,7 +25,8 @@ g <- function(arm, bl, seeds) expand.grid(arm = arm, bl = bl, noise = c("Normal"
 RPH <- Sys.getenv("R_PHASE", "R1"); CAND <- strsplit(Sys.getenv("CAND", "P1"), ",")[[1]]
 g3 <- function(arm, seeds) expand.grid(arm = arm, bl = c("VS", "S"), noise = c("Normal", "Beta", "Mixed"), tau = c(0.05, 0.25, 0.5, 0.75, 0.95), seed = seeds, stringsAsFactors = FALSE)
 tasks <- if (RPH == "R1") rbind(g("P1", "S", 1:5), g("P2", "S", 1:5), g("P2", "VS", 1:3), g("P3", "S", 1:5)) else if (RPH == "R1b")
-  rbind(g("L2x", "S", 1:5), g("P3", "VS", 1:5)) else if (RPH == "R1c") g("L4x", "S", 1:5) else if (RPH == "R1d") g("L2x", "VS", 1:5) else       # R1b: equal-wall-time control (his sampler, 2x sweeps) on S; P3 on VS; R1c: his sampler at 4x on S (HQ: plateau)
+  rbind(g("L2x", "S", 1:5), g("P3", "VS", 1:5)) else if (RPH == "R1c") g("L4x", "S", 1:5) else if (RPH == "R1d") g("L2x", "VS", 1:5) else if (RPH == "I8")
+  rbind(g("I8", "S", 1:5), g("I8", "VS", 1:5)) else      # Astra idea 2: 8 ADMM iterations per prox map, 8x sweeps = equal wall time       # R1b: equal-wall-time control (his sampler, 2x sweeps) on S; P3 on VS; R1c: his sampler at 4x on S (HQ: plateau)
   rbind(g3("L", 1:10), do.call(rbind, lapply(CAND, function(a) g3(a, 1:10))))   # R3: full interior grid, 10 seeds (existing fits are skipped)
 if (RPH == "R3") { OUT <- file.path(Sys.getenv("E07_OUT"), "r3"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE) }
 sic_start <- function(y, tau) {                       # Koenker SIC over a 25-point penalty grid; QTF MAP by the exact solver
@@ -47,7 +48,8 @@ res <- parallel::mclapply(seq_len(nrow(tasks)), function(i) {
   r <- tryCatch({
     d <- PAPER$simulate_data(tk$seed, 500L, tk$tau, tk$bl, tk$noise); pc <- paper_cfg(tk$bl); sb <- sigma_bar(tk$noise, tk$tau)
     if (tk$arm == "L2x") { pc$it <- 2L * pc$it; pc$burn <- 2L * pc$burn }
-    if (tk$arm == "L4x") { pc$it <- 4L * pc$it; pc$burn <- 4L * pc$burn }   # his sampler unchanged, twice the sweeps (P3 costs ~2x per sweep)
+    if (tk$arm == "L4x") { pc$it <- 4L * pc$it; pc$burn <- 4L * pc$burn }
+    admm_it <- 150L; if (tk$arm == "I8") { admm_it <- 8L; pc$it <- 8L * pc$it; pc$burn <- 8L * pc$burn }   # his sampler unchanged, twice the sweeps (P3 costs ~2x per sweep)
     a0 <- 1; b0 <- pc$b0; lam_c <- NA; init <- "y"; asis <- pc$asis; lamjump <- FALSE
     if (tk$arm == "P1") asis <- TRUE
     if (tk$arm == "P3") lamjump <- TRUE
@@ -55,7 +57,7 @@ res <- parallel::mclapply(seq_len(nrow(tasks)), function(i) {
     options(bqtf.metric_cap = 1e8); set.seed(tk$seed + 1000L)
     fit <- PAPER$gibbs_pmala_aug(d$y, tk$tau, 2L, a0 = a0, b0 = b0, a_sigma = 0.1, b_sigma = 0.1, gibbs_iter = pc$it, gibbs_burn = pc$burn,
              delta_init = 0.2, lambda_init = NULL, adapt_target = 0.5, adapt_gain = 1, adapt_kappa = 0.6, delta_bounds = c(1e-8, 100),
-             control = PAPER$tf_control, metric = "curv", c_fixed = 1e4, rho = NULL, iters = 150L, mh = TRUE, adapt = TRUE, init = init,
+             control = PAPER$tf_control, metric = "curv", c_fixed = 1e4, rho = NULL, iters = admm_it, mh = TRUE, adapt = TRUE, init = init,
              warm = 200L, gamma_warm = 1e4, prior_scale = "none", cmap = FALSE, kappa = 3, adapt_all = TRUE, K = 1L, asis = asis, tol = 0,
              lamjump = lamjump, verbose = FALSE)
     post <- (pc$burn + 1):pc$it; TH <- fit$theta; lam <- fit$lambda[post]; sig <- fit$sigma[post]
