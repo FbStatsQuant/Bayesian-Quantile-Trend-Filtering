@@ -485,7 +485,7 @@ N the largest number of cluster coordinates on the good set. Hence:
 - **Without (ML):** the hypothesis is **(XN): Π_{ω,ℓ}(#{cluster coordinates at level θ} > ηk/log C_x | y) ≤ ¼**. It is implied by an **average pointwise** bound, (1/n)·ΣᵢΠ(|δᵢ| > θL | y) ≤ η·ℓ^{−1/3}/(8 log C_x) (Markov). On the body the count is ≤ 4Mk′/L² = 86M(log m)^{1/6}·k/L² (§9.2(a)): the same factor M(log n)^{1/6}/η as in §9.2(e), but now for a **count**, with no sup-norm and no height.
 
 **Unverified steps of the assembly.**
-1. ‖m_V‖∞ ≤ m̄ → 0 on every variance class of §3.5. On each class H_V ⪯ (fixed envelope), so (C_V)ᵢᵢ and ψᵀC_Vψ are bounded by fixed quantities and |m_{V,i}| ≤ ω((C_V)ᵢᵢ·ψᵀC_Vψ)^{1/2}. On the typical class this is ≲ (ω/a)·k/√n → 0 for ℓ ≫ n^{3/2}. On the max-variance classes (2^i > c₀ ≍ κ^{6/5}) the same bound is ≲ κ·2^{i/6}/√n, which is not small below ℓ ≈ n^{7/4}; there the z-integrals must be truncated (‖z‖₁ ≤ C·k′ on the body) and the cost e^{C·k′·κ·2^{i/6}/√n} set against the class probability e^{−2^{i−1}}. The exponents compare correctly when k′ ≪ √n (true on the window). On those classes the truncated z-integral is bounded by its volume, at most e^{C·k′·log n}, which the class probability e^{−κ^{6/5}/2} also absorbs. The classes of rows 2–3 of §3.5 have probability only e^{−C·κ}, so there the mean bound itself is needed, with the envelope constants 2^{i/6}. Not written.
+1. ‖m_V‖∞ ≤ m̄ → 0 on every variance class of §3.5. On each class H_V ⪯ (fixed envelope), so (C_V)ᵢᵢ and ψᵀC_Vψ are bounded by fixed quantities and |m_{V,i}| ≤ ω((C_V)ᵢᵢ·ψᵀC_Vψ)^{1/2}. On the typical class, with item 2 and the gain bound ψᵀC_Vψ ≤ C·κ/ω² of §3.4, this is ≲ k/√(a·n) → 0 for ℓ ≫ n^{3/2}. On the max-variance classes (2^i > c₀ ≍ κ^{6/5}) the same bound is ≲ κ·2^{i/6}/√n, which is not small below ℓ ≈ n^{7/4}; there the z-integrals must be truncated (‖z‖₁ ≤ C·k′ on the body) and the cost e^{C·k′·κ·2^{i/6}/√n} set against the class probability e^{−2^{i−1}}. The exponents compare correctly when k′ ≪ √n (true on the window). On those classes the truncated z-integral is bounded by its volume, at most e^{C·k′·log n}, which the class probability e^{−κ^{6/5}/2} also absorbs. The classes of rows 2–3 of §3.5 have probability only e^{−C·κ}, so there the mean bound itself is needed, with the envelope constants 2^{i/6}. Not written.
 2. The pointwise variance — SKETCH, constant not computed. (C_V)ᵢᵢ is the posterior variance of δᵢ in the Gaussian model with noise variance 1/a and prior variances V on Dδ, so it is at most the Bayes risk of any linear estimator that is exact on quadratics. The local quadratic fit on a window of length w′ gives (C_V)ᵢᵢ ≤ 9/(a·w′) + C·w′⁴·Σ_{j∈window}Vⱼ (Lemma Lev for the noise part; Newton's formula for the bias, with coefficients ≤ C·w′²). On the local-sum events of §3.2, Σ_{window}Vⱼ ≤ c₊·w′·v₁, and w′ ≍ h gives (C_V)ᵢᵢ ≲ k/(a·n). This must be done directly, as here: the operator envelope of Lemma 2b″ would add a term of order ε/a to the diagonal, which is too large.
 3. That shifting the score leaves the determinant factors of §3 unchanged is exact; that the gain bounds of §3.4 are used only through ψᵀC_Vψ was checked from the statement, not line by line.
 
@@ -509,3 +509,18 @@ N the largest number of cluster coordinates on the good set. Hence:
 - §9.4 is the item to audit first. The pointwise inequality and the Gaussian algebra are elementary; the assembly is a sketch and the (ML) threshold 2/π depends on m̄ → 0.
 - The hand example in §9.4 and all constants in §9.2(e) are by hand, once.
 - **UNTESTED.** No numerics. Cheap checks from fixed-λ draws: the cluster count R and the number of cluster coordinates N against k (for (XN)); the Gamma(d, 1) domination of Corollary D1 on a few blocks (an exact sampler check); the largest posterior mean |[δᵢ]| and sd for (FG). Pilot cost: one fixed-λ chain per ℓ on the existing κ̂ runs.
+
+## Theory response to §9 (2026-11-23). Fable A's final status today.
+
+**Status: (XS) on [n^{26/17}, n^{9/5}] is OPEN. §9 is UNAUDITED.**
+
+**PROVED (unaudited):**
+- (XS) reduces to (XE), an energy bound on the excess. This uses the H-sharp body, which the audit restricted to its corrected polylog floor.
+- An obstruction: the existing tools bound widths and counts, never heights.
+- **Lemma D (deletion).** Φ(δ) − Φ(Aδ) is dominated by Gamma(d, 1), with no net and no data event.
+
+**SKETCH:** a sparse-shift comparison. It would make L4b unconditional on this range when a·L² > 2/π.
+
+**Stopping point:** the sup-norm of the comparison mean on the atypical variance classes. (FG), forgetting in probability, is the shared missing input with Fable B's sup-norm program (`FABLE_B_supnorm.md` §§12–16).
+
+**Fable A final status today:** L4b is cross-family audited, and the posterior band exclusion reaches n^{21/11} (1af9f8b). The fixed-pair Occam bound holds to n^{9/5}. §9 is committed and unaudited.
