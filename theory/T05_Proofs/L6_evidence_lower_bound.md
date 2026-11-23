@@ -30,7 +30,7 @@ Here C₁ = max(f̄/2, 1/L) is the constant of L2. The prior mass of G satisfies
 
 with V₃ the volume of the unit ball in ℝ³. In turn:
 - with L4 and u_h = u\*: Π_λ(u_h + B_{ε/2}) ≥ exp{ −λ‖Dθ\*‖₁ − φ(ε/2) } (fallback);
-- with L4q and u_h mollified: Π_λ(u_h + B_{ε/2}) ≥ exp{ −c_K λ²‖u_h‖₂² − φ(ε/2) } (primary).
+- with the half-radius form of L4q and u_h mollified (L4q-M): Π_λ(u_h + B_{ε/2}) ≥ exp{ −c_{K′} λ²‖u_h‖₂² − φ(ε/2) }, with K′ = K(λε/2), assuming δ_A ≤ λε/4 (primary).
 
 **Consequence (rates).** With the bounds of L3 and Corollary L4q-M, −log ν(G) ≲ C′nε² provided ε² ≳ λ^{−1/3} + min{λVn^{−3}, V²λ^{5/3}n^{−5}}, up to the 3·log(1/(ε√n)) term. That term is negligible against nε².
 

@@ -30,7 +30,7 @@ Then
 
 With probability ≥ 1 − 1.44/(nε²), N(ℝⁿ) ≥ ν(G) e^{−ω(1.44C₁ + 1)nε²}. The prior mass satisfies
 
-  −log ν(G) ≤ φ(ε/2) + [c_K λ²‖u_h‖₂² (L4q) or λ‖u\*‖₁ (L4)] + O(log n) ≤ C_prior · nε²,
+  −log ν(G) ≤ φ(ε/2) + [c_{K′} λ²‖u_h‖₂² (half-radius L4q, K′ = K(λε/2)) or λ‖u\*‖₁ (L4)] + O(log n) ≤ C_prior · nε²,
 
 at the stated tuning. This uses L3 for φ(ε/2) ≲ (n^{5/2}/(λε))^{2/5} ≲ nε², and L4q-M for the mollified shift.
 
@@ -72,8 +72,8 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 | L2 excess risk | margins, C₁ | **advisor-checked** (Astra: accept with fixes; fixes applied) |
 | L3 small ball | φ(ε) bound | **self-checked** (numerical check passed, NOTS 2857810): φ(ε) ≤ 30x^{2/5}(log m)^{1/5} + 6 via the Gaussian scale mixture + Anderson + singular values of C³ (no Laplace small-deviation theory needed); awaiting the advisor check |
 | L4 ℓ₁ shift | fallback prior mass | **advisor-checked** (Astra: accept) |
-| L4q quadratic shift | primary prior mass | **self-checked** (Fable adversarial check: correct with fixable gaps, all fixed); awaiting advisor check |
-| L4q-M mollification | bias term | **self-checked** (signed order-3 kernel; proof in L4q file) |
+| L4q quadratic shift | primary prior mass | **advisor-checked** (Astra: ACCEPT; half-radius form stated first) |
+| L4q-M mollification | bias term | **advisor-checked** (Astra: ACCEPT WITH FIXES, applied: explicit kernel, ‖u_h‖∞, c_{K′}^{5/6} kept with a fresh half-radius threshold check) |
 | L5 normalization | propriety, flat c | **advisor-checked** (Astra: accept) |
 | L6 evidence | denominator | **draft**, self-checked given L3/L4/L4q |
 | L8′ bounded numerator | Theorem A | **draft** (`L8p_bounded_numerator.md`): exact-MGF identity, log E e^{−ωX} ≤ −Bω·m(δ) on \|δ\| ≤ Δ with B ≥ η/2 for ω ≤ (1−η)ω̄; Step 2 closed given L6; numerical check queued |
