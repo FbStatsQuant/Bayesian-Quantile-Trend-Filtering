@@ -134,7 +134,7 @@ Theorem B, with uniformity in σ as in (c)(1), needs:
 2. **λ:** deterministic, of order n^{5/2}/V (or (n³/V)^{3/4}). Learned λ is pending P3.
 3. **Noise:** light-tailed.
 
-**Verdict (MEASURED).** Condition 1 is incompatible with Felipe's MSE bar: every σ ≥ σ̄ arm failed, including with λσ matched. **No Route-B method can align with Theorem B as it stands.** Engineering has been told not to spend compute on it. Route B becomes viable only if the theorem moves below σ̄ (C1 or C2). Then the condition would be: σ in a compact interval around σ₀, and λ in C1's window.
+**Verdict (MEASURED).** Condition 1 is incompatible with Felipe's MSE bar: every σ ≥ σ̄ arm failed, including with λσ matched. With σ = 1.1σ̄ and λ learned under a prior centred to match λσ (c39b1c6, `sigma_sprint/arms/`), the median MSE ratio is 1.34–1.53 and 10–13 of 18 cells exceed 1.25. The mode matches, but at the 2–7× higher temperature the posterior mean is rougher (‖D³θ̂‖₁ 1.3–4.5×). **No Route-B method can align with Theorem B as it stands.** Engineering has been told not to spend compute on it. Route B becomes viable only if the theorem moves below σ̄ (C1 or C2). Then the condition would be: σ in a compact interval around σ₀, and λ in C1's window.
 
 ---
 
