@@ -100,7 +100,7 @@ All theorems concern this \emph{posterior}. They say nothing about how well a pa
 \toprule
  & $\sigma$ & $\lambda$ & floor & hyper\-parameters & joint & $\tau$ range & vs.\ the method \\
 \midrule
-Felipe's method & learned, IG & learned, $\Ga(1,b_0)$ & none & $b_0$ const.; IG$(0.1,0.1)$ & yes, on $C$ & 0.05--0.95; joint 0.90--0.99 & --- (no theorem at any rate) \\[2pt]
+Felipe's method & learned, IG & learned, $\Ga(1,b_0)$ & none & $b_0$ const.; IG$(0.1,0.1)$ & yes, on $C$ & 0.05--0.95; joint 0.90--0.99 & --- (with $\sigma$ learned, no theorem at any rate) \\[2pt]
 Thm C & learned, IG & deterministic, oracle window & --- & IG$(a,b)$, any $a,b>0$ & no & interior & differs: $\lambda$ not learned \\[2pt]
 Thm C$^*$ & learned, IG & deterministic, $\asymp n^{5/2}/V$ & --- & IG$(a,b)$ & no (yes via J) & interior & differs: $\lambda$ not learned \\[2pt]
 Thm V0T / V0T$^*$ & learned, IG & learned, $\Ga(1,b_0)$ or $\Ga(1,c_bn^{-5/2})$, trunc. & $\lambda\ge\kappa_-n^{5/2}$, $\kappa_-{=}1.6{\cdot}10^{-5}$ & as the method & no (yes via J) & interior & differs by the floor only; identical at $n=500$ (\ME) \\[2pt]
@@ -394,7 +394,7 @@ Model and assumptions of V0T$^*$, with floor $\Lambda_{-,n}:=\kappa_{-,n}n^{5/2}
 \subsection{The open links}
 
 \begin{itemize}
-\item \textbf{L2, bounded $\lambda$, (DC)} \OP{} for the three designs together. With $g_n(s,\ell):=\log(\ell/(2t))+n^{-1}\log\E_s\exp\{-\ell\norm{D(y-E)}_1\}$ and $b^*:=-1-\log\sigma_0$: (DC$_\gamma$) is ``with probability $\to1$, $\sup\{g_n(s,\ell):s>0,\ \ell_1\le\ell\le\ell_0\}\le b^*-\gamma$''. Given (DC$_\gamma$), $\Pi(\ell_1\le\lambda\le\ell_0\mid y)\le e^{-\gamma n/2}$ (\PU). The reduction to a compact rectangle is \PU. \emph{Gaussian design:} \PA{} (Fable B / Astra, ACCEPT WITH FIXES; \texttt{FABLE\_B\_L2\_analysis.md}, \texttt{23c6d54}, audit \texttt{845116d}) at the paper levels $\tau\in\{0.05,0.25,0.5,0.75,0.95\}$, on $[\ell_1,\ell_0]$ with $\ell_0=790$ ($\tau=\tfrac12$), $196$ ($0.25/0.75$), $12$ ($0.05/0.95$). The posterior consequence uses (A3) for the denominator. Not every $\tau$: the method fails at extreme quantiles. Mixed and Beta: \OP. Beta at $\tau=0.95$: not covered by this method. The method stops at a constant $\ell_0$, so it gives nothing for L4a.
+\item \textbf{L2, bounded $\lambda$, (DC)} \OP{} for the three designs together. With $g_n(s,\ell):=\log(\ell/(2t))+n^{-1}\log\E_s\exp\{-\ell\norm{D(y-E)}_1\}$ and $b^*:=-1-\log\sigma_0$: (DC$_\gamma$) is ``with probability $\to1$, $\sup\{g_n(s,\ell):s>0,\ \ell_1\le\ell\le\ell_0\}\le b^*-\gamma$''. Given (DC$_\gamma$), $\Pi(\ell_1\le\lambda\le\ell_0\mid y)\le e^{-\gamma n/2}$ (\PU). The reduction to a compact rectangle is \PU. \emph{Gaussian design:} \PA{} (Fable B / Astra, ACCEPT WITH FIXES; \texttt{FABLE\_B\_L2\_analysis.md}, \texttt{23c6d54}, audit \texttt{845116d}) at the paper levels $\tau\in\{0.05,0.25,0.5,0.75,0.95\}$, on $[\ell_1,\ell_0]$ with $\ell_0=790$ ($\tau=\tfrac12$), $196$ ($0.25/0.75$), $12$ ($0.05/0.95$). The posterior consequence uses (A3) for the denominator. Not every $\tau$: the method fails at extreme quantiles. Mixed and Beta: \OP, work in progress. Beta at $\tau=0.95$: not covered by this method. The method stops at a constant $\ell_0$, so it gives nothing for L4a.
 \item \textbf{L4a, $\lambda\in[\ell_0,n^{3/2}]$} \OP. No theory; even the $\beta<6$ heuristic has no justification here. Fallback: the named assumption below.
 \item \textbf{L4b, $\lambda\in[n^{3/2},Cn^{2.30}]$:} \OP. A partial result is in progress (Fable A); Theory will report its status at 17:05.
 \end{itemize}
