@@ -24,8 +24,9 @@ if (PH == "ind") {
   NS <- as.integer(strsplit(Sys.getenv("V_N", "2000,4000"), ",")[[1]]); SEEDS <- eval(parse(text = Sys.getenv("V_SEEDS", "1:3")))
   CH <- seq_len(as.integer(Sys.getenv("V_CHAINS", "1")))
   g <- function(arm, bl) expand.grid(arm = arm, n = NS, bl = bl, noise = c("Normal", "Beta", "Mixed"), tau = c(0.05, 0.5, 0.95), seed = SEEDS, chain = CH, stringsAsFactors = FALSE)
-  tasks <- rbind(g(c("C", "V0T"), c("VS", "S")), g("C2x", "S"))
-  if (nzchar(Sys.getenv("V_CELLS"))) { keep <- strsplit(Sys.getenv("V_CELLS"), ",")[[1]]                 # e.g. "VS:Mixed:0.95,S:Beta:0.95"
+  ARMS <- strsplit(Sys.getenv("V_ARMS", "C;V0T;C2x"), ";")[[1]]
+  tasks <- rbind(g(intersect(c("C", "V0T"), ARMS), c("VS", "S")), if ("C2x" %in% ARMS) g("C2x", "S"))
+  if (nzchar(Sys.getenv("V_CELLS"))) { keep <- strsplit(Sys.getenv("V_CELLS"), ";")[[1]]                 # e.g. "VS:Mixed:0.95;S:Beta:0.95" (";": sbatch --export splits on commas)
     tasks <- tasks[paste(tasks$bl, tasks$noise, tasks$tau, sep = ":") %in% keep, ] }
   tasks$file <- file.path(OUT, sprintf("%s_n%05d_%s_%s_t%03d_s%d_c%d.rds", tasks$arm, tasks$n, tasks$bl, tasks$noise, round(100 * tasks$tau), tasks$seed, tasks$chain))
   tasks <- tasks[!file.exists(tasks$file), ]; tasks <- tasks[order(-tasks$n, tasks$arm != "C2x", tasks$bl != "VS"), ]

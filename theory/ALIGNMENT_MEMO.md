@@ -33,6 +33,15 @@
   - **(ii)** V2 (constant shape, scaled rate) **fails class-wide**, even on a bounded design satisfying the strict margin. So the margin condition is NOT sufficient.
   - **(iii)** Felipe's Gamma(n, 1) gives no RMS contraction at any radius o(n^{−1/3}).
   - **Consequence:** for an adaptive λ prior (data-passing), any theorem must be **design-specific** (the paper's smooth noise families). That is OPEN, and it is Tuesday's target.
+- **Exact-Gibbs hyperparameter screen (MEASURED, Engineering; prior effect only, both arms exact Gibbs):**
+  - **PASSES:** **A-rule λ ~ Gamma(1, b_n), b_n = 1/(5500·(n/500)^{5/2})**. It is n-only, one rule for both signals, and V2-shaped. Median MSE ratio against his current prior: 0.95 / 0.90 / 0.53 at n = 500 / 1000 / 2000; max 1.13.
+  - **FAILS:** Gamma(n, 1): median ×1.85, up to ×6.1, as predicted.
+  - Theory's H-V2 specs are being re-run (after a submission bug).
+  - **Candidate ranking for the λ prior (pending the full screen):**
+    1. **A-rule** (data-favoured): it is the natural target for Tuesday's design-specific, floor-free theorem;
+    2. H-V2 variants (pending);
+    3. V0T (his prior + floor): has the audited theorem now, but uses a truncation, which is outside the families.
+  - **No theorem covers the A-rule yet.** Class-wide it falls under the V2 impossibility, so the theorem must be design-specific.
 - **New freedom (Felipe):** Gamma/IG hyperparameters may be deterministic functions of n (τ for σ), but no truncation. Candidates for the exact-Gibbs screen: H-V2 (Gamma(1, b₀(500/n)^{5/2})), H-V2-common, H-V2-shape2. The theorem for these without the floor needs the 'no-interpolation' evidence lemma (Fable B and Astra, in progress).
 
 **Joint non-crossing (Theorem J, Fable B; PROVED and cross-family audited, Astra: ACCEPT WITH FIXES).** For a fixed number of levels, V0T\* and C\* transfer to the paper's joint non-crossing posterior at n^{−5/6}, with no extra separation condition: upper (A2) forces separated true quantiles, and the sup-norm conclusion makes the constraint asymptotically inactive. Caveat: at the paper's n the ordering is likely still active, so the theorem says the constraint does no harm asymptotically, not that it helps.
