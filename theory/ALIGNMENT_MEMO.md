@@ -134,7 +134,7 @@
   - **FAILS:** Gamma(n, 1): median ×1.85, up to ×6.1, as predicted.
   - Theory's H-V2 specs are being re-run (after a submission bug).
   - **Candidate ranking for the λ prior (pending the full screen):**
-    1. **A-rule** (data-favoured): it is the natural target for Tuesday's design-specific, floor-free theorem;
+    1. **A-rule** (data-favoured): it is the natural target for Tuesday's design-specific, floor-free theorem. **Data gate: posterior-level (exact sampler, both arms exact Gibbs); with his P-MALA sampler: UNTESTED.**
     2. H-V2 variants (pending);
     3. V0T (his prior + floor): has the audited theorem now, but uses a truncation, which is outside the families.
   - **No theorem covers the A-rule yet.** Class-wide it falls under the V2 impossibility, so the theorem must be design-specific.
@@ -149,6 +149,8 @@
 - In the β ≈ 1.1 cell (Beta τ = 0.01), it sits at 12.6×.
 - Caveat: the collapsed cells are mostly not converged.
 - Caveat: coverage is ≈ 0.3 there under his priors too, with MSE ratio ≈ 1. So the extreme levels are hard for both priors, not only for the A-rule. V0T\* (with the floor) and Theorem J are not subject to this limitation.
+
+**Route B is CLOSED (HQ, 2026-11-23).** The joint exact sampler failed Felipe's MSE bar against his joint sampler (10 of 78 levels above 1.25), so **Felipe's P-MALA stays the method.** The theory targets his method: V0T\*, C\*, J and LB are the headline; the A-rule is the floor-free target. No theory claim here is built on his sampler's outputs.
 
 **Caveat for the paper:** all theorems concern the POSTERIOR. His P-MALA λ is not converged at n ≥ 1000 (Engineering aca7214).
 

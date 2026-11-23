@@ -35,7 +35,7 @@ rows <- list(); for (cf in cfgs) {
     labs(title = sprintf("%s · %s · joint levels %s–%s (%s set)", bl, c(Normal = "Gaussian", Beta = "Beta", Mixed = "Mixed normal")[[noise]], format(min(taus)), format(max(taus)), G[[1]]$set),
          subtitle = paste("MSE his→v3:", sub), x = "u", y = "y") +
     theme_minimal(base_size = 10) + theme(legend.position = "bottom", plot.title = element_text(face = "bold"), plot.subtitle = element_text(size = 6.5, colour = "grey25"))
-  ggsave(file.path(OUT, sprintf("joint_%s_%s_%s.png", G[[1]]$set, bl, noise)), g, width = 8, height = 5, dpi = 300, device = "png", type = "cairo")
+  ggsave(file.path(OUT, sprintf("joint_%s_%s_%s.png", G[[1]]$set, bl, noise)), g, width = 8, height = 5, dpi = 150, device = "png", type = "cairo")
 }
 R <- do.call(rbind, rows); write.csv(R, file.path(OUT, "joint_gate_levels.csv"), row.names = FALSE)
 print(R, digits = 3, row.names = FALSE)

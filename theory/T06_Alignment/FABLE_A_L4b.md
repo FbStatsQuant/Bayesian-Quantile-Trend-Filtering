@@ -376,3 +376,136 @@ By T1, a coordinate with |δᵢ| > L sits in a peak above L/2 of width ≲ ℓ^{
 | [n^{3/2}, n^{26/17}] | SKETCH | OPEN |
 
 All rows are in the min-density version; the averaged-β̄ version is still to be done.
+
+---
+
+## 9. (XS) on [n^{26/17}, n^{9/5}]: two reductions, a net-free comparison lemma, the stopping point
+
+*Appended 2026-11-23, 16:15–16:50 CT, Fable A. Not audited. Read for this section: `FABLE_B_supnorm.md` §11–§13 (Lemmas B1, B3–B7, unaudited). Notation of §4–§5; h := (ℓ/ω)^{1/3} (bandwidth), k = n·ℓ^{−1/3}, k′ = 21.5·(log m)^{1/6}·k, a = ω(1 − η)f, 𝐡 = Σᵢh_L(δᵢ) the Huber loss at level L, v = (|δ| − L)₊sign(δ). "Body" := K_H ∩ {𝐡 ≤ 2Mk′}; its posterior probability → 1 by Theorem H and Theorem H-sharp (audited range).*
+
+### 9.0 Outcome
+
+**(XS) is not proved.** The combination asked for (block spike lemma + translation + no-plateau + H-sharp) stops at an arithmetic obstruction, stated in §9.2. What is new:
+
+| # | Claim | Status |
+|---|---|---|
+| 1 | The ℓ₁ half of (XS) is free: on the body, the score on the excess is o(k). (XS) reduces to **(XE): Π((f/2)‖v‖₂² > ηk \| y) ≤ ¼** | PROVED given H-sharp (§9.1) |
+| 2 | On the body the number of excursion clusters (runs above θL that reach L) is ≤ TV₁(δ)/((1 − θ)L) + 1 = k·ℓ^{−2/21}·polylog. Their entropy is o(k) | PROVED (§9.2) |
+| 3 | Block spike + counting + no-plateau + H-sharp bound the widths and the number of excursions, never their height; the count misses the target by the factor M·(log n)^{1/6}/η. They do not give (XE) | PROVED obstruction (arithmetic) (§9.2) |
+| 4 | **Deletion lemma:** for any affine projection A of co-rank d, Φ(δ) − Φ(Aδ) is dominated by Gamma(d, 1) under the posterior. No net, no data event. It reproduces Lemma B1 with halved constants and extends the block comparison to every block length | PROVED (§9.3) |
+| 5 | **Sparse-shift comparison:** the Huber integrand is a mixture of shifted Gaussian integrands, at a cost of one factor C_x(a, L) per cluster coordinate. C_x < 1 iff **(ML): a·L² > 2/π**. Under (ML), LO-low would hold on [n^{26/17}, n^{9/5}] **with no hypothesis** | pointwise inequality and Gaussian algebra PROVED; assembly SKETCH (§9.4) |
+| 6 | Without (ML) the hypothesis becomes a **count**: (XN) the number of coordinates above θL is ≤ ηk/log C_x. The height of excursions no longer matters | SKETCH, same assembly (§9.4) |
+
+### 9.1 The ℓ₁ half of (XS) is free — PROVED given Theorem H-sharp
+
+On the body, L‖v‖₁ ≤ 𝐡(δ) ≤ 2Mk′. In §4.5 the score on the excess was bounded crudely, |⟨ψ, v⟩| ≤ ‖v‖₁. Use instead step 2 of the proof of H-sharp: on the Hoeffding event for interval sums of ψ, for every η₁ ∈ (0, 1],
+
+  |⟨ψ, v⟩| ≤ η₁·fL‖v‖₁ + (C log n/(η₁fL))·(TV₁(δ) + ‖δ‖∞).
+
+Take η₁ := η/(43·f·M·(log m)^{1/6}). The first term is ≤ η₁·f·2Mk′ = ηk. The second is C′(log n)^{7/6}·(TV₁ + ‖δ‖∞) = o(k), because on K_H both TV₁ and ‖δ‖∞ are smaller than k by a power of n (Lemma LK on bodies; L10-I in Huber form). With (a/2)‖δ^c‖₂² + aL‖v‖₁ = a·𝐡(δ), the consequence of §4.5 becomes, for every δ in the body:
+
+  **−ωℛ(δ) ≤ ω⟨ψ, δ⟩ − a·𝐡(δ) + 4ωη·k + o(k) = ω⟨ψ, δ⟩ − (a/2)‖δ‖₂² + (a/2)‖v‖₂² + 4ωη·k + o(k).**
+
+So Theorem LO-low holds under **(XE): Π_{ω,ℓ}((f/2)‖v‖₂² > ηk | y) ≤ ¼**, with 𝒢 := body ∩ {(f/2)‖v‖₂² ≤ ηk} in the halving lemma. On the body #{i : |δᵢ| > L} ≤ 4Mk′/L², so (f/2)‖v‖₂² ≤ (f/2)‖v‖∞²·4Mk′/L², and (XE) follows from the sup-norm bound ‖δ‖∞ ≤ L + ϑₙ, ϑₙ := L·(η/(43·f·M·(log m)^{1/6}))^{1/2}, with posterior probability ≥ ¾. (XE) cannot be weakened inside the Gaussian comparison: the true integrand e^{−a𝐡} is **larger** than the Gaussian one e^{−(a/2)‖δ‖²} wherever |δᵢ| > L. §9.4 changes the comparison instead.
+
+### 9.2 What the block spike lemma, the no-plateau lemma and H-sharp give together
+
+All statements are for δ in the body, on the data events already named.
+
+(a) **Count — PROVED.** #{i : |δᵢ| > L/2} ≤ 16Mk′/L².
+
+(b) **Clusters — PROVED.** Fix θ ∈ [½, 1). A *cluster* is a maximal run of indices with δᵢ > θL (or < −θL) that contains an index with |δᵢ| > L. Each interior cluster rises by (1 − θ)L and falls by (1 − θ)L on disjoint edges, so
+
+  **R(δ) := #clusters ≤ TV₁(δ)/((1 − θ)L) + 1 ≤ C·T^{1/3}r^{2/3}·k/((1 − θ)L) = k·ℓ^{−2/21}·polylog** (Lemma LK on K_H).
+
+The number of sign-labelled unions of ≤ R intervals is ≤ (2en)^{2R} = e^{o(k)}. So **the positions of the excursions cost nothing; only the coordinates inside them do.**
+
+(c) **Width — PROVED (T1, with the audit's template-count condition).** With posterior probability → 1 no cluster at θ = ½ is longer than (5/4)·w_T, w_T := (32C_β·ℓ/(ωfL))^{1/3} = C_T·h.
+
+(d) **Shape on most blocks — PROVED, deterministic.** For a block I of length g and the quadratic q_I through the three points to its left, Newton's formula (Fable B, Lemma B1, step 1) gives pathwise max_{i∈I}|θᵢ − q_{I,i}| ≤ ((g + 1)²/2)·‖(Dθ)_{𝒥_I}‖₁. With Lemma B6 (counting on Theorem H's body): all but a fraction 2T/K₂ of the blocks of length g = εh have |δ − (quadratic)| ≤ (K₂/2 + o(1))·ε³/ω on the block. This needs no conditional statement. Lemma B1 adds the conditional tail given the boundary, which matters only for the exceptional blocks.
+
+(e) **Why this does not give (XE) — PROVED arithmetic.**
+- *Energy bounds counts, not heights.* By (a) there are at most 16Mk′/(L²w) clusters of width ≥ w at θ = ½. For w ≍ h that is a fraction ≍ M(log n)^{1/6}/(L²h) of the bandwidth windows. Each may carry excess energy (height − L)²·w, and none of the four tools bounds the height (K_H bounds it by a power of n only).
+- *If the heights were ≤ A·L:* ‖v‖₂² ≤ (A − 1)²L²·#{|δᵢ| > L} ≤ 4(A − 1)²Mk′. This is ≤ 2ηk/f only for A − 1 ≲ (η/(M(log n)^{1/6}))^{1/2}. So (XE) is in practice the sup-norm statement at level L(1 + c(log n)^{−1/12}); it is not weaker than (SN) in kind.
+- *Translation is blind to the height.* Removing a matching template of height H − L and width w from a peak gains ω·f·L·(H − L)·w in the likelihood (the loss is linear above L) and costs at most ℓ·C_β(H − L)/w² in the prior. The height cancels: the exclusion holds iff w³ ≥ C·ℓ/(ωfL), which is T1. A taller peak of the same width is not less likely by this argument.
+- *The block spike lemma* bounds the deviation from the minimal-roughness interpolant given the boundary cost. The height of the interpolant is not bounded (Fable B's F1), and the roughness budget T·n/ℓ allows a fraction ≍ T/(ωL) of the bandwidth windows to carry a peak of height L and width h. That fraction is a constant.
+- *The band.* T1 excludes widths > C_T·h. The prior excludes widths < c·(ℓL)^{1/3} only given the boundary cost. On [c(ℓL)^{1/3}, C_T·h], a constant factor wide in units of h, the likelihood and prior terms have the same order.
+
+So the count of excursion coordinates is within the factor M·(log n)^{1/6}/η of what is needed, and the heights are not controlled at all. §9.4 removes the heights from the problem.
+
+### 9.3 The deletion lemma — PROVED
+
+Φ is the convex potential of §5.2 (in δ or, equivalently, in θ).
+
+**Lemma D (deletion).** Let A be an affine map of ℝⁿ with A∘A = A, and d := n − dim(fixed space of A). For every data vector and every λ ∈ [0, 1):
+
+  **E[e^{λ(Φ(δ) − Φ(Aδ))} | y] ≤ (1 − λ)^{−d},  hence  Π_{ω,ℓ}(Φ(δ) − Φ(Aδ) ≥ 2d + t | y) ≤ e^{−t/2}.**
+
+*Proof.* T_λ := (1 − λ)I + λA is affine; its linear part has eigenvalue 1 on a space of dimension n − d and 1 − λ on a complement, so |det| = (1 − λ)^d. By convexity Φ(T_λδ) ≤ (1 − λ)Φ(δ) + λΦ(Aδ), i.e. λ(Φ(δ) − Φ(Aδ)) ≤ Φ(δ) − Φ(T_λδ). And E[e^{Φ(δ) − Φ(T_λδ)} | y] = ∫e^{−Φ(T_λδ)}dδ/∫e^{−Φ} = (1 − λ)^{−d}. Take λ = ½: the probability is ≤ 2^d·e^{−d − t/2} ≤ e^{−t/2}. ∎
+
+*Variants, same proof.* (i) Conditional: if A changes only the coordinates in W and, for each value of θ_{Wᶜ}, is an affine idempotent in θ_W (for instance θ_W ↦ any measurable function of θ_{Wᶜ}), the bound holds conditionally on θ_{Wᶜ}, with d ≤ |W|. (ii) Cutoff: for χ ∈ [0, 1]ⁿ, Φ(δ) − Φ((1 − χ)δ) is dominated in the same sense with d replaced by ‖χ‖₁ (since ∏(1 − λχᵢ) ≥ (1 − λ)^{‖χ‖₁}).
+
+*Against the translation lemma.* The translation lemma compares δ with δ − b for one fixed b, and a family of templates costs its cardinality. Lemma D compares δ with its image under a projection, simultaneously for all δ, and costs the co-rank. The amplitude of the deleted component is free.
+
+**Corollary D1 (blocks of every length).** For every block W of length g, with θ′_W a minimal-roughness interpolant of the outside, F_W and ρ_W as in Lemma B1, and Q_W the loss on W: conditionally on θ_{Wᶜ}, with probability ≥ 1 − e^{−t/2},
+
+  **ω[Q_W(θ_W) − Q_W(θ′_W)] + ℓ[F_W(θ_W) − ρ_W] ≤ 2g + t.**
+
+- For **any** g: the draw's loss on the block exceeds the interpolant's by at most (2g + t)/ω. There is no restriction to sub-bandwidth blocks and no factor e^{2ℓρ}.
+- For g(g + 1)² ≤ ℓ/(ωk̄): with N := ‖𝖣(θ_W − θ′_W)‖₁ ≤ F_W + ρ_W and ωk̄‖θ_W − θ′_W‖₁ ≤ (ℓ/2)N, the display gives ℓN ≤ 4ℓρ_W + 4g + 2t, hence **‖θ_W − θ′_W‖∞ ≤ (g + 1)²·(2ρ_W + (2g + t)/ℓ)** with conditional probability ≥ 1 − e^{−t/2}. This is Lemma B1 with its constants halved (B1 at the same probability gives (g + 1)²(4ρ_W + (3.6g + t)/ℓ)). It is an independent proof of B1.
+
+**Corollary D2 (low rank).** For a linear projection P of rank d: Π(Φ(δ) − Φ(δ − Pδ) ≥ 2d + t | y) ≤ e^{−t/2}. With P the projection onto splines of knot spacing K·h supported in a window W (d ≈ |W|/(Kh)), this is the **local** analogue of the evidence comparison in Theorem H-sharp, with cost 2d + t in place of the global denominator bound e^{−Ck′}. That is what target (i) of §5.3 (local Huber energy ≤ C(|W|/n)k′) needs. What is missing to conclude is the pathwise lower bound Φ(δ) − Φ(δ − Pδ) ≥ c·ω·f‖Pδ‖₂² − (score and roughness terms) on the window. It needs a two-sided form of Lemma CA for the difference ℛ(δ) − ℛ(δ − Pδ) and the quadratic regime on W. Not done.
+
+### 9.4 The sparse-shift comparison — inequality PROVED, assembly SKETCH
+
+**Pointwise inequality — PROVED.** For θ ∈ [½, 1), x ≥ θL and c_θ := ∫₀^∞e^{−a((1−θ)L·z + z²/2)}dz = a^{−1/2}·𝗆((1 − θ)L√a), 𝗆 the Mills ratio:
+
+  **e^{−a·h_L(x)} ≤ c_θ^{−1}·∫₀^∞e^{−(a/2)(x − z)² − aL·z}dz.**
+
+(For x > L put z = x − L + s: the exponent is a·h_L(x) + a·s²/2, and ∫_{s ≥ −(x−L)}e^{−as²/2}ds ≥ (π/(2a))^{1/2} ≥ c_θ. For θL ≤ x ≤ L: (x − z)²/2 + Lz = x²/2 + z(L − x) + z²/2 ≤ x²/2 + (1 − θ)L·z + z²/2.) Symmetrically for x ≤ −θL with z ≤ 0.
+
+**Consequence — PROVED.** Outside the clusters |δᵢ| ≤ L, so h_L(δᵢ) = δᵢ²/2 there. For δ with cluster set S(δ) (level θ) and cluster signs: e^{−a𝐡(δ)} ≤ c_θ^{−|S|}∫e^{−(a/2)‖δ − z‖₂² − aL‖z‖₁}dz_S, the integral over z supported on S with the cluster signs. Summing over the admissible sets (≤ (2en)^{2R} of them, §9.2(b)) removes the dependence of S on δ.
+
+**Shifted Gaussian integral — PROVED algebra.** The prior is centred at the truth as in §3 (cost e^{ℓ‖Dθ\*‖₁} = e^{o(k)}), so the comparison measure has no offset. For fixed variances V, with C_V = a^{−1}(I − DᵀH_V^{−1}D) (0 ⪯ C_V ⪯ a^{−1}I) the comparison covariance of §5.3 and m_V := ω·C_Vψ its mean:
+
+  ∫e^{ω⟨ψ,δ⟩ − (a/2)‖δ − z‖²}dN_V(δ) = [the same at z = 0]·exp{a⟨z, m_V⟩ + (a²/2)zᵀC_Vz − (a/2)‖z‖²} ≤ [the same at z = 0]·e^{a‖z‖₁·‖m_V‖∞}.
+
+So if ‖m_V‖∞ ≤ m̄ < L, the z-integral over each cluster coordinate is ≤ 1/(a(L − m̄)), and each cluster coordinate costs the factor
+
+  **C_x := [c_θ·a·(L − m̄)]^{−1} = [√a·(L − m̄)·𝗆((1 − θ)L√a)]^{−1}.**
+
+As θ → 1 and m̄ → 0 this is (2/(π·a·L²))^{1/2}. **C_x ≤ 1 iff (ML): a·L² > 2/π ≈ 0.64** (with θₙ = 1 − 1/log n the cluster count of §9.2(b) is still o(k/log n)).
+
+**What this would give — SKETCH.** On the body, by §9.1 and the two displays:
+
+  Z̃ restricted to the body ≤ e^{4ωηk + o(k)}·(2en)^{2R}·max(1, C_x)^{N}·[the Gaussian comparison integral of §3],
+
+N the largest number of cluster coordinates on the good set. Hence:
+- **Under (ML): no hypothesis.** Theorem LO-low would hold on [C·n^{26/17}polylog, n^{9/5}] for every ω with β < 6 and ω(1 − η)f·L² > 2/π, for any admissible pair (L, f) of (A2). T1 and (XE) are not used.
+- **Without (ML):** the hypothesis is **(XN): Π_{ω,ℓ}(#{cluster coordinates at level θ} > ηk/log C_x | y) ≤ ¼**. It is implied by an **average pointwise** bound, (1/n)·ΣᵢΠ(|δᵢ| > θL | y) ≤ η·ℓ^{−1/3}/(8 log C_x) (Markov). On the body the count is ≤ 4Mk′/L² = 86M(log m)^{1/6}·k/L² (§9.2(a)): the same factor M(log n)^{1/6}/η as in §9.2(e), but now for a **count**, with no sup-norm and no height.
+
+**Unverified steps of the assembly.**
+1. ‖m_V‖∞ ≤ m̄ → 0 on every variance class of §3.5. On each class H_V ⪯ (fixed envelope), so (C_V)ᵢᵢ and ψᵀC_Vψ are bounded by fixed quantities and |m_{V,i}| ≤ ω((C_V)ᵢᵢ·ψᵀC_Vψ)^{1/2}. On the typical class this is ≲ (ω/a)·k/√n → 0 for ℓ ≫ n^{3/2}. On the max-variance classes (2^i > c₀ ≍ κ^{6/5}) the same bound is ≲ κ·2^{i/6}/√n, which is not small below ℓ ≈ n^{7/4}; there the z-integrals must be truncated (‖z‖₁ ≤ C·k′ on the body) and the cost e^{C·k′·κ·2^{i/6}/√n} set against the class probability e^{−2^{i−1}}. The exponents compare correctly when k′ ≪ √n (true on the window). On those classes the truncated z-integral is bounded by its volume, at most e^{C·k′·log n}, which the class probability e^{−κ^{6/5}/2} also absorbs. The classes of rows 2–3 of §3.5 have probability only e^{−C·κ}, so there the mean bound itself is needed, with the envelope constants 2^{i/6}. Not written.
+2. The pointwise variance — SKETCH, constant not computed. (C_V)ᵢᵢ is the posterior variance of δᵢ in the Gaussian model with noise variance 1/a and prior variances V on Dδ, so it is at most the Bayes risk of any linear estimator that is exact on quadratics. The local quadratic fit on a window of length w′ gives (C_V)ᵢᵢ ≤ 9/(a·w′) + C·w′⁴·Σ_{j∈window}Vⱼ (Lemma Lev for the noise part; Newton's formula for the bias, with coefficients ≤ C·w′²). On the local-sum events of §3.2, Σ_{window}Vⱼ ≤ c₊·w′·v₁, and w′ ≍ h gives (C_V)ᵢᵢ ≲ k/(a·n). This must be done directly, as here: the operator envelope of Lemma 2b″ would add a term of order ε/a to the diagonal, which is too large.
+3. That shifting the score leaves the determinant factors of §3 unchanged is exact; that the gain bounds of §3.4 are used only through ψᵀC_Vψ was checked from the statement, not line by line.
+
+**Hand example, unchecked (Gaussian noise, τ = ½, unit scale).** L = 1: f = 0.341, (ML) reads ω > 1.9, and β < 6 reads ω < 8.2. L = 3: 0.43 < ω < 4.0. L = 0.45: 8.2 < ω < 9.3. So admissible pairs (L, f) cover ω up to about 9.3, against the min-density threshold 9.6. Small ω is covered by large L.
+
+### 9.5 The precise stopping point
+
+1. **(XS) ⇐ (XE)** (§9.1, PROVED): only the energy of the excess above L is at stake.
+2. **B1 + T1 + translation + H-sharp do not give (XE)** (§9.2, PROVED arithmetic): they bound the widths and the number of excursions, not their heights, and the count is off by M(log n)^{1/6}/η. The gap is the band of widths [c(ℓL)^{1/3}, C_T·h], where the prior and the likelihood terms have the same order and both are linear in the height.
+3. **The first open step is step 1 of the assembly in §9.4**: the sup-norm of the comparison mean m_V on the atypical variance classes, with truncated shifts. If it holds, L4b on [n^{26/17}, n^{9/5}] is unconditional for a·L² > 2/π and conditional on the count (XN) otherwise.
+4. **For (XN) without (ML), or for (XE)**, a localization at the bandwidth scale is needed. I state it as a hypothesis and do not attempt it (Fable B's parallel piece):
+
+   **(FG) forgetting in probability.** For all but a fraction η·ℓ^{−1/3}·(log n)^{−C} of the coordinates i, the posterior mean and standard deviation of δᵢ satisfy |[δᵢ]| ≤ L/4 and sd(δᵢ) ≤ L/(8 log n).
+
+   **(FG) ⇒ (XN) — PROVED** (log-concave marginals, §5.1: Π(|δᵢ| > θL | y) ≤ e²·n^{−2} on those coordinates; Markov on the rest). The second-moment bound in expectation that H-sharp suggests gives (FG) with (log n)^{+C} in place of (log n)^{−C}. Lemma D (Corollary D2) is the tool I would use for the local energy half; Fable B's B3–B5 for the level.
+
+### 9.6 Flags
+
+- Lemma D and Corollaries D1–D2 are new and short. Check: the determinant of T_λ, and that the conditional variant needs only log-concavity of the conditional density.
+- §9.1 uses Theorem H-sharp in its audited (narrowed) range.
+- §9.4 is the item to audit first. The pointwise inequality and the Gaussian algebra are elementary; the assembly is a sketch and the (ML) threshold 2/π depends on m̄ → 0.
+- The hand example in §9.4 and all constants in §9.2(e) are by hand, once.
+- **UNTESTED.** No numerics. Cheap checks from fixed-λ draws: the cluster count R and the number of cluster coordinates N against k (for (XN)); the Gamma(d, 1) domination of Corollary D1 on a few blocks (an exact sampler check); the largest posterior mean |[δᵢ]| and sd for (FG). Pilot cost: one fixed-λ chain per ℓ on the existing κ̂ runs.

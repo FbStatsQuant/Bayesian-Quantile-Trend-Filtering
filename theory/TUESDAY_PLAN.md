@@ -57,13 +57,15 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 - **Why design-specific.** No class-wide theorem exists for an unfloored adaptive Gamma prior. This is the soft-floor impossibility, with two independent notes (Astra; Fable B).
 - **Extreme τ is out of scope.** At τ = 0.01/0.99 the design condition fails for every paper design (β ≈ 13–14 against ≈ 6). At those levels the paper keeps V0T\* and Theorem J.
 
-**Data gate (Felipe's rule).** The A-rule has passed the exact-Gibbs screen: median MSE ratio 0.95 / 0.90 / 0.53 at n = 500 / 1000 / 2000, max 1.13. It still needs the P-MALA paired test and a joint non-crossing version before the paper can use it. That is Engineering's work, not Theory's; it is listed in §5.
+**Route B is CLOSED** (HQ, 2026-11-23): Felipe's P-MALA stays the method.
+
+**Data gate (Felipe's rule), posterior-level (exact sampler) only; with his sampler it is UNTESTED.** The A-rule has passed the exact-Gibbs screen, with both arms exact Gibbs: median MSE ratio 0.95 / 0.90 / 0.53 at n = 500 / 1000 / 2000, max 1.13. It still needs the P-MALA paired test and a joint non-crossing version before the paper can use it. That is Engineering's work, not Theory's; it is listed in §5.
 
 ## 1. What is already proved and audited (fallbacks)
 
 | Fallback | Method it covers | Rate | Status |
 |---|---|---|---|
-| **F1: V0T\*** | his method + λ floor 1.6e-5·n^{5/2} | n^{−5/6}(log n)^{1/6}, exact at the oracle with LB | PROVED, cross-family audited; data gate running |
+| **F1: V0T\*** | his method + λ floor 1.6e-5·n^{5/2} | n^{−5/6}(log n)^{1/6}, exact at the oracle with LB | PROVED, cross-family audited; individual data gate met, joint τ = 0.99 unresolved |
 | **F2: C\*** | σ learned, λ deterministic at the oracle | n^{−5/6}(log n)^{1/6} | PROVED, cross-family audited |
 | **F3: conditional A-rule** | A-rule, no floor | n^{−5/6}(log n)^{1/3} | assembly PROVED under the evidence margin (E); (E) stated as an assumption with numerical support (β table, Engineering λ-drift check) |
 | Joint | V0T\* and C\* under non-crossing, fixed levels | n^{−5/6} | Theorem J, PROVED, cross-family audited |
