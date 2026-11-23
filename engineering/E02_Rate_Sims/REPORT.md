@@ -1,6 +1,6 @@
-# E-02 Contraction-rate simulations: report
+# E-02 Contraction-rate simulations: final report
 
-*Engineering, 2026-11-22. Spec: HQ default grid plus Theory T-03 (statement v2). Sampler: exact banded Gibbs, certified fit by E-04 (`../E04_Sampler_Check/REPORT.md`). Compute: NOTS Slurm, about 104 core-hours so far (ceiling 200). Raw outputs: `/projects/ml75/fb31/BQTF/runs/E02-rates-20261122` (they go to the PC via E-01 when sealed). Tables are in `tables/` and figures in `figs/`.*
+*Engineering, 2026-11-22. Spec: HQ default grid plus Theory T-03 (statement v2). Sampler: exact banded Gibbs, certified fit by E-04 (`../E04_Sampler_Check/REPORT.md`). Compute: NOTS Slurm, 92 core-hours in total by sacct, including lamxl (approved ≈ 130, ceiling 200). Raw outputs: `/projects/ml75/fb31/BQTF/runs/E02-rates-20261122` (they go to the PC via E-01 when sealed). Tables are in `tables/` and figures in `figs/`.*
 
 ## Setup
 - **Posterior.** ALD working likelihood at fixed σ = σ₀ = E ρ_τ(ε − q_τ) (the KL projection), with a Laplace prior on D⁽³⁾θ, flat on quadratics. λ is fixed (frozen arms) or ~Gamma(1, b₀) (learned arms).
@@ -75,7 +75,14 @@ All cells in the many-mode regime (n·λ^(−1/3) ≥ 10):
 **Mixing.**
 - ESS(log λ) falls to about 25 per 10k at n = 2k and about 8 at n = 8k (sin).
 - Repeating the conjugate + interweaving λ moves (1, 5 or 20 per sweep) does **not** help (ESS ≈ 25 in every case): the λ–θ coupling dominates.
-- The remedy is longer runs, about 8× at n = 2k and 25× at n = 8k: minutes to about an hour per chain on one core. The 10–25× chains for the deciding cells are running. θ summaries are unaffected (ESS(Δ²) 1100–1900).
+- The remedy is longer runs, about 8× at n = 2k and 25× at n = 8k: minutes to about an hour per chain on one core. θ summaries are unaffected (ESS(Δ²) 1100–1900).
+- **Extra-long chains (lamxl: b₀ = n^(−5/2), sin and PQ, 100k kept at n = 2k and 250k at n = 8k, 10 seeds) confirm the 30k results.**
+  - ESS(log λ) rises to 175–814.
+  - The median half-chain drift halves, to 0.016–0.033.
+  - λ̄(lamxl)/λ̄(30k) is 0.97–1.02 per cell, with every seed within 0.89–1.11.
+  - The λ̄ slopes are unchanged: sin 2.541 [2.513, 2.566], PQ 2.138 [2.020, 2.273], against 2.531 and 2.139 before.
+  - The PQ/sin ratio is 9.96 → 4.75 → 3.25.
+  - (`tables/lamxl_T3extra_analysis.txt`.)
 
 ## 4. P-MALA vs Gibbs (learned λ and σ; paper's sampler, unmodified; sin, N(0, 0.5²), 30k sweeps, 5 reps)
 
@@ -87,7 +94,20 @@ All cells in the many-mode regime (n·λ^(−1/3) ≥ 10):
 - **At the paper's b₀ = 1 the samplers agree; the paper's numbers stand.** Gibbs is a large optional efficiency gain.
 - **At b₀ = n⁻², P-MALA in the paper's run length does not converge for n ≳ 2k.** λ stays near its start, because of the capped preconditioner and local moves (E-04 §4). A b₀ ∝ n⁻² recommendation needs the Gibbs sampler, or a P-MALA fix (raise the cap, start near the posterior λ, run far longer).
 
+## 5. τ = 0.9 and Cauchy arms (T3 raw grid, λ = n^a, sin and PQT, n = 1k–4k)
+The arms are N(0, 0.25²) at τ = 0.9 (20 seeds) and Cauchy(0, 0.1) at τ = ½ (10 seeds), with σ matched to the Gaussian κ = 16. They behave like the τ = ½ Gaussian arm:
+- **Spread law holds.** Rough-spread constant C = rough·κ^(5/6)·λ^(1/3) in the many-mode cells (n·λ^(−1/3) ≥ 10):
+  - 0.315–0.317 at τ = 0.9 and 0.356–0.358 for Cauchy;
+  - against 0.326–0.327 at τ = ½ (0.3 in §1).
+- **Same slopes where the regime holds.** In the cells that stay many-mode over the whole range (a ≤ 2), the rough-spread slopes in n are:
+  - τ = 0.9: −0.48 and −0.56/−0.57;
+  - Cauchy: −0.50/−0.51 and −0.60;
+  - against −a/3 = −0.50 and −0.67, and like the τ = ½ arm (−0.47 and −0.60).
+  - At a ≥ 15/7 these raw-grid cells leave the many-mode regime (n·λ^(−1/3) < 10) and saturate, as at τ = ½ (§1).
+- **Mixing is fine.** ESS(Δ²) ≥ 190 per 5000 in every cell, with λ‖Dθ‖₁/m ≤ 1.02 except sin at a ≥ 15/7 (bias-dominated, as at τ = ½).
+- **No new effect from the tail or the quantile level.** The sampler and the spread law carry over unchanged. E-06 tests the rates for these laws on the calibrated, many-mode grid.
+
 ## Caveats
 - **Clamps.** All runs used the production latent clamps; their effect is ≤ 2% (E-04 B2). New runs default to clamp-free draws.
 - **Seeds.** The same seed is used across n, so all slope CIs use a paired bootstrap.
-- **Not run (budget).** p1x and p2 (t₂, τ = 0.9, extra orders on the default grid) were cut for budget; only partial outputs exist. The Cauchy arm is in T3, but not yet summarised here.
+- **Not run (budget).** p1x and p2 (t₂, τ = 0.9, extra orders on the default grid) were cut for budget; only partial outputs exist. The Cauchy and τ = 0.9 arms of T3 are summarised in §5.
