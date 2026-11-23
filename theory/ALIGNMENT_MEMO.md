@@ -62,7 +62,7 @@
     - **MEASURED (Engineering, existing exact Gibbs):** the A-rule's λ ratio drops at the tails in the predicted direction, most at Beta 0.95 (β = 6.0). The dominant effect, though, is the signal: the λ ratio is ≈ 3–10 on S and ≈ 0.2–0.8 on VS.
     - **So the A-rule is a natural Tuesday target for τ ∈ [0.05, 0.95]**, and the extreme levels 0.01/0.99 are likely out of reach of this route.
   - **A-rule lower tail (Fable A, `FABLE_A_Arule_lowertail.md`, unaudited):**
-    - **PROVED:** a floor-free A-rule result at fixed σ in the (EM) range. The posterior mass of {λ < c₋n^{5/2}(log n)^{−1/2}} → 0, via a new reverse small-ball lemma.
+    - **PROVED:** an A-rule lower-tail result with no floor, but only at fixed σ in the (EM) range, NOT at the learned σ. The posterior mass of {λ < c₋n^{5/2}(log n)^{−1/2}} → 0, via a new reverse small-ball lemma.
     - **At the learned σ:** conditional on one explicit evidence inequality ("under-smoothed pairs cost code length").
     - **Proxy design condition:** β = τ(1−τ)/(f₀σ₀) < β_c ≈ 6 (CONJECTURE). It **predicts that the A-rule's λ drifts below its prior mean at Gaussian τ = 0.01/0.99 and Beta τ = 0.99**; a cheap data check has been requested from Engineering.
     - ~~Three lemmas would close the gap for 1 < β < 6 on C1's window (SKETCH).~~ Superseded by the next bullet. The earlier "β < 5.2" is withdrawn.
@@ -70,7 +70,9 @@
     - **Open:** uniformity in (σ, λ), a genuine gap with a repair route; the range of λ below n^{2.30}, which has no route; bounded λ, for which a numerical certificate is needed.
     - As proved it uses the worst-case density, so **Gaussian τ = 0.05/0.95 and Beta 0.95 are not covered yet**. The averaged-β version is a Tuesday piece.
   - **Theorem U / U-σ: uniformity, closing the gap the LO audit found** (Fable A, `T06_Alignment/FABLE_A_uniformity.md`; **PROVED and cross-family audited**, Astra: ACCEPT WITH FIXES, f5f05de).
-    - **Result:** under the joint posterior with σ learned, **the A-rule puts vanishing mass on λ ∈ [C·n^{2.30}polylog, c₋n^{5/2}(log n)^{−1/2}]**, with no floor, for worst-case β < 6.
+    - **Result: the A-rule posterior excludes the middle band of λ.** Under the joint posterior with σ learned, it puts vanishing mass on λ ∈ [C·n^{2.30}polylog, c₋n^{5/2}(log n)^{−1/2}], for worst-case β < 6.
+    - **This is NOT yet a floor-free theorem.** That needs gap 4 (λ below n^{2.30}) and hence (LT) of Theorem H's Corollary P.
+    - The nine audit fixes are applied by reference tonight; the paper version (Tuesday rewrite) will contain them in full.
     - **Still open:** λ below n^{2.30}. Astra's attempt today proved obstructions (`astra_gap4_sign.md`); Fable is working on it.
   - **Averaged β** (Fable B, `T06_Alignment/FABLE_B_averaged_beta.md`). The condition is β̄ = ωt·Σfᵢ^{−5/6}/Σfᵢ^{1/6} < 6, and the key inequality is PROVED, unaudited. LO with β̄ is SKETCH.
     - **Values:** Gaussian 0.05/0.95: 4.43; Beta 0.95: 5.12; Mixed 0.05/0.95: 4.46. So if the sketch closes, **the whole paper grid τ ∈ [0.05, 0.95] is covered**.

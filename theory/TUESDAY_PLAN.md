@@ -15,6 +15,28 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 
 **Compute.** Nothing new this evening. The only compute in the plan is H5's interval certificate, on Tuesday, sized by Engineering first.
 
+## The remaining floor-free chain (HQ steer)
+
+**Target.** Corollary P's lower-tail input (LT): Π(λ < Λ₋ | y) → 0 at Λ₋ = c₋n^{5/2}(log n)^{−1/2}, with σ learned and no floor. The λ-range below Λ₋ splits into pieces, following `FABLE_A_Arule_lowertail.md` §2:
+
+| Link | λ-range / step | Status | Prover | Auditor | Fallback |
+|---|---|---|---|---|---|
+| L1 | (I) tiny λ < 2t/(eσ₀) | PROVED, class-wide (lowertail §2) | — | Astra (with H1: RSB/LT-EM audit) | — |
+| L2 | (II) bounded λ ∈ [ℓ₁, ℓ₀]: the design condition (DC) = G5 | OPEN; numerical certificate planned | Fable | Astra | (DC) as a named assumption, with an interval-arithmetic certificate |
+| L3 | (III-a/b) interpolating fits; extreme scales | PROVED, class-wide (lowertail §2; Lemma S) | — | Astra (H1) | — |
+| L4 | **(III-c) λ ∈ [ℓ₀, C·n^{2.30}]: gap 4** | OPEN; Astra's obstructions (b88fb9b); CT Fable A attempt today | Fable | Astra | the sign of κ on this range as a named assumption, with κ̂ data |
+| L5 | (III-c) λ ∈ [C·n^{2.30}, Λ₋] | **DONE: Theorem U-σ, audited** (f5f05de) | — | — | — |
+| L6 | L1–L5 ⇒ (LT) at Λ₋ = c₋n^{5/2}(log n)^{−1/2} | assembly (lowertail §5, PROVED given its inputs) | Fable | Astra | — |
+| L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | H6 is SKETCH (lowertail §5) | Astra | Fable | the rate keeps an extra log |
+| L8 | Rate n^{−5/6}(log n)^{1/3}, with LB matching up to logs | follows from L7 + Theorem LB | — | — | — |
+
+**Coverage upgrade (gap 2, in parallel).** Every link that uses β (L4, L5) is currently min-density. The averaged β̄ (H3) upgrades coverage to the whole grid τ ∈ [0.05, 0.95].
+
+**Paper hygiene (Tuesday).**
+- Clean rewrites with every audit fix written in full: LO (11 findings), U (9), LB (done).
+- The §3 node estimate of U re-read against the fixed LO text.
+- Prover: Fable A. Auditor: Astra re-reads the diff.
+
 ## 0. Aim
 
 **Headline target: a floor-free theorem for the data-favoured A-rule.** The A-rule is Felipe's method with one hyperparameter changed: λ ~ Gamma(1, b_n), b_n = 1/(5500·(n/500)^{5/2}). It stays in the Gamma family, is a function of n only, and has no truncation. σ ~ IG(0.1, 0.1) is learned and θ is drawn by P-MALA.
