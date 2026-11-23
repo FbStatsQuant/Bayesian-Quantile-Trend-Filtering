@@ -8,7 +8,8 @@
 E07 <- Sys.getenv("E07_DIR"); E02 <- Sys.getenv("E02_DIR"); OUT <- file.path(Sys.getenv("E07_OUT"), "v0t"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
 PH <- Sys.getenv("V_PHASE", "ind"); KM <- 1.6e-5
 ld <- function(f, joint = FALSE) { pl <- readLines(file.path(E07, f)); pl <- pl[seq_len(grep("^# ---- Main", pl)[1] - 1L)]; E <- new.env(parent = globalenv())
-  local({ commandArgs <- function(trailingOnly = FALSE) if (trailingOnly) character(0) else c("R", paste0("--file=", file.path(E02, if (joint) "Joint_Sampler_PMALA_Augmented.R" else "Individual_Sampler_PMALA_Augmented.R"))) }, envir = E)
+  fname <- file.path(E02, if (joint) "Joint_Sampler_PMALA_Augmented.R" else "Individual_Sampler_PMALA_Augmented.R")
+  E$commandArgs <- function(trailingOnly = FALSE) if (trailingOnly) character(0) else c("R", paste0("--file=", fname))   # closure sees fname
   eval(parse(text = pl), envir = E); E }
 paper_cfg <- function(bl) if (bl == "VS") list(b0 = 1e-3, asis = TRUE, it = 30000L, burn = 10000L) else list(b0 = 5e-4, asis = FALSE, it = 20000L, burn = 5000L)
 sig0n <- function(noise, tau, n) { u <- seq_len(n) / n                       # n^-1 sum_i E rho_tau(eps_i - q_i), exact per design point
@@ -51,7 +52,7 @@ if (PH == "ind") {
   }, mc.cores = as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "2")), mc.preschedule = FALSE)
   cat(sprintf("[%s] done: %d ok, %d failed\n", format(Sys.time()), sum(unlist(res) == "ok"), sum(unlist(res) != "ok")))
 } else {
-  J <- ld("Joint_Sampler_PMALA_Augmented_V0T.R", joint = TRUE); J$load_box_cpp(E02, E02)
+  J <- ld("Joint_Sampler_PMALA_Augmented_V0T.R", joint = TRUE); J$load_box_cpp(Sys.getenv("E07_JOINTCPP", file.path(E07, "ejoint")), E02)   # separate dirs (box .cpp includes the individual one)
   taus <- c(0.90, 0.93, 0.96, 0.97, 0.98, 0.99); n <- 2000L; JS <- as.integer(Sys.getenv("J_SWEEPS", "30000"))
   tasks <- expand.grid(arm = c("C", "V0T"), noise = strsplit(Sys.getenv("J_NOISES", "Normal,Beta,Mixed"), ",")[[1]], stringsAsFactors = FALSE)
   tasks$file <- file.path(OUT, sprintf("joint_%s_n%05d_VS_%s_s1.rds", tasks$arm, n, tasks$noise)); tasks <- tasks[!file.exists(tasks$file), ]
