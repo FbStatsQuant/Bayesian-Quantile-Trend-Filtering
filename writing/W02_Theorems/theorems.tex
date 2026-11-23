@@ -282,7 +282,7 @@ C1, C2 and V0T/V2T with the floor $\Lambda_-=\kappa_-n^{k+1/2}$ carry over for $
 
 \plainly{The A-rule changes one hyperparameter of Felipe's method and adds no floor. Its rate $b_n$ shrinks with $n$ so that the prior keeps pace with the oracle $\lambda$. Eight links lead from the proved pieces to the target. Five are proved, the assembly is proved, and three are open (L2, L4a, L4b). \textbf{It is not a theorem until the open links close.}}
 
-\begin{named}{Target (A-rule, floor-free)}
+\begin{named}{Target (A-rule, no floor) --- not a theorem}
 Model: Felipe's method with $\lambda\sim\Ga(1,b_n)$, $b_n=1/(5500\,(n/500)^{5/2})$, $\sigma\sim\IG(0.1,0.1)$ learned, no truncation. At $\tau\in[0.05,0.95]$, for the paper's three noise designs, $\theta$ contracts at $n^{-5/6}$ up to logs (via L7: $n^{-5/6}(\log n)^{1/3}$), with $\sigma$ and $\lambda$ both learned.
 \end{named}
 
@@ -364,7 +364,7 @@ Under (REG) ($f_i=f(i/n)$, a deterministic secant profile valid on all frozen pa
 \label{tab:beta}
 \begin{tabular}{@{}lcccc@{}}
 \toprule
-Design & $\tau$ & worst case & $\bar\beta$ & $\bar\beta<6$? \\
+Design & $\tau$ & worst case & $\bar\beta$ & $\bar\beta<6$ met? \\
 \midrule
 Gaussian & 0.05, 0.95 & 6.70 & 4.43 & yes \\
  & 0.25, 0.75 & 2.79 & 1.84 & yes \\
@@ -417,7 +417,7 @@ Assumption & What it says & Empirical / design check \\
 \midrule
 (A1)--(A3), (UI), (S0) & independence; two-sided margin; roughness budget $V$; check loss UI; $\szero\ge d$ & hold for all three designs, both truths, every fixed level (W-01 note) \\[2pt]
 (REG) & a smooth secant-density profile in $u$, bounded away from 0 and $\infty$ & holds for the three designs (Theory's check) \\[2pt]
-$\bar\beta<6$ & averaged evidence condition at the learned scale & computed: $\le5.12$ on $\tau\in[0.05,0.95]$; fails at $0.97$ and $0.99$ (Table~\ref{tab:beta}). \ME: the $\hat\kappa$ pilot (one seed, Gaussian) had the predicted sign at $0.05$--$0.5$ and lost it at $0.97$ \\[2pt]
+$\bar\beta<6$ & averaged evidence condition at the learned scale & computed: $\le5.12$ on $\tau\in[0.05,0.95]$; exceeds $6$ at $0.97$ and $0.99$, where the sufficient condition is not met; no failure is proved there (Table~\ref{tab:beta}). \ME: the $\hat\kappa$ pilot (one seed, Gaussian) had the predicted sign at $0.05$--$0.5$ and lost it at $0.97$ \\[2pt]
 (DC) (L2) & no partial interpolation at bounded $\lambda$ & no data yet. Gaussian design: proved by analysis (new, not audited). Beta, mixed: Tier-3 surface map planned (Tuesday at the earliest) \\[2pt]
 (L4a) & $\supP\Pi(\ell_0\le\lambda\le n^{3/2}(\log n)^c\mid y)\to0$ & \ME{} (A-rule screen, posterior medians only): at $\tau=0.5$, $\lambda/\lambda^*$ is stable from $n=500$ to $2000$ (S: $0.85\to1.05$; VS: $3.2\to2.8$). Zero mass below $n^{3/2}$ is \emph{not} shown, and cannot be with medians. Watch item: S at $\tau=0.95$ (Normal $0.59\to0.08$ at $n=1000$, one seed). Draws check proposed for Tuesday \\[2pt]
 L4b: (PM2) & pointwise posterior bound $\max_i[\delta_i^2]\le s^2/(3\log n)^2$ on $[n^{108/61},n^{54/25}]$; nothing yet below $n^{108/61}$ & none yet; measurable from fixed-$\lambda$ chains (\texttt{FABLE\_A\_L4b.md}). Fallback: named assumption \\
@@ -440,8 +440,8 @@ L4b: (PM2) & pointwise posterior bound $\max_i[\delta_i^2]\le s^2/(3\log n)^2$ o
 
 \begin{itemize}
 \item \textbf{Felipe's exact method (no floor, constant $b_0$).} There is no contraction theorem at any rate. Class-wide, none can exist (the obstruction). Under constant $b_0$ the learned $\lambda$ grows like $n^{3/4}$ (\ME, memo), outside every window. A design-specific theorem for it is \OP.
-\item \textbf{Class-wide floor-free results.} Impossible for unfloored Gamma priors, constant or scaled (the obstruction). Soft floors through Gamma shape parameters either pin $\lambda$ at its prior mean or fail class-wide (Astra; Fable B; not audited).
-\item \textbf{$\tau=0.01$ and $0.99$ under the A-rule.} $\bar\beta\approx13$--$14$ against $6$ for all three designs, so this route is expected not to cover them. V0T$^*$ and Theorem J are not subject to this limitation.
+\item \textbf{Any result without a floor, class-wide.} Impossible for unfloored Gamma priors, constant or scaled (the obstruction). Soft floors through Gamma shape parameters either pin $\lambda$ at its prior mean or fail class-wide (Astra; Fable B; not audited).
+\item \textbf{$\tau=0.01$ and $0.99$ under the A-rule.} $\bar\beta\approx13$--$14$ against $6$ for all three designs, so the sufficient condition of this route is not met there; nothing is claimed at these levels for the A-rule. The $\bar\beta$ condition does not enter V0T$^*$ or Theorem J.
 \item \textbf{The joint version of the A-rule.} Theorem J is proved for V0T$^*$ and C$^*$ only.
 \item \textbf{The joint fit at the paper's $n$.} Theorem J works by showing that the constraint becomes inactive. Where the constraint is active (realistic $n$, nearby levels), nothing is proved.
 \item \textbf{Coverage of credible bands; Bernstein--von Mises.} Not claimed anywhere. $\sbar$ matters for calibration, not for the rate (memo, item (a)).
