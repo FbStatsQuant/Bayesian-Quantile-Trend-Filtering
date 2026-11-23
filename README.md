@@ -26,6 +26,10 @@ In simulations with varying-smoothness and smooth signals under Gaussian, Beta, 
 | `literature/` | Reading list with DOI/arXiv links. PDFs are local only (git-ignored), except our own `Large Prior.pdf`. |
 | `archive/` | Superseded material kept for the record (small files only) and `archived_campaigns.md`, the index of the NOTS campaigns archived to the PC. |
 
+**Committing (all departments share one working tree and git index):**
+- Commit with explicit paths, staging and committing in ONE command: `git add <your paths> && git commit -m "..."`.
+- Never use `git commit -a`, `git add -A` or `git add .`, and never commit an index you did not stage yourself in that same command. A commit picks up whatever any department has staged.
+
 ## Quick start
 
 Requirements: R >= 4.4 with `Rcpp`, `RcppArmadillo`, `glmgen`, `Matrix`; a C++17 compiler. The joint tests also need `clarabel`. Building the paper needs TeX Live with `algorithmicx` (algpseudocode), `bbm` and `bbold`.

@@ -42,6 +42,9 @@ Run everything from a copy of the kit outside the repo (the script refuses other
 6. **Close the window:** tell Theory and HQ ("window closed; Theory works in `theory/` now; here is the `sed` for `Papers/` -> `literature/`").
 
 ## D. History rewrite (D1) and push
+- **Blob-level drop (added 2026-11-23, HQ):** `strip_blobs.txt` lists the 12 superseded 300-dpi gate-result PNGs from commit **f297aef** (`engineering/E07_Tuning_Free/joint_gibbs/gate_results/*.png`, ≈ 5.9 MB in total).
+  - The same paths now hold 150-dpi versions, so they are dropped by blob id (`--strip-blobs-with-ids`, wired into `05_history_rewrite.sh`), not by path.
+  - None of the 12 ids is in the current tree (checked).
 
 Done right after step C5 while the freeze still holds, so that only one push happens.
 

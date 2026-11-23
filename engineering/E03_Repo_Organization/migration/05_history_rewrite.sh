@@ -56,10 +56,14 @@ PATHS_EOF
 # 2. fresh mirror clone (filter-repo wants a fresh clone; --no-local avoids hardlinks to the original)
 run git clone --mirror --no-local "$REPO" "$WORK/mirror.git"
 # 3. rewrite
+#    plus blob-level removals (strip_blobs.txt next to this script): superseded heavy blobs whose PATHS must survive, e.g. the 300-dpi
+#    gate-result PNGs of f297aef (re-rendered at 150 dpi at the same paths, HQ 2026-11-23).  One blob id per line.
+STRIP="$(cd "$(dirname "$0")" && pwd)/strip_blobs.txt"; STRIP_OPT=()
+[ -s "$STRIP" ] && STRIP_OPT=(--strip-blobs-with-ids "$STRIP")
 if [ "$DRY_RUN" = "1" ]; then
-  echo "DRY: (cd $WORK/mirror.git && git filter-repo --invert-paths --paths-from-file $WORK.paths.txt)"
+  echo "DRY: (cd $WORK/mirror.git && git filter-repo --invert-paths --paths-from-file $WORK.paths.txt ${STRIP_OPT[*]})"
 else
-  ( cd "$WORK/mirror.git" && git filter-repo --invert-paths --paths-from-file "$WORK.paths.txt" )
+  ( cd "$WORK/mirror.git" && git filter-repo --invert-paths --paths-from-file "$WORK.paths.txt" "${STRIP_OPT[@]}" )
   ( cd "$WORK/mirror.git" && git reflog expire --expire=now --all && git gc --prune=now --aggressive -q )
 fi
 # 4. checks on the rewritten mirror
