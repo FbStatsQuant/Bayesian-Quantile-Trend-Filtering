@@ -37,15 +37,17 @@
   - A lower bound in one case (quadratic truth) is the best single addition.
   - The oracle λ depends on V.
 
+- **Reading note for the body (§0–§8).** These sections are the dated T-03 record. Where they write σ ≥ σ̄ (non-strict), read ω ≤ (1−η)ω̄ (v3.1). Where they call a lemma "drafted", "to be written" or "pending", the current status is in FINAL SUMMARY item 4 and in `../T05_Proofs/SKELETON.md`.
+
 ## FINAL SUMMARY (read this first; it supersedes §0–§7 where they differ)
 
-**1. The theorem.** `STATEMENT_DRAFT.md` v3 is the final statement. Under (A1)–(A4), at fixed σ and λ:
+**1. The theorem.** `STATEMENT_DRAFT.md` v3 was the final T-03 statement; it is now **superseded by v3.1** (addendum above). Under (A1)–(A4), at fixed σ and λ:
 
   ε²(λ) = (log n)^c κ^{−5/6}[λ^{−1/3} + min{κ^{−1/6}λVn^{−3}, V²λ^{5/3}n^{−5}}].
 
 - **Primary rate:** n^{−5/6}, the linear-smoother rate, at λ ≍ n^{5/2}/V.
 - **Fallback rate:** n^{−3/4} at λ ≍ (n³/V)^{3/4}.
-- **Two versions:** Theorem A requires σ ≥ σ̄ = τ(1−τ)/f and is the milestone. Theorem A⁺ holds for every σ and is the one that covers the paper's practice.
+- **Two versions:** Theorem A requires **strict slack**, ω ≤ (1−η)ω̄ with ω̄ = f/(τ(1−τ)) (v3.1; the v3 equality case σ ≥ σ̄ is false), and is the milestone. Theorem A⁺ holds for every σ and is the one that covers the paper's practice. The light-tail **Theorem B** is now proved (addendum).
 - **Not claimed:** credible-set coverage, BvM, fast rates, or a lower bound (the lower bound appears as a conjecture).
 
 **2. Numerical evidence** (company sampler, E-04 passed; §8.1a′–§8.1e):
@@ -63,15 +65,14 @@
 - the sharp σ̄ and the gap ratios R = σ̄/σ₀: π/2 for Gaussian noise at τ = ½, up to 4.5 at τ = 0.95;
 - the correction of Padilla–Chatterjee Lemma 19 (off by n^{r−1}).
 
-**4. The proof campaign has started (T-05).**
-- **Self-checked:** L2, L4, L5.
-- **Drafted:** L6 (evidence bound, any σ, moment-free); **L3** (small ball, up to (log n)^{6/5}); and **L4q** (quadratic shift, conditional only on λε ≳ n^{10/7}·polylog, which holds at the oracle).
-- **Open:** L8′ (bounded numerator; σ ≥ σ̄), L8-b (realized numerator; any σ), and L9/L10 (sup-norm tail; the crux).
+**4. The proof campaign (T-05); status as of the 2026-11-22 checkpoint.**
+- **Advisor-checked:** L2, L3 (small ball, (log m)^{1/5} only), L4, L4q, L4q-M, L5, L6, L8′ (bounded numerator, strict slack), L10-I (interpolation, i.e. L10 Stage 2).
+- **Theorem B (light tails): proof complete, advisor-checked** (`../T05_Proofs/B_light_tail.md`; audit package `../T05_Proofs/THEOREM_B_COMPLETE.md`).
+- **Open:** L10 Stage 1 (sup-norm localization; parked at the checkpoint, `../T05_Proofs/parked/L10_stage1_NOTES.md`), and L8-b (realized numerator; any σ).
 
 **5. Gate item (what Felipe's decision turns on).**
 - L4q needs Π_λ(h + B) ≥ e^{−Cλ²‖h‖²}Π_λ(B) for small-ball sets B.
-- It is plausible, and now drafted: symmetrization reduces it to the marginal density of uⱼ at 0 under Π_λ restricted to B, and neighbour-coordinate compensation bounds that density by ≈ 3λ.
-- An independent Fable check and an advisor check are pending.
+- It is now proved and advisor-checked (Astra: ACCEPT): symmetrization reduces it to the marginal density of uⱼ at 0 under Π_λ restricted to B, and neighbour-coordinate compensation bounds that density by c_K·λ ≤ 3.15λ.
 
 **6. Stage-B/C notes.**
 - The learned scale σ needs a first-moment condition.

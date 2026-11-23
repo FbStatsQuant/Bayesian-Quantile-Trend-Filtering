@@ -26,7 +26,7 @@ Then
 
   E₀ Πₙ(E₁ ∪ E₂ | y) ≤ E₀[ N(E₁)/N(ℝⁿ) ] + E₀ Πₙ(E₂ | y).
 
-## Step 1: denominator (L6, done in draft)
+## Step 1: denominator (L6; advisor-checked)
 
 With probability ≥ 1 − 1.44/(nε²), N(ℝⁿ) ≥ ν(G) e^{−ω(1.44C₁ + 1)nε²}. The prior mass satisfies
 

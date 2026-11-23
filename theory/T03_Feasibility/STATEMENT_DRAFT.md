@@ -147,7 +147,7 @@ The second statement follows from the first, because L10 is part of the proof: o
 | **L3 (small ball)** | For n ≥ 5 and x := n^{5/2}/(λε): φ(ε) ≤ 30·x^{2/5}(log m)^{1/5} + 6. **Loss of (log m)^{1/5} only.** [Advisor-checked: Fable, FABLE_L3_L8p.md.] | Proved via the Gaussian scale mixture of the Laplace law, Anderson's theorem, Horn's inequality for the singular values of C³, and a head/tail product bound. No Laplace small-deviation theory is needed. |
 | **L4 (ℓ₁ shift)** | Π_λ(x + C) ≥ e^{−λ‖x‖₁}Π_λ(C) for every measurable C. (Agapiou–Dashti–Helin's Prop. 2.11 is the centred-ball case at unit scale.) [Advisor-checked.] | Trivial. |
 | **L4q (quadratic shift, new)** | Let K(ρ) := 4δ_A·Φ(ρ/4)/ρ, with Φ(λr) := φ(r) and δ_A := maxⱼ‖a_{j+1} − aⱼ‖ ≤ n/√3. If δ_A ≤ λr/2, then for every h, Π_λ(h + B_r) ≥ Π_λ(B_r)·exp(−λΣⱼ min{\|hⱼ\|, c_K λhⱼ²}), with c_K = e^{K(λr)}/(1 − e^{−2}). **Condition (C):** K ≤ 1 (so c_K ≤ 3.15). It holds for λr ≥ 51·n^{10/7}(log m)^{1/7} (via L3), or for λr ≥ 8n² log(2n) (elementary). K is nonincreasing in λr. [L4q: advisor-checked, ACCEPT.] | **Decides n^{−5/6} versus n^{−3/4}.** Route: symmetrization (AM–GM); Jensen; a density bound at 0 for the log-concave conditional marginal, via neighbour compensation, L4 and Borell. |
-| **L4q-M (mollified truth)** | For 3 ≤ w ≤ m/2, the explicit signed local-quadratic kernel gives u_h with ‖u_h‖₂ ≤ CV/(n²√w), ‖u_h‖∞ ≤ CV/(n²w) and ‖S(u\* − u_h)‖ₙ² ≤ CV²(w/n)⁵. It is applied at half radius: Π_λ(u_h + B_{ε/2}) uses δ_A ≤ λε/4 and K′ := K(λε/2). This gives ε² ≥ C·c_{K′}^{5/6}·V²λ^{5/3}n^{−5}, with w ≍ n(ε/V)^{2/5}. [ACCEPT WITH FIXES (Astra); fixes being applied.] | Medium. The kernel must be signed: a nonnegative kernel gives V²(w/n)⁴. |
+| **L4q-M (mollified truth)** | For 3 ≤ w ≤ m/2, the explicit signed local-quadratic kernel gives u_h with ‖u_h‖₂ ≤ CV/(n²√w), ‖u_h‖∞ ≤ CV/(n²w) and ‖S(u\* − u_h)‖ₙ² ≤ CV²(w/n)⁵. It is applied at half radius: Π_λ(u_h + B_{ε/2}) uses δ_A ≤ λε/4 and K′ := K(λε/2). This gives ε² ≥ C·c_{K′}^{5/6}·V²λ^{5/3}n^{−5}, with w ≍ n(ε/V)^{2/5}. [Advisor-checked: Astra, ACCEPT WITH FIXES; fixes applied.] | Medium. The kernel must be signed: a nonnegative kernel gives V²(w/n)⁴. |
 | **L5 (quadratic part)** | The flat coordinates c are integrated with the same Lebesgue normalization in N(B) and in N(ℝⁿ). The posterior is proper and quadratically equivariant. [Advisor-checked.] | By construction. |
 | **L7 (sieve)** | For Ã = A_ε + R₂B₂ + R₁B₁ (ADH Prop. 2.15, p = 1): Π_λ((u\* + Ã)ᶜ) ≤ e^{λ‖u\*‖₁}·e^{−r/K}/Π_λ(A_ε). The fine-scale component A_ε is a **multiscale** small-ball set. | Medium. It may be unnecessary under the VP's two-stage L10 route. Astra notes that at the oracle the centring charge can be ≍ n^{1/2}, against an evidence budget of ≍ n^{1/6}. |
 
@@ -161,14 +161,17 @@ The second statement follows from the first, because L10 is part of the proof: o
 | **L8-b (realized numerator)** | Theorem A⁺ on the localized set: the Hölder–Knight route (preferred) or the v3 plan. | **High.** |
 | **L9-a (far region)** | Πₙ(Δ²ₙ > K \| y) → 0 **in P₀-probability**, by convexity of the empirical risk plus log-concavity of Πₙ. Moment-free; **no expected remote numerator.** | Medium. It may be subsumed by L10 Stage 1. |
 | **L9-c (sieve complement)** | Πₙ(outside the sieve \| y) → 0 in P₀-probability. | High as written. It may be avoided by the VP's two-stage L10 route. |
-| **L10 (sup-norm)** | Πₙ(‖θ − θ\*‖∞ > Δ \| y) → 0 in P₀-probability, for a fixed Δ ≤ Δ₀. **It needs independent localization:** interpolation on a shell that is already small in ‖·‖ₙ cannot establish entry into that shell (Astra). Candidate (VP): (1) TV⁽³⁾(δ) ≲ n³/λ in posterior probability; then P&C's uniform bound over TV balls, plus convexity along rays, gives Δ²ₙ ≲ λ^{−2/7}, moment-free, for any ω. (2) The interpolation ‖P_R δ‖∞ ≲ ‖δ‖ₙ^{4/5}·TV⁽³⁾(δ)^{1/5} then gives ‖δ‖∞ → 0 for λ ≥ n^{21/11+}. This fixes a₀. | **Highest risk; essential.** P&C's Lemma 19 is off by n^{r−1} as printed (verified). |
+| **L10 (sup-norm)** | Πₙ(‖θ − θ\*‖∞ > Δ \| y) → 0 in P₀-probability, for a fixed Δ ≤ Δ₀. **It needs independent localization:** interpolation on a shell that is already small in ‖·‖ₙ cannot establish entry into that shell (Astra). Candidate (VP): (1) TV⁽³⁾(δ) ≲ n³/λ in posterior probability; then P&C's uniform bound over TV balls, plus convexity along rays, gives Δ²ₙ ≲ λ^{−2/7}, moment-free, for any ω. (2) The interpolation ‖P_R δ‖∞ ≲ ‖δ‖ₙ^{4/5}·TV⁽³⁾(δ)^{1/5} then gives ‖δ‖∞ → 0 for λ/n^{21/11} → ∞. This fixes a₀. **Stage 2 = L10-I: advisor-checked** (`../T05_Proofs/L10I_interpolation.md`). **Stage 1: parked.** | **Highest risk; essential.** P&C's Lemma 19 is off by n^{r−1} as printed (verified). |
 
-## Main open doubts (ranked by proof risk; both final reviews agree on the order)
+## Main open doubts (ranked by proof risk; both final reviews agree on the order; status as of the 2026-11-22 checkpoint)
 
-1. **L10, with L9-a and L9-c.** This is the circularity above. The two-stage route is under construction (T-05).
+**Already closed:** Theorem B (light tails), proof complete and advisor-checked (`../T05_Proofs/THEOREM_B_COMPLETE.md`).
+
+
+1. **L10, with L9-a and L9-c.** This is the circularity above. Stage 2 (L10-I) is advisor-checked. Stage 1 is **parked at the checkpoint**, with a sketch route in `../T05_Proofs/parked/L10_stage1_NOTES.md`.
 2. **L8-b (A⁺ only).** If it fails, the theorem keeps strict slack: Gaussian σ₀ stays excluded, and learning σ is blocked.
 3. **L9-c and L7 as written.** These are avoidable via the route in item 1.
-4. **L4q-M fixes.** Low risk: L4q itself is accepted. If L4q-M failed, n^{−5/6} would become n^{−3/4}.
+4. **L4q, L4q-M:** advisor-checked (low risk). If L4q-M failed, n^{−5/6} would become n^{−3/4}.
    - *Numerical support:* E-02 Gaussian-twin ratio 1.00 ± 0.02; bias-equivalence 0.996–1.013; calibrated kinked bias² slopes matching 5a/3 − 5 and excluding ℓ₁ (MEMO §8.1a′, §8.1a″, §8.1e).
 5. **L3.** Low; a failure costs polylogs only.
 6. **L6.** Low; it is correct given its inputs.
