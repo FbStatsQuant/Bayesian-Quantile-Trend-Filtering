@@ -20,6 +20,8 @@
 #              reversible for N(mu, P^{-1}), acceptance 1
 #   "hybrid" : the paper's P-MALA move (curvature metric, ADMM prox, MH, step size adapted in warm-up only) as step 2
 #              (step 5 still draws theta exactly, as its validity requires)
+# S0 (2026-11-23): diagnostics from the posterior package (bulk/folded Rhat, bulk and tail ESS), NA = not converged, one fixed
+# stored-theta stride with iteration indices, dispersed theta starts, cap hits flagged.
 # Defaults (PROPOSAL items 3, 5): y standardised by s_y = 1.4826 MAD(D^3 y)/sqrt(20); lambda ~ Gamma(2, n^{-5/2}),
 # sigma ~ IG(0.1, 0.1) on the standardised scale; 4 chains from lambda0 = m x {1e-2, 1, 1e2, 1e4}, theta0 = y; blocks of 1000
 # sweeps, first half discarded; stop when rank-normalised split-Rhat <= 1.01 and bulk ESS >= 400 for every monitored scalar.
@@ -43,13 +45,12 @@ noise_scale <- function(y) { s <- 1.4826 * mad(D3(y), constant = 1) / sqrt(20)
   if (!is.finite(s) || s <= 0) s <- IQR(y) / 1.349
   if (!is.finite(s) || s <= 0) s <- diff(range(y)); if (!is.finite(s) || s <= 0) s <- 1; s }
 
-# rank-normalised split-Rhat and bulk ESS (Vehtari et al. 2021), for a draws x chains matrix
+# Multichain diagnostics (S0; Astra HQ review): posterior::rhat (max of rank-normalised bulk and folded split-Rhat), ess_bulk, ess_tail
+# (Vehtari et al. 2021) on an iterations x chains matrix.  An undefined value is returned as NA and counts as NOT converged.
 rhat_ess <- function(M) {
-  S <- length(M); zr <- qnorm((rank(M, ties.method = "average") - 3 / 8) / (S + 1 / 4)); Z <- matrix(zr, nrow(M))
-  h <- nrow(Z) %/% 2; Zs <- cbind(Z[1:h, , drop = FALSE], Z[(h + 1):(2 * h), , drop = FALSE])
-  W <- mean(apply(Zs, 2, var)); B <- h * var(colMeans(Zs)); rh <- sqrt(((h - 1) / h * W + B / h) / W)
-  ess <- sum(apply(Z, 2, function(x) as.numeric(coda::effectiveSize(x))))
-  c(rhat = if (is.finite(rh)) rh else 1, ess = ess)
+  r <- tryCatch(posterior::rhat(M), error = function(e) NA_real_); b <- tryCatch(posterior::ess_bulk(M), error = function(e) NA_real_)
+  t <- tryCatch(posterior::ess_tail(M), error = function(e) NA_real_)
+  c(rhat = if (is.finite(r)) r else NA_real_, ess = if (is.finite(b)) b else NA_real_, ess_tail = if (is.finite(t)) t else NA_real_)
 }
 
 # one sweep; st = chain state (standardised scale)
@@ -101,41 +102,45 @@ bqtf_tf <- function(y, tau, sigma_mode = c("P", "F"), sigma_F = NA, move = c("ex
   u <- seq_len(n) / n; Qp <- qr.Q(qr(cbind(1, u, u^2))); idx <- unique(pmax(1L, round(n * (1:9) / 10)))
   sig0 <- if (is.na(sig_fix)) mean(rho_tau(x - median(x), tau)) else sig_fix
   chains <- min(chains, length(lambda0_mult))
-  ST <- lapply(seq_len(chains), function(cc) list(theta = x, lambda = m * lambda0_mult[cc], sigma = sig0, z = rep(sig0, n),
+  th0 <- list(x, stats::smooth.spline(u, x)$y, x + rnorm(n, 0, sd(x) / 2), rep(median(x), n))       # dispersed theta starts (S0)
+  ST <- lapply(seq_len(chains), function(cc) list(theta = th0[[(cc - 1L) %% 4L + 1L]], lambda = m * lambda0_mult[cc], sigma = sig0, z = rep(sig0, n),
                                                   delta = 0.2, adapt = TRUE, it = 0L, acc = NA, nev = 0L))
-  MON <- vector("list", chains); THs <- vector("list", chains); nev_tot <- 0
+  stride <- max(1L, as.integer(ceiling(max_sweeps * n / 5e6)))                                     # ONE fixed stored-theta stride (S0)
+  if (!is.null(fixed_sweeps)) stride <- max(1L, as.integer(ceiling(fixed_sweeps * n / 5e6)))
+  MON <- vector("list", chains); THs <- vector("list", chains); ITs <- vector("list", chains); nev_tot <- 0
   total <- 0L; done <- FALSE; diag <- NULL
   while (!done) {
     nb <- if (!is.null(fixed_sweeps)) fixed_sweeps else block
     for (cc in seq_len(chains)) {
-      mon <- matrix(NA_real_, nb, 4L + 3L + length(idx)); th_keep <- matrix(NA_real_, nb, n)
+      mon <- matrix(NA_real_, nb, 4L + 3L + length(idx)); th_keep <- matrix(NA_real_, nb, n); it_keep <- integer(nb)
       for (i in seq_len(nb)) {
         ST[[cc]]$it <- ST[[cc]]$it + 1L
         ST[[cc]]$adapt <- (ST[[cc]]$it <= (total + nb) / 2)       # hybrid: adapt the P-MALA step in the warm-up half only
         ST[[cc]] <- e07_sweep(ST[[cc]], x, tau, a0, b0, a_s, b_s, sig_fix, move, r_pcn, P, collapsed)
-        mon[i, ] <- e07_mon(ST[[cc]], x, tau, Qp, idx); th_keep[i, ] <- ST[[cc]]$theta; nev_tot <- nev_tot + ST[[cc]]$nev
+        mon[i, ] <- e07_mon(ST[[cc]], x, tau, Qp, idx); nev_tot <- nev_tot + ST[[cc]]$nev
+        if (ST[[cc]]$it %% stride == 0L) { th_keep[i, ] <- ST[[cc]]$theta; it_keep[i] <- ST[[cc]]$it }
       }
-      MON[[cc]] <- rbind(MON[[cc]], mon); THs[[cc]] <- rbind(THs[[cc]], th_keep)
-      # keep memory bounded: thin the stored theta history by 2 whenever it exceeds 4 * keep_max rows (both halves alike)
-      if (nrow(THs[[cc]]) > 8L * keep_max) THs[[cc]] <- THs[[cc]][seq(2L, nrow(THs[[cc]]), by = 2L), , drop = FALSE]
+      MON[[cc]] <- rbind(MON[[cc]], mon); keep_rows <- it_keep > 0L
+      THs[[cc]] <- rbind(THs[[cc]], th_keep[keep_rows, , drop = FALSE]); ITs[[cc]] <- c(ITs[[cc]], it_keep[keep_rows])
     }
     total <- total + nb
     post <- (total %/% 2 + 1L):total
     if (!is.na(sig_fix)) { cols <- setdiff(seq_len(ncol(MON[[1]])), 2L) } else cols <- seq_len(ncol(MON[[1]]))
-    diag <- t(sapply(cols, function(j) rhat_ese <- rhat_ess(sapply(MON, function(M) M[post, j]))))
-    ok <- all(diag[, "rhat"] <= rhat_max) && all(diag[, "ess"] >= ess_min)
-    if (verbose) cat(sprintf("sweeps %d: max Rhat %.3f min ESS %.0f\n", total, max(diag[, "rhat"]), min(diag[, "ess"])))
+    diag <- t(sapply(cols, function(j) rhat_ess(sapply(MON, function(M) M[post, j]))))
+    ok <- !anyNA(diag) && all(diag[, "rhat"] <= rhat_max) && all(diag[, "ess"] >= ess_min) && all(diag[, "ess_tail"] >= ess_min)
+    if (verbose) cat(sprintf("sweeps %d: max Rhat %.3f min bulk ESS %.0f min tail ESS %.0f\n", total, max(diag[, "rhat"]), min(diag[, "ess"]), min(diag[, "ess_tail"])))
     done <- !is.null(fixed_sweeps) || ok || total >= max_sweeps
   }
   # posterior summaries from the second half of every chain (theta history is thinned uniformly, so take its second half)
-  TH <- do.call(rbind, lapply(THs, function(Tm) Tm[(nrow(Tm) %/% 2 + 1L):nrow(Tm), , drop = FALSE]))
-  if (nrow(TH) > keep_max * chains) TH <- TH[round(seq(1, nrow(TH), length.out = keep_max * chains)), , drop = FALSE]
+  # post-warm-up theta draws by iteration index (second half), all at the same stride
+  TH <- do.call(rbind, lapply(seq_along(THs), function(cc) THs[[cc]][ITs[[cc]] > total %/% 2, , drop = FALSE]))
   TH <- ctr + sc * TH
   lam <- unlist(lapply(MON, function(M) exp(M[post, 1]))) / sc; sig <- unlist(lapply(MON, function(M) exp(M[post, 2]))) * sc
   secs <- proc.time()[["elapsed"]] - t0
   list(mean = colMeans(TH), median = apply(TH, 2, median), lo = apply(TH, 2, quantile, 0.025), hi = apply(TH, 2, quantile, 0.975),
-       lambda = lam, sigma = sig, sweeps = total, chains = chains, converged = all(diag[, "rhat"] <= rhat_max) && all(diag[, "ess"] >= ess_min),
-       rhat_max = max(diag[, "rhat"]), ess_min = min(diag[, "ess"]), ess_loglam = diag[1, "ess"], seconds = secs,
+       lambda = lam, sigma = sig, sweeps = total, chains = chains, converged = ok, cap_hit = !ok && is.null(fixed_sweeps),
+       rhat_max = max(diag[, "rhat"]), ess_min = min(diag[, "ess"]), ess_tail_min = min(diag[, "ess_tail"]), ess_loglam = diag[1, "ess"],
+       diag = diag, stride = stride, seconds = secs,
        slice_evals_per_sweep = nev_tot / (total * chains), s_y = sc, center = ctr, b0_raw = b0 * sc, sigma_mode = sigma_mode, move = move,
        draws = TH)
 }
