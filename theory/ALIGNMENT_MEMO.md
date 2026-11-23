@@ -60,7 +60,16 @@
     - **PROVED:** a floor-free A-rule result at fixed σ in the (EM) range. The posterior mass of {λ < c₋n^{5/2}(log n)^{−1/2}} → 0, via a new reverse small-ball lemma.
     - **At the learned σ:** conditional on one explicit evidence inequality ("under-smoothed pairs cost code length").
     - **Proxy design condition:** β = τ(1−τ)/(f₀σ₀) < β_c ≈ 6 (CONJECTURE). It **predicts that the A-rule's λ drifts below its prior mean at Gaussian τ = 0.01/0.99 and Beta τ = 0.99**; a cheap data check has been requested from Engineering.
-    - Three lemmas would close the gap for 1 < β < 6 on C1's window (SKETCH).
+    - ~~Three lemmas would close the gap for 1 < β < 6 on C1's window (SKETCH).~~ Superseded by the next bullet. The earlier "β < 5.2" is withdrawn.
+  - **Theorem LO, the local Occam bound** (Fable A, `T06_Alignment/FABLE_A_three_lemmas.md`, a854245; **PROVED at fixed σ and λ, NOT audited**). At the learned σ, the evidence of under-smoothed fits decays whenever **β < 6**, which is the conjectured constant itself. It holds for λ ≥ n^{2.30}, below the oracle n^{5/2}.
+    - **Open:** uniformity in (σ, λ), which is SKETCH; the range of λ below n^{2.30}, which has no route; bounded λ, for which a numerical certificate is needed.
+    - As proved it uses the worst-case density, so **Gaussian τ = 0.05/0.95 and Beta 0.95 are not covered yet**. The averaged-β version is a Tuesday piece.
+  - **Sign reduction** (Fable B, `T06_Alignment/FABLE_B_Arule_gauss.md`, 5fb5e67; identities verified by Theory). The λ lower tail reduces to the sign of a posterior mean, κ(ℓ) = m − ℓ·E_ℓ‖Dθ‖₁. At τ = ½ no diverging floor is proved; this is a negative result.
+  - **MEASURED, internal (κ̂ pilot):** Engineering 75ad1a4, 0.29 core-h; Theory's reading is `T06_Alignment/kappa_pilot_reading.md`, 3c4562a.
+    - On the Gaussian design, one seed, κ̂ > 0 at τ = 0.05, 0.25 and 0.5.
+    - The slope is −1/3 at 0.25/0.5, as predicted.
+    - At τ = 0.97, n = 2000, the sign is lost, as predicted.
+    - This supports the averaged β < 6 design condition.
   - **Lower bound, Theorem LB (referee point #1), Fable B** (`T06_Alignment/FABLE_B_lowerbound.md`). **PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES). **All eleven confirmed fixes, plus the plausible one, are applied in commit efc0a09.**
     - **Statement:** E₀Π(Δ²ₙ(θ − θ\*) ≤ c₀λ^{−1/3} | y) → 0, with an explicit finite-n bound: 1.44/D + 8D^{3/2}e^{5−(Σ+1)D}, D = nλ^{−1/3}.
     - **Exact scope of the lower bound:**
