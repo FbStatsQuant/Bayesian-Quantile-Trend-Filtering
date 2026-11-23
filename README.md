@@ -22,6 +22,7 @@ In simulations with varying-smoothness and smooth signals under Gaussian, Beta, 
 | `applications/` | Real-data analyses (`Growth/`, `Air Quality/`, `Munich Rent/`). Open items are listed in its README. |
 | `theory/` | Theory Department task folders (T-01 ...). Theory commits only here. |
 | `engineering/` | Engineering Department task folders (E-01 ...), including `E03_Repo_Organization/`. |
+| `writing/` | Writing Department task folders (W-01 ...: statement drafts, reviews). The Writing Department commits only here. |
 | `literature/` | Reading list with DOI/arXiv links. PDFs are local only (git-ignored), except our own `Large Prior.pdf`. |
 | `archive/` | Superseded material kept for the record (small files only) and `archived_campaigns.md`, the index of the NOTS campaigns archived to the PC. |
 
