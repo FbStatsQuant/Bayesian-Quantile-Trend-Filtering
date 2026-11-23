@@ -16,7 +16,7 @@ Notation as in L2:
 
 ## Statement
 
-**(a) Exact MGF.** For δ > 0,
+**(a) Exact MGF.** *(Part (a) needs no margin assumption: it holds for any law of Zᵢ, so it may be cited without (A2) or Fᵢ(0) = τ, as in Theorem B's Proposition 1. Its survival form is E e^{−ωXᵢ(δ)} = e^{−ω(1−τ)δ}[1 + ω∫₀^δ e^{ωs}(1 − Fᵢ(s)) ds]; see the first display of the proof of (a).)* For δ > 0,
 
   E e^{−ωXᵢ(δ)} = h_τ(ωδ) − ω e^{−ω(1−τ)δ} ∫₀^δ e^{ωs}(Fᵢ(s) − τ) ds,
 
@@ -26,7 +26,7 @@ where h_τ(t) := τe^{−(1−τ)t} + (1−τ)e^{τt} is the MGF of a centred tw
 
   log E e^{−ωXᵢ(δ)} ≤ −B(ω, Δ) · ω · mᵢ(δ),  where  B(ω, Δ) := e^{−ωΔ − ω²Δ²/8} − ω/ω̄ − 0.0321·ω²Δ/f.
 
-In particular, if ω ≤ (1−η)ω̄ and Δ ≤ Δ₀, where Δ₀ is the largest Δ ≤ L with
+In particular, if ω ≤ (1−η)ω̄ and Δ ≤ Δ₀, where Δ₀ = Δ₀(η, ω̄, τ, L) is the largest Δ ≤ L with
 
   ω̄Δ·(1 + ω̄Δ/8 + 0.0321/(τ(1−τ))) ≤ η/2,
 

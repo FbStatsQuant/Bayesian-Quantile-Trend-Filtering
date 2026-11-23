@@ -2,7 +2,7 @@
 
 **Status:** advisor-checked (2026-11-22), Astra (`reviews/ASTRA_B_L6.md`): ACCEPT WITH FIXES. The finite-sample inequality and its probability are accepted as written. The rate consequence is corrected to include the small-ball logarithm.
 **Depends on:** L2 (for C₁), L5 (normalization), L3 (small ball), and L4 or L4q (shift) with Corollary L4q-M (mollification).
-**Used by:** the assembly of Theorem A (SKELETON).
+**Used by:** the assembly of Theorem A (SKELETON) and Theorem B (`B_light_tail.md`, Step 3).
 
 ## Setting
 
@@ -20,7 +20,7 @@ where B_r = {u : ‖P⊥Su‖ₙ ≤ r} as in L4q, and P_N is the projector onto
 
 ## Statement
 
-For any ω > 0 (no restriction on σ) and any law satisfying (A1) and (A2),
+For any ω > 0 (no restriction on σ), any law satisfying (A1) and **the upper half of (A2)** (which gives Fᵢ(0) = τ and C₁ via L2), and any deterministic centre u_h with ‖P⊥S(u_h − u\*)‖ₙ ≤ ε/2,
 
   P₀( N(ℝⁿ) ≥ ν(G)·exp{ −ω(1.44 C₁ + 1) nε² } ) ≥ 1 − 1.44/(nε²).
 
@@ -78,3 +78,7 @@ This uses L2 (4) and independence across i (A1). No moments of y are used, since
 
 - **#6 (inequality, probability, constants): accepted as written.** Astra adds two points. The center is deterministic for the given truth and prior. B's weaker version of A2 (the upper half plus the quantile identity) suffices for C₁.
 - **#2 (rate consequence): corrected.** The spread requirement now carries (log m)^{1/6}. The shift term is that of the available route, with its hypotheses. The volume term is kept exactly.
+
+## Response to the end-to-end audit (Astra #1 / Fable #4)
+
+The formal statement now assumes only (A1) and the upper half of (A2), with a deterministic centre. This is exactly what the proof uses (C₁, the variance bound, Fᵢ(0) = τ) and what Theorem B supplies. The mathematics is unchanged.

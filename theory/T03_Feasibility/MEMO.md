@@ -29,7 +29,7 @@
   - The mixture row is corrected: it is not covered globally.
 - **Positioning (HQ decision).** The light-tail **Theorem B** is proved first.
   - B assumes the global MGF condition (EM). Sufficient conditions are Astra's two-sided envelope, or a ψ₁ bound plus a σ threshold.
-  - B is in Δ²ₙ only. It implies a strict **point-density** threshold F′(q) ≥ ωτ(1−τ) + 2b, so Gaussian noise at σ₀ is still excluded, plus tail necessity. It does **not** imply A4's secant condition, so B covers some cases A does not (Astra: uniform errors, τ = ½, ω = 1).
+  - B is in Δ²ₙ only. If Fᵢ is differentiable at the quantile, B implies a strict **point-density** threshold F′(q) ≥ ωτ(1−τ) + 2b, so Gaussian noise at σ₀ is still excluded; it also implies tail necessity. B's scale condition is stated via the point density and does not require A's secant condition for a fixed margin class. For differentiable laws, however, it implies A4 for some small margin interval, so B genuinely covers laws that A excludes only when Fᵢ is not differentiable at the quantile (dyadic staircase example). Corrected after the end-to-end audit: the earlier uniform-error example fails A4 only at L = 4.
   - **If the moment-free Theorem A is proved**, A is the main theorem and B is the warm-up proposition.
   - **If not**, B is the main theorem, and moment-free contraction is stated as a conjecture supported by the t₂ and Cauchy simulations.
 - **Sandwich check** (Engineering, the VP's test). At Gaussian noise, τ = ½, σ = σ₀, the replicate variance of the posterior mean divided by the spread is 1.49 in the null-space directions (≈ π/2) and 1.08 in the rough part. The σ̄ restriction is therefore a limitation of the proof route, not an empirical inflation of the rate.

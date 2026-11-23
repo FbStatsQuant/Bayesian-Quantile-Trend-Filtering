@@ -32,7 +32,7 @@ With probability ≥ 1 − 1.44/(nε²), N(ℝⁿ) ≥ ν(G) e^{−ω(1.44C₁ +
 
   −log ν(G) ≤ φ(ε/2) + [c_{K′} λ²‖u_h‖₂² (half-radius L4q, K′ = K(λε/2)) or λ‖u\*‖₁ (L4)] + O(log n) ≤ C_prior · nε²,
 
-at the stated tuning. This uses L3 for φ(ε/2) ≲ (n^{5/2}/(λε))^{2/5} ≲ nε², and L4q-M for the mollified shift.
+at the stated tuning. This uses L3 for φ(ε/2) ≤ 30·(2n^{5/2}/(λε))^{2/5}(log m)^{1/5} + 6, which is ≤ C·nε² once ε² ≳ λ^{−1/3}(log m)^{1/6} (L6, rate consequence), and L4q-M for the mollified shift. Theorem B uses its own κ-free radii (`B_light_tail.md`).
 
 ## Step 2: numerator on the bounded region (L8′; advisor-checked)
 
@@ -54,7 +54,7 @@ Combining with Step 1: E₀[N(E₁)/N(ℝⁿ)] ≤ exp{−(η′ω c₀ M − C 
 
 We need E₀ Πₙ(‖θ − θ\*‖∞ > Δ | y) → 0. Plan (STATEMENT v3.1; now the VP's two-stage route, with Stage 2 = L10-I):
 - **(a)** {Δ²ₙ > K}: by convexity of ℛ and log-concavity of Πₙ (L9-a). This is moment-free.
-- **(b)** On {Δ²ₙ ≤ K}, use the interpolation ‖P_R δ‖∞ ≲ ‖δ‖ₙ^{4/5}·TV⁽³⁾(δ)^{1/5} together with posterior control of TV⁽³⁾(δ). The latter comes from the two-level sieve (L7, ADH Prop. 2.15) plus a numerator bound outside the sieve (L9-c). This is where λ ≥ n^{a₀} enters.
+- **(b)** Use L10-I for the full vector, ‖δ‖∞ ≤ 6‖δ‖ₙ + 7.06‖δ‖ₙ^{4/5}TV⁽³⁾(δ)^{1/5}, with its Huber bootstrap (no prior smallness of ‖δ‖ₙ is needed), together with posterior control of TV⁽³⁾(δ) (Stage 1, parked). The latter comes from the two-level sieve (L7, ADH Prop. 2.15) plus a numerator bound outside the sieve (L9-c). This is where λ ≥ n^{a₀} enters.
 
 ## Step 4 (Theorem A⁺, any σ)
 

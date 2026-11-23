@@ -2,7 +2,7 @@
 
 **Status:** advisor-checked (2026-11-22), Astra (`reviews/ASTRA_L10I.md`): L10-I ACCEPT WITH FIXES, all applied; Huber corollary ACCEPT. The Christoffel supremum is now proved analytically to be exactly 9 (Astra's formula). The numerical check `checks/l10i_christoffel.py` passed and is now a cross-check only.
 **Depends on:** nothing.
-**Used by:** L10 (both stages of the VP's two-stage route), and the squared-loss corollary of Theorem B.
+**Used by:** L10, Stage 2 of the VP's two-stage route; and, **prospectively**, the flagged squared-loss corollary of Theorem B, for which a Stage-1-type posterior TV bound is a hypothesis (audit, Astra #6).
 
 ## Statement
 
