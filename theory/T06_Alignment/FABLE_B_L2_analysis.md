@@ -406,3 +406,15 @@ For both designs R_n → R and σ₀,ₙ → σ₀ by the law of large numbers, 
 **Beta at τ = 0.95:** the range is non-empty but short, ℓ ∈ [1.96, 4.1]. The method caps at ≈ 8.9 there, so the certificate route remains for larger ℓ₀.
 
 **Next:** Astra cross-family audit of §8–§9 (Tuesday, or tonight if Codex is free).
+
+## Cross-family audit response to §8–§9 (Astra, `reviews/AUDIT_astra_DCW.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** All eight findings are CONFIRMED, and Theory rules that they **HOLD**. Astra's independent quadrature reproduces Ā for Beta (1.980639) and for Mixed (1.112840), the Mixed entropy (1.098203), and Theory's Gaussian values.
+
+**Fixes (applied by reference; written in full in Tuesday's clean rewrite):**
+- **Hypothesis.** State γ < log(2tR/σ₀) as a hypothesis, together with fixed 0 < ℓ₁ < ℓ₀ and positive γ, η, δ.
+- **Posterior conclusion.** It uses the denominator bound under (A3).
+- **Table.** Replace the §9 table by the audit's full-precision table, with endpoints rounded strictly down. Use 1223 for Gaussian ½, 10.08 for the Mixed tails, 49.75 for Beta ½, and 378 for Beta 0.05 (conservative; formula 380.15). The unwhitened column is labelled approximate.
+- **Beta τ = 0.95.** The range [1.96, 4.1] holds, with margin 0.0022. **The "cap ≈ 8.9" is unproved and is deleted.**
+
+**Status: L2 is PROVED and cross-family audited for all three paper designs at τ ∈ {0.05, 0.25, 0.5, 0.75, 0.95}**, on [ℓ₁, ℓ₀] with ℓ₀ from the audit table, given (A3) for the denominator. Beta at τ = 0.95 has a short range only, which is still non-empty.
