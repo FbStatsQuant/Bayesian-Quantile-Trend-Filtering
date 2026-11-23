@@ -48,3 +48,23 @@ Every finding was verified by Theory.
 
 - **Covers** σ exactly as Felipe's method learns it, at the oracle rate.
 - **λ is deterministic here.** For both learned (Felipe's method plus the λ floor), see Theorem V0T\* (Fable A, in progress). It needs C2 uniform over ℓ ≥ Λ₋ against the mixed denominator.
+
+## Cross-family audit (Astra, `reviews/AUDIT_astra_F_C2.md`, 2026-11-23)
+
+Verdicts:
+- **Theorem C\*: ACCEPT.**
+- Lemma F and W′: ACCEPT.
+- C1 with W′: ACCEPT WITH FIXES.
+- C2: ACCEPT WITH FIXES.
+
+All seven findings were verified by Theory and **HOLD**:
+1. **F interior and ends.** Confirmed.
+2. **C1 with W′.** Carry forward Vλ = o(n³) and the denominator condition at the improved radius. Both hold at the oracle: n^{−5/6} = o(n^{−5/7}).
+3. **Shells.** Define E_a = {aD_n < ‖δ‖₂² ≤ 2aD_n, ‖δ‖∞ ≤ s₀} explicitly, with D_n = nε² and s₀ = min(L, 3f/(4ω₂f̄)), before the Tonelli step. Note added; C1 gives s_K → 0 deterministically.
+4. **Coarse event.** Var(Q) ≤ (J+3)/4, and Chebyshev gives failure probability ≤ 4(J+3)/(9(J−1)²) → 0. Confirmed.
+5. **Fine factor.** Hoeffding failure ≤ (2m)^{−3}, and 2ω₂b_J/λ = O(n^{−5/12}(log n)^{1/12}). Confirmed.
+6. **Shell coverage.** The upper edge of shell k is 2^{k+1}Mε², so any terminal index K ≥ log₂(r²/(Mε²)) − 1 suffices. Floor and ceiling both work.
+   - **Disagreement with Opus (#1), minor:** Opus required the ceiling; Astra shows the floor also works. Theory sides with Astra on the mathematics. Since the ceiling used in Step 3 is valid either way, nothing changes. Flagged to HQ.
+7. **Learned-σ transfer.** Under Lemma S's hypotheses, confirmed.
+
+**Status: Theorem C\* is cross-audited by both families** (Opus, Astra) on all of its Fable-written parts.
