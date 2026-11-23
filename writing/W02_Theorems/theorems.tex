@@ -144,7 +144,7 @@ Model: $\pi(\theta,\sigma\mid y)\propto\sigma^{-n}e^{-Q(\theta)/\sigma}\,e^{-\la
 \end{enumerate}
 \end{named}
 \covers{$\sigma$ exactly as the method learns it. $\lambda$ is not learned.}
-\status{\stPA. Assembly by Theory from C1 and Lemma W (both audited by Astra) and Lemma S (written by an Astra assistant, audited by Opus: ACCEPT WITH FIXES). Final read by Fable: ACCEPT at the oracle; the window's upper end was corrected to $n^{108/41}V^{-42/41}$. File \texttt{THEOREM\_C.md}, commit \texttt{574407c}.}
+\status{\stPA. Assembly by Theory from C1 and Lemma W (both audited by Astra) and Lemma S (written by an Astra assistant, audited by Opus (ACCEPT WITH FIXES) and read by Fable). Final read by Fable: ACCEPT at the oracle; the window's upper end was corrected to $n^{108/41}V^{-42/41}$. File \texttt{THEOREM\_C.md}, commit \texttt{574407c}.}
 
 \subsection{\texorpdfstring{Theorem C$^*$: $\sigma$ learned, oracle $\lambda$, rate $n^{-5/6}$}{Theorem C*: sigma learned, oracle rate}}
 
@@ -228,7 +228,7 @@ If $(32\Sigma)^3\le\lambda\le(n/42)^3$, then
 \[
 \E_0\,\Pi\big(\Delta_n^2(\theta-\theta^*)\le c_0\lambda^{-1/3}\mid y\big)\ \le\ 1.44/D+8D^{3/2}\exp\{5-(\Sigma+1)D\}.
 \]
-Along any sequence with $\lambda_n\to\infty$, $\lambda_n=o(n^3)$ and $\beta$ bounded, the left side tends to $0$, uniformly over the laws with the given $(L,\bar f)$ and the $\beta$-admissible truths. The same holds for $\norm{\theta-\theta^*}_n^2$. No lower margin, no (EM), no moments, no $\sigma\ge\sbar$.
+Along any sequence with $\lambda_n\to\infty$, $\lambda_n=o(n^3)$ and $\beta\le\bar\beta$ for a fixed $\bar\beta$, the left side tends to $0$ (so $D\to\infty$), uniformly over the laws with the given $(L,\bar f)$ and the $\bar\beta$-admissible truths, with one $c_0$ computed from $\bar\beta$. The same holds for $\norm{\theta-\theta^*}_n^2$. No lower margin, no (EM), no moments, no $\sigma\ge\sbar$.
 \end{named}
 
 \noindent\textbf{Exact scope.}
@@ -280,7 +280,7 @@ C1, C2 and V0T/V2T with the floor $\Lambda_-=\kappa_-n^{k+1/2}$ carry over for $
 \section{Target: the A-rule without a floor \quad \stTARGET}
 \label{sec:arule}
 
-\plainly{The A-rule changes one hyperparameter of Felipe's method and adds no floor. Its rate $b_n$ shrinks with $n$ so that the prior keeps pace with the oracle $\lambda$. Eight links lead from the proved pieces to the target. Five are proved, the assembly is proved, and three are open (L2, L4a, L4b). \textbf{It is not a theorem until the open links close.}}
+\plainly{The A-rule changes one hyperparameter of Felipe's method and adds no floor. Its rate $b_n$ shrinks with $n$ so that the prior keeps pace with the oracle $\lambda$. Eight links lead to the target. L5 and L7 are proved and audited. L1, L3 and the assembly L6 are proved, not yet audited. L2 is proved and audited for the Gaussian design only. L4a and L4b are open. \textbf{It is not a theorem until the open links close.}}
 
 \begin{named}{Target (A-rule, no floor) --- not a theorem}
 Model: Felipe's method with $\lambda\sim\Ga(1,b_n)$, $b_n=1/(5500\,(n/500)^{5/2})$, $\sigma\sim\IG(0.1,0.1)$ learned, no truncation. At $\tau\in[0.05,0.95]$, for the paper's three noise designs, $\theta$ contracts at $n^{-5/6}$ up to logs (via L7: $n^{-5/6}(\log n)^{1/3}$), with $\sigma$ and $\lambda$ both learned.
@@ -308,10 +308,10 @@ The $\lambda$-range below $\Lambda_{-,n}$ is split into pieces:
 Link & $\lambda$ range / step & Status & Source; prover / auditor \\
 \midrule
 L1 & tiny $\lambda<\ell_1:=(1-\eta)\,2t/(e\szero)\,e^{-\eta}$ & \PU{} (class-wide) & \texttt{FABLE\_A\_Arule\_lowertail.md} \S2 (I); Fable A; audit queued (Astra) \\[2pt]
-L2 & bounded $\lambda\in[\ell_1,\ell_0]$: design condition (DC) & \OP, work in progress; statement and reductions \PU & \texttt{FABLE\_B\_DC.md}; Fable B. Certificate specified, untested \\[2pt]
+L2 & bounded $\lambda\in[\ell_1,\ell_0]$: design condition (DC) & Gaussian: \PA; Mixed/Beta: \OP & \texttt{FABLE\_B\_DC.md}; \texttt{FABLE\_B\_L2\_analysis.md} (\texttt{23c6d54}, audit \texttt{845116d}); Fable B / Astra \\[2pt]
 L3 & interpolating fits; extreme scales & \PU{} (class-wide) & lowertail \S2 (III-a/b), using Lemma S (audited) \\[2pt]
 L4a & $\lambda\in[\ell_0,n^{3/2}]$ & \OP; named assumption with a data check & \texttt{L4a\_assumption.md} \\[2pt]
-L4b & $\lambda\in[n^{3/2},\,C n^{2.30}]$ & \OP, work in progress; one new lemma needed & \texttt{FABLE\_A\_gap4.md}; Fable A \\[2pt]
+L4b & $\lambda\in[n^{3/2},\,C n^{2.30}]$ & \OP; partial result pending & Fable A; Theory reports at 17:05 \\[2pt]
 L5 & $\lambda\in[L_n,\Lambda_{-,n}]$: $L_n=Cn^{99/43}(\log n)^c$, $\Lambda_{-,n}=c_-n^{5/2}(\log n)^{-1/2}$ & \PA & Theorems LO, U, U-$\sigma$ with averaged $\bar\beta<6$; Fable A, Fable B / Astra \\[2pt]
 L6 & L1--L5 $\Rightarrow$ (LT) & assembly \PU{} given its inputs & lowertail \S5 \\[2pt]
 L7 & (LT) $\Rightarrow$ rate $n^{-5/6}(\log n)^{1/3}$ (V0T$^*$, $n$-dependent floor) & \PA & \texttt{FABLE\_A\_V0Tstar\_nfloor.md}; Fable A / Astra \\[2pt]
@@ -332,11 +332,11 @@ At fixed $\sigma$ ($\omega=1/\sigma$), let $p$ be any probability law on $[\Lamb
 \status{\stPA. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (nine findings, all held; the denominator event was replaced by Astra's common event). File \texttt{FABLE\_A\_theoremH.md}, commit \texttt{0e7e7c6}.}
 
 \begin{named}{Theorem LO (local Occam bound, at fixed $(\omega,\ell)$)}
-Assume (A1), full (A2) in secant form with $(L,f,\bar f)$, (A3) with $V$; $\omega=1/s$ fixed; $\beta:=\omega t/f$. Let $\beta<6$. There are $\varepsilon\in(0,1)$, $C<\infty$ and $K_0$ (depending on $6-\beta$ and the class constants) such that for every $K\ge K_0$ and every $\ell$ with $C(K)n^{99/43}(\log n)^c\le\ell\le n^3/(\TV\cdot K)$, with probability $\ge1-C/K-C/k_*-P_0(\Omega_G^c)$,
+Assume (A1), full (A2) in secant form with $(L,f,\bar f)$, (A3) with $V$; $\omega=1/s$ fixed; $\beta:=\omega t/f$. Let $\beta<6$. There are $\varepsilon\in(0,1)$, $C<\infty$ and $K_0$ (depending on $6-\beta$ and the class constants) such that for every $K\ge K_0$ and every $\ell$ with $C(K)n^{99/43}(\log n)^c\le\ell\le n^3/(T\,V\,K)$ ($T\ge4$ C1's constant, $V$ the (A3) bound), with probability $\ge1-C/K-C/k_*-P_0(\Omega_G^c)$,
 \[
 \tilde Z_\omega(\ell)\ \le\ n^Ce^{CK}\exp\{-(1-\varepsilon)(\pi/6)(6-\beta)k_*\},\qquad k_*:=(2\omega f')^{1/6}n\ell^{-1/3}/\pi .
 \]
-Here $\tilde Z_\omega(\ell)$ is the centred evidence at tuning $\ell$, and $k_*$ the effective number of fitted modes.
+Here $\tilde Z_\omega(\ell)$ is the centred evidence at tuning $\ell$, $k_*$ the effective number of fitted modes, and $f':=(1-\eta)f$, $\eta\in(0,\tfrac12)$. The upper endpoint uses C1's finite numerator inequality (audit finding 4).
 \end{named}
 \status{\stPA{} at fixed $(\omega,\ell)$. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (eleven findings, all held). File \texttt{FABLE\_A\_three\_lemmas.md}, commit \texttt{63849f0}.}
 
@@ -347,7 +347,7 @@ For the A-rule ($\lambda\sim\Ga(1,b_n)$, $b_n=c_bn^{-5/2}$, untruncated), under 
 \item (U-$\sigma$, $\sigma\sim\IG(a,b)$ learned, Lemma S's assumptions, condition (LO): $t/(f(1-\epsilon)d)<6$ for some $\epsilon\in(0,\tfrac12)$) $\ \supP\Pi(L_n\le\lambda<\Lambda_{-,n}\mid y)\to0$ for the joint posterior.
 \end{itemize}
 \end{named}
-\status{\stPA. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (nine findings, all held; applied by reference, written in full in Tuesday's clean rewrite). File \texttt{FABLE\_A\_uniformity.md}, commit \texttt{f5f05de}.}
+\status{\stPA. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (nine findings, all held; applied by reference, written in full in Tuesday's clean rewrite). Requires a fixed positive margin for the common lower secant slope (audit, header). File \texttt{FABLE\_A\_uniformity.md}, commit \texttt{f5f05de}.}
 
 \begin{named}{Averaged condition $\bar\beta<6$ (replaces the worst-case $\beta$)}
 Let $f_i>0$ be the lower secant slope of $F_i$ at the quantile, $\omega=1/\sigma$, and
@@ -394,9 +394,9 @@ Model and assumptions of V0T$^*$, with floor $\Lambda_{-,n}:=\kappa_{-,n}n^{5/2}
 \subsection{The open links}
 
 \begin{itemize}
-\item \textbf{L2, bounded $\lambda$, (DC)} \OP, work in progress. With $g_n(s,\ell):=\log(\ell/(2t))+n^{-1}\log\E_s\exp\{-\ell\norm{D(y-E)}_1\}$ and $b^*:=-1-\log\sigma_0$: (DC$_\gamma$) is ``with probability $\to1$, $\sup\{g_n(s,\ell):s>0,\ \ell_1\le\ell\le\ell_0\}\le b^*-\gamma$''. Given (DC$_\gamma$), $\Pi(\ell_1\le\lambda\le\ell_0\mid y)\le e^{-\gamma n/2}$ (\PU). The reduction to a compact rectangle is \PU. There is no proof yet at Gaussian $\tau=\tfrac12$ (work in progress). A three-tier numerical certificate is specified and untested.
+\item \textbf{L2, bounded $\lambda$, (DC)} \OP{} for the three designs together. With $g_n(s,\ell):=\log(\ell/(2t))+n^{-1}\log\E_s\exp\{-\ell\norm{D(y-E)}_1\}$ and $b^*:=-1-\log\sigma_0$: (DC$_\gamma$) is ``with probability $\to1$, $\sup\{g_n(s,\ell):s>0,\ \ell_1\le\ell\le\ell_0\}\le b^*-\gamma$''. Given (DC$_\gamma$), $\Pi(\ell_1\le\lambda\le\ell_0\mid y)\le e^{-\gamma n/2}$ (\PU). The reduction to a compact rectangle is \PU. \emph{Gaussian design:} \PA{} (Fable B / Astra, ACCEPT WITH FIXES; \texttt{FABLE\_B\_L2\_analysis.md}, \texttt{23c6d54}, audit \texttt{845116d}) at the paper levels $\tau\in\{0.05,0.25,0.5,0.75,0.95\}$, on $[\ell_1,\ell_0]$ with $\ell_0=790$ ($\tau=\tfrac12$), $196$ ($0.25/0.75$), $12$ ($0.05/0.95$). The posterior consequence uses (A3) for the denominator. Not every $\tau$: the method fails at extreme quantiles. Mixed and Beta: \OP. Beta at $\tau=0.95$: not covered by this method. The method stops at a constant $\ell_0$, so it gives nothing for L4a.
 \item \textbf{L4a, $\lambda\in[\ell_0,n^{3/2}]$} \OP. No theory; even the $\beta<6$ heuristic has no justification here. Fallback: the named assumption below.
-\item \textbf{L4b, $\lambda\in[n^{3/2},Cn^{2.30}]$} \OP, work in progress. One new lemma (a posterior bound on high-amplitude energy) is needed (\texttt{FABLE\_A\_gap4.md}). Fable A is working on it today; its status will be taken from Theory's report.
+\item \textbf{L4b, $\lambda\in[n^{3/2},Cn^{2.30}]$:} \OP. A partial result is in progress (Fable A); Theory will report its status at 17:05.
 \end{itemize}
 
 \subsection{Named assumptions and their empirical status}
@@ -413,9 +413,8 @@ Assumption & What it says & Empirical / design check \\
 (A1)--(A3), (UI), (S0) & independence; two-sided margin; roughness budget $V$; check loss UI; $\szero\ge d$ & hold for all three designs, both truths, every fixed level (W-01 note) \\[2pt]
 (REG) & a smooth secant-density profile in $u$, bounded away from 0 and $\infty$ & holds for the three designs (Theory's check) \\[2pt]
 $\bar\beta<6$ & averaged evidence condition at the learned scale & computed: $\le5.12$ on $\tau\in[0.05,0.95]$; exceeds $6$ at $0.97$ and $0.99$, where the sufficient condition is not met; no failure is proved there (Table~\ref{tab:beta}). \ME: the $\hat\kappa$ pilot (one seed, Gaussian) had the predicted sign at $0.05$--$0.5$ and lost it at $0.97$ \\[2pt]
-(DC) (L2) & no partial interpolation at bounded $\lambda$ & no data yet; Tier-3 surface map planned (Tuesday at the earliest) \\[2pt]
-(L4a) & $\supP\Pi(\ell_0\le\lambda\le n^{3/2}(\log n)^c\mid y)\to0$ & \ME{} (A-rule screen, posterior medians only): at $\tau=0.5$, $\lambda/\lambda^*$ is stable from $n=500$ to $2000$ (S: $0.85\to1.05$; VS: $3.2\to2.8$). Zero mass below $n^{3/2}$ is \emph{not} shown, and cannot be with medians. Watch item: S at $\tau=0.95$ (Normal $0.59\to0.08$ at $n=1000$, one seed). Draws check proposed for Tuesday \\[2pt]
-L4b lemma & posterior bound on high-amplitude energy for $\lambda\in[n^{3/2},n^{2.30}]$ & none; named assumption as fallback \\
+(DC) (L2) & no partial interpolation at bounded $\lambda$ & Gaussian design: \PA{} at $\tau\in\{0.05,0.25,0.5,0.75,0.95\}$ (no data needed). Mixed, Beta: \OP; no data yet; Tier-3 surface map planned (Tuesday at the earliest) \\[2pt]
+(L4a) & $\supP\Pi(\ell_0\le\lambda\le n^{3/2}(\log n)^c\mid y)\to0$ & \ME{} (A-rule screen, posterior medians only): at $\tau=0.5$, $\lambda/\lambda^*$ is stable from $n=500$ to $2000$ (S: $0.85\to1.05$; VS: $3.2\to2.8$). Zero mass below $n^{3/2}$ is \emph{not} shown, and cannot be with medians. Watch item: S at $\tau=0.95$ (Normal $0.59\to0.08$ at $n=1000$, one seed). Draws check proposed for Tuesday \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -426,7 +425,7 @@ L4b lemma & posterior bound on high-amplitude energy for $\lambda\in[n^{3/2},n^{
 
 \medskip
 \noindent\fbox{\begin{minipage}{0.97\textwidth}
-\textbf{Not a theorem yet.} The A-rule target becomes a theorem only when L2, L4a and L4b are proved, and L1, L3 and L6 are audited. Until then it may be stated only conditionally: on (DC), (L4a) and the L4b lemma as named assumptions (or on (E), fallback F3).
+\textbf{Not a theorem yet.} The A-rule target becomes a theorem only when L2 (Mixed, Beta), L4a and L4b are proved, and L1, L3 and L6 are audited. Until then it may be stated only conditionally: on (DC), (L4a) and the L4b lemma as named assumptions (or on (E), fallback F3).
 \end{minipage}}
 
 %=====================================================================
@@ -434,7 +433,7 @@ L4b lemma & posterior bound on high-amplitude energy for $\lambda\in[n^{3/2},n^{
 \label{sec:notcovered}
 
 \begin{itemize}
-\item \textbf{Felipe's exact method (no floor, constant $b_0$).} There is no contraction theorem at any rate. Class-wide, none can exist (the obstruction). Under constant $b_0$ the learned $\lambda$ grows like $n^{3/4}$ (\ME, memo), outside every window. A design-specific theorem for it is \OP.
+\item \textbf{Felipe's exact method (no floor, constant $b_0$).} With $\sigma$ learned as in the method, there is no contraction theorem at any rate. (At a fixed $\sigma$ in the (EM) range, roughly $\sigma\ge\sbar$, constant $b_0$ gives $n^{-1/4}$ without a floor, but the learned $\sigma$ is $0.13$--$0.64\,\sbar$.) Class-wide, none can exist (the obstruction). Under constant $b_0$ the learned $\lambda$ grows like $n^{3/4}$ (\ME, memo), outside every window. A design-specific theorem for it is \OP.
 \item \textbf{Any result without a floor, class-wide.} Impossible for unfloored Gamma priors, constant or scaled (the obstruction). Soft floors through Gamma shape parameters either pin $\lambda$ at its prior mean or fail class-wide (Astra; Fable B; not audited).
 \item \textbf{$\tau=0.01$ and $0.99$ under the A-rule.} $\bar\beta\approx13$--$14$ against $6$ for all three designs, so the sufficient condition of this route is not met there; nothing is claimed at these levels for the A-rule. The $\bar\beta$ condition does not enter V0T$^*$ or Theorem J.
 \item \textbf{The joint version of the A-rule.} Theorem J is proved for V0T$^*$ and C$^*$ only.
@@ -453,7 +452,7 @@ L4b lemma & posterior bound on high-amplitude energy for $\lambda\in[n^{3/2},n^{
 
 \noindent\fbox{\begin{minipage}{0.97\textwidth}
 \begin{enumerate}[leftmargin=*, label=\textbf{D\arabic*.}]
-\item \textbf{Main theorem now.} Present V0T$^*$ (his method plus the floor $\lambda\ge1.6\times10^{-5}n^{5/2}$; $\sigma$ and $\lambda$ learned; $n^{-5/6}(\log n)^{1/6}$; matched by LB) as the main theorem, with the A-rule as the stated target. Together with Theorem J for the joint fit and Theorem LB for exactness.
+\item \textbf{Main theorem now.} Present V0T$^*$ (his method plus the floor $\lambda\ge1.6\times10^{-5}n^{5/2}$; $\sigma$ and $\lambda$ learned; $n^{-5/6}(\log n)^{1/6}$; matched by LB) as the main theorem, with the A-rule as the stated target. Together with Theorem J for the joint fit and Theorem LB for exactness. \emph{Data gate} (\ME, internal): individual test at $n=4000$ met (median MSE ratio $0.47$, max $0.99$; his chain is stuck there, so the floor rescues the sampler); joint $0.90$--$0.98$ matched; joint $0.99$ unresolved (neither arm converged, not a floor effect). Felipe's variant rule needs a working joint version, so the joint $0.99$ cell is still open.
 \item \textbf{Adopt the A-rule as the paper's $\lambda$ prior?} Its data case is the exact-Gibbs screen: median MSE ratio against the current prior $0.95$ / $0.90$ / $0.53$ at $n=500$ / $1000$ / $2000$, max $1.13$ (\ME, memo). Before the paper can use it, it still needs the P-MALA paired test and a joint non-crossing version (Engineering). No theorem covers it yet.
 \item \textbf{Fallbacks if the target does not close.} F1: V0T$^*$ is the unconditional statement (proved + audited). F2: C$^*$ ($\sigma$ learned, oracle $\lambda$; proved + audited). F3: the conditional A-rule theorem (assembly proved, not audited) under the evidence margin (E), or under (DC), (L4a) and the L4b lemma as named assumptions. Plan: if the headline does not close by Tuesday night, F3 is the paper's A-rule statement and F1 the unconditional one.
 \end{enumerate}
