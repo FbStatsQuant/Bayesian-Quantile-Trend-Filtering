@@ -1,6 +1,10 @@
 d <- "/home/fb31/BQTF_runs/E02/free_check"
 fs <- list.files(d, "\\.rds$", full.names = TRUE)
-R <- lapply(fs, readRDS)
+R <- lapply(fs, function(f) { r <- readRDS(f)
+  if (is.null(r$a0)) { r$a0 <- 1; r$b0 <- 0.01  # file from first launch (before a0/b0/median/kappa were stored): recompute from traces
+    post <- (r$burn + 1):r$iters; r$lam_med <- median(r$lambda[post])
+    r$kappa <- mean(dnorm(qnorm(r$tau)) / ((1 + (seq_len(r$n) / r$n)^2) / 4)) / r$sig_mean }
+  r })
 df <- do.call(rbind, lapply(R, function(r) data.frame(base = r$baseline, tau = r$tau, n = r$n, a0 = r$a0, b0 = r$b0, seed = r$seed,
   lam = r$lam_mean, lam_med = r$lam_med, kappa = r$kappa, lo = r$lam_q[1], hi = r$lam_q[2], lam_cap = r$lam_mean / r$CAP, sig = r$sig_mean, lamsig = r$lamsig,
   sig_L0 = r$sig_L0, sig_Lh = r$sig_Lhat, lamSD_m = r$lamSD_m, essL = r$ess_loglam, essS = r$ess_sig,
