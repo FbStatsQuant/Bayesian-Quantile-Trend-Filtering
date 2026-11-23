@@ -218,3 +218,20 @@ So for Beta at τ = 0.95 this argument gives nothing: the right-skewed Beta nois
 **Consequences for the chain:**
 - L2 closes for the Gaussian design, if the audit passes.
 - The L4a range gets an explicit lower end, ℓ₀ = 790 at τ = ½ and 12 at τ = 0.05/0.95. The constant ℓ₀ is a hard limit of this method; that limit is proved.
+
+## Cross-family audit response (Astra, `reviews/AUDIT_astra_L2.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES for the bounded-range result at the tabulated Gaussian levels.** All eight findings are CONFIRMED, and Theory rules that they **HOLD**. Theory's own earlier response said "every τ"; that is **withdrawn** together with Fable B's claim.
+
+| # | Fix (applied by reference; written in full in Tuesday's clean rewrite) |
+|---|---|
+| 1 | No repair needed (evidence identity) |
+| 2 | Fix the quantifiers after Proposition N: the projection bound holds simultaneously; the Markov event is pointwise in ℓ until the grid argument |
+| 3 | c_Λ = 0.7497255685… (the printed 0.7497 rounds safely). Keep 6 ≤ x\* ≤ n − 3 as a hypothesis; the lower-endpoint condition ℓ₁ς_max > (c_Λ/3)³ holds at all tabulated endpoints |
+| 4 | Flat bound: take the supremum at s_hi (do not drop 3 log s/n). Grid: bound each point from the node with **larger s and smaller ℓ**. The three sets cover every s, including the band [0.06/ℓ, 1/ℓ] |
+| 5 | **The "every τ" claim is withdrawn.** σ₀/(2tR) diverges as τ ↓ 0 (Mills), and the corner argument fails at extreme quantiles. State (DC-G) for a specified nonempty interval. The posterior consequence needs its own denominator bound, which uses (A3) with V |
+| 6 | Endpoints at slack 0.03: **790 (τ = ½), 196 (0.25/0.75), 12 (0.05/0.95)**, and 3.4 (0.01/0.99). The join to region (I) uses the slack-adjusted ℓ₁ |
+| 7 | Interpolating fits are excluded at every tuning under the strict corner margin σ₀e^{2γ} < 2tR (keep m = n − 3) |
+| 8 | Part 2's limitation is restricted to *this* bound. Delete the Δ = 0 coverage assertion; the hybrid stays CONJECTURE |
+
+**Status: L2 is PROVED and cross-family audited for the paper's Gaussian design at the levels τ ∈ {0.05, 0.25, 0.5, 0.75, 0.95}**, on [ℓ₁, ℓ₀] with the endpoints above, given (A3) for the denominator. Mixed and Beta: open (Fable B, in progress). Beta at τ = 0.95: not covered by this method.
