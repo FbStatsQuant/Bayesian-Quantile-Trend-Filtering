@@ -2,7 +2,7 @@
 
 *Theory Department, 2026-11-23.*
 
-**Status: SELF-CHECKED (2026-11-23, 13:40 CT); not yet audited.** All six items of the self-check list pass; one fix (a log factor in condition (i)). It needs an audit by a different model before HQ can relay it.
+**Status: AUDITED by Astra (`reviews/AUDIT_astra_C1_W.md`, 2026-11-23), all findings applied (see "Response to the audit").** Astra's verdict on the version as first written was REJECT, because it lacked the upper restriction Vλ = o(n³) and the uniform L6 hypotheses. With those added, Astra confirms that the proof establishes the oracle conclusion uniformly on compact σ-intervals. Self-checked 13:40 CT.
 
 **Purpose.** This is the σ-aligned headline candidate for `../ALIGNMENT_MEMO.md`, route C1. It needs no (EM), no σ ≥ σ̄ and no moments. Its rate is suboptimal.
 
@@ -27,7 +27,8 @@ with C_r a constant depending only on f (chosen in Step 3).
 
 Assume λ = λₙ is such that:
 - **(i) the sup-norm condition** r⁴T₀ → 0, i.e. **λ/(n^{23/11}(log n)^{12/11}) → ∞**, since r⁴T₀ ≍ n^{23/7}λ^{−11/7}(log n)^{12/7};
-- **(ii) the denominator** has a radius ε = εₙ ∈ (0, 1) with nε² → ∞, nε² = o(n r²), and prior budget −log Π_λ(u_h + B_{ε/2}) ≤ C_pr·nε² (L3 + L4 or L4q/L4q-M, as in Theorem B).
+- **(i′) the TV restriction** Vλ = o(n³), i.e. T₀ ≫ V. Without it the truth's own TV can exceed the TV radius; see Astra's counterexample at λ = n^{7/2}, finding 2.
+- **(ii) the denominator, uniformly over the class:** a common deterministic sequence ε = εₙ ∈ (0, 1) and a constant C_pr such that, for every admissible truth, there is a deterministic centre u_h with ‖P⊥S(u_h − u\*)‖ₙ ≤ ε/2 and −log Π_λ(u_h + B_{ε/2}) ≤ C_pr·nε², and with nε² → ∞, nε² = o(n r²). At the oracle this is supplied by Theorem B's construction (L3 + half-radius L4q + L4q-M; joins J5–J8).
 
 At λ ≍ n^{5/2}/V, (ii) holds with ε² ≍ (log n)^{1/6}V^{1/3}n^{−5/6}, and n^{−5/6} = o(n^{−4/7}).
 
@@ -85,7 +86,7 @@ In both cases δ₁ ∈ K′.
 
 Both terms → 0, because nε² = o(n r²), εnr → ∞ and nε² = o(n). The probability of the complement of the event is ≤ P₀(Ω_Gᶜ) + 1.44/(nε²) → 0.
 
-**Uniformity in ω.** For ω ∈ [ω₁, ω₂], the first term is largest at ω₁ in its leading exponential (its polynomial prefactor at ω₁ is harmless), and the denominator is weakest at ω₂. So replacing ω by ω₁ in −ωfnr²/8 and by ω₂ elsewhere bounds the supremum. The condition is n r² ≫ (ω₂/ω₁)nε², which holds. The events Ω_G and Ω₆ are ω-free. ∎
+**Uniformity in ω.** For ω ∈ [ω₁, ω₂], replace ω by ω₁ in **both** the prefactor (16/(ωf ε n r))³ and the negative exponent −ωfnr²/8, and by ω₂ in the positive denominator exponent and in Step 6's a. One intersection Ω_G ∩ Ω₆ controls every ω on each dataset. Measurability of the supremum follows from continuity in ω (the endpoint integrands give an integrable dominator, by L5). The condition is n r² ≫ (ω₂/ω₁)nε², which holds. The events Ω_G and Ω₆ are ω-free. ∎
 
 ## What this gives and what it does not
 
@@ -112,3 +113,18 @@ Both terms → 0, because nε² = o(n r²), εnr → ∞ and nε² = o(n). The p
 6. **Use of (A2).** The lower half of (A2) enters only in Step 1 (the local margin) and in the threshold of Step 3; L6 uses only the upper half. ✓
 
 **Fix:** condition (i) carries the log factor (log n)^{12/11}; it is still satisfied at λ ≍ n^{5/2}/V.
+
+## Response to the audit (Astra, `reviews/AUDIT_astra_C1_W.md`)
+
+Each finding was verified by Theory before it was applied.
+
+| # | Finding | Ruling | Theory's check | Change |
+|---|---|---|---|---|
+| 1 | Step 6 needs Vλ = o(n³) | **HOLDS** | Step 6's exponent is −Tn/2 + a + 1 + m log 2 + Vλ/(2n²); it is ≤ −Tn/4 only if Vλ/n² = o(n). My self-check noted this but did not put it in the statement. | Condition (i′) added |
+| 2 | Counterexample at λ = n^{7/2} | **HOLDS** | TV(δ) ≥ TV(θ\*) − TV(θ). With TV(θ\*) ≈ V > T₀ = Tn³/λ, the posterior is pushed outside the TV radius. It violates (i′), so it is consistent with finding 1. | Covered by (i′) |
+| 3 | L6's centre and a uniform budget are needed | **HOLDS** | A budget at an arbitrary centre does not give L6's approximation hypothesis. | (ii) restated with common ε, C_pr and a centre u_h for every truth |
+| 4 | Bousquet level x = log n needs nr² ≫ log n | **HOLDS** (moot after #1) | Under (i′), λ ≤ n³ gives nr² ≳ n^{2/7}(log n)^{6/7} ≫ log n. | None needed beyond (i′) |
+| 5 | ω₁ belongs in the prefactor too | **HOLDS** | The prefactor ∝ ω^{−3} is largest at ω₁. | Uniformity paragraph corrected |
+| 6 | Width: rounding of k and the null-space term in the entropy comparison | **HOLDS** (cosmetic) | Taking q = (T₀√n/ρ)^{1/3} with k = 1 if q < 1, q ≤ k ≤ 2q if 1 ≤ q ≤ m, and k = m otherwise gives the same bound. | Lemma W remark added |
+
+**Net effect.** The oracle conclusion is unchanged: contraction at rate n^{−4/7}(log n)^{6/7} and ‖δ‖∞ → 0, for every σ, uniformly on compact σ-intervals, moment-free. The general-λ statement now carries the window n^{23/11}(log n)^{12/11} ≪ λ ≪ n³/V.

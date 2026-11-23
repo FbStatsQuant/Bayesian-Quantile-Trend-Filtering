@@ -1,6 +1,6 @@
 # Lemma W: Rademacher width of the TV⁽³⁾ ∩ ℓ₂ body (in-house, via L3's singular values)
 
-*Theory Department, 2026-11-23. Status: **PROVED (self-checked; not yet audited)**. Used by route C1 of `../ALIGNMENT_MEMO.md`.*
+*Theory Department, 2026-11-23. Status: **PROVED; advisor-checked (Astra: ACCEPT, `reviews/AUDIT_astra_C1_W.md`)**. Used by route C1 of `../ALIGNMENT_MEMO.md`.*
 
 ## Statement
 
@@ -52,3 +52,7 @@ Let G := sup_{δ∈K}|ℛ(δ) − M(δ)|, with ℛ(δ) = Σᵢ Xᵢ(δᵢ) and M
 - Bousquet's inequality, with envelope ≤ 2 sup_K‖δ‖∞ and wimpy variance ≤ sup_K Σδᵢ² ≤ nρ², gives the deviation.
 
 All of this is **moment-free**: the Xᵢ are bounded by |δᵢ|.
+
+**Remarks after the audit (Astra, finding 6).**
+- *Rounding.* Put q := (T₀√n/ρ)^{1/3}. Take k = 1 if q < 1 (then the tail is ≤ √n ρ√q); take q ≤ k ≤ 2q if 1 ≤ q ≤ m; take k = m if q > m (then the tail vanishes and √m ≤ √q). The displayed order bound holds in every case.
+- *Entropy comparison.* For the full body, the entropy (Dudley) bound must include the null-space term of order √n ρ, as Lemma W does.
