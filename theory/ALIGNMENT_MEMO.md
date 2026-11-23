@@ -28,6 +28,8 @@
 - **V2** (b₀ ∝ n^{−5/2}): pilot running.
 - **V1** (λ fixed): expected to fail on data; test running.
 
+**Joint non-crossing (Theorem J, Fable B; Theory-checked; Astra audit running).** For a fixed number of levels, V0T\* and C\* transfer to the paper's joint non-crossing posterior at n^{−5/6}, with no extra separation condition: upper (A2) forces separated true quantiles, and the sup-norm conclusion makes the constraint asymptotically inactive. Caveat: at the paper's n the ordering is likely still active, so the theorem says the constraint does no harm asymptotically, not that it helps.
+
 **General k:** rate n^{−(2k+1)/(2k+2)} at λ = n^{k+1/2}/V, for every k ≥ 1. **PROVED and cross-family audited** (Fable B; Astra: ACCEPT WITH FIXES). The Christoffel constant (k+1)² is proved for every degree. k = 1 has a thin but sufficient margin. At k = 0 only Theorem B survives.
 
 **Caveat for the paper:** all theorems concern the POSTERIOR. His P-MALA λ is not converged at n ≥ 1000 (Engineering aca7214).
