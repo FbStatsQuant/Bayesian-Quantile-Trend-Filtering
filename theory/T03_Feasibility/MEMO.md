@@ -19,6 +19,24 @@
 
 ---
 
+## ADDENDUM v3.1 (2026-11-22, after the final reviews; supersedes the summary below where they differ)
+
+- **Statement.** `STATEMENT_DRAFT.md` is now v3.1. Its changes:
+  - Theorem A requires **strict slack**, ω ≤ (1−η)ω̄. The equality case is false (Astra's counterexample).
+  - The window is n² ≤ λ ≤ n³/(V^{3/2}(log n)^{C₀}), with C₀ > 3c/5.
+  - The theorem is stated in both losses.
+  - L10 is planned via the VP's two-stage route.
+  - The mixture row is corrected: it is not covered globally.
+- **Positioning (HQ decision).** The light-tail **Theorem B** is proved first.
+  - B assumes the global MGF condition (EM). Sufficient conditions are Astra's two-sided envelope, or a ψ₁ bound plus a σ threshold.
+  - B is in Δ²ₙ only. It does not relax σ > σ̄; it adds a tail constraint.
+  - **If the moment-free Theorem A is proved**, A is the main theorem and B is the warm-up proposition.
+  - **If not**, B is the main theorem, and moment-free contraction is stated as a conjecture supported by the t₂ and Cauchy simulations.
+- **Sandwich check** (Engineering, the VP's test). At Gaussian noise, τ = ½, σ = σ₀, the replicate variance of the posterior mean divided by the spread is 1.49 in the null-space directions (≈ π/2) and 1.08 in the rough part. The σ̄ restriction is therefore a limitation of the proof route, not an empirical inflation of the rate.
+- **Outlook (referee points, no action now).**
+  - A lower bound in one case (quadratic truth) is the best single addition.
+  - The oracle λ depends on V.
+
 ## FINAL SUMMARY (read this first; it supersedes §0–§7 where they differ)
 
 **1. The theorem.** `STATEMENT_DRAFT.md` v3 is the final statement. Under (A1)–(A4), at fixed σ and λ:
