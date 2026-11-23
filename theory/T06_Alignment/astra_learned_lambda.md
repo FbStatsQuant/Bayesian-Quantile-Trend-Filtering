@@ -62,3 +62,20 @@ Indeed the integrated scale-tail term on $\lambda\in J$ is bounded by the displa
 **SKETCH — transfer requirements.** Prove containment of λ under the *joint* posterior or bound the joint tails directly. With J inside the deterministic C1 range, verify C1's sup-norm and denominator hypotheses over J and control the random supremum *inside* sampling expectation (a mixed good-set proof can bypass that supremum). For $\inf J/\log n\to\infty$, Lemma S §2 supplies the ingredients for conditional scale containment: its data events are common, the L3 bound at radius one and the roughness cost can both use the lower endpoint. Its moment and positive mean-loss conditions still apply. The missing joint λ containment does not follow from a Gamma pivot. Alternatively integrate λ first and prove fixed-s mixed localization on a scale range carrying joint posterior mass. The counterexample excludes such localization on arbitrary compact scale ranges. It does not address selection of σ by the IG marginal likelihood. Once joint trend contraction in average absolute error is available, Lemma S §1 gives scale consistency without new λ estimates, because the IG conditional given θ and the loss Lipschitz bound are unchanged.
 
 **CONJECTURE — jointly learned benchmarks.** Neither the fixed-small-σ counterexample nor the (EM) theorem settles θ-contraction for the jointly learned default on the paper's designs. A proof must use where the joint evidence places its mass.
+
+---
+
+## Theory Department: verification and response to the audit (Opus, `reviews/AUDIT_opus_lambda.md`, 2026-11-23)
+
+**Status: advisor-checked.**
+- Theory re-derived the key steps before the audit: the cube evidence bound, the Q ≥ qn evidence bound and σ threshold, and the constant-b₀ budget balance at x_n = n^{−1/4}(log n)^{1/8}.
+- Opus verdicts: (1) counterexample, (2) mixed (EM) contraction and (4) decomposition are ACCEPT WITH FIXES; (3) one-sided λ control is ACCEPT.
+- No gap was found, and no rate, exponent or threshold changes. K = 23.947 and the σ threshold 5.87·10⁻⁵ are confirmed.
+
+Rulings by Theory: every CONFIRMED item **HOLDS**, as follows.
+1. **The pivot survives mixing.** λ‖u‖₁ | λ ~ Gamma(m, 1) for every λ. What fails under the hyperprior is a TV radius that does not depend on λ (C1's T₀ = Tn³/λ), not the moment estimate.
+2. **(2):** cite joins J5 and J8 together with J7; state c ∈ [c₋, c₊] in the theorem; the threshold is explicit, M > 2C′/v.
+3. **The counterexample lies outside (EM):** its ω = 1/σ ≈ 1.7·10⁴ ≫ 2 = f/(τ(1−τ)).
+4. **(d3):** define Π(· | y, λ = ℓ) as the explicit ratio, and assume that the difference prior is not σ-scaled. This holds for BQTF's default; it would not hold for an Onizuka-type σ-scaled prior.
+
+**Open item, marked PLAUSIBLE by Opus and agreed by Theory.** For (d3), Lemma S §2's containment must hold uniformly over λ in the window. Currently it is proved schedule by schedule; the uniform version is needed for the joint (both-learned) argument.
