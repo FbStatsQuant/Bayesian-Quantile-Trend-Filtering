@@ -2,7 +2,7 @@
 
 *Theory Department, 2026-11-23.*
 
-**Status: proof WRITTEN, self-check in progress; not yet audited.** Every step below is stated with its justification. It needs a full self-check, then an audit by a different model, before HQ can relay it.
+**Status: SELF-CHECKED (2026-11-23, 13:40 CT); not yet audited.** All six items of the self-check list pass; one fix (a log factor in condition (i)). It needs an audit by a different model before HQ can relay it.
 
 **Purpose.** This is the σ-aligned headline candidate for `../ALIGNMENT_MEMO.md`, route C1. It needs no (EM), no σ ≥ σ̄ and no moments. Its rate is suboptimal.
 
@@ -26,7 +26,7 @@ Fix T ≥ 4. Put T₀ := T·n³/λ and
 with C_r a constant depending only on f (chosen in Step 3).
 
 Assume λ = λₙ is such that:
-- **(i) the sup-norm condition** r⁴T₀ → 0, i.e. **λ/n^{23/11} → ∞**;
+- **(i) the sup-norm condition** r⁴T₀ → 0, i.e. **λ/(n^{23/11}(log n)^{12/11}) → ∞**, since r⁴T₀ ≍ n^{23/7}λ^{−11/7}(log n)^{12/7};
 - **(ii) the denominator** has a radius ε = εₙ ∈ (0, 1) with nε² → ∞, nε² = o(n r²), and prior budget −log Π_λ(u_h + B_{ε/2}) ≤ C_pr·nε² (L3 + L4 or L4q/L4q-M, as in Theorem B).
 
 At λ ≍ n^{5/2}/V, (ii) holds with ε² ≍ (log n)^{1/6}V^{1/3}n^{−5/6}, and n^{−5/6} = o(n^{−4/7}).
@@ -94,7 +94,7 @@ Both terms → 0, because nε² = o(n r²), εnr → ∞ and nε² = o(n). The p
 - **It does not give** the optimal rate. That is n^{−4/7} here, against n^{−5/6}; with an entropy width instead of Lemma W, n^{−5/7}. The optimal rate below σ̄ is route C2 (Hölder–Knight), which can now use the sup-norm localization from C1.
 - **It does not cover** learned λ under constant b₀, where λ ∝ n^{3/4} is outside (i).
 
-## Self-check list (to do before audit)
+## Self-check (done 13:40 CT)
 
 1. Lemma W's constants and the choice of k when (T₀√n/r)^{1/3} > m.
 2. The exact form of Bousquet's inequality used (one-sided, on the class {ℛ − M}), including the envelope with s_K.
@@ -102,3 +102,13 @@ Both terms → 0, because nε² = o(n r²), εnr → ∞ and nε² = o(n). The p
 4. That L6's prior-mass inputs hold at the claimed λ: the half-radius conditions of L4q-M at λ = n^{5/2}/V, as in Theorem B.
 5. Measurability of the cone partition.
 6. That (A2)'s lower half is needed only in Step 1 (the local margin), and that L6 needs only the upper half.
+
+**Results of the self-check.**
+1. **k ≤ m.** At the oracle, k\* = (T₀√n/r)^{1/3} ≤ m ⇔ λr ≥ T√n, which holds for λ ≥ n². (If k = m the tail vanishes but the head is ~ n r, too large, so k\* ≤ m is needed, and it holds.) ✓
+2. **Bousquet.** Applied to F ∪ (−F), F = {(Xᵢ(δᵢ) − mᵢ(δᵢ))ᵢ : δ ∈ K′}, with sup|fᵢ| ≤ 2s_K and v ≤ n r². This gives P(G ≥ EG + √(2x(v + 4s_K·EG)) + 2s_K x/3) ≤ e^{−x}. With x = log n the deviation is o(n r²). ✓
+3. **Step 6.** t ≤ Γ/(Tn) + s₀, because n²‖u‖₁/T₀ = Γ/(Tn) and n²‖u\*‖₁ ≤ V. The function t³e^{at}1{t>1} is increasing in t. Then t³ ≤ 6eᵗ, and the Gamma MGF at rate ½ is 2^m. The n₀ condition is Tn/4 ≥ a + 1 + Vλ/(2n²) + m log 2: true for T ≥ 4, since a = o(n) and Vλ/n² = o(n) for λ = o(n³/V). ✓
+4. **L6 prior mass at λ ≍ n^{5/2}/V.** As in Theorem B (joins J5–J9, audited). ✓
+5. **Measurability.** A₁ and A₂ are Borel (defined by continuous functions). ✓
+6. **Use of (A2).** The lower half of (A2) enters only in Step 1 (the local margin) and in the threshold of Step 3; L6 uses only the upper half. ✓
+
+**Fix:** condition (i) carries the log factor (log n)^{12/11}; it is still satisfied at λ ≍ n^{5/2}/V.

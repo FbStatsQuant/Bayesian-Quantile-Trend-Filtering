@@ -95,13 +95,13 @@ Here Π_σ is the θ-posterior at fixed σ (λ fixed, or learned and mixed over)
      This breaks the circularity Astra flagged in the W-01 review.
    - **§3, PROVED: transfer.** If Hypothesis U holds (uniform fixed-σ localization on the whole of [l, H₀], with the supremum inside the expectation), then (H) and hence Lemma S follow.
    - **Hypothesis U is exactly what C1 states** (`T06_Alignment/C1_any_sigma.md`: E sup_{ω∈[ω₁,ω₂]} Π_ω(‖δ‖ₙ > r | y) → 0, which gives |Q − Q\*|/n ≤ ‖δ‖ₙ ≤ r → 0).
-3. **Combined (C1 + Lemma S): learned σ under Felipe's IG(0.1, 0.1) prior, deterministic λ ≫ n^{23/11} (including λ ≍ n^{5/2}/V):**
+3. **Combined (C1 + Lemma S): learned σ under Felipe's IG(0.1, 0.1) prior, deterministic λ ≫ n^{23/11}(log n)^{12/11} (including λ ≍ n^{5/2}/V):**
    - Π(‖θ − θ\*‖²ₙ > r² | y) → 0 with r² ≍ n^{1/7}λ^{−2/7}(log n)^{6/7}, i.e. n^{−4/7} at the oracle;
    - ‖θ − θ\*‖∞ → 0;
    - σ/σ₀,ₙ → 1 in posterior probability;
    - moment-free apart from uniform integrability, and with **no condition σ > σ̄**.
 
-   **Status: SKETCH, pending C1's self-check and the audits of C1, Lemma W and Lemma S.** If these hold, this is a **σ-aligned theorem**: it covers the method's actual σ treatment, at a suboptimal rate.
+   **Status: C1 SELF-CHECKED (13:40 CT); W PROVED (self-checked); S verified by Theory; cross-model audit of all three pending.** If these hold, this is a **σ-aligned theorem**: it covers the method's actual σ treatment, at a suboptimal rate.
 
 ---
 
