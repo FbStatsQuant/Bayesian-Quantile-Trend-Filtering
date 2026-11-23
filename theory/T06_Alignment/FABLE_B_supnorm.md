@@ -343,3 +343,84 @@ Both are constant-level statements, in a regime where every quantity is of its n
 **The stopping point, now a single sign.** A strict Brascamp–Lieb gap, ω·Var(S_v | X) ≤ (1 − c)·E[∂_vS_v | X]; the non-strict version is proved. Equivalently: monotone regression between neighbouring coordinates. This is where route (b)'s Markov structure should enter. **That makes it the Tuesday entry point for the L4a/L4b lemma.**
 
 **Diagnostic (UNTESTED, internal).** It can ride on the Tuesday draws check: compare Σ̂⁻¹ with ω·P_𝒮·diag(κ̂)·P_𝒮.
+
+---
+
+## 11. Route (b): the order-3 Markov structure
+
+*Appended 2026-11-23, about 16:30 CT, same author. Not audited. Read for this section: `FABLE_A_gap4.md` §3–4. Object: the full fixed-(ω, ℓ) posterior of θ on ℝⁿ, density ∝ exp{−ωQ(θ) − ℓ‖Dθ‖₁}; k̄ := max(τ, 1 − τ).*
+
+### 11.0 Outcome
+
+| # | Claim | Status |
+|---|---|---|
+| 1 | (i) **The interaction is not attractive.** The FKG lattice (MTP₂) criterion fails in θ-coordinates, in u = Dθ coordinates and in second-difference coordinates. No positive-association theorem applies; monotone neighbour regression is not obtained | PROVED computation (§11.1) |
+| 2 | (ii) **Block spike lemma.** For a block I of length g with g(g+1)² ≤ ℓ/(ωk̄), every data vector and every outside configuration: P(‖θ_I − θ′_I‖∞ > a \| outside, y) ≤ exp{2ℓρ_I + 1.8g − ℓa/(2(g+1)²)}, θ′_I the minimal-roughness interpolant and ρ_I its cost | PROVED (§11.2) |
+| 3 | Exact additivity ℛ(δ) = ℛ(δ^{lo}) + ℛ(δ^{hi}), and: for Fable A's reduction a **posterior-probability** bound Π(E_s > ηk \| y) ≤ ½ is enough (it can be absorbed) | PROVED (§11.3) |
+| 4 | The bound on high-amplitude energy | **not proved**; it is reduced to two named statements, (ρ) and (B2) (§11.4) |
+
+### 11.1 FKG does not apply — PROVED computation
+
+Holley's criterion on ℝⁿ asks for −log(density) to have non-positive mixed second derivatives (in the distributional sense).
+- *θ-coordinates.* The likelihood is a sum of one-coordinate terms (no mixed derivatives). A penalty term |cᵀθ| with stencil c = (−1, 3, −3, 1) has mixed derivative δ₀(cᵀθ)·c_ic_k, and c_ic_k takes both signs: (−1)(3) < 0 but (−1)(−3) > 0 and (3)(−3) < 0, (3)(1) > 0. So the third-difference penalty is attractive between adjacent coordinates and **repulsive between coordinates two apart**. (For first differences, c = (−1, 1), every product is negative: order k = 0 is attractive. For second differences, c = (1, −2, 1), the pair at distance two is repulsive. So FKG is available only for k = 0.)
+- *u-coordinates.* The prior is a product. The likelihood terms ρ_τ(yᵢ − (Nc + Su)ᵢ) have mixed derivatives ρ_τ″·S_{ij}S_{ik} ≥ 0 (all entries of S are ≥ 0): repulsive.
+- *Second-difference coordinates.* The penalty becomes a first difference (attractive) but the likelihood is again a convex function of a non-negative combination: repulsive.
+
+The criterion is sufficient, not necessary, so this does not show that neighbour regressions fail to be monotone. It shows that **no off-the-shelf positive-association argument gives the sign** asked for in §10.3 (L). Item (i) stops here.
+
+### 11.2 The block spike lemma — PROVED
+
+Let I = {p+1, …, p+g} with at least three coordinates on each side, and 𝒥_I := {p−2, …, p+g} the g + 3 stencils that touch I. Fix the outside values. Let F(θ_I) := Σ_{j∈𝒥_I}|(Dθ)_j|, ρ_I := min_{θ_I}F, θ′_I a minimizer, β := θ_I − θ′_I ∈ ℝ^g, and 𝖣β ∈ ℝ^{g+3} the values on 𝒥_I of D applied to β extended by zero.
+
+**Lemma B1.** If g(g+1)² ≤ ℓ/(ωk̄), then for every a > 0, every data vector and every outside configuration:
+
+  **P(‖θ_I − θ′_I‖∞ > a | θ_{Iᶜ}, y) ≤ exp{2ℓρ_I + g·log 6 − ℓa/(2(g+1)²)}.**
+
+*Proof.*
+1. *Inverse inequality.* β extended by zero vanishes at p−2, p−1, p, so by Newton's formula β_{p+i} = Σ_{j=p−2}^{p+i−3}C(p+i−j−1, 2)·(𝖣β)_j, with coefficients ≤ (g+1)²/2. Hence ‖β‖∞ ≤ ((g+1)²/2)·‖𝖣β‖₁ and ‖β‖₁ ≤ (g(g+1)²/2)·‖𝖣β‖₁. In particular 𝖣 is injective and N(β) := ‖𝖣β‖₁ is a norm on ℝ^g.
+2. *Sandwich.* F(θ_I) = ‖(Dθ′)_{𝒥_I} + 𝖣β‖₁ ∈ [N(β) − ρ_I, N(β) + ρ_I], and |Q_I(θ′_I + β) − Q_I(θ′_I)| ≤ k̄‖β‖₁ ≤ (ℓ/(2ω))·N(β) by the hypothesis on g. So the conditional density of β is between c·e^{−ℓρ_I}e^{−(3ℓ/2)N(β)} and c·e^{ℓρ_I}e^{−(ℓ/2)N(β)}.
+3. *Ratio.* For any Borel A: P(β ∈ A | ·) ≤ e^{2ℓρ_I}·∫_Ae^{−(ℓ/2)N}/∫e^{−(3ℓ/2)N} = e^{2ℓρ_I}·3^g·P_{ℓ/2}(A), where P_c has density ∝ e^{−cN(β)} (by scaling, ∫e^{−cN} = c^{−g}∫e^{−N}).
+4. *Radial law.* Under P_c, N(β) ~ Gamma(g, rate c). {‖β‖∞ > a} ⊂ {N > 2a/(g+1)²}, and P(Gamma(g, 1) > x) ≤ 2^g e^{−x/2}. ∎
+
+**Reading.** At block lengths up to the bandwidth (g³ ≲ ℓ/ω), the likelihood cannot move a block away from the prior's minimal-roughness interpolant of its surroundings by more than a ≈ (g²/ℓ)·(4ℓρ_I + 4g): **features narrower than the bandwidth are slaved to the prior, whatever the data.** With the prior-typical boundary cost ℓρ_I ≍ g this is a ≍ g³/ℓ, which is ≪ s = ℓ^{−1/18}/log n for g ≤ c·(ℓs)^{1/3}, a length just below the bandwidth ℓ^{1/3}. The lemma is deterministic in the data, so it is immune to the score-alignment obstruction (Astra §1; (O1) of `FABLE_A_gap4.md`): a score-aligned bump of width < g and amplitude > a simply has no room.
+
+### 11.3 Two exact facts for the reduction — PROVED
+
+- **Additivity.** ℛ(δ) = ΣᵢXᵢ(δᵢ) and Xᵢ(0) = 0. With δ^{hi}ᵢ := δᵢ1{|δᵢ| > s} and δ^{lo} := δ − δ^{hi}: **ℛ(δ) = ℛ(δ^{lo}) + ℛ(δ^{hi})**, exactly. The high-amplitude part of the loss is a sum over the high-amplitude coordinates only.
+- **Absorption.** In the reduction of `FABLE_A_gap4.md` §3, Z̃ ≤ e^{Cηk}𝒵 + N(K_Hᶜ) + N(K_H ∖ 𝒢). If Π_{ω,ℓ}(K_H ∖ 𝒢 | y) ≤ ½, i.e. N(K_H ∖ 𝒢) ≤ ½Z̃, then Z̃ ≤ 2(e^{Cηk}𝒵 + N(K_Hᶜ)). So **a posterior-probability bound of ½ on {E_s(δ) > ηk} suffices**; an absolute evidence bound e^{−ck} is not needed.
+
+### 11.4 Where it stops
+
+To get Π_{ω,ℓ}(E_s(δ) > ηk | y) ≤ ½ from Lemma B1, two statements are missing.
+
+**(ρ) Posterior control of the boundary cost.** Lemma B1 carries the factor e^{2ℓρ_I}. ρ_I ≤ ‖(Dθ)_{𝒥_I}‖₁, and Theorem H gives only the global bound ‖Dθ‖₁ ≤ Tn/ℓ, i.e. ℓρ_I ≲ g **on average over blocks**. What is needed is: for all but a fraction o(k/n·…) of the blocks, ℓρ_I ≤ C·g, in posterior probability. The global bound gives this by Markov's inequality for a fixed fraction of blocks (at most a fraction 1/K of the n/g blocks have ℓ·‖Dθ‖_{1,block} > K·T·g), which is **not enough**: the exceptional blocks are a constant fraction, and E_s > ηk is itself an event about a fraction ≍ k/(n s²·g)·… of blocks. A multi-scale induction (the cost at scale g is controlled by the deviations at scale 2g, which Lemma B1 controls given the cost at scale 2g) is the natural proof; it is not written.
+
+**(B2) Wide runs.** After Lemma B1, a high-amplitude set consists of runs of length ≳ g whose profile varies slowly (it is the interpolant of coarse values plus a deviation ≤ a). For such δ one needs, uniformly: **ℛ(δ^{hi}) ≥ (1 − η)·M(δ^{hi})**, with M(δ^{hi}) ≥ (f/2)‖δ^{hi}‖₂². Scale bookkeeping says there is room: on a run of length L the margin is ≥ ω(f/2)s²L, the profiles have ≈ L/g free coarse values, so the entropy is ≈ (L/g)·log n, and s²·g ≍ ℓ^{−1/9}·(ℓs)^{1/3} = ℓ^{11/54}/polylog ≫ log n. So a net-and-union argument over coarse profiles should work run by run — SKETCH; the uniformity over the deviation ≤ a inside each block (where score alignment is possible but bounded by ω·a·L) also has to be absorbed, which needs a ≪ s²·f, i.e. a slightly shorter g.
+
+**Then the conclusion would be:** on K_H ∖ 𝒢 minus the spiky configurations, −ωℛ(δ) ≤ ω·η·f·k − ω(1 − η)(f/2)‖δ^{hi}‖₂² (Lemma 1′ for the low part, (B2) for the high part), which is ≤ −cηk as soon as E_s > 3ηk; and the spiky configurations have small posterior probability by B1 + (ρ). That is the posterior statement (O1) asks for.
+
+**Markov-chain form — SKETCH.** Conditionally on the triples at block boundaries, blocks are independent, so the sequence of boundary triples is a Markov chain under the posterior. Both (ρ) and the block-wise version of the energy bound are statements about this chain; the clean formulation is a drift condition: a Lyapunov function V of the boundary triple (distance to the truth plus incompatibility cost) with E[e^{θ(E_s^{block} + V(next))} | current] ≤ e^{θ(ϱ·V(current) + c)}, ϱ < 1. Lemma B1 is the "one-step contraction at scales below the bandwidth" for the incompatibility part. The contraction of the distance-to-truth part over a block of length C·h (the forgetting property of §7) is the piece with no proof and no partial result.
+
+### 11.5 Assessment
+
+- (i) is closed negatively: the sign will not come from positive association.
+- (ii) has one new unconditional tool (Lemma B1) and a sharper target (posterior probability ½ instead of an evidence bound). The remaining work is (ρ), (B2) and forgetting at the bandwidth scale. Of these, (B2) looks routine, (ρ) looks like a careful induction, and forgetting is the genuine difficulty: it is where the likelihood, not the prior, must do the work, at exactly the scale where Lemma B1's hypothesis g³ ≲ ℓ/ω stops.
+- Lemma B1 uses only that the check loss is k̄-Lipschitz; it holds for any Lipschitz convex loss and every level τ.
+
+## Theory response to §11 (2026-11-23)
+
+**Status: OPEN. UNAUDITED.**
+
+**(i) FKG fails.** The FKG lattice criterion fails in θ-, u- and second-difference coordinates; only k = 0 is attractive. This is a PROVED computation. Since the criterion is only sufficient, monotone regression is not disproved, but off-the-shelf positive association is ruled out.
+
+**(ii) New unconditional tool: the block spike lemma (PROVED, unaudited).** Sub-bandwidth features are slaved to the prior, deterministically in the data, so the lemma is immune to the score-alignment obstruction.
+
+**Sharpening of Fable A's target (PROVED).**
+- The loss splits exactly into low and high parts.
+- In FABLE_A_gap4.md §3, a posterior-probability bound of ½ on high-amplitude energy suffices.
+
+**What stops it:**
+- posterior control of the boundary cost for almost all blocks, which needs a multi-scale induction;
+- the forgetting property at the bandwidth scale, where the likelihood must do the work. **This is the genuine difficulty.**
+
+**Next.** All of this goes to Tuesday's L4a/L4b entry, alongside the strict Brascamp–Lieb gap (§10).
