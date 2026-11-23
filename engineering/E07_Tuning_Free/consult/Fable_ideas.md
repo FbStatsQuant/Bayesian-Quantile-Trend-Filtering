@@ -45,7 +45,7 @@ Same block per level, with f(η) = −∞ whenever θ(η) leaves [θ_{j−1}, θ
 Add one common curve Δ to **every** level: θ_j ← θ_j + Δ. Ordering is preserved for any Δ, so there is no box. Given all (s_j, z_j, λ_j, σ_j), Δ ~ N(P_Σ⁻¹ Σ_j P_j(μ_j − θ_j), P_Σ⁻¹) with P_Σ = Σ_j P_j, banded: one `banded_gauss_draw` with w = Σ_j w_j, iw = Σ_j iw_j. Exact Gibbs along a translation; cost ≈ 1/J of a sweep.
 **Why:** at 0.97–0.99 the levels are stacked, and one-level-at-a-time updates can only creep; the common mode moves at full posterior scale.
 **Confirm / kill:** ESS/s of the level-averaged curve at 9 points improves ≥ 2× at equal wall time on a 0.95–0.99 stack; kill below 1.3×.
-The same block is valid in his joint P-MALA with the P_j replaced by a draw-free MH version (propose Δ ~ N(0, cP_Σ⁻¹), ratio Π_j π_j(θ_j+Δ)/π_j(θ_j)).
+His joint P-MALA has no s_j, so there it is a Metropolis move: propose Δ ~ N(0, cP̃⁻¹) with P̃ the sum of his level metrics, accept with probability min{1, exp Σ_j [U_j(θ_j) − U_j(θ_j+Δ)]} (symmetric proposal; one step size c).
 
 ### Idea 4: gap coordinates
 Parametrise (θ₁, g_j = θ_{j+1} − θ_j ≥ 0). Each g_j | rest is Gaussian (precision Σ_{l>j} P_l) truncated to the positive orthant: one-sided constraints, at the gap's own scale. Sample with elliptical slice sampling using closed-form feasible angles (rejection-free, no step size), in segments of 25–50 points so one bad coordinate does not shrink the whole move; fallback: exact reflective HMC (Pakman–Paninski), O(n) per wall hit.
@@ -116,4 +116,4 @@ S / Normal, τ = 0.5, n = 300, seed 1, his priors (b₀ = 5e-4), 1200 sweeps, 40
 
 - The T-block chain reaches the exact-Gibbs λ distribution; his chain is still 9–20× below it after 1200 sweeps.
 - Conjugate step for reference: 1/√m = 0.058.
-- **Compute disclosure:** my first two runs used multithreaded BLAS by mistake (one was killed at 300 s; together roughly 4 core-hours on this PC, not NOTS). The reported run was pinned to one core, 30 s.
+- **Compute disclosure:** my first two runs used multithreaded BLAS by mistake (one was killed at 300 s; together up to ≈ 4 core-hours on this PC, not NOTS). The reported run was pinned to one core, 30 s.
