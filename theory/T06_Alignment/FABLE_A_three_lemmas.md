@@ -11,9 +11,9 @@
 | **Lemma 1** (uniform quadratic remainder on C1's body) | **PROVED** (§2), for ℓ ≥ C·n^{54/25}·polylog |
 | **Lemma 2a** (eigenvalues of DDᵀ, two-sided, sharp constant; sharp sums) | **PROVED** (§3.1) |
 | **Lemma 2b** (deterministic sandwich for the scale-mixture covariance) | **PROVED** (§3.2) |
-| **Lemma 2c** (sharp Laplace transform of the prior: exponent (4b′)^{1/6}·nℓ^{−1/3}) | **PROVED** (§3.3), for ℓ ≥ C·n^{9/4} |
+| **Lemma 2c** (Laplace transform of the prior: **one-sided** exponent bound (4b′)^{1/6}·nℓ^{−1/3}, uniform in the shift; audit finding 6) | **PROVED** (§3.3), for ℓ ≥ C·n^{9/4} |
 | **Lemma 3** (assembly without Cauchy–Schwarz, exact in the mixture) ⇒ **Theorem LO**: Z̃_ω(ℓ) ≤ n^{C}·exp{−κ₁·nℓ^{−1/3}} whenever **β = ωt/f < 6** | **PROVED at fixed (ω, ℓ)** (§4), for ℓ ≥ C·n^{99/43}·polylog (99/43 ≈ 2.30) |
-| Uniformity in ω on a compact and in ℓ on the window; consequence for the A-rule | SKETCH (§5) |
+| Uniformity in ω on a compact and in ℓ on the window; consequence for the A-rule | **OPEN — genuine gap** (audit finding 10; repair route in finding 11). The §5 sketch is withdrawn as a proof |
 
 **Two corrections to `FABLE_A_Arule_lowertail.md` §7.**
 1. The threshold "β < 5.2" attributed there to a Hölder assembly is wrong. With Young's inequality on the coarse score and Hölder between the fine MGF and the prior's Laplace transform, the best possible threshold is (π/0.6)·[max_θ θ^{5/6}(1−θ)^{1/6}]² = 5.24·0.637² ≈ **2.1**, and with Lemma F's proven (non-sharp) Frobenius constant it drops below 1, i.e. below (EM). That route is abandoned.
@@ -113,7 +113,7 @@ with c₊ := (1 + γ)(1 + η), c₋ := (1 − γ)(1 − η)/(1 + γ), and **tr �
 
 *Proof.* For vectors: (ā + d)(ā + d)ᵀ ⪯ (1 + γ)āāᵀ + (1 + γ^{−1})ddᵀ and ⪰ (1 − γ)āāᵀ − (γ^{−1} − 1)ddᵀ. Also |b|·ā_bā_bᵀ ⪯ Σ_{j∈b}a_ja_jᵀ (Cauchy–Schwarz), and from the first inequality ā_bā_bᵀ ⪰ (1 + γ)^{−1}a_ja_jᵀ − γ^{−1}d_jd_jᵀ. Sum over j ∈ b with weights Vⱼ, use the block-sum bounds and Vⱼ ≤ v̄, then sum over b. For the trace: a_j − a_{j′} = P⊥(s_j − s_{j′}), and s_j(i) − s_{j+1}(i) = (i − j − 2)₊, so ‖s_j − s_{j+1}‖₂² ≤ n³/3 and ‖d_j‖₂ ≤ 2w·n^{3/2}/√3. ∎
 
-**Probability of the hypothesis (PROVED).** P(Vⱼ > c₀v₁) = e^{−c₀}. For a block of N ≥ w exponentials (Cramér): P(sum ≥ (1 + η)Nv₁) ≤ e^{−Nη²/3} and P(sum ≤ (1 − η)Nv₁) ≤ e^{−Nη²/2}.
+**Probability of the hypothesis (PROVED).** P(Vⱼ > c₀v₁) = e^{−c₀}. For a block of N ≥ w exponentials (Cramér): P(sum ≥ (1 + η)Nv₁) ≤ e^{−Nη²/3} **for 0 < η ≤ ½** (audit finding 3; the exact rate is η − log(1 + η)) and P(sum ≤ (1 − η)Nv₁) ≤ e^{−Nη²/2}.
 
 ### 3.3 Lemma 2c: sharp Laplace transform of the prior — PROVED
 
@@ -247,3 +247,29 @@ The posterior of λ puts no mass between n^{2.31} and the oracle scale. This is 
 Removing the min-density loss needs the averaged condition (Lemma 2b with position-dependent fᵢ). This is now a named Tuesday piece.
 
 **Data (κ̂ pilot, Engineering 75ad1a4, one seed).** The sign of the evidence slope is positive at τ = 0.05 on this Gaussian design. That supports the averaged condition, not the min-density one.
+
+
+## Cross-family audit response (Astra, `reviews/AUDIT_astra_LO.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES for Theorem LO at fixed (ω, ℓ).** The strict threshold β < 6 and the window n^{99/43} are confirmed. **The uniform statement and the A-rule consequence (§5) are OPEN.**
+
+Theory re-derived the load-bearing checks before ruling:
+- the Cramér rate at η = 1: 1 − log 2 = 0.307 < ⅓;
+- the window: 33/10 · 30/43 = 99/43;
+- the (1 + 1/n)^m ≤ e interpolation in finding 11.
+
+| # | Finding | Ruling | Change |
+|---|---|---|---|
+| 1 | Gaussian integration and shift signs: both shift terms negative; envelope fixed before Q2 | HOLDS | Fix the envelope B before applying Q2 in §4.3–4.4 (wording) |
+| 2 | Dyadic score events: use H_i = K·2^{i/6}; failures < 9.2/K; count the flat score once | HOLDS | Notation in §4.4 (K_i², the fractional mode count) |
+| 3 | Cramér upper tail η²/3 only for η ≤ ½; block-window existence calculation | HOLDS (checked) | §3.2 corrected in place; the §4.5 calculation is replaced by the audit's (ℓ^{43/30} ≳ n^{33/10}) |
+| 4 | Coefficient 6 reached with slack after fixing 6 − β; **at the endpoint ℓ = n³/(TVK), "Vℓ = o(n³)" and "q → ∞" do not follow at fixed K** | HOLDS | §6: use C1's finite numerator inequality at the upper endpoint, and a large numerical lower bound on q (via K₀) in place of q → ∞ |
+| 5 | Active-set contraction: factor 4; open interval {−s < Zᵢ < s}; shell intersection with K′; requires 3 ≤ X ≤ m/4 | HOLDS | Lemma 1: use the open active interval; state the X range |
+| 6 | Lemma 2c is a **one-sided** exponent bound; the nominal coefficient needs A > π, κ₋ → ∞ and slack | HOLDS | §0 table relabelled; the text after 2c is qualified |
+| 7 | Spectral input correct; gain-tail cutoff must be an integer J = ⌊ηn⌋; by-product error O(1/r + (r/n)²) | HOLDS (consistent with `lemma2a_check.out`) | Lemma 2a proof: integer cutoff; by-product restricted to r³ = O(n²) |
+| 8 | Lemma F′ (trimmed knots) and Lemma Lev hold; ‖(I − P_H)e‖∞ < 13.1h² | HOLDS | **F′ and Lev are now audited** (this also serves Theorem H) |
+| 9 | Non-identical noise: use the minimum *lower secant slope*, not the minimum point density; the cut-offs 3.82/1.34 check | HOLDS | §1 remark: secant constant, strict margin. **No averaged-density criterion is supplied** (Tuesday gap 2) |
+| 10 | **Genuine gap in §5**: the scalar grid does not control the changing block matrices 𝒟(w), nor the signed shift ψᵀBy\*; K_n ≫ log n and K_n = o(min k\*) conflict at the large window | HOLDS | §5 withdrawn as a proof; uniformity is OPEN |
+| 11 | (PLAUSIBLE) Repair route: an ℓ-grid at ratio 1 + 1/n interpolates the whole evidence within a factor e; log-convexity in ω handles compact σ-intervals; it needs stronger score tails (Hanson–Wright type, O(√(d log n) + log n)) on a polynomial grid | HOLDS as a route (the interpolation step was checked) | Becomes Tuesday gap 3's plan |
+
+**Status: Theorem LO is PROVED at fixed (ω, ℓ) and cross-family audited, with the fixes above. Uniformity in (σ, λ), and hence the A-rule posterior statement, is OPEN.**
