@@ -1,0 +1,5 @@
+source("/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E07_Tuning_Free/joint_gibbs/validate/common2.R")
+taus <- c(0.90, 0.93, 0.96, 0.97, 0.98, 0.99); d <- simulate_data(1, 500, taus[1], "VS", "Normal")
+f <- bqtf_joint2(d$y, taus, 1, 0.01, 0.1, 0.1, 400, 200, chain_ids = 1, keep_theta = FALSE)
+cat("v2 sec/sweep", f$sec_per_sweep, " crossings", sum(f$crossings), " pCN acc", round(f$acc_pcn, 3), " asis moved", round(f$asis_moved, 3), "\n")
+print(round(apply(f$lambda[201:400, , 1], 2, median), 1))
