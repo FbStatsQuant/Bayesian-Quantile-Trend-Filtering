@@ -195,3 +195,21 @@ Summing (a)–(c) and adding the probabilities of the complements of the events 
 - **Excludes** the band [C·n^{99/43}polylog, c₋n^{5/2}(log n)^{−1/2}] under the joint posterior with σ learned, for the min-density β < 6.
 - **Does not cover** λ below n^{2.30} (gap 4, open) or the averaged β (gap 2).
 - **Caveat:** §3 substitutes stronger tails into §4 of the three-lemmas note. It must be re-read against that text once audit fixes 1–4 are applied.
+
+## Cross-family audit response (Astra, `reviews/AUDIT_astra_U.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES for Theorems U and U-σ** on the stated window, with a fixed positive margin for the common lower secant slope. All nine findings are CONFIRMED. Theory rules that all **HOLD**. They are specifications rather than repairs: no step fails.
+
+| # | Fix (applied by reference; Tuesday's clean rewrite incorporates it) |
+|---|---|
+| 1 | Fix the upper envelope before expanding the negative square. Hanson–Wright on the original score, with QP_N = 0. Young's inequality gives gain ≤ (1+η)β′d₊/2 + C log n. Hoeffding on By\*, with flat directions counted once. |
+| 2 | Dyadic budget H_i = (2 log n + i)/t, giving a constant C′₂ independent of node and partition. |
+| 3 | Block window with C′₂; separate notation for LO's deterministic c₋ and the band constant c₋. |
+| 4 | Specify the panel radius r_p² = C_rT^{2/7}Λ_p^{−2/7}(log n)^{6/7} (W′); check the finite endpoint inequality of the second cone. |
+| 5 | Shell proof at body tuning Λ_p; K = (log n)² is admissible because 99/43 > 54/25. |
+| 6 | Clip the last node to n^{5/2}; union failure O(n^{−3}log²n). |
+| 7 | "For all ω > 0" becomes "for all ω ∈ I" in the mixed-denominator display; choose κ_min·c₋^{−1/3} > A. |
+| 8 | Apply U on the reciprocal hull [1/((1+ϵ)B), 1/((1−ϵ)d)]; the off-centre compact loses e^{−c(ϵ)n+o(n)}. |
+| 9 | Extreme scales: choose C > 1 + log(2B), then (H₀, l) by Lemma S §2; the numerator is restricted to band tunings only. |
+
+**Status: Theorems U and U-σ are PROVED and cross-family audited.** Under the joint posterior with σ learned, the A-rule puts vanishing mass on λ ∈ [C n^{99/43}polylog, c₋n^{5/2}(log n)^{−1/2}], for the min-density condition β < 6. Open: λ below n^{2.30} (gap 4), and the averaged β (gap 2, `FABLE_B_averaged_beta.md`).
