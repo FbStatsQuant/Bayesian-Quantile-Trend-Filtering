@@ -4,6 +4,7 @@ suppressPackageStartupMessages({ library(ggplot2); library(scales) })
 args <- commandArgs(TRUE); IN <- args[1]; OUT <- args[2]; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 fs <- list.files(IN, pattern = "\\.rds$", full.names = TRUE); obj <- setNames(lapply(fs, readRDS), basename(fs))
 R <- do.call(rbind, lapply(obj, `[[`, "row")); rownames(R) <- NULL
+R$tv3 <- sapply(obj, function(o) sum(abs(diff(o$mean, differences = 3L))))       # ||D^3 theta_hat||_1 of the posterior mean
 R$noise_lab <- c(Normal = "Gaussian", Beta = "Beta", Mixed = "Mixed normal")[R$noise]
 cat(sprintf("%d fits (%d L, %d F)\n", nrow(R), sum(R$arm == "L"), sum(R$arm == "F")))
 se <- function(x) sd(x) / sqrt(length(x))
@@ -19,16 +20,20 @@ T <- do.call(rbind, lapply(seq_len(nrow(cells)), function(j) {
              width_L = mean(L$mciw), width_L_se = se(L$mciw), width_F = mean(F$mciw), width_F_se = se(F$mciw),
              lam_L = mean(L$lam_mean), lam_F = mean(F$lam_mean), sig_L = mean(L$sig_mean), sig_L_se = se(L$sig_mean), sig_F = F$sig_mean[1],
              lamsig_L = mean(L$lamsig_mean), lamsig_F = mean(F$lamsig_mean), sigL_over_sbar = mean(L$sig_mean) / L$sigma_bar[1],
-             ess_loglam_L = median(L$ess_loglam), ess_loglam_F = median(F$ess_loglam), sec_L = mean(L$seconds), sec_F = mean(F$seconds))
+             ess_loglam_L = median(L$ess_loglam), ess_loglam_F = median(F$ess_loglam), sec_L = mean(L$seconds), sec_F = mean(F$seconds),
+             tv3_L = mean(L$tv3), tv3_F = mean(F$tv3))
 }))
+T$crit <- ifelse(T$ratio_geo > 1.25, "FAIL (>1.25)", ifelse(T$ratio_geo > 1.10, "over 1.10", "ok"))
 write.csv(T, file.path(OUT, "sigma_sprint_table.csv"), row.names = FALSE)
+cat(sprintf("\nCRITERION (Felipe/HQ): median paired MSE ratio F/L = %.3f (bar <= 1.10); cells > 1.25: %d of %d; max %.2f\n",
+            median(T$ratio_geo), sum(T$ratio_geo > 1.25), nrow(T), max(T$ratio_geo)))
 f3 <- function(m, s) sprintf("%.4f ± %.4f", m, s); f2 <- function(m, s) sprintf("%.3f ± %.3f", m, s)
-md <- c("| Signal | Noise | τ | MSE L | MSE F | MSE F/L (paired, ±2SE) | Cover L | Cover F | Width L | Width F | λ̄ L | λ̄ F | σ̄ L (÷σ̄) | σ F | λσ L | λσ F |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
+md <- c("| Signal | Noise | τ | MSE L | MSE F | MSE F/L (paired, ±2SE) | Cover L | Cover F | Width L | Width F | λ̄ L | λ̄ F | σ̄ L (÷σ̄) | σ F | λσ L | λσ F | ‖D³θ̂‖₁ L | ‖D³θ̂‖₁ F |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|")
 for (j in seq_len(nrow(T))) { x <- T[j, ]
-  md <- c(md, sprintf("| %s | %s | %.2f | %s | %s | %.2f [%.2f, %.2f] | %s | %s | %s | %s | %.3g | %.3g | %.4f (%.2f) | %.4f | %.3g | %.3g |", x$signal, x$noise, x$tau,
+  md <- c(md, sprintf("| %s | %s | %.2f | %s | %s | %.2f [%.2f, %.2f] | %s | %s | %s | %s | %.3g | %.3g | %.4f (%.2f) | %.4f | %.3g | %.3g | %.3g | %.3g |", x$signal, x$noise, x$tau,
     f3(x$mse_L, x$mse_L_se), f3(x$mse_F, x$mse_F_se), x$ratio_geo, x$ratio_geo_lo, x$ratio_geo_hi, f2(x$cover_L, x$cover_L_se), f2(x$cover_F, x$cover_F_se),
-    f2(x$width_L, x$width_L_se), f2(x$width_F, x$width_F_se), x$lam_L, x$lam_F, x$sig_L, x$sigL_over_sbar, x$sig_F, x$lamsig_L, x$lamsig_F)) }
+    f2(x$width_L, x$width_L_se), f2(x$width_F, x$width_F_se), x$lam_L, x$lam_F, x$sig_L, x$sigL_over_sbar, x$sig_F, x$lamsig_L, x$lamsig_F, x$tv3_L, x$tv3_F)) }
 writeLines(md, file.path(OUT, "sigma_sprint_table.md"))
 
 # ---- per-cell figures (seed 1): data, truth, L and F posterior means with 95% bands, MSE in subtitle ----------------------
@@ -68,4 +73,4 @@ g <- ggplot(A, aes(v, cell, colour = arm)) + geom_vline(data = REF, aes(xinterce
   labs(title = "Fixed σ = 1.1σ̄ vs learned σ, Felipe's original sampler (paper settings)", subtitle = "n = 500, 5 paired seeds per cell", x = NULL, y = NULL) +
   theme_minimal(base_size = 10) + theme(legend.position = "bottom", plot.title = element_text(face = "bold"), strip.text = element_text(face = "bold"))
 ggsave(file.path(OUT, "overview_ratio_coverage.png"), g, width = 9, height = 7, dpi = 300, device = "png", type = "cairo")
-print(T[, c("signal", "noise", "tau", "mse_L", "mse_F", "ratio_geo", "ratio_geo_lo", "ratio_geo_hi", "cover_L", "cover_F", "width_L", "width_F", "lam_L", "lam_F", "sig_L", "sigL_over_sbar", "sig_F", "lamsig_L", "lamsig_F", "ess_loglam_L", "ess_loglam_F")], digits = 3, row.names = FALSE)
+print(T[, c("signal", "noise", "tau", "mse_L", "mse_F", "ratio_geo", "ratio_geo_lo", "ratio_geo_hi", "cover_L", "cover_F", "width_L", "width_F", "lam_L", "lam_F", "sig_L", "sigL_over_sbar", "sig_F", "lamsig_L", "lamsig_F", "tv3_L", "tv3_F", "ess_loglam_L", "ess_loglam_F", "crit")], digits = 3, row.names = FALSE)
