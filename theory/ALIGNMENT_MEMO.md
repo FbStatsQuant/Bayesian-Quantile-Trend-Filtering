@@ -19,7 +19,7 @@
 |---|---|---|
 | (a) | σ > σ̄ is used ONLY in Theorem B's expected-numerator step (EM). It is a limit of that proof technique: not needed for contraction, and not used for coverage. | PROVED |
 | (b) | Contraction holds for fixed σ < σ̄ at the SAME rate n^{−5/6}: C1 (localization) + Lemma F + C2 (realized-numerator shells), uniformly on compact σ-intervals, moment-free. | PROVED, audited by both families |
-| (c) | Learned σ: **Theorem C\*** gives n^{−5/6} with σ ~ IG learned, at deterministic oracle λ (Lemma S: σ is contained in [l, H₀] and concentrates on σ₀,ₙ). MEASURED: σ/σ₀,ₙ = 0.95–1.02, with width ∝ n^{−1/2}. | PROVED, audited |
+| (c) | Learned σ: **Theorem C\*** gives n^{−5/6} with σ ~ IG learned, at deterministic oracle λ (Lemma S: σ is contained in [l, H₀] and concentrates on σ₀,ₙ). MEASURED: σ/σ₀,ₙ = 0.95–1.02, with width ∝ n^{−1/2}. | PROVED; every part audited by both families (Lemma S: Opus + Fable) |
 | (d) | Constant b₀ alone (no floor) is **not** covered: λ ∝ n^{3/4} (MEASURED), outside every window. With the floor (V0T) it is covered at n^{−5/6} for constant OR scaled b₀. Under (EM), constant b₀ gives n^{−1/4} without a floor. | PROVED (floor); the no-floor case below σ̄ is OPEN (Fable A, in progress) |
 | (e) | Route B with Theorem B as it stood is impossible on data: every σ ≥ σ̄ arm fails Felipe's MSE bar. Route A succeeded; see the headline. | MEASURED + PROVED |
 
@@ -32,7 +32,7 @@
 
 **Caveat for the paper:** all theorems concern the POSTERIOR. His P-MALA λ is not converged at n ≥ 1000 (Engineering aca7214).
 
-**Still arriving:** Fable A (the no-floor method), Fable B (the Fable read of Lemma S), the VP's reply, the V1/V2/V0T data.
+**Still arriving:** Fable A and an independent Astra co-prover (the no-floor method), the Astra audit of general k, the VP's reply, the V1/V2/V0T data.
 
 ---
 

@@ -96,3 +96,14 @@ Take expectations and suprema over laws. U and §2 give (H), hence §1 gives Lem
 | 7 | Not uniform as σ₀ → 0 or ∞ | HOLDS (scope) | The statement is at each fixed design and level, as written. |
 | 8 | Hypothesis U on Theorem B's route needs (EM) at 1/l, which fails for every design | HOLDS | U must come from the local-margin fixed-σ result **C1** (`C1_any_sigma.md`, Astra-audited), not from Theorem B. That is the route used. |
 | 9 | §2 uses only λ/log n → ∞ | HOLDS | Header noted. |
+
+## Cross-family audit (Fable, `reviews/AUDIT_fable_S.md`, 2026-11-23)
+
+Verdicts: **§1 ACCEPT, §2 ACCEPT WITH FIXES (editorial), §3 ACCEPT.** Fable re-derived all nine rulings in the Theory table above and agrees with them. No mathematical error, no circularity, no disagreement with Opus on the mathematics. Twelve findings: ten CONFIRMED, two PLAUSIBLE.
+
+Theory's rulings:
+- **§2 is uniform over λ ≥ Λ₋, and valid for V2T's λ-mixed prior** (CONFIRMED). Both λ-entries are monotone in the right direction, and §1 does not use λ. **HOLDS.**
+- **The containment interval is wide** (H₀/l > 10⁵/(kd)) and inflates M through ω₂/ω₁. A second disintegration over [(1 ∓ η′)s_n] fixes this (PLAUSIBLE). **HOLDS.** It is already used in FABLE_A_n56.md (V0T\*), whose interval [(1−η₁)d, (1+η₁)B] is Astra-audited.
+- **Editorial:** list §2's hypotheses, give the L3 threshold explicitly, and state l < min(1, d, q/2), noting that l ≤ q/2 is implied. **HOLDS.**
+
+**Status: Lemma S is audited by both families (Opus, Fable).**
