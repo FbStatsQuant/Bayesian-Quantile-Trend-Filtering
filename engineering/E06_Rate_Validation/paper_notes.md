@@ -1,4 +1,10 @@
-# E-06: notes for `paper_section.tex` (held until Theory's Tuesday confirmation, per HQ)
+# E-06: notes for `paper_section.tex`
+
+*DECIDED by HQ, 2026-11-23, with Theory confirming:*
+- *Main text: the rough radius q̂ₙ^⊥. Supplement: the full Δ²ₙ plus the null-space sentence.*
+- *Fallback/Padilla excess: finite-n, ≈ −0.36 per log λ (E-02).*
+- *σ₀ arm: empirical support beyond the proved range, not a proof.*
+- *Write `paper_section.tex` after the E-07 PROPOSAL.*
 
 ## Decisions
 - **Main text:** the rough radius q̂ₙ^⊥.
