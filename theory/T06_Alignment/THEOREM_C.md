@@ -2,7 +2,7 @@
 
 *Theory Department, 2026-11-23. INTERNAL until HQ clears it.*
 
-**Status: PROVED (assembly).** Every input is cross-audited:
+**Status: PROVED (assembly); final advisor read by Fable (CP), `FABLE_joint_V2.md` §2: ACCEPT at the oracle, FIX for the general window. The fix is applied, after Theory verified it: bias V²λ^{5/3}n^{−5} ≪ n^{1/7}λ^{−2/7} ⇔ λ ≪ n^{108/41}V^{−42/41}.** Every input is cross-audited:
 - C1: Astra audit, findings applied (`C1_any_sigma.md`).
 - W: Astra, ACCEPT (`W_width_lemma.md`).
 - S: Opus, ACCEPT WITH FIXES, applied (`astra_sigma_concentration.md`).
@@ -24,7 +24,8 @@ with the flat prior on quadratics, any fixed a, b > 0 (the paper uses 0.1, 0.1),
 - (A3) TV⁽³⁾(θ\*) ≤ V.
 - Row-average uniform integrability of ρ_τ(Zᵢ). This holds for the paper's Gaussian, Beta and mixture designs.
 - σ₀,ₙ := n⁻¹Σᵢ E ρ_τ(Zᵢ) ≥ d > 0. This holds at each fixed design and level: σ₀ ∈ [0.0046, 0.29].
-- **λ deterministic, with n^{23/11}(log n)^{12/11} ≪ λ ≪ n³/V.** This includes the oracle λ ≍ n^{5/2}/V.
+- **λ deterministic, λ ≍ n^{5/2}/V (the oracle).** More generally, any deterministic λ with n^{23/11}(log n)^{12/11} ≪ λ ≪ n^{108/41}V^{−42/41} (≈ n^{2.63}), for which C1's denominator hypothesis (ii) holds.
+  - *Corrected after Fable's final read:* the earlier upper end n³/V was wrong. Above n^{108/41}V^{−42/41} the bias radius V²λ^{5/3}n^{−5} exceeds r_n², and (ii) fails.
 
 **No (EM), no σ ≥ σ̄, no exponential or higher moments.**
 
