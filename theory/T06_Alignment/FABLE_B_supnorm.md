@@ -517,3 +517,103 @@ What is proved today about forgetting is Lemma B3 / Corollary B4: **the boundary
 **The stopping point is a loop** between three statements: a lower bound on sd(T), the block spike lemma's boundary-cost input, and coarse-scale localization. Three possible entries are listed: non-percolation, an amplitude bootstrap, and confinement in γ.
 
 **Diagnostic (UNTESTED, internal).** |mean − τ| ≤ 8/K³ is an exact sampler check on saved draws. It can ride on Tuesday's draws run.
+
+---
+
+## 13. Entering the loop through the amplitude bootstrap
+
+*Appended 2026-11-23, about 16:40 CT, same author. Not audited. Uses Theorem H (audited) for the global bodies; Fable A's H-sharp (unaudited) is only discussed. Notation of §11–§12; g = K·h, b = 1_g^{∗4}, window = supp b; F̂_b(x) := Σᵢbᵢ1{Zᵢ < x}/Σᵢbᵢ (a functional of the data on the window).*
+
+### 13.0 Outcome
+
+**The bootstrap does not close.** Two of its three steps are now proved; the precise failing steps are F1 and F2 below.
+
+| # | Claim | Status |
+|---|---|---|
+| 1 | **Counting lemma:** on Theorem H's TV body, all but a fraction 2T/K₂ of the blocks of length g′ have boundary cost ℓρ_I ≤ K₂·g′. This is statement (ρ) of §11.4 for almost all blocks | PROVED (§13.1) |
+| 2 | On those blocks Lemma B1 gives slaving to the interpolant within a\* = (4K₂ + 6)·g′³/ℓ, with conditional probability ≥ 1 − e^{−g′} | PROVED (§13.1) |
+| 3 | **What mean balance gives under an amplitude bound:** P(δ ≥ x on the whole window \| outside) ≤ [8/K³ + τ − (1 − p_A)F̂_b(−A)]/[F̂_b(x) − F̂_b(−A)] | PROVED (§13.2) |
+| 4 | Consequence: at x = A the bound is ≈ ½ for a smooth density (f̄/(2f) with the worst-case secant constants). **Mean balance alone does not contract the amplitude**; the factor 8/K³ is an additive bias on the level, not a multiplicative contraction | PROVED (§13.2) |
+| 5 | The step that would work: under crossing regularity, one step takes amplitude ≤ L/2 directly to level error ≲ 1/(f·K³) + polylog/√(ωf·g) | SKETCH (§13.3) |
+| 6 | **F1:** no crude a priori amplitude bound on whole windows follows from Huber energy, even at the sharp rate | PROVED obstruction (§13.4) |
+| 7 | **F2:** crossing regularity uniformly over the posterior-relevant shapes | open; reduced to a finite-dimensional uniform law of large numbers (§13.4) |
+
+### 13.1 The boundary cost for almost all blocks — PROVED
+
+**Lemma B6 (counting).** Partition {1, …, n} into consecutive blocks I of length g′ ≥ 3. For every θ with ‖Dθ‖₁ ≤ Θ: #{I : ρ_I > x} ≤ 2Θ/x.
+
+*Proof.* ρ_I ≤ ‖(Dθ)_{𝒥_I}‖₁ (the actual θ_I is a candidate in the minimum), and each stencil touches at most two blocks, so Σ_Iρ_I ≤ 2‖Dθ‖₁. Markov. ∎
+
+On Theorem H's event, TV(δ) ≤ T₀ = Tn³/ℓ, so ‖Dθ‖₁ ≤ Tn/ℓ + V/n² =: Θ. With x = K₂g′/ℓ: **the fraction of blocks with ℓρ_I > K₂g′ is ≤ (2T/K₂)(1 + o(1))**. ρ_I is a function of the outside of I, so "good block" is an event on which Lemma B1 can be applied conditionally:
+
+  for a good block, P(‖θ_I − θ′_I‖∞ > a\* | θ_{Iᶜ}, y) ≤ e^{−g′},  a\* := (2(g′+1)²/ℓ)·(2K₂ + 2.8)·g′ ≈ (4K₂ + 6)·g′³/ℓ.
+
+With g′ = ε·h this is a\* ≈ (4K₂ + 6)·ε³/ω: a small constant for small ε, and → 0 if ε = εₙ → 0 slowly (with K₂ = Kₙ → ∞ slowly, so that the bad fraction 2T/K₂ → 0 as well). **So (ρ) is not the obstacle for "almost all blocks"; it is an obstacle only for the exceptional fraction** (see F3 in §13.4).
+
+### 13.2 What mean balance gives under an amplitude bound — PROVED
+
+Let E_x := {δᵢ ≥ x for all i ∈ window} and suppose that, given the outside, P(|δᵢ| ≤ A on the window | outside) ≥ 1 − p_A.
+
+**Lemma B7.** For every outside configuration and data vector with F̂_b(x) > F̂_b(−A):
+
+  **P(E_x | outside, y) ≤ [τ + 8/K³ − (1 − p_A)·F̂_b(−A)]/[F̂_b(x) − F̂_b(−A)].**
+
+*Proof.* φ_b(θ) = Σᵢbᵢ1{Zᵢ < δᵢ}/Σᵢbᵢ ≥ F̂_b(min_{window}δ). So φ_b ≥ F̂_b(x) on E_x, φ_b ≥ F̂_b(−A) on {|δ| ≤ A} ∖ E_x, and φ_b ≥ 0 otherwise. Take conditional expectations and use Corollary B4 (E[φ_b | outside] ≤ τ + 8/K³). ∎
+
+On the data event where the weighted empirical distribution functions are within O(√(log n/g)) of their means (Hoeffding, union over windows and finitely many levels), F̂_b(x) ≈ τ + (secant slope)·x, and for 0 < x ≤ A ≤ L:
+
+  **P(E_x | outside) ≤ [8/K³ + f̄·A + τ·p_A + o(1)]/[f·(x + A)].**
+
+*Reading.* At x = A this is f̄/(2f) ≥ ½ with the worst-case constants, and ≈ ½ for a density that is smooth at the quantile. The balance identity bounds the probability that the path sits at the top of its allowed range on a whole window by about one half, and no better. **The amplitude bootstrap cannot run on mean balance: 8/K³ enters as an additive bias 8/(f·K³) on the level, which is only visible once the conditional law of the level is known to be concentrated.** The mixture obstruction of §12.3(1) is exactly what Lemma B7 fails to exclude.
+
+### 13.3 The step that would work — SKETCH
+
+Along the bump, G(T) := ω·Q(θ⁰ + Tb) = ω·Σᵢbᵢρ_τ(tᵢ − T) + const is the b-weighted check loss of the crossing points tᵢ = (yᵢ − θ⁰ᵢ)/bᵢ, minimal at their weighted τ-quantile T\*. Assume **crossing regularity (CR)**: for |T − T\*| ≤ u₁ and u ≥ u₀, the crossing mass Σᵢbᵢ1{tᵢ ∈ (T, T + u]} is ≥ (1 − η)·f·‖b‖₂²·u. Then V′(T) ≥ ω(1 − η)f‖b‖₂²·(T − T\* − u₀) − 8gℓ for T > T\*, and by Lemma S5 and the log-concave tail (LC1), with conditional probability ≥ 1 − n^{−C}:
+
+  |T − T\*| ≲ u₀ + 8gℓ/(ωf‖b‖₂²) + log n/(ωf‖b‖₂²)^{1/2}.
+
+In level units (× peak of b ≈ ⅔g³, ‖b‖₂² ≈ 0.48g⁷): **|level − balance level| ≲ (level resolution u₀) + 11/(f·K³) + log n/√(ωf·g)**, and the balance level is within O(√(log n/g))/f of the truth by the data event of §13.2. This is a one-step statement: it does not need iteration in A, only A ≤ L/2 (so that the noise density is ≥ f along the path). Alignment of θ⁰ with the data makes G steeper, which helps; what (CR) excludes is a **gap** in the crossing points around T\*, i.e. a transverse shape that is far above the data on part of the window and far below on another part.
+
+### 13.4 The failing steps
+
+**F1. No crude a priori amplitude bound on whole windows — PROVED obstruction.** The step needs |δ| ≤ L/2 on the whole window. Theorem H gives the Huber energy 𝐡(δ) ≤ n·r², hence #{i : |δᵢ| > L/2} ≤ 8n·r²/L². The expected number of such coordinates in a window of length 4g is therefore only bounded by 32g·r²/L²:
+- with Theorem H, r² ≍ ℓ^{−2/7}·polylog: g·r² ≍ K·ℓ^{1/21}·polylog → ∞;
+- with H-sharp, r² ≍ ℓ^{−1/3}(log n)^{1/6}: g·r² ≍ K·(log n)^{1/6}, still not small.
+
+So energy bounds, even at the sharp rate, allow of the order of one high-amplitude coordinate per bandwidth. They are consistent with every window containing one. The true count is presumably zero, but that is a sup-norm statement, the thing being proved. Lemma B1 turns an isolated high coordinate in a good block into a high interpolant, but the interpolant may be steep, so it need not be high on a long run; controlling its slope needs the coarse levels, i.e. the amplitude bound again.
+
+**F2. Crossing regularity uniformly over shapes.** (CR) for a **fixed** θ⁰ is a law of large numbers over ≍ g independent data points. The transverse configuration is a posterior draw and depends on the data. On good blocks (§13.1) the shape on the window is the interpolant of ≍ g/g′ coarse values up to a\*, so (CR) at resolution u₀ ≫ a\*/(peak of b) follows from a uniform law of large numbers over a family of VC dimension O(g/g′) with sample size ≍ g: fine when h ≫ (K/ε)·log n. This is routine but **not written**, and it requires the amplitude bound of F1 to place the path inside the region where the density is ≥ f.
+
+**F3. The exceptional blocks.** §13.1 leaves a fraction ≤ 2T/K₂ of rough blocks. For a statement about most windows this is harmless. For the sup-norm, or for the energy E_s of `FABLE_A_gap4.md`, the exceptional windows must be shown to carry no excess amplitude; a counting bound cannot do that. It needs either an exponential tail for the block roughness (Lemma B1 gives one only relative to ρ_I) or the non-percolation argument of §11.4.
+
+### 13.5 Where the loop can actually be entered
+
+F1 is the true entry problem: every step proved so far needs the path to be inside the bulk of the noise on a **whole** window, and no available global bound gives that for even one window with certainty. Two ways I see, neither carried out:
+
+- **Replace the amplitude hypothesis by a quantile hypothesis.** The balance identity and Lemma B7 never use |δ| ≤ A except to bound φ_b from below. A hypothesis of the form "at most a fraction ϑ of the window has |δᵢ| > L/2" is what energy bounds do give for most windows (ϑ ≍ r²/L² averaged), and it changes F̂_b(−A) by at most ϑ. The crossing-regularity step then has to be redone with a ϑ-fraction of uncontrolled coordinates, whose total weight in G′ is ≤ ω·ϑ·Σbᵢ; this is below the balance resolution 8gℓ when ϑ ≲ 8/K³. So **with the energy control of Theorem H (ϑ ≍ ℓ^{−2/7}·polylog on most windows; ℓ^{−1/3}·polylog with H-sharp), ϑ ≪ K^{−3} and the high-amplitude coordinates are invisible to the window balance**, and the level of the remaining (1 − ϑ)-part could be localized. What is then missing is only the shape control of that part (F2 on the low-amplitude coordinates) and a separate argument that the ϑ-part cannot stay high (Lemma B1 on good blocks: a high coordinate next to low neighbours is a spike).
+- **Confinement in γ** (§9.6): at large γ everything is inside the bulk by construction; the loop B6 → B1 → (CR) → level localization then closes at that γ, and one continues in γ. This needs each step with probability close to 1, which the present forms of §13.2–13.3 do not give.
+
+The first is the more concrete, and it is where I would start: it is a bootstrap in the **fraction ϑ of out-of-bulk coordinates per window**, not in the amplitude, with contraction supplied by Lemma B1 (spikes are excluded) rather than by 8/K³.
+
+### 13.6 Flags
+
+- Lemmas B6 and B7 are new, short and unaudited.
+- §13.3 and §13.5 are sketches; no constant in them has been checked.
+- H-sharp (`FABLE_A_L4b.md` §4.6) is unaudited; §13.4 uses only its rate.
+- The conclusion "energy bounds allow one high coordinate per bandwidth" is an arithmetic statement about what the bounds permit, not a claim about the posterior.
+
+## Theory response to §13 (2026-11-23)
+
+**Status: OPEN. UNAUDITED.** The amplitude bootstrap does not close.
+
+**PROVED:**
+- The boundary-cost statement holds for almost all blocks (a counting lemma on Theorem H's TV body).
+- Slaving holds on good blocks.
+- **8/K³ is not a contraction factor**; it is an additive bias.
+
+**Failing steps:**
+- F1 (proved obstruction): there is no crude whole-window amplitude bound from Huber energy.
+- F2 (open): crossing regularity.
+- F3 (open): the exceptional rough blocks.
+
+**Next entry (sketch).** Bootstrap in the out-of-bulk *fraction* ϑ per window, with contraction from the spike lemma. **This is the Tuesday entry point for the posterior sup-norm lemma** that serves L4a, L4b and (SN).
