@@ -27,7 +27,7 @@
 | L2 | bounded λ (design condition DC) | **PROVED and cross-family audited for all three paper designs** at τ ∈ {0.05, 0.25, 0.5, 0.75, 0.95} (Fable B / Astra, `T06_Alignment/FABLE_B_L2_analysis.md` incl. Theorem DC-W). ℓ₀ at τ = ½: Gaussian 1223, Mixed 1194, Beta 49.75; tails: Gaussian 18.9, Mixed 10.08, Beta 0.05: 378, Beta 0.95: 4.1 (short range). Uses (A3). Not "every τ" |
 | L3 | interpolating fits, extreme scales | PROVED, class-wide (not audited) |
 | L4a | [ℓ₀, n^{3/2}] | OPEN; named assumption with data check (`T06_Alignment/L4a_assumption.md`) |
-| L4b | [n^{3/2}, n^{2.30}] | **Partly closed, cross-family audited** (Fable A / Astra, `T06_Alignment/FABLE_A_L4b.md`, 1af9f8b). The posterior band exclusion now reaches **n^{21/11} ≈ n^{1.91}**. Fixed-(σ, λ) Occam bound to n^{9/5}; to n^{26/17} under one hypothesis. **Open:** the posterior statement on [n^{3/2}, n^{21/11}] (min-density version). Late sketch (unaudited; Astra audit running): unconditional on [n^{8/5}, n^{9/5}] for Gaussian τ ∈ [0.25, 0.75] |
+| L4b | [n^{3/2}, n^{2.30}] | **Partly closed, cross-family audited** (Fable A / Astra, `T06_Alignment/FABLE_A_L4b.md`, 1af9f8b). The posterior band exclusion now reaches **n^{21/11} ≈ n^{1.91}**. Fixed-(σ, λ) Occam bound to n^{9/5}; to n^{26/17} under one hypothesis. **Open:** the posterior statement on [n^{3/2}, n^{21/11}] (min-density version). **Late addition, audited (58a0da8):** the fixed-(σ, λ) bound is unconditional down to n^{26/17} under (ML) a·L² > 2/π with β evaluated at the secant slope f(L) (Gaussian τ ∈ [0.25, 0.75]). The posterior band statement below n^{21/11} is still OPEN (uniformity) |
 | L5 | [n^{2.30}, c₋n^{5/2}(log n)^{−1/2}] (averaged β̄); extended down to n^{21/11} in the min-density version by L4b's audited uniform step | **PROVED, cross-family audited**: "the A-rule posterior excludes the middle band of λ", averaged β̄ < 6, all paper designs at τ ∈ [0.05, 0.95] |
 | L6 | L1–L5 ⇒ (LT) | assembly PROVED given its inputs (not audited) |
 | L7 | (LT) ⇒ rate n^{−5/6}(log n)^{1/3} via V0T\* with an n-dependent floor | **PROVED, cross-family audited** |
@@ -155,7 +155,6 @@
 **Caveat for the paper:** all theorems concern the POSTERIOR. His P-MALA λ is not converged at n ≥ 1000 (Engineering aca7214).
 
 **Still arriving at 18:00:**
-- the Astra audit of Fable A's L4b §9–10 sketch;
 - the VP's reply, if any;
 - the V2 pilot and the H-V2 screen re-runs (Engineering).
 
