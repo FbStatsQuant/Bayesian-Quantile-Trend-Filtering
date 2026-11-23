@@ -75,10 +75,10 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 | L4q quadratic shift | primary prior mass | **advisor-checked** (Astra: ACCEPT; half-radius form stated first) |
 | L4q-M mollification | bias term | **advisor-checked** (Astra: ACCEPT WITH FIXES, applied: explicit kernel, ‖u_h‖∞, c_{K′}^{5/6} kept with a fresh half-radius threshold check) |
 | L5 normalization | propriety, flat c | **advisor-checked** (Astra: accept) |
-| L6 evidence | denominator | **draft**, self-checked given L3/L4/L4q |
+| L6 evidence | denominator | **advisor-checked** (Astra: ACCEPT WITH FIXES, applied: small-ball log in the rate consequence) |
 | L8′ bounded numerator | Theorem A | **self-checked** (`L8p_bounded_numerator.md`; numerical check passed, NOTS 2857877): exact MGF identity, log E e^{−ωX} ≤ −Bω·m(δ) on \|δ\| ≤ Δ with B ≥ η/2 for ω ≤ (1−η)ω̄; Step 2 closed given L6; awaiting the advisor check |
 | L8-b realized numerator | Theorem A⁺ | plan only |
 | L9-a far region | both | to attempt |
 | L10-I interpolation | L10 (deterministic part) | **self-checked** (`L10I_interpolation.md`): ‖δ‖∞ ≤ 6‖δ‖ₙ + 7.06‖δ‖ₙ^{4/5}TV⁽³⁾^{1/5}; Huber corollary; numerical check passed |
 | L9-c, L10 sup-norm | both | open (crux) |
-| B: Props 1–2 + assembly | Theorem B (light tails) | **self-checked** (`B_light_tail.md`); awaiting the advisor check |
+| B: Props 1–2 + assembly | Theorem B (light tails) | **advisor-checked** (Astra: Props 1, 2 ACCEPT; assembly ACCEPT WITH FIXES, applied); fully checked once L3 passes its advisor check |
