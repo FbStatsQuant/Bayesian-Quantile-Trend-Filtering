@@ -58,11 +58,15 @@ This is a failure of the route, not a counterexample to contraction (see (b)).
 
 | Route | Covers | Rate | Status |
 |---|---|---|---|
-| **C1. Gauge decomposition + uniform empirical process + integration against ν** (`T05_Proofs/parked/L10_stage1_NOTES.md`, main thread; Huber variant) | **every fixed σ > 0**, moment-free | r² ≍ λ^{−2/7} for λ ≫ n^{21/11}; r² ≍ n^{15/11}/λ for n^{15/11} ≪ λ ≪ n^{21/11} | SKETCH. The open item is a citable width/entropy lemma for the discrete TV⁽³⁾ ∩ ℓ₂ ball. Being checked by the VP; then Theory. |
+| **C1. Gauge decomposition + uniform empirical process + integration against ν** (`T05_Proofs/parked/L10_stage1_NOTES.md`, main thread) | **every fixed σ > 0**, moment-free, **uniformly on compact σ-intervals** | With the in-house width (Lemma W): ‖δ‖²ₙ ≲ n^{1/7}λ^{−2/7}(log n)^{6/7} for λ ≫ n^{23/11}, i.e. **≈ n^{−4/7} at λ = n^{5/2}/V**. With an entropy width (if citable): λ^{−2/7}, for λ ≫ n^{21/11}, i.e. n^{−5/7}. **Byproduct: ‖δ‖∞ → 0 for every σ** (L10-I on the localized body) | SKETCH. **Every ingredient is in hand:** the width lemma is PROVED in-house (`T06_Alignment/W_width_lemma.md`, from L3's advisor-checked singular values); then symmetrization, Ledoux–Talagrand, Bousquet; L6 for the denominator (any σ); L10-I for the sup-norm; convexity along rays; the Gamma(m) tail of λ‖u‖₁. The cone integration remains to be written out and audited. |
 | **C2. Hölder–Knight realized numerator (VP)** | every fixed σ > 0, uniformly on compact σ-intervals | optimal λ^{−1/3} | SKETCH, exponent level only (FINAL_fable_v3 §3b). Its remainder step needs localization, which C1 could supply. |
 | C3. Tempering from B at σ′ > σ̄ | — | — | Dead end: it needs a uniform realized lower bound on ℛ over the bad set, which is exactly C1's content. |
 
-**Why C1 is the natural aligned headline.** It works for **any** σ, so it covers σ₀ and the learned σ's range, with no (EM) and no moments. Its rate is suboptimal: n^{−5/7} at λ = n^{5/2}, against n^{−5/6}. C2 would restore the optimal rate on top of it.
+**Why C1 is the natural aligned headline.**
+- It works for **any** σ, so it covers σ₀ and the learned σ's range, with no (EM) and no moments.
+- Its bounds are uniform over compact σ-intervals: e^{−ωx} is monotone in ω, and the events (L6's and the empirical-process event) are σ-free.
+- It also yields sup-norm localization for every σ. That is exactly the input C2 needs, and also L10 for Theorem A.
+- Its rate is suboptimal: n^{−4/7} with the in-house width, n^{−5/7} with an entropy width, against the optimal n^{−5/6}. C2, built on C1's localization, would restore the optimal rate.
 
 ---
 
@@ -100,6 +104,8 @@ Here Π_σ is the θ-posterior at fixed σ (λ fixed, or learned and mixed over)
 - The mismatch is PROVED in this sense: a constant b₀ is not of the form c·n^{−5/2} with c bounded.
 - The n^{3/4} growth and the n^{−1/4} rate are heuristic. They match the sprint λ̄ within a factor of 2–4 at n = 500, and R-A1-post will measure λ against n.
 - A theorem for constant b₀ is P3(ii) ("(b₀/n)^{1/4}-type"): **OPEN**.
+
+**At the paper's n the learned λ is near the oracle (MEASURED against computed).** The oracle is n^{5/2}/V, with V from the statements note (Table simV): ≈ 3.6e4 (S, V ≈ 156) and ≈ 768 (VS, V ≈ 7276) at n = 500. The learned λ̄ in the σ sprint is 9e2–2.6e4 (S) and 1.1e3–3.1e3 (VS), i.e. 0.03–0.7× the oracle on S and 1.5–4× on VS. So the mismatch is asymptotic, not at the paper's n. The n^{3/4} growth with constant b₀ is MEASURED in E-02 (slope 0.745; statements note, line 485), and R-A1-post re-measures it under the default priors.
 
 **What would align λ.**
 - **(i)** State the default as **b₀ = c·n^{−5/2} with c fixed** at its n = 500 value. This is identical at the paper's n and differs elsewhere. It needs P3 plus Engineering's paired check at other n, under Felipe's rules. Proposal: UNTESTED.
