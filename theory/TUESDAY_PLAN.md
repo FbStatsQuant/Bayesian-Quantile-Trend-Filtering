@@ -8,9 +8,9 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 
 | Gap | Piece (§2) | Prover | Auditor | Fallback | Account |
 |---|---|---|---|---|---|
-| 1. LO audited | H0 (running since today 15:xx) | Fable A (done) | Astra | F3, the conditional theorem | Codex |
+| 1. LO audited | H0: **DONE** (Astra: ACCEPT WITH FIXES at fixed (ω, ℓ), 63849f0; Lemma F′/Lev also audited) | — | — | — | — |
 | 2. **Min-density loss → averaged β.** This brings Gaussian 0.05/0.95 and Beta 0.95 back in | H3 | Fable | Astra | headline at τ ∈ [0.25, 0.9] on every design, plus the cells whose worst-case β < 6 | CP |
-| 3. Uniformity in σ (compact) and λ (window) | H2 | Fable | Astra | an extra K_n factor in the rate | CP |
+| 3. **Uniformity in σ (compact) and λ (window).** Harder than planned: the audit found a genuine gap. **Route** (audit finding 11): an ℓ-grid at ratio 1 + 1/n interpolates the evidence within a factor e; log-convexity in ω; Hanson–Wright-type score tails on the polynomial grid | H2 | Fable | Astra | the conditional theorem F3 with uniformity as a stated assumption | CP |
 | 4. **λ below n^{2.30}**: intermediate range G4 (sign route via κ) and bounded range G5 (certificate) | H4, H5 | Astra (H4), Fable (H5) | Fable (H4), Astra (H5) | named assumption, supported by κ̂ data (F3) | Codex (H4), CP + Engineering (H5) |
 
 **Compute.** Nothing new this evening. The only compute in the plan is H5's interval certificate, on Tuesday, sized by Engineering first.
