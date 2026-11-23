@@ -28,7 +28,7 @@ where Xᵢ(δ) = ρ_τ(Zᵢ − δ) − ρ_τ(Zᵢ) and Zᵢ = yᵢ − θ\*ᵢ.
   - *Where B genuinely differs.* B can cover laws that A excludes for every L only when Fᵢ is not differentiable at the quantile. Example (Fable; verified by Theory): the dyadic staircase Z = ±2^{−k−1} with probability 2^{−k−2} (k ≥ 0), τ = ½. Its secant constant is ½ on every L ≤ 1 (smaller for L > 1), so ω̄ = 2 for every L and A4 fails for all ω ≥ 2. Meanwhile m(2^{−j}) = 4^{−j}/3 and inf m(δ)/δ² = 1/3, and (EM) holds for 2 ≤ ω < 8/3:
     - analytically for small δ, via E X² ≤ δ²/4 and log E e^{−ωX} ≤ −ωδ²[1/3 − (ω/8)e^{ωδ/2}];
     - analytically for large δ, via |Z| ≤ ½;
-    - by exact evaluation of the discrete MGF on δ ∈ [10⁻⁶, 40] (`/home/fb31/BQTF_ops/theory_scratch/dyadic_check.py`): inf g = 0.0833, 0.0583, 0.0208 at ω = 2, 2.2, 2.5, matching 1/3 − ω/8, and negative at ω = 2.7.
+    - by exact evaluation of the discrete MGF on δ ∈ [10⁻⁶, 40] (`checks/dyadic_check.py`): inf g = 0.0833, 0.0583, 0.0208 at ω = 2, 2.2, 2.5, matching 1/3 − ω/8, and negative at ω = 2.7.
 - **Tail necessity.** For d ≥ 1, the event {Zᵢ > d} alone contributes e^{ωτd}P(Zᵢ > d) to the MGF. So (EM) forces **P(Zᵢ > d) ≤ e^{−ω(τ+b)d}**, and reflection gives P(Zᵢ < −d) ≤ e^{−ω(1−τ+b)d}. This alone excludes polynomial tails. *(The earlier claim that failure of (EM) gives infinite expected evidence is withdrawn. Astra's counterexample: a density ∝ e^{−ω|z|/2}/(1+|z|)², at the critical rate, has finite expected evidence.)*
 - **Mid-range.** The bound must also hold at intermediate δ (Astra's bounded counterexample: an atom at ±4 breaks it at δ = 4).
 

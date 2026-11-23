@@ -41,4 +41,11 @@
 
 ## Fable child notes
 
-*(appended by the L10 design child; see below)*
+**Status: the child was cancelled at the checkpoint (2026-11-23, Central evening of 11-22) without a deliverable.** It was a Fable 5.2 child at xhigh effort, launched 23:43 UTC.
+- It stayed in a single long reasoning turn for about an hour and never consumed the four steering messages (the output path, the VP's two-stage route, the Stage 1 focus, the stop request). It wrote no file: neither `/home/fb31/L10_candidate.md` nor a section here.
+- Recorded from its visible reasoning summaries, for resumption. These are exploration only, with nothing proved:
+  1. **1-D log-concave marginals with a union bound.** Each θᵢ − θ\*ᵢ has a log-concave posterior marginal, hence exponential tails relative to its scale. A union bound over n coordinates would need each coordinate within ≈ Δ/log n with constant posterior probability. The open problem is getting per-coordinate control from the averaged (Huber) bound.
+  2. **Borell's lemma reduction.** If Πₙ(‖δ‖∞ ≤ rₙ) ≥ 2/3 with rₙ → 0, then the tail beyond Δ is exponentially small. This only moves the problem to a constant-probability sup-norm bound. (Same conclusion as the main thread's item 4 in the original brief.)
+  3. **Shift (change-of-variables) argument** with a local bump g: compare Πₙ(E) with Πₙ(E − g). It was being developed when cancelled. The issues already identified (prior cost λ‖Dg‖₁ against the local gain; uniformity of the realized ratio) are in the main thread's brief.
+  4. A remark it made: the posterior spread ≍ λ^{−1/3} still shrinks for any polynomial λ.
+- **Assessment (Head of Theory).** Nothing in the child's exploration supersedes the main-thread route above (gauge decomposition with integration against ν), which addresses the circularity directly. On resumption, start from the main-thread notes.
