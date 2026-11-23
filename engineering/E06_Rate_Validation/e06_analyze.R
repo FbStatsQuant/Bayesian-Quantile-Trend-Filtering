@@ -51,6 +51,11 @@ S <- do.call(rbind, lapply(seq_len(nrow(meta)), function(j) {
              stringsAsFactors = FALSE)
 }))
 S <- S[order(S$truth, S$sched, S$arm, S$noise, S$tau), ]
+# calibration cap (HQ): flag configs whose Lam_star was capped by the many-mode restriction
+cal <- readRDS(file.path(E06_OUT, "calibration.rds"))
+S$capped <- mapply(function(tr, nz, ta) isTRUE(cal$binding[cal$truth == tr & cal$noise == nz & cal$tau == ta]), S$truth, S$noise, S$tau)
+invisible(file.copy(file.path(E06_OUT, "calibration_curves.csv"), file.path(E06_RES, "tables", "e06_calibration_curves.csv"), overwrite = TRUE))
+write.csv(cal, file.path(E06_RES, "tables", "e06_calibration.csv"), row.names = FALSE)
 
 # anomaly gate for launching phase supp (HQ): many-mode, ESS/R-hat at E-02 standards, no saturation
 S$flag <- with(S, paste0(ifelse(nl_min < 10, "few-mode;", ""), ifelse(ess_d2_min < 110, "ESS;", ""), ifelse(rhat_max > 1.01, "Rhat;", ""),
@@ -99,16 +104,16 @@ sup <- c("\\begin{longtable}{lllllcccccc}", "\\toprule",
          "truth & noise & $\\tau$ & $\\lambda_n$ & $\\sigma$ & pred. & $\\hat q_n$ slope [95\\% CI] & log-adj. & rough $\\hat q_n$ slope & mean $\\Delta^2$ slope & $P_{1\\text{k}}/P_{32\\text{k}}$ \\\\",
          "\\midrule", "\\endhead")
 for (j in seq_len(nrow(S))) { x <- S[j, ]
-  sup <- c(sup, sprintf("%s & %s & %.1f & %s & %s & $%.3f$ & %s & $%.2f$ & %s & %s & %s/%s \\\\", if (x$truth == "pq") "pq" else "sin",
+  sup <- c(sup, sprintf("%s & %s & %.1f & %s & %s & $%.3f$ & %s & $%.2f$ & %s & %s & %s/%s \\\\", paste0(x$truth, if (x$capped) "$^\\dagger$" else ""),
     NOISE_TEX[[x$noise]], x$tau, SCHED_TEX[[x$sched]], ARM_TEX[[x$arm]], x$pred, fmt(x$slope_q95, x$lo_q95, x$hi_q95),
     x$slope_q95_logadj, fmt(x$slope_rough_q95, x$lo_rough_q95, x$hi_rough_q95), fmt(x$slope_mean, x$lo_mean, x$hi_mean), ex(x$cfg, x$n_min), ex(x$cfg, x$n_max))) }
-sup <- c(sup, "\\bottomrule", "\\end{longtable}")
+sup <- c(sup, "\\bottomrule", "\\multicolumn{11}{l}{\\footnotesize $^\\dagger$ calibration constant capped to keep $n\\lambda^{-1/3} \\ge 10$ in every cell (uncapped MAP-risk curves: \\texttt{calibration\\_curves.csv}).}", "\\end{longtable}")
 writeLines(sup, file.path(E06_RES, "tables", "e06_supp_table.tex"))
 dg <- c("\\begin{longtable}{lllllcccccc}", "\\toprule",
         "truth & noise & $\\tau$ & $\\lambda_n$ & $\\sigma$ & $\\min n\\lambda^{-1/3}$ & $\\max w/n$ & $\\max \\text{bias}^2/\\text{risk}$ & $\\max \\lambda\\|D\\theta\\|_1/m$ & min ESS & max $\\hat R$ \\\\",
         "\\midrule", "\\endhead")
 for (j in seq_len(nrow(S))) { x <- S[j, ]
-  dg <- c(dg, sprintf("%s & %s & %.1f & %s & %s & %.0f & %.3f & %.2f & %.2f & %.0f & %.3f \\\\", x$truth, NOISE_TEX[[x$noise]], x$tau,
+  dg <- c(dg, sprintf("%s & %s & %.1f & %s & %s & %.0f & %.3f & %.2f & %.2f & %.0f & %.3f \\\\", paste0(x$truth, if (x$capped) "$^\\dagger$" else ""), NOISE_TEX[[x$noise]], x$tau,
     SCHED_TEX[[x$sched]], ARM_TEX[[x$arm]], x$nl_min, x$w_n_max, x$bias_frac_max, x$pen_ratio_max, x$ess_d2_min, x$rhat_max)) }
 dg <- c(dg, "\\bottomrule", "\\end{longtable}")
 writeLines(dg, file.path(E06_RES, "tables", "e06_supp_diagnostics.tex"))
