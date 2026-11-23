@@ -21,7 +21,10 @@ def max_mgf(dist, q, tau, w):
     s = np.linspace(0, DMAX, NS); ds = s[1]-s[0]
     Fr = dist.cdf(q+s); Fl = dist.cdf(q-s)
     # cumulative integrals int_0^d e^{ws}(1-F(s)) ds and int_0^a e^{ws}F(-s) ds, computed in log-safe form
-    gr = np.exp(w*s)*(1-Fr); gl = np.exp(w*s)*Fl
+    with np.errstate(divide='ignore'):
+        gr = np.exp(w*s + np.log(np.clip(1-Fr, 0, None)))   # log-space: avoids inf*0 = nan
+        gl = np.exp(w*s + np.log(np.clip(Fl, 0, None)))
+    assert np.all(np.isfinite(gr)) and np.all(np.isfinite(gl)), "overflow: reduce DMAX"
     Ir = np.concatenate([[0], np.cumsum((gr[1:]+gr[:-1])/2*ds)])
     Il = np.concatenate([[0], np.cumsum((gl[1:]+gl[:-1])/2*ds)])
     Mr = np.exp(-w*(1-tau)*s)*(1+w*Ir); Ml = np.exp(-w*tau*s)*(1+w*Il)
