@@ -1,0 +1,4 @@
+"arm","seeds","median_ratio","max_ratio","cells_over_1.25","cells_over_1.10","mean_cover","min_cover","mean_cover_L","verdict","r1_gate"
+"P1",5,1.00953300475378,1.2625901518594,1,1,0.789022222222222,0.6496,0.7988,"rejected (data): median 1.01, 1 cells > 1.25 (max 1.26)","FAIL: S median 1.010, S max 1.26"
+"P2",5,1.01927531164429,1.20350660283305,0,4,0.784481481481481,0.598,0.791511111111111,"passes rule 1","FAIL: S median 1.046, S max 1.20, VS max 1.11"
+"P3",5,0.873311304257634,1.09839505341904,0,0,0.804,0.6336,0.7988,"passes rule 1","PASS: S median 0.873, S max 1.10"
