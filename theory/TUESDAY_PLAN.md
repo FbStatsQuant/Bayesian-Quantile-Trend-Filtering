@@ -28,8 +28,18 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 | L4b | (III-c) λ ∈ [n^{3/2}, C·n^{2.30}]: LO extension via truncation (Fable A today) | OPEN; one new lemma (a posterior bound on high-amplitude energy) | Fable A | Astra | named assumption |
 | L5 | (III-c) λ ∈ [C·n^{2.30}, Λ₋] | **DONE: Theorem U-σ, audited** (f5f05de) | — | — | — |
 | L6 | L1–L5 ⇒ (LT) at Λ₋ = c₋n^{5/2}(log n)^{−1/2} | assembly (lowertail §5, PROVED given its inputs) | Fable | Astra | — |
-| L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | H6: CT Fable A writing it today (`FABLE_A_V0Tstar_nfloor.md`) | Fable A | Astra | the rate keeps an extra log |
+| L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | **PROVED today, unaudited** (`FABLE_A_V0Tstar_nfloor.md`, 4a6dddb; rate n^{−5/6}(log n)^{1/3} confirmed); Astra audit running | Fable A | Astra | the rate keeps an extra log |
 | L8 | Rate n^{−5/6}(log n)^{1/3}, with LB matching up to logs | follows from L7 + Theorem LB | — | — | — |
+
+**L4a, the named assumption (Felipe's assumptions-vs-empirics rule):** see `T06_Alignment/L4a_assumption.md`.
+- **Statement:** sup_P E_P Π(ℓ₀ ≤ λ ≤ n^{3/2}polylog | y) → 0.
+- **Finite-n proxy:** posterior λ / (n^{5/2}/V) bounded below, uniformly in n.
+- **Existing data (A-rule screen, medians only):** at τ = 0.5, λ/λ\* is stable from n = 500 to 2000 (S: 0.85 → 1.05; VS: 3.2 → 2.8).
+  - VS medians sit below n^{3/2} at paper n. This is expected, because the oracle itself is below n^{3/2} while n < V ≈ 7276.
+  - **Watch item:** S at τ = 0.95 (Normal: 0.59 → 0.08 at n = 1000, one seed).
+  - Zero mass below n^{3/2} is NOT shown.
+- **Tuesday check:** re-run A_H1 with λ draws saved, n up to 4000, 3 seeds. Engineering to price it.
+- **Referee note:** §4 of that file.
 
 **Coverage upgrade (gap 2): DONE** (a5453af). L5 now holds with averaged β̄ on the whole grid τ ∈ [0.05, 0.95]. L4a and L4b inherit whichever β the new lemma uses.
 
