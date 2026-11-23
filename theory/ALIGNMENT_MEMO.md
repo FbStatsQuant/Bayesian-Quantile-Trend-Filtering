@@ -78,7 +78,7 @@ This is a failure of the route, not a counterexample to contraction (see (b)).
   - PROVED by assembling cross-audited parts: C1 (Astra), Lemma F, W′ and C2 (Opus), Lemma S (Opus).
 - **Theorem V0T, Felipe's method plus a λ floor, σ AND λ learned, at n^{−4/7}(log n)^{6/7}** (`FABLE_V2T_proof.md`; Astra: ACCEPT WITH FIXES).
   - The floor never binds at n = 500 (measured).
-  - The n^{−5/6} version (V0T\*) is in preparation (Fable A).
+  - **Theorem V0T\*: the same at the ORACLE RATE n^{−5/6}(log n)^{1/6}** (`FABLE_A_n56.md`). Fable proved it; Astra audited it: ACCEPT WITH FIXES, eight editorial findings, all held. **This is the headline for Felipe's method + floor.**
   - The V0T data test is built and awaits HQ's OK.
 
 **Presentation caveat (Engineering, aca7214, V2_lambda_traces.png).** Every theorem here concerns the POSTERIOR. At n = 1000–2000 and the paper's run lengths, Felipe's P-MALA has not converged in λ (R̂ 1.3–2.3; on S at n = 2000, τ = ½, its λ sits about 20× below the exact posterior). Statements about his method at larger n should therefore say "the posterior it targets", and the paper should note that reaching it requires adequate run length or mixing. This is a sampler matter, not a theory gap.

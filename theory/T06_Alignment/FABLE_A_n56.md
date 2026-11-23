@@ -274,3 +274,24 @@ This is a re-derivation by the same model that wrote the original, so it is not 
 **Sup-norm rate.** n^{−7/30}(log n)^{1/15} is what L10-I gives from (√M·ε, T₀ ≍ √n). No claim that it is sharp.
 
 **Not verified.** The internals of C1, Theorem C, V2T, L3, L6, L10-I (used as quoted, or as read in their files); the numerical value of C_ε (it depends on C_M); L6's 1.44 against V2T's 1.25 (each is quoted from its own audited file).
+
+---
+
+## Theory Department: cross-family audit response (Astra, `reviews/AUDIT_astra_V0Tstar.md`, 2026-11-23)
+
+Verdicts:
+- **Theorem C\*: ACCEPT.**
+- **Lemma C2-mix: ACCEPT WITH FIXES.**
+- **Theorem V0T\*: ACCEPT WITH FIXES.**
+
+All eight findings are CONFIRMED. Theory verified the central new step (the λ-mixed fine MGF is monotone in ℓ, so it is bounded by its value at the floor) before the audit, and rules that **all eight HOLD**. None changes a conclusion or a rate. The fixes, all editorial:
+1. **σ-interval.** Narrowing to [(1−η₁)d, (1+η₁)B] uses the audited scale consistency of Theorem C / V2T; it is non-circular.
+2. **Mixed measure.** Cauchy–Schwarz is applied in dc ⊗ Π̄ on the deterministic sup-norm-restricted shell.
+3. **Probabilities.** State the Markov failure probability **unconditionally**, then intersect with the λ-free score event (the coarse event, failure ≤ 4(J+3)/(9(J−1)²); the fine event, failure ≤ (2m)^{−3}).
+4. **Floor comparison and fine constant.** Confirmed.
+5. **Evidence.** One deterministic centre per truth across the window; the upper support of λ is unbounded, and that is harmless.
+6. **(N11).** Reserve positive slack and state the threshold as a **strict** inequality. The ceiling shell index is fine.
+7. **Rate.** ε̄² = M C_ε n^{−5/6}[κ₋^{−1/3}(log m)^{1/6} + κ₋^{5/3}V²], and the sup-norm rate follows.
+8. **The alternative-floor sketch (outside both theorems).** It needs extra log care; it stays SKETCH.
+
+**Status: Theorem V0T\* (Felipe's method + λ floor, σ and λ learned, n^{−5/6}) is PROVED and cross-family audited, modulo editorial fixes.**
