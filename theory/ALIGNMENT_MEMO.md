@@ -85,10 +85,23 @@ Here Π_σ is the θ-posterior at fixed σ (λ fixed, or learned and mixed over)
    - Hence E₀ sup_{ω∈[ω₁,ω₂]} Π_ω(E | y) → 0 for M > (2/b)(ω₂/ω₁)(1.44C₁ + 1 + C_pr/ω₂). This is **P2, proved**.
    - It covers learned σ only with a prior supported in the (EM) range, and Engineering's data rule that out on MSE.
    - **Below σ̄ the same trick applies to C1** (its bound is uniform in ω on compacts by the same monotonicity) — SKETCH.
-2. **σ-posterior concentration on I — OPEN; R-A1-post requested** (σ/σ₀,ₙ quantiles vs n).
-   - Route: σ | θ, y ~ IG(n + a, b + Q(θ)), with Q(θ) = Σρ_τ(yᵢ − θᵢ).
-   - |Q(θ) − Q(θ\*)| ≤ Σ|δᵢ| ≤ n(√Δ²ₙ + Δ²ₙ), and Q(θ\*)/n → σ₀ by a uniform law of large numbers (needs a first moment of the noise).
-   - So σ concentrates on σ₀ ± O(√Δ²ₙ + n^{−1/2}) **once θ is localized**. C1 supplies that localization for every σ, which breaks the circularity Astra flagged. SKETCH.
+2. **σ-posterior concentration and compact containment: Lemma S** (temporary Astra assistant, `T06_Alignment/astra_sigma_concentration.md`). **Verified step by step by Theory; cross-check by a second model pending.**
+   - **§1, PROVED:** (H) ⇔ σ/s_n → 1, with s_n = σ₀,ₙ. This uses the IG(n + a, b + Q) conditional (Gamma pivot plus Chebyshev), a law of large numbers under row-average uniform integrability of the check loss (which covers the paper's Gaussian, Beta and mixture designs), and |Q − Q\*| ≤ n‖δ‖ₙ.
+   - **§2, PROVED: compact containment** Π(σ ∉ [l, H₀] | y) → 0, with **no trend localization needed** (only (A3) and λ/log n → ∞):
+     - a coarse evidence bound e^{−Cn}, taken at σ ∈ [1, 2];
+     - the upper tail, via the flat integral ≤ C_k s³;
+     - the lower tail, via data roughness: Q(θ) < qn forces ‖Dθ‖₁ ≥ nd/4, whose prior cost 2^m e^{−λnd/8} beats the O(n log n) IG moment.
+
+     This breaks the circularity Astra flagged in the W-01 review.
+   - **§3, PROVED: transfer.** If Hypothesis U holds (uniform fixed-σ localization on the whole of [l, H₀], with the supremum inside the expectation), then (H) and hence Lemma S follow.
+   - **Hypothesis U is exactly what C1 states** (`T06_Alignment/C1_any_sigma.md`: E sup_{ω∈[ω₁,ω₂]} Π_ω(‖δ‖ₙ > r | y) → 0, which gives |Q − Q\*|/n ≤ ‖δ‖ₙ ≤ r → 0).
+3. **Combined (C1 + Lemma S): learned σ under Felipe's IG(0.1, 0.1) prior, deterministic λ ≫ n^{23/11} (including λ ≍ n^{5/2}/V):**
+   - Π(‖θ − θ\*‖²ₙ > r² | y) → 0 with r² ≍ n^{1/7}λ^{−2/7}(log n)^{6/7}, i.e. n^{−4/7} at the oracle;
+   - ‖θ − θ\*‖∞ → 0;
+   - σ/σ₀,ₙ → 1 in posterior probability;
+   - moment-free apart from uniform integrability, and with **no condition σ > σ̄**.
+
+   **Status: SKETCH, pending C1's self-check and the audits of C1, Lemma W and Lemma S.** If these hold, this is a **σ-aligned theorem**: it covers the method's actual σ treatment, at a suboptimal rate.
 
 ---
 
@@ -126,6 +139,8 @@ Theorem B, with uniformity in σ as in (c)(1), needs:
 ---
 
 ## Pending inputs
+
+- Self-check of C1 (`T06_Alignment/C1_any_sigma.md`), then a cross-model audit of C1, W and S (Fable on CP from 15:15 CT).
 
 - VP consultation on C1, C2 and (c)(2): due 16:30 CT.
 - Engineering R-A1-post + R-A2 (≈ 5.5 core-h; awaiting HQ's compute OK): σ and λ concentration against n, and fixed σ ≈ σ₀.
