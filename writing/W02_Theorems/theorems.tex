@@ -280,7 +280,7 @@ C1, C2 and V0T/V2T with the floor $\Lambda_-=\kappa_-n^{k+1/2}$ carry over for $
 \section{Target: the A-rule without a floor \quad \stTARGET}
 \label{sec:arule}
 
-\plainly{The A-rule changes one hyperparameter of Felipe's method and adds no floor. Its rate $b_n$ shrinks with $n$ so that the prior keeps pace with the oracle $\lambda$. Eight links lead to the target. L5 and L7 are proved and audited. L1, L3 and the assembly L6 are proved, not yet audited. L2 is proved and audited for the Gaussian design only. L4a and L4b are open. \textbf{It is not a theorem until the open links close.}}
+\plainly{The A-rule changes one hyperparameter of Felipe's method and adds no floor. Its rate $b_n$ shrinks with $n$ so that the prior keeps pace with the oracle $\lambda$. Eight links lead to the target. L5 and L7 are proved and audited. L1, L3 and the assembly L6 are proved, not yet audited. L2 is proved and audited for the Gaussian design only. L4b is proved and audited down to $n^{21/11}$ and open below. L4a is open. \textbf{It is not a theorem until the open links close.}}
 
 \begin{named}{Target (A-rule, no floor) --- not a theorem}
 Model: Felipe's method with $\lambda\sim\Ga(1,b_n)$, $b_n=1/(5500\,(n/500)^{5/2})$, $\sigma\sim\IG(0.1,0.1)$ learned, no truncation. At $\tau\in[0.05,0.95]$, for the paper's three noise designs, $\theta$ contracts at $n^{-5/6}$ up to logs (via L7: $n^{-5/6}(\log n)^{1/3}$), with $\sigma$ and $\lambda$ both learned.
@@ -311,8 +311,8 @@ L1 & tiny $\lambda<\ell_1:=(1-\eta)\,2t/(e\szero)\,e^{-\eta}$ & \PU{} (class-wid
 L2 & bounded $\lambda\in[\ell_1,\ell_0]$: design condition (DC) & Gaussian: \PA; Mixed/Beta: \OP & \texttt{FABLE\_B\_DC.md}; \texttt{FABLE\_B\_L2\_analysis.md} (\texttt{23c6d54}, audit \texttt{845116d}); Fable B / Astra \\[2pt]
 L3 & interpolating fits; extreme scales & \PU{} (class-wide) & lowertail \S2 (III-a/b), using Lemma S (audited) \\[2pt]
 L4a & $\lambda\in[\ell_0,n^{3/2}]$ & \OP; named assumption with a data check & \texttt{L4a\_assumption.md} \\[2pt]
-L4b & $\lambda\in[n^{3/2},\,C n^{2.30}]$ & \OP; partial result pending & Fable A; Theory reports at 17:05 \\[2pt]
-L5 & $\lambda\in[L_n,\Lambda_{-,n}]$: $L_n=Cn^{99/43}(\log n)^c$, $\Lambda_{-,n}=c_-n^{5/2}(\log n)^{-1/2}$ & \PA & Theorems LO, U, U-$\sigma$ with averaged $\bar\beta<6$; Fable A, Fable B / Astra \\[2pt]
+L4b & $\lambda\in[n^{3/2},\,C n^{2.30}]$ & \PA{} to $n^{21/11}$; \OP{} below & \texttt{FABLE\_A\_L4b.md} (\texttt{1af9f8b}); Fable A / Astra \\[2pt]
+L5 & $\lambda\in[L_n,\Lambda_{-,n}]$, $\Lambda_{-,n}=c_-n^{5/2}(\log n)^{-1/2}$; $L_n=Cn^{21/11}$polylog (min-density $\beta$), $Cn^{99/43}(\log n)^c$ (averaged $\bar\beta$) & \PA & Theorems LO, U, U-$\sigma$ with averaged $\bar\beta<6$; Fable A, Fable B / Astra \\[2pt]
 L6 & L1--L5 $\Rightarrow$ (LT) & assembly \PU{} given its inputs & lowertail \S5 \\[2pt]
 L7 & (LT) $\Rightarrow$ rate $n^{-5/6}(\log n)^{1/3}$ (V0T$^*$, $n$-dependent floor) & \PA & \texttt{FABLE\_A\_V0Tstar\_nfloor.md}; Fable A / Astra \\[2pt]
 L8 & rate $n^{-5/6}(\log n)^{1/3}$, matched by LB up to logs & follows from L7 and LB & --- \\
@@ -396,7 +396,13 @@ Model and assumptions of V0T$^*$, with floor $\Lambda_{-,n}:=\kappa_{-,n}n^{5/2}
 \begin{itemize}
 \item \textbf{L2, bounded $\lambda$, (DC)} \OP{} for the three designs together. With $g_n(s,\ell):=\log(\ell/(2t))+n^{-1}\log\E_s\exp\{-\ell\norm{D(y-E)}_1\}$ and $b^*:=-1-\log\sigma_0$: (DC$_\gamma$) is ``with probability $\to1$, $\sup\{g_n(s,\ell):s>0,\ \ell_1\le\ell\le\ell_0\}\le b^*-\gamma$''. Given (DC$_\gamma$), $\Pi(\ell_1\le\lambda\le\ell_0\mid y)\le e^{-\gamma n/2}$ (\PU). The reduction to a compact rectangle is \PU. \emph{Gaussian design:} \PA{} (Fable B / Astra, ACCEPT WITH FIXES; \texttt{FABLE\_B\_L2\_analysis.md}, \texttt{23c6d54}, audit \texttt{845116d}) at the paper levels $\tau\in\{0.05,0.25,0.5,0.75,0.95\}$, on $[\ell_1,\ell_0]$ with $\ell_0=790$ ($\tau=\tfrac12$), $196$ ($0.25/0.75$), $12$ ($0.05/0.95$). The posterior consequence uses (A3) for the denominator. Not every $\tau$: the method fails at extreme quantiles. Mixed and Beta: \OP, work in progress. Beta at $\tau=0.95$: not covered by this method. The method stops at a constant $\ell_0$, so it gives nothing for L4a.
 \item \textbf{L4a, $\lambda\in[\ell_0,n^{3/2}]$} \OP. No theory; even the $\beta<6$ heuristic has no justification here. Fallback: the named assumption below.
-\item \textbf{L4b, $\lambda\in[n^{3/2},Cn^{2.30}]$:} \OP. A partial result is in progress (Fable A); Theory will report its status at 17:05.
+\item \textbf{L4b, $\lambda\in[n^{3/2},Cn^{2.30}]$: partly closed, cross-family audited} (Fable A / Astra: ACCEPT WITH FIXES; \texttt{FABLE\_A\_L4b.md}, commit \texttt{1af9f8b}).
+\begin{itemize}
+\item \emph{Posterior statement} (\PA): Theorems U / U-$\sigma$ now hold down to $n^{21/11}$ up to logs. So the A-rule posterior excludes $\lambda\in[Cn^{21/11}\mathrm{polylog},\,c_-n^{5/2}(\log n)^{-1/2}]$, under the min-density condition $\beta<6$.
+\item \emph{Fixed $(\sigma,\lambda)$ only:} the Occam bound holds down to $n^{9/5}$, and to $n^{26/17}$ under one hypothesis (SN/XS).
+\item \emph{\OP:} the posterior statement on $[n^{3/2},n^{21/11}]$; the averaged-$\bar\beta$ version below $n^{99/43}$.
+\item Theorem H-sharp holds only above a polylog floor, $\ell/[K^6(\log n)^{27/2}]\to\infty$.
+\end{itemize}
 \end{itemize}
 
 \subsection{Named assumptions and their empirical status}
@@ -414,6 +420,7 @@ Assumption & What it says & Empirical / design check \\
 (REG) & a smooth secant-density profile in $u$, bounded away from 0 and $\infty$ & holds for the three designs (Theory's check) \\[2pt]
 $\bar\beta<6$ & averaged evidence condition at the learned scale & computed: $\le5.12$ on $\tau\in[0.05,0.95]$; exceeds $6$ at $0.97$ and $0.99$, where the sufficient condition is not met; no failure is proved there (Table~\ref{tab:beta}). \ME: the $\hat\kappa$ pilot (one seed, Gaussian) had the predicted sign at $0.05$--$0.5$ and lost it at $0.97$ \\[2pt]
 (DC) (L2) & no partial interpolation at bounded $\lambda$ & Gaussian design: \PA{} at $\tau\in\{0.05,0.25,0.5,0.75,0.95\}$ (no data needed). Mixed, Beta: \OP; no data yet; Tier-3 surface map planned (Tuesday at the earliest) \\[2pt]
+L4b (below $n^{21/11}$) & posterior exclusion of $\lambda\in[n^{3/2},n^{21/11}]$; averaged-$\bar\beta$ version below $n^{99/43}$ & \OP; none yet. $[n^{21/11},n^{2.30}]$ is \PA{} (min-density $\beta<6$) \\[2pt]
 (L4a) & $\supP\Pi(\ell_0\le\lambda\le n^{3/2}(\log n)^c\mid y)\to0$ & \ME{} (A-rule screen, posterior medians only): at $\tau=0.5$, $\lambda/\lambda^*$ is stable from $n=500$ to $2000$ (S: $0.85\to1.05$; VS: $3.2\to2.8$). Zero mass below $n^{3/2}$ is \emph{not} shown, and cannot be with medians. Watch item: S at $\tau=0.95$ (Normal $0.59\to0.08$ at $n=1000$, one seed). Draws check proposed for Tuesday \\
 \bottomrule
 \end{tabular}
@@ -425,7 +432,7 @@ $\bar\beta<6$ & averaged evidence condition at the learned scale & computed: $\l
 
 \medskip
 \noindent\fbox{\begin{minipage}{0.97\textwidth}
-\textbf{Not a theorem yet.} The A-rule target becomes a theorem only when L2 (Mixed, Beta), L4a and L4b are proved, and L1, L3 and L6 are audited. Until then it may be stated only conditionally: on (DC), (L4a) and the L4b lemma as named assumptions (or on (E), fallback F3).
+\textbf{Not a theorem yet.} The A-rule target becomes a theorem only when L2 (Mixed, Beta), L4a and L4b (below $n^{21/11}$) are proved, and L1, L3 and L6 are audited. Until then it may be stated only conditionally: on (DC), (L4a) and the L4b lemma as named assumptions (or on (E), fallback F3).
 \end{minipage}}
 
 %=====================================================================
