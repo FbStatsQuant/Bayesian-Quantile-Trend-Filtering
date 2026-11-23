@@ -818,3 +818,78 @@ To see the balance one needs εₙ ≲ K^{−3}: (i) ā ≤ 1/(7f̄K³), and (ii
 **Remaining elsewhere:** non-clean windows (G2). The "B11 at level A₁" step is asserted, not rewritten.
 
 **For Tuesday:** a cross-family audit of §9–§15 (Astra), then the approximation lemma, then G2.
+
+---
+
+## 16. The deterministic approximation step: what bump balances give, and where it stops
+
+*Appended 2026-11-23, about 16:40 CT, same author. Not audited. By hand, no compute. Notation of §15; G′ = K′·h is a bump scale with K′³ ≥ 256/(f·L); β(G′) := βₙ + εₙ at that scale, so that on the events of B12 and B14 every θ clean on W = supp b satisfies |Σᵢbᵢ(Fᵢ(δᵢ) − τ)| ≤ β(G′)·G′⁴. Its leading term is (f̄/f)·8·(h/G′)³.*
+
+### 16.0 Outcome
+
+**The approximation lemma I proposed in §15.4 is false in the strength needed. B14 does not improve the level-versus-fraction trade-off of Theorem B10, and an every-window sup-norm bound does not follow from B10 + B14. The stopping point is a scale gap, and it traces back to one crude inequality in Lemma B3.**
+
+| # | Claim | Status |
+|---|---|---|
+| 1 | **Plateau exclusion:** on a clean window there is no run of length 4G′ on which δ > β(G′)/f (or < −β(G′)/f), with posterior probability ≥ 1 − n^{−C+2} | PROVED (Lemma B15 + Theorem B14) |
+| 2 | If δ is within ā′ of a **single** quadratic on a clean stretch of length 28G′, then ‖δ‖∞ ≤ 82·(β(G′)/f + 2(f̄/f)ā′) + ā′ there | PROVED (Proposition B16); its hypothesis is not available |
+| 3 | "All scales between g and G" was wrong: the balance identity carries relative bias ≍ (h/w)³ for **every** test direction at scale w, so it is void at scales w ≲ h | PROVED observation (§16.2) |
+| 4 | **Scale gap:** at amplitude a, slaving excludes widths ≲ h·(ωa/(5K₂))^{1/3}, balance excludes widths ≳ 4h·(8f̄/(f²a))^{1/3}; widths in between are not excluded by anything proved | PROVED arithmetic (§16.3) |
+| 5 | Root cause and next target: the bound \|⟨sign(Dθ), Db⟩\| ≤ ‖Db‖₁ in Lemma B3. With square-root cancellation (‖Db‖₂ = √(20G′) instead of 8G′) the bias at G′ = h would be ≍ ℓ^{−1/6}, the conjectured sup-norm scale | CONJECTURE (§16.4) |
+
+### 16.1 Two deterministic statements — PROVED
+
+**Lemma B15 (plateau exclusion).** Let |δᵢ| ≤ L on W = supp b and |Σᵢbᵢ(Fᵢ(δᵢ) − τ)| ≤ β·G′⁴. Then f·Σᵢbᵢδᵢ⁺ − f̄·Σᵢbᵢδᵢ⁻ ≤ β·G′⁴, and the same with ± exchanged. In particular **min_W δ ≤ β/f and max_W δ ≥ −β/f.**
+
+*Proof.* f·x⁺ − f̄·x⁻ ≤ Fᵢ(x) − τ ≤ f̄·x⁺ − f·x⁻ for |x| ≤ L. Sum with weights bᵢ ≥ 0, Σbᵢ = G′⁴. ∎
+
+With Theorem B14 (union over the ≤ n shifts and O(log n) dyadic scales, C enlarged): with posterior probability ≥ 1 − n^{−C+2} on the data event, no window of length 4G′ on which θ is clean carries δ > β(G′)/f throughout.
+
+**Proposition B16 (sup-norm from balance, for a single quadratic).** Let a stretch of 28G′ points be covered by seven consecutive bump supports W₁, …, W₇, on each of which the hypothesis of B15 holds, and let |δ − 𝗉| ≤ ā′ on the stretch for one quadratic 𝗉. Then ‖δ‖∞ ≤ 82·B₀ + ā′ on the stretch, B₀ := β/f + 2(f̄/f)·ā′.
+
+*Proof.* 𝗉 changes sign at most twice along the integers, so at least five of the W_k are one-signed for 𝗉; pick three of them with indices pairwise ≥ 2 apart (first, third, fifth of the five). On such a W_k, say 𝗉 ≥ 0: δ⁻ ≤ ā′, so B15 gives Σbᵢδᵢ⁺ ≤ (β + f̄ā′)G′⁴/f, hence some i ∈ W_k has δᵢ⁺ ≤ (β + f̄ā′)/f and 0 ≤ 𝗉ᵢ ≤ B₀. The three points have gaps ≥ 4G′, 4G′, 12G′ in a stretch of 28G′; Lagrange: 784/(4·12) + 784/(4·4) + 784/(4·12) ≤ 82. ∎
+
+*Why B16 does not apply.* "One quadratic ± ā′ on 28G′ points" would come from slaving at length 28K′·h, which is beyond the hypothesis of Lemma B1 (g³ ≤ ℓ/(ωk̄)), and whose error would be ā′ ≍ K₂·(28K′)³/ω ≫ 1 in any case. On a clean window, slaving gives a different quadratic on each block of length g ≪ h, and consecutive ones are tied only up to ā at three points, which extrapolates with factor (distance/g)².
+
+### 16.2 Why smaller scales cannot be used — PROVED observation
+
+For any direction b at scale w (support ≍ w, amplitude 1): |⟨b, s⟩| ranges up to ≍ w, while Lemma B3's bound is ℓ‖Db‖₁/ω ≍ ℓ/(ω·w²). The relative bias is ≍ ℓ/(ω·w³) = (h/w)³, **for every test direction, not only the B-spline**: by the inverse inequality in step 1 of Lemma B1, ‖b‖∞ ≤ ((w+1)²/2)·‖Db‖₁ for b supported on w points, so ℓ‖Db‖₁/(ω‖b‖₁) ≥ 2ℓ/(ω·w·(w+1)²). So B14-type statements say something only at w ≥ K′·h with K′ a large constant, and their level resolution is ≍ (f̄/f²)·8/K′³. My phrase "bumps at all scales between g and G" in §15.4 was wrong: below ≍ h the balance is void.
+
+### 16.3 The scale gap — PROVED arithmetic
+
+Take a feature of amplitude a (constant or slowly decreasing) on a clean stretch.
+- **Narrow, by slaving (Theorem B10).** Removed if its width is below g/2 with ā ≤ a/257, i.e. width ≲ W₋(a) := h·(ω·a/(5K₂·257))^{1/3}·(1 + o(1)).
+- **Wide, by balance (Lemma B15).** Excluded if one-signed on 4G′ points with β(G′)/f < a, i.e. width ≳ W₊(a) := 4h·(8f̄/(f²·a))^{1/3}·(1 + o(1)), and also ≥ 4h·(256/(fL))^{1/3}.
+- W₊/W₋ ≍ (K₂/a²)^{1/3}·const > 1 always, and the gap widens as a → 0.
+
+*What the proved bounds permit (arithmetic, not a claim about the posterior):* an oscillation of wavelength ≍ h and amplitude a ≲ K₂/ω. Its roughness per block is ≍ ℓ·a·g/h³ ≤ K₂·g, so every block is good; its positive and negative half-waves can be balanced so as to cancel in every bump average at scale ≥ K′·h (up to boundary remainders that decay with K′). Neither B10 nor B14 sees it. Its exclusion is a likelihood-margin statement at the bandwidth scale (energy ω·f·a² per coordinate against data-aligned gains): for a ≫ ℓ^{−1/7}·polylog this is again (B2)/(G1) of §14.3; below that, down to ℓ^{−1/6}, nothing proved applies.
+
+### 16.4 Stopping point and the one inequality to sharpen
+
+**Stopping point.** On clean windows: (a) features narrower than W₋(a) are excluded (B10); (b) one-signed features wider than W₊(a) are excluded with probability 1 − n^{−C} (B14 + B15); (c) **features of width between W₋(a) and W₊(a), in particular oscillations at the bandwidth, are not excluded.** Note that "clean at level a" already means ‖δ_W‖∞ ≤ a, so the real question is the trade-off between the level a and the fraction of non-clean windows. What is proved is the energy-counting trade-off of Theorem B10 (fraction ≲ M·(2T/K₂ + 2·257²·r²/a²); e.g. level ≲ ℓ^{−2/21}·polylog off a vanishing fraction of blocks). **B14 + B15 add plateau exclusion (no plateau above ≈ (f̄/f²)·8/K′³ of width 4K′h on clean windows) but do not improve that trade-off**, because the dense blocks that limit it are of intermediate width, case (c). An every-window sup-norm bound needs (c) and (G2).
+
+**The inequality to sharpen — CONJECTURE.** Lemma B3 is an identity: ω·E[⟨b, s⟩ | outside] = −ℓ·E[⟨sign(Dθ), Db⟩ | outside]. The loss is in |⟨sign(Dθ), Db⟩| ≤ ‖Db‖₁ = 8G′. For the bump, Db is ±1, ∓3, ±3, ∓1 on four runs of length G′, so ⟨sign(Dθ), Db⟩ is a signed combination of four run-sums of the signs of the third differences. If these run-sums are of square-root size (as under the Laplace prior, where the signs are independent and symmetric), then |⟨sign(Dθ), Db⟩| ≲ ‖Db‖₂·√(log n) = √(20G′·log n), and the relative bias becomes √20·(h/G′)³·G′^{−1/2}·√(log n). **At G′ = h this is ≍ ℓ^{−1/6}·√(log n): the conjectured sup-norm scale appears exactly at the bandwidth.** So the target is:
+
+  **(SGN) Under the posterior, the sign sequence of Dθ has run-sums of size O(√(G′·log n)) over runs of length G′ ≍ h,** in conditional expectation given the outside, or in probability along fibres (it enters B5/B14 through the penalty term of V′, which is the same quantity).
+
+(SGN) would close the gap from above (balance informative down to w ≍ h), leaving a constant-factor gap to slaving that the single-quadratic Proposition B16 is designed for. I have no proof of (SGN); it is a statement about the posterior of the knot signs, in u = Dθ coordinates, where the prior is a product and the likelihood is the repulsive term of §11.1.
+
+### 16.5 Flags
+
+- Lemma B15 and Proposition B16 are new, short and unaudited. B16 is correct but currently unusable.
+- §16.3's oscillation is an example of what the proved inequalities allow; it is not shown to have posterior mass.
+- (SGN) is a conjecture with no supporting computation. **UNTESTED diagnostic:** from saved draws, the run-sums Σ_{j∈run}sign((Dθ)_j) over runs of length h, 2h, 4h; square-root size supports (SGN), linear size refutes it. Cost: post-processing of existing draws only.
+- §15.4 item 1 ("apply B14 at all shifts and at scales between g and G") is superseded by §16.2.
+
+## Theory response to §16 (2026-11-23). Fable B's final status today.
+
+**Status: OPEN. UNAUDITED.** §15.4's proposed approximation lemma is **withdrawn**: it is false in the strength needed.
+
+**PROVED:**
+- **Plateau exclusion (B15 + B14).**
+- **Proposition B16.** The sup-norm bound for a single quadratic. It holds, but its hypothesis cannot be supplied.
+- **The scale gap.** Slaving excludes narrow widths and balance excludes wide one-signed widths. Oscillations at the bandwidth scale are excluded by nothing proved.
+
+**Next target (CONJECTURE).** (SGN), square-root run-sums of the posterior signs of Dθ over runs of length ≈ h. The diagnostic (UNTESTED, internal) is post-processing of saved draws; it can ride on Tuesday's draws run.
+
+**Fable B final status today:** L2 is DONE and audited for all three designs. Sup-norm lemma §§1–16: OPEN, with a precise stopping point. All of it is committed.
