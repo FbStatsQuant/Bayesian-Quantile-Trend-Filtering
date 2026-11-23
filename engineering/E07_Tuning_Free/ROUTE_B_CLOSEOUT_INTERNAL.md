@@ -1,14 +1,40 @@
-# E-07 evidence package, 8 PM, 2026-11-23
-*Engineering → HQ. Every number below is measured and paired: same datasets and seeds, same posterior, against Felipe's original sampler code at its published settings.*
+# E-07 route B closeout (INTERNAL; not for Felipe)
+*Engineering, 2026-11-23.*
+- **Status:** route B was CLOSED by HQ at 16:40 CT because the joint gate failed Felipe's MSE bar (§1).
+- **Record:** this file is the internal record of the measured results. Every number is paired (same datasets and seeds, same posterior) against Felipe's original sampler code at its published settings.
+- **What stays in the repo:** the exact individual Gibbs stays as the company's simulation tool for Theory work, as in E-02. The joint v1, v2 and v3 samplers stay as an internal record.
+- **Compute:** E-07 total 86.7 core-h (cap 88).
 
-## 1. Joint gate (the decider) ⏳
+## 1. Joint gate (the decider): FAILED
 - **Design:** the paper's own joint designs, with his settings in both arms.
   - **Tail set:** levels 0.90, 0.93, 0.96, 0.97, 0.98, 0.99. λⱼ ~ Gamma(1, b₀) with b₀ = 0.01 (VS) and 0.001 (S), from his package config `experiments/extreme_quantiles/packages/Extreme_Joint_Sampler/config.R`, line 12: `lambda_prior_rate = c(VS = 0.01, S = 0.001)`.
   - **Central set:** the interior joint batch t50, levels 0.2–0.8. b₀ = 0.01, from `experiments/interior_quantiles/joint_nots/config.R`, line 26.
   - **Both sets:** σⱼ ~ IG(0.1, 0.1) learned; ordering θ₁ ≤ … ≤ θ_J; 30,000 sweeps with 10,000 burn-in in both arms (his: 1 chain, as published; new: 2 chains).
   - **Grid:** signals VS and S × noise Gaussian, Beta, mixed normal, **seed 1** (one seed per configuration).
   - **Note:** the joint b₀ values differ from his individual-sampler values (VS 1e-3, S 5e-4) because they are his own joint configs. They are not ours.
-- **Results:** ⏳
+- **Results** (78 levels; `joint_gibbs/gate_results/joint_gate_levels.csv`; plots `joint_gibbs/gate_results/*.png`):
+
+| | Median MSE ratio (v3 / his) | Max | Levels > 1.25 | Levels < 1 |
+|---|---|---|---|---|
+| All 78 levels | 1.057 | 1.62 | **10** | 23 |
+| Central set (42) | 1.059 | 1.62 | | 12 |
+| Tail set (36) | 1.057 | 1.50 | | 11 |
+
+  - **The bar** is median ≤ 1.10 and no level > 1.25. The 10 levels above 1.25 fail it.
+  - **The 10 levels above 1.25 are:**
+    - S-Beta central 0.3, 0.5, 0.6 and 0.7 (1.26, 1.28, 1.46, 1.62);
+    - VS-Beta central 0.6 (1.26);
+    - S-Mixed tail 0.96–0.98 (1.35–1.51);
+    - VS-Beta tail 0.90 (1.28);
+    - VS-Mixed tail 0.93 (1.26).
+  - His output has lower MSE than the exact posterior mean at 55 of the 78 levels.
+  - **v3 wins at:** VS-Beta tail 0.93–0.99 (0.51–0.82), VS-Normal (central 0.80–1.04, tail 0.89–1.06) and VS-Mixed central (0.88–1.07).
+  - **Everything other than MSE passes:** 0 crossings in both arms, v3 R̂(log λ) ≤ 1.008, ESS(log λ)/s ≈ 1500× his (median), v3 wall time ≈ 10% of his (430–750 s against 2700–5800 s per configuration).
+- **Why (measured, same posterior):**
+  - His joint λ is not converged: ESS(log λ) is 1–58 per 30k sweeps.
+  - His λ medians are **1.0–3.6× v3's** at almost every level. v3's λ is confirmed by an independent exact sampler (v2, single-site truncated Gibbs).
+  - Where his output wins, his over-smoothed, unconverged chain lands closer to the truth than the exact posterior mean does (mostly S, and mixed noise).
+- **Caveat:** one seed per configuration.
 
 ## 2. Individual sampler: exact augmented Gibbs vs his P-MALA (same posterior)
 **Same posterior** means his priors exactly (λ ~ Gamma(1, b₀) with b₀ = 1e-3 for VS and 5e-4 for S; σ ~ IG(0.1, 0.1)), the same ALD working likelihood, k = 2, and his data generator. The point estimate is the posterior mean, and MSE is measured against the true quantile curve.
@@ -56,4 +82,6 @@ His published S runs (20k sweeps, ASIS off) are too short. Running **his unchang
 - **On VS it gives no gain**, so it is reported for S only.
 - **Table:** `r1/I8_vs_L_fits.csv`.
 
-## 5. What remains ⏳
+## 5. Outcome
+- **No method from route B qualifies:** there is no joint win at his published settings. Nothing from this file goes to Felipe.
+- **Facts about his published sampler** are summarised separately in `PAPER_RISK_convergence.md`, for HQ's decision.
