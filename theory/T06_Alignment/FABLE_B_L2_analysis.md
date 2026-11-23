@@ -235,3 +235,174 @@ So for Beta at τ = 0.95 this argument gives nothing: the right-skewed Beta nois
 | 8 | Part 2's limitation is restricted to *this* bound. Delete the Δ = 0 coverage assertion; the hybrid stays CONJECTURE |
 
 **Status: L2 is PROVED and cross-family audited for the paper's Gaussian design at the levels τ ∈ {0.05, 0.25, 0.5, 0.75, 0.95}**, on [ℓ₁, ℓ₀] with the endpoints above, given (A3) for the denominator. Mixed and Beta: open (Fable B, in progress). Beta at τ = 0.95: not covered by this method.
+
+---
+
+## 8. L2 for general independent noise: the whitened theorem (Mixed, Beta, and a sharper Gaussian range)
+
+*Appended 2026-11-23, about 15:45 CT, same author. Not audited. Design constants in §9 were computed by numerical quadrature (throw-away script, not in the repository). This section **supersedes §5** (its hand estimates and its reliance on log-concave concentration) and sharpening (a) of §4.*
+
+### 8.0 What is new
+
+- The Gaussian steps (i), (ii) of Proposition N are replaced by arguments valid for **any** independent noise with a few moments. **Log-concavity is not needed.** The lower bound on the true density of T uses a *reverse Markov* step against a Gaussian reference; the upper bound on the full true density uses the product structure.
+- The data are **whitened** first. This replaces ς_max^{−1/3} by the average **Ā = ∫₀¹ς(u)^{−1/3}du**, which matters for the strongly heteroscedastic Beta design (s.d. from 0.077 to 0.289) and is what makes the Beta τ = 0.95 range non-empty.
+
+| # | Claim | Status |
+|---|---|---|
+| 1 | Lemma E1-W (whitened evidence identity) | PROVED (§8.2) |
+| 2 | Lemma E4 (integrating out the three flat directions costs a polynomial factor) | PROVED (§8.3) |
+| 3 | Lemma E5 (reverse Markov lower bound for the true density of T) | PROVED (§8.4) |
+| 4 | Weighted spectral sum for DΣDᵀ by block bracketing | PROVED (§8.5), using Lemma 2a per block |
+| 5 | **Proposition N-W** and **Theorem DC-W**: (DC_γ) on [ℓ₁, ℓ₀] whenever c_Λ·ℓ₀^{−1/3}·Ā ≥ Δ_KL + slack | PROVED (§8.6) under (M1)–(M3) |
+| 6 | (M1)–(M3) for the Mixed and Beta designs | PROVED (§8.7), the Mixed varentropy and envelope constants not made explicit |
+| 7 | Ranges for all cells (§9) | PROVED arithmetic of item 5; the inputs are quadrature values |
+
+### 8.1 Assumptions and notation
+
+Noise: εᵢ = yᵢ − θ\*ᵢ independent with density fᵢ, mean mᵢ, variance vᵢ = ςᵢ².
+- **(M1)** vᵢ = v(i/n) with v of bounded variation, 0 < v_min ≤ v ≤ v_max; standardized fourth moments E[(εᵢ − mᵢ)⁴]/vᵢ² ≤ m̃₄.
+- **(M2)** −log fᵢ(εᵢ) has mean hᵢ (the differential entropy) and variance ≤ v_h. h̄ₙ := n⁻¹Σhᵢ → h̄.
+- **(M3)** either the supports of the fᵢ are intervals of length ≤ S̄, or fᵢ(x) ≤ C₀e^{−c₀|x|} and E|εᵢ| ≤ C₁.
+
+W := diag(1/ςᵢ); ε̃ := Wε (unit variances), ε̃_c := ε̃ − Eε̃, f̃ᵢ(x) := ςᵢfᵢ(ςᵢx). Ñ: orthonormal basis of range(WN); Q̃ ∈ ℝ^{m×n}: orthonormal rows spanning (range WN)^⊥; G := ÑᵀWN. μ̂₁ ≤ … ≤ μ̂_m: the eigenvalues of **DΣDᵀ**, Σ = diag(vᵢ). Ā_B := n⁻¹Σ_bn_b·(v_b⁺)^{−1/6} for a partition into B consecutive blocks, v_b⁺ := max_{i∈b}vᵢ; Ā := ∫₀¹v(u)^{−1/6}du; under (M1), 0 ≤ Ā − Ā_B ≤ TV(v^{−1/6})/B + O(B/n).
+
+### 8.2 Lemma E1-W — PROVED
+
+Let p̃_{s,ℓ} be the density on ℝ^m of Ỹ_mod := Q̃W(Su + E). Then for every y:
+
+  **Z(s, ℓ) = t^{−n}·(det W/|det G|)·p̃_{s,ℓ}(Q̃Wy),  |det G| = det(NᵀΣ^{−1}N)^{1/2} ≥ v_max^{−3/2}.**
+
+*Proof.* With 𝔪 as in E1 (so 𝔪(y + Nb) = 𝔪(y)), for φ ≥ 0 and Ã ⊂ ℝ³: by the substitution E = y − Nc − Su, and Q̃WN = 0, ÑᵀWNc = Gc,
+
+  ∫𝔪(y)φ(Q̃Wy)1{ÑᵀWy ∈ Ã}dy = ∫∫∫φ(Q̃W(Su + E))1{Gc + ÑᵀW(Su + E) ∈ Ã}∏q_s(Eᵢ)dE Π_ℓ(du)dc = (|Ã|/|det G|)·𝔼φ(Ỹ_mod).
+
+On the other side put ỹ = Wy = Ñã + Q̃ᵀr̃ (dy = det(W)^{−1}dã dr̃). W^{−1}Ñã ∈ range N, so 𝔪(y) = 𝔪(W^{−1}Q̃ᵀr̃), and the left side is det(W)^{−1}|Ã|∫𝔪(W^{−1}Q̃ᵀr̃)φ(r̃)dr̃. Compare. GᵀG = NᵀW(ÑÑᵀ)WN = NᵀW²N because ÑÑᵀ projects onto range(WN). ∎
+
+Lemma E2 is unchanged (with Q̃ = [P̃; P̃′], the true density f̃ of Q̃Wy and f̃_T of P̃Wy; f̃ need not be positive everywhere: the conditional Markov step only needs E₀[p(R | T)/f̃(R | T) | T] ≤ 1).
+
+**E3′-W.** P̃WS = P̃WA₀ (rows of P̃ are orthogonal to WN), so T̃_mod = M̃u + P̃WE with M̃ := P̃WA₀ and M̃M̃ᵀ = P̃·L̃⁺·P̃ᵀ, L̃ := Σ^{1/2}DᵀDΣ^{1/2} (Lemma W1(c) of `FABLE_B_averaged_beta.md`, with its W equal to Σ^{−1}); the nonzero eigenvalues of L̃ are the μ̂_r. Taking for P̃ the eigenvectors of L̃⁺ for 1/μ̂₁, …, 1/μ̂_d, Lemma E3 gives, for every s > 0:
+
+  log‖π̃_T‖∞ ≤ −½Σ_{r≤d}log(4/(ℓ²μ̂_r)).
+
+### 8.3 Lemma E4: the three flat directions — PROVED
+
+Let f̃_Q be the density of Q̃ε̃. Under (M2), (M3), for K ≥ 1, with probability ≥ 1 − 3/K:
+
+  **log f̃_Q(Q̃ε̃) ≤ Σᵢlog f̃ᵢ(ε̃ᵢ) + log(K·V₃·B_n³ + 1),  B_n = O(K·n).**
+
+*Proof.* (ε̃ ↦ (Ñᵀε̃, Q̃ε̃) is orthogonal.) f̃_Q(Q̃ε̃) = ∫_{ℝ³}∏ᵢf̃ᵢ(ε̃ᵢ + (Ñb)ᵢ)db. Divide by ∏f̃ᵢ(ε̃ᵢ) > 0 (a.s.) and split at ‖b‖ = B_n.
+- *Inside.* For a fixed shift vector w, E₀∏ᵢ[f̃ᵢ(ε̃ᵢ + wᵢ)/f̃ᵢ(ε̃ᵢ)] = ∏ᵢ∫f̃ᵢ(x + wᵢ)1{f̃ᵢ(x) > 0}dx ≤ 1. So the expectation of the inner integral is ≤ V₃B_n³, and by Markov it is ≤ K·V₃B_n³ off probability 1/K.
+- *Outside, bounded supports.* The integrand vanishes unless |(Ñb)ᵢ| ≤ S̄/ς_min for all i, which forces ‖b‖₂ = ‖Ñb‖₂ ≤ √n·S̄/ς_min. Take B_n equal to this; the outer integral is 0.
+- *Outside, envelope case.* ∏f̃ᵢ(ε̃ᵢ + wᵢ) ≤ C̃₀ⁿe^{c̃₀‖ε̃‖₁}e^{−c̃₀‖b‖₂} (as ‖w‖₁ ≥ ‖w‖₂ = ‖b‖₂). Off probability 2/K: ‖ε̃‖₁ ≤ K·n·C̃₁ (Markov) and −Σlog f̃ᵢ(ε̃ᵢ) ≤ n·|h̃̄| + √(nKv_h) (Chebyshev, (M2)). With B_n := (2/c̃₀)[n·log C̃₀ + c̃₀KnC̃₁ + n|h̃̄| + √(nKv_h)] + n, the outer integral divided by ∏f̃ᵢ(ε̃ᵢ) is ≤ 1 for large n. ∎
+
+Since Σᵢlog f̃ᵢ(ε̃ᵢ) = Σᵢlog ςᵢ + Σᵢlog fᵢ(εᵢ) and log det W = −Σlog ςᵢ, Lemma E1-W, E4 and Chebyshev on (M2) give, off probability 4/K:
+
+  **log(det W/|det G|) + log f̃(Q̃Wy) ≤ −n·h̄ₙ + √(nKv_h) + 3·log(Kn) + C.**
+
+### 8.4 Lemma E5: reverse Markov for the true density of T — PROVED
+
+For any random vector T with density f_T and **any** probability density g on the same space: P(f_T(T) < e^{−x}·g(T)) ≤ e^{−x}.
+
+*Proof.* P(g(T)/f_T(T) > eˣ) ≤ e^{−x}·E[g(T)/f_T(T)] = e^{−x}∫_{f_T>0}g ≤ e^{−x}. ∎
+
+Apply it to T = P̃Wy = P̃Wθ\* + P̃ε̃ with g := N(P̃Wθ\* + P̃Eε̃, I_d). Off probability e^{−x}: −log f̃_T(P̃Wy) ≤ x + (d/2)log(2π) + ½‖P̃ε̃_c‖². The coordinates of ε̃_c are independent, centred, of unit variance, and Π := P̃ᵀP̃ is a projector of rank d, so E‖P̃ε̃_c‖² = d and Var = ΣᵢΠᵢᵢ²(E ε̃_{c,i}⁴ − 1) + 2Σ_{i≠j}Πᵢⱼ² ≤ max(m̃₄, 2)·d. By Chebyshev, off probability 1/K:
+
+  **−log f̃_T(P̃Wy) ≤ x + (d/2)·log(2πe) + ½√(K·max(m̃₄, 2)·d).**
+
+No shape assumption on the noise is used; the mean of the noise (non-zero for skewed laws and τ ≠ ½) is absorbed in the centre of g.
+
+### 8.5 The weighted spectral sum — PROVED
+
+Let ϕ̂(μ) := log(2/(ℓ²μ)) − c′, decreasing. Take B blocks of lengths n_b, 𝒥_b and D_b as in Lemma W3 of `FABLE_B_averaged_beta.md`, κ_b := (2/(ℓ²v_b⁺))^{1/6}·n_b/π, x\*_b := κ_be^{−c′/6}, d_b := ⌊x\*_b⌋ − 3 (assume 6 ≤ x\*_b ≤ n_b − 3) and **d := Σ_bd_b**. Then
+
+  **½·Σ_{r≤d}ϕ̂(μ̂_r) ≥ Σ_b[3x\*_b − 12·log κ_b − ½] = c_Λ·ℓ^{−1/3}·n·Ā_B − B·(12·log n + ½).**
+
+*Proof.* The principal submatrix of DΣDᵀ on ∪_b𝒥_b is ⊕_bD_bΣ_bD_bᵀ ⪯ 𝒞 := ⊕_bv_b⁺·D_bD_bᵀ. By Cauchy interlacing and Weyl monotonicity μ̂_r ≤ λ_r(𝒞) for r ≤ Σ(n_b − 3). Since ϕ̂ decreases, Σ_{r≤d}ϕ̂(μ̂_r) ≥ Σ_{r≤d}ϕ̂(λ_r(𝒞)), and the sum of ϕ̂ over the d smallest eigenvalues of 𝒞 is at least its sum over any other d eigenvalues of 𝒞, in particular over {v_b⁺μ_r^{(b)} : r ≤ d_b, all b}. For each block, step (iv) of Proposition N with (n, ς_max²) replaced by (n_b, v_b⁺) gives Σ_{r≤d_b}ϕ̂(v_b⁺μ_r^{(b)}) ≥ 6x\*_b − 24·log κ_b − 1. Finally 3x\*_b = c_Λ·n_b·(ℓ²v_b⁺)^{−1/6}. ∎
+
+### 8.6 Proposition N-W and Theorem DC-W — PROVED
+
+**Proposition N-W.** Under (M1)–(M3), for every s > 0, a, x > 0, K ≥ 1 and every ℓ with 6 ≤ x\*_b ≤ n_b − 3 for all b, off probability e^{−a} + e^{−x} + 5/K:
+
+  log Z(s, ℓ) ≤ −n·log t − n·h̄ₙ − c_Λ·n·ℓ^{−1/3}·Ā_B + a + x + C√(nK) + C·B·log(Kn).
+
+*Proof.* By E1-W and E2: log Z ≤ −n log t + a + log‖π̃_T‖∞ + [log(det W/|det G|) + log f̃(Q̃Wy)] − log f̃_T(P̃Wy). Insert E3′-W, §8.3 and §8.4: the T-terms combine to −½Σ_{r≤d}[log(4/(ℓ²μ̂_r)) − log(2πe)] = −½Σ_{r≤d}ϕ̂(μ̂_r), and §8.5 applies. ∎
+
+The events of probability 1/K do not depend on s; three of them do not depend on ℓ either.
+
+**Theorem DC-W.** Assume (M1)–(M3), σ₀,ₙ → σ₀, R_n → R with σ₀ < 2tR, ‖Dθ\*‖₁ = o(n), and
+
+  **c_Λ·ℓ₀^{−1/3}·Ā > Δ_KL + γ + η + 2δ,  Δ_KL = 1 + log(σ₀/t) − h̄.**
+
+Then (DC_γ) holds on [ℓ₁, ℓ₀], i.e. sup{g_n(s, ℓ) : s > 0, ℓ₁ ≤ ℓ ≤ ℓ₀} ≤ b\* − γ + o(1) with probability → 1.
+
+*Proof.* As Theorem DC-G: the flat bound and the corner bound of `FABLE_B_DC.md` §2.1–2.2 hold for every law; on the compact part use the grid lemma and Proposition N-W at the N nodes with a = ηn, x = (log n)², K = log n, and a fixed B so large that c_Λℓ₀^{−1/3}(Ā − Ā_B) is below the strict slack. The failure probability is ≤ N·e^{−ηn} + N_ℓ·(e^{−(log n)²} + 2/log n) + 3/log n → 0 (N, N_ℓ are constants), and the error terms are O(√(log n/n)). ∎
+
+**So ℓ₀ = (c_Λ·Ā/(Δ_KL + slack))³.** Compared with §4, ς_max^{−1/3} is replaced by Ā = ∫ς^{−1/3}.
+
+### 8.7 The two designs satisfy (M1)–(M3) — PROVED
+
+**Beta design.** yᵢ ~ Beta(1, bᵢ), bᵢ = 11 − 10uᵢ ∈ [1, 11], density b(1 − y)^{b−1} on [0, 1]; εᵢ = yᵢ − q_τ(uᵢ).
+- *Log-concavity (asked).* log f = log b + (b − 1)log(1 − y) is concave on [0, 1] for every b ≥ 1 (linear at b = 1, the uniform law). Extended by zero it is log-concave on ℝ. **But this is not used:** §8 needs no log-concavity.
+- *Bounded support (asked).* It is handled in Lemma E4's first case (S̄ = 1): the flat-direction integral is over a ball of radius √n/ς_min, and the positivity of f̃ is not needed in E2. The jump of the density at y = 0 plays no role.
+- (M1): v(u) = b/((1+b)²(2+b)), smooth and monotone in u, from 0.00588 (b = 11) to 1/12 (b = 1); all moments bounded.
+- (M2): −log f(Y) = −log b + (b − 1)·X with X := −log(1 − Y) ~ Exponential(rate b) (because 1 − Y ~ Beta(b, 1)). So h = −log b + 1 − 1/b and **Var(−log f(Y)) = (b − 1)²/b² ≤ 1**. h̄ = ∫₀¹[−log(11 − 10u) + 1 − 1/(11 − 10u)]du = −0.87747.
+
+**Mixed design.** yᵢ ~ uᵢ·N(−0.2, ½) + (1 − uᵢ)·N(0.2, ½) (variance ½ per component, as in `gap_ratio_check.py`).
+- (M1): v(u) = 0.5 + 0.16·u(1 − u) ∈ [0.5, 0.54]; fourth moments bounded.
+- (M2): |log f_u(x)| ≤ C + (|x| + 0.2)², so the variance of the information density is bounded uniformly in u (constant not made explicit). h̄ = 1.09820 (quadrature).
+- (M3): f_u(x) ≤ π^{−1/2}exp{−(|x| − 0.2)₊²}, which gives the envelope after the shift by q_τ(u); E|ε| bounded.
+
+For both designs R_n → R and σ₀,ₙ → σ₀ by the law of large numbers, and σ₀/(2tR) ∈ [0.18, 0.47] (`noFloor_necessary.out`).
+
+---
+
+## 9. Ranges for all paper cells (total slack 0.03)
+
+Ā = ∫ς^{−1/3}: **1.4574** (Gaussian), **1.9806** (Beta), **1.1128** (Mixed). c_Λ = 0.7497. ℓ₁ = 2t/(eσ₀).
+
+| Design | τ | σ₀ | Δ_KL | ℓ₁ | **ℓ₀ = (c_ΛĀ/(Δ_KL + 0.03))³** | with ς_max instead of Ā (§4 form) |
+|---|---|---|---|---|---|---|
+| Gaussian | 0.50 | 0.13298 | 0.0722 | 1.38 | **1224** | 791 |
+| Gaussian | 0.25, 0.75 | 0.10593 | 0.1324 | 1.30 | **304** | 197 |
+| Gaussian | 0.05, 0.95 | 0.03438 | 0.3802 | 1.02 | **18.9** | 12.2 |
+| Mixed | 0.50 | 0.28954 | 0.0486 | 0.64 | **1195** | 1180 |
+| Mixed | 0.25 | 0.23062 | 0.1088 | 0.60 | **217** | 215 |
+| Mixed | 0.05, 0.95 | 0.07483 | 0.3563 | 0.47 | **10.1** | 9.9 |
+| Beta | 0.05 | 0.00866 | 0.1755 | 4.04 | **378** | 168 |
+| Beta | 0.25 | 0.03686 | 0.2508 | 3.74 | **148** | 66 |
+| Beta | 0.50 | 0.05557 | 0.3737 | 3.31 | **49.8** | 22.2 |
+| Beta | 0.75 | 0.05028 | 0.5613 | 2.74 | **15.8** | 7.1 |
+| Beta | 0.95 | 0.01779 | 0.8954 | 1.96 | **4.1** | 1.8 (empty) |
+
+(The Mixed values supersede the hand estimates of §5: h̄ is 1.098, not 1.08.)
+
+**Beta at τ = 0.95.**
+- *What fails in the §4 form.* Δ_KL = 0.895 is large: at the 0.95 level the asymmetric-Laplace density is a poor fit to Beta(1, b) noise (the truth has its mode at the left end of the support, with a hard edge, while ALD_{0.95} centred at the quantile has its mode at the quantile). So b\* lies 0.9 nats per observation below the entropy bound, and with ς_max = 0.289 the gain 0.75·(0.289ℓ)^{−1/3} exceeds 0.925 only for ℓ < 1.84 < ℓ₁.
+- *The whitened variant helps.* The Beta design is strongly heteroscedastic, so Ā = 1.98 against ς_max^{−1/3} = 1.51. Theorem DC-W gives **ℓ₀ = 4.1 at slack 0.03 (4.6 at zero slack) > ℓ₁ = 1.96**. The range [1.96, 4.1] is non-empty but short, and the slack is thin: the certificate route of `FABLE_B_DC.md` remains the way to reach a larger ℓ₀ in this cell if one is wanted.
+- *What cannot help.* Any refinement of this method keeps Δ_KL, so ℓ₀ ≤ (0.935·Ā/Δ_KL)³ ≈ 8.9 for this cell even with the exact Gaussian constant.
+
+**Caveats.**
+- ℓ₀ in the table is evaluated at Ā (B → ∞). For a fixed B the theorem needs the strict inequality with Ā_B; the difference is absorbed in the slack.
+- The ranges at the outer levels are short (Gaussian and Mixed at 0.05/0.95: up to 19 and 10). They are still constants, which is all L2 requires.
+- σ₀ and the worst-case checks are the values of `gap_ratio_check.out`; Ā, h̄ (Mixed) and the table arithmetic come from my quadrature and were not cross-checked by a second script.
+
+**Alignment with the audit of §1–§7 (`reviews/AUDIT_astra_L2.md`).** §8–§9 were written before I saw the audit response above; its fixes carry over as follows.
+- *Fix 2 (quantifiers), fix 4 (flat bound at s_hi; each point bounded from the node with larger s and smaller ℓ):* the proof of Theorem DC-W is that of DC-G and takes them unchanged.
+- *Fix 3 (hypothesis on x\*):* here it reads 6 ≤ x\*_b ≤ n_b − 3 for every block, i.e. ℓ·ς_min > (c_Λ/3)³ = 0.0156 at the lower end. It holds in every cell of §9 (smallest value: Beta, ℓ₁ς_min = 1.96 × 0.0767 = 0.15).
+- *Fix 5 (no "every τ"; the denominator needs (A3)):* Theorem DC-W is claimed only for the tabulated levels, where σ₀ < 2tR holds with the margins of `noFloor_necessary.out`; the posterior consequence needs the benchmark denominator, which uses (A3).
+- *Fix 6 (slack-adjusted ℓ₁):* the bound of Proposition N-W is valid, and stronger, below ℓ₁, so the range may start at the slack-adjusted ℓ₁ without change. The Gaussian ς_max column above is the audited one (790, 196.7, 12.2).
+- *Fix 7 (strict corner margin σ₀e^{2γ} < 2tR):* assumed in Theorem DC-W as in DC-G.
+- *Fix 8:* nothing in §8–§9 uses the withdrawn Δ = 0 remark.
+
+## Theory response to §8–§9 (2026-11-23)
+
+**Status: Theorem DC-W (general independent noise, whitened) is PROVED (one pass), UNAUDITED.** If it holds, L2 covers Mixed and Beta. The audited Gaussian result above, with ℓ₀ = 790 / 196 / 12, stands independently.
+
+**Checked by Theory:**
+- **Ā (Gaussian).** ∫₀¹((1+u²)/4)^{−1/3}du = 1.45741, by quadrature.
+- **ℓ₀ (Gaussian, τ = ½).** (c_Λ·Ā/(Δ_KL + 0.03))³ = 1223.7, which matches the table's 1224.
+- **Not checked:** the Beta and Mixed constants Ā and the entropies; the varentropy and envelope constants for Mixed. Fable B flags these too.
+
+**Beta at τ = 0.95:** the range is non-empty but short, ℓ ∈ [1.96, 4.1]. The method caps at ≈ 8.9 there, so the certificate route remains for larger ℓ₀.
+
+**Next:** Astra cross-family audit of §8–§9 (Tuesday, or tonight if Codex is free).
