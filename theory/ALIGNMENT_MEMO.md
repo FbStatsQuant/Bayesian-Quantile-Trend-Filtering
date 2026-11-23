@@ -1,8 +1,40 @@
 # Alignment memo: does the theorem's σ/λ match Felipe's method?
 
-*Theory Department, 2026-11-23 (draft 1, 13:40 CT). INTERNAL, for HQ.*
+*Theory Department, 2026-11-23 (final candidate, 14:30 CT; inputs still arriving are marked). INTERNAL, for HQ.*
 
 **Status labels.** PROVED means proved by Theory, with the proof here or in the cited file; "not yet audited" when no advisor has checked it. SKETCH means the steps are written but unverified. OPEN means no proof. MEASURED means Engineering data, with the source cited.
+
+## EXECUTIVE SUMMARY
+
+**Headline — Theorem V0T\* (PROVED, cross-family audited; data gate pending).**
+- **Method:** Felipe's method — σ ~ IG(0.1, 0.1) learned, λ ~ Gamma(1, b₀) learned at his constant b₀ — **plus one change: a λ floor λ ≥ 1.6e-5·n^{5/2}**.
+- **Result:** θ contracts at the **oracle rate n^{−5/6}(log n)^{1/6}**. No σ̄ condition, no exponential moments.
+- **At the paper's n:** the floor never binds at n = 500 (MEASURED), so V0T is his method there.
+- **Audit trail:** Fable proved it; Astra audited it (ACCEPT WITH FIXES, editorial).
+- **Data gate:** the paired data test against his method at n = 2000/4000, plus the joint smoke test, is running (≤ 15 core-h).
+
+**Answers to HQ's questions:**
+
+| | Answer | Status |
+|---|---|---|
+| (a) | σ > σ̄ is used ONLY in Theorem B's expected-numerator step (EM). It is a limit of that proof technique: not needed for contraction, and not used for coverage. | PROVED |
+| (b) | Contraction holds for fixed σ < σ̄ at the SAME rate n^{−5/6}: C1 (localization) + Lemma F + C2 (realized-numerator shells), uniformly on compact σ-intervals, moment-free. | PROVED, audited by both families |
+| (c) | Learned σ: **Theorem C\*** gives n^{−5/6} with σ ~ IG learned, at deterministic oracle λ (Lemma S: σ is contained in [l, H₀] and concentrates on σ₀,ₙ). MEASURED: σ/σ₀,ₙ = 0.95–1.02, with width ∝ n^{−1/2}. | PROVED, audited |
+| (d) | Constant b₀ alone (no floor) is **not** covered: λ ∝ n^{3/4} (MEASURED), outside every window. With the floor (V0T) it is covered at n^{−5/6} for constant OR scaled b₀. Under (EM), constant b₀ gives n^{−1/4} without a floor. | PROVED (floor); the no-floor case below σ̄ is OPEN (Fable A, in progress) |
+| (e) | Route B with Theorem B as it stood is impossible on data: every σ ≥ σ̄ arm fails Felipe's MSE bar. Route A succeeded; see the headline. | MEASURED + PROVED |
+
+**Variants:**
+- **V0T** (his method + floor): identical at n = 500; theorem at n^{−5/6}; data test running.
+- **V2** (b₀ ∝ n^{−5/2}): pilot running.
+- **V1** (λ fixed): expected to fail on data; test running.
+
+**General k:** rate n^{−(2k+1)/(2k+2)} at λ = n^{k+1/2}/V. Only constants change for k ≥ 2; k = 1 needs Lemma F; k = 0 breaks. SKETCH by substitution; audit on Tuesday.
+
+**Caveat for the paper:** all theorems concern the POSTERIOR. His P-MALA λ is not converged at n ≥ 1000 (Engineering aca7214).
+
+**Still arriving:** Fable A (the no-floor method), Fable B (the Fable read of Lemma S), the VP's reply, the V1/V2/V0T data.
+
+---
 
 **The method (Felipe's default).** σ ~ IG(0.1, 0.1), learned. λ ~ Gamma(1, b₀), learned, with b₀ = 1e-3 (VS) or 5e-4 (S). θ drawn by P-MALA. The posterior is π(θ, λ, σ | y) ∝ σ^{−n}e^{−Σρ_τ(yᵢ−θᵢ)/σ}·λ^m e^{−λ‖Dθ‖₁}·Gamma(λ)·IG(σ).
 
