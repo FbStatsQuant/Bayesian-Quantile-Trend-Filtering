@@ -52,8 +52,8 @@ Arms on the same data and seeds:
 
 **Smoke evidence already in hand** (G0, cancelled at 9.5 min on HQ's instruction; 3 seeds; **prototype diagnostics, so not decisive**):
 - **On the paper's own data and priors, O's ESS(log λ) is 1.4–17 in 20–30k sweeps.** The C arm with 4 chains (R̂ ≤ 1.01) gives 600–2500.
-- **VS (ASIS on in the paper):** O and C agree. λ̄ is within 15% and MSE within 5%.
-- **S (ASIS off in the paper):** O's λ̄ is 1.5–2.7× below C's, and O's MSE is 16–60% higher (τ = ½: 0.0028/0.0048/0.0039 against 0.0018/0.0041/0.0029).
+- **VS (ASIS on in the paper):** O and C agree within O's Monte Carlo noise. λ̄ ratios are 0.67–1.14, and MSE differs by −16% to +9% with no consistent sign.
+- **S (ASIS off in the paper):** O's λ̄ is consistently below C's, by 1.4–2.7× in all 6 paired fits. O's MSE is higher in all 6, by 13–60% (τ = ½: 0.0028/0.0048/0.0039 against 0.0018/0.0041/0.0029).
 - This looks like the E-05 mechanism: λ starts low and drifts up slowly.
 - **If S1 confirms it with validated diagnostics, the paper's S results are under-converged in λ. That is a finding HQ and Felipe need, whatever is adopted.**
 
