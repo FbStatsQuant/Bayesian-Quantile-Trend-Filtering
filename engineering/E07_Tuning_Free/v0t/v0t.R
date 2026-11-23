@@ -8,7 +8,7 @@
 E07 <- Sys.getenv("E07_DIR"); E02 <- Sys.getenv("E02_DIR"); OUT <- file.path(Sys.getenv("E07_OUT"), "v0t"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
 PH <- Sys.getenv("V_PHASE", "ind"); KM <- 1.6e-5
 ld <- function(f, joint = FALSE) { pl <- readLines(file.path(E07, f)); pl <- pl[seq_len(grep("^# ---- Main", pl)[1] - 1L)]; E <- new.env(parent = globalenv())
-  fname <- file.path(E02, if (joint) "Joint_Sampler_PMALA_Augmented.R" else "Individual_Sampler_PMALA_Augmented.R")
+  fname <- if (joint) file.path(Sys.getenv("E07_JOINTCPP", file.path(E07, "ejoint")), "Joint_Sampler_PMALA_Augmented.R") else file.path(E02, "Individual_Sampler_PMALA_Augmented.R")
   E$commandArgs <- function(trailingOnly = FALSE) if (trailingOnly) character(0) else c("R", paste0("--file=", fname))   # closure sees fname
   eval(parse(text = pl), envir = E); E }
 paper_cfg <- function(bl) if (bl == "VS") list(b0 = 1e-3, asis = TRUE, it = 30000L, burn = 10000L) else list(b0 = 5e-4, asis = FALSE, it = 20000L, burn = 5000L)

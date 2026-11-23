@@ -81,6 +81,8 @@ This is a failure of the route, not a counterexample to contraction (see (b)).
   - The n^{−5/6} version (V0T\*) is in preparation (Fable A).
   - The V0T data test is built and awaits HQ's OK.
 
+**Presentation caveat (Engineering, aca7214, V2_lambda_traces.png).** Every theorem here concerns the POSTERIOR. At n = 1000–2000 and the paper's run lengths, Felipe's P-MALA has not converged in λ (R̂ 1.3–2.3; on S at n = 2000, τ = ½, its λ sits about 20× below the exact posterior). Statements about his method at larger n should therefore say "the posterior it targets", and the paper should note that reaching it requires adequate run length or mixing. This is a sampler matter, not a theory gap.
+
 ## (c) Learned σ
 
 **Decomposition (PROVED, one line).** For any interval I and any event E,
