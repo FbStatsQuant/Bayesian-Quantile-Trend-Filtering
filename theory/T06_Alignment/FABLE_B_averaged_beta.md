@@ -186,3 +186,138 @@ None of these uses the homogeneity of f beyond constants. I have not rewritten t
 **The crossing.** All three designs cross 6 between τ = 0.96 and 0.97, which is consistent with the κ̂ pilot's sign loss at 0.97.
 
 **Tuesday.** Gap 2 becomes: rewrite LO's remaining steps with weights fᵢ (constants in max f/min f), under the regularity fᵢ = f(i/n) with f of bounded variation. Then audit (Astra).
+
+---
+
+## 7. Theorem LO-β̄: the weighted proof, step by step
+
+*Appended 2026-11-23, about 15:20 CT, by the same author. Not audited. It rewrites Fable A's §4.1–4.6 with weights, including the fixes of `reviews/AUDIT_astra_LO.md`, findings 1–4. "LO §x" refers to `FABLE_A_three_lemmas.md`.*
+
+### 7.0 Statement and status
+
+**Regularity (REG).** fᵢ = f(i/n), where fᵢ is the lower secant slope of Fᵢ on [−s_K, s_K] (finding 9), with 0 < f_min ≤ f ≤ f_max and TV(f) ≤ V_f. Write Θ := f_max/f_min.
+
+**Notation.** wᵢ = ω(1−η)fᵢ, w_min, w_max; β′_max := ω²t/w_min = ωt/((1−η)f_min); k := nℓ^{−1/3}; k_\*^{min}, k_\*^{max} := Fable A's k_\* evaluated at f_min, f_max; S_±, β̄, k̄_\* as in §1.1, so k_\*^{min} ≤ k̄_\* ≤ k_\*^{max} ≤ Θ^{1/6}k_\*^{min}.
+
+**Theorem LO-β̄.** Assume the hypotheses of Theorem LO and (REG), and **β̄ < 6**. There are ε ∈ (0, 1), C and K₀, depending on 6 − β̄, Θ, V_f/f_min and the class constants, such that for K ≥ K₀ and every ℓ in Theorem LO's window (lower constant depending also on Θ), with probability ≥ 1 − C/K − C/k_\*^{min} − P₀(Ω_Gᶜ):
+
+  **Z̃_ω(ℓ) ≤ n^{C}·e^{CK}·exp{−(1 − ε)·(π/6)·(6 − β̄)·k̄_\*}.**
+
+| Step | Content | Status |
+|---|---|---|
+| 7.1 | Reduction to the weighted Gaussian likelihood (Lemma 1) | PROVED |
+| 7.2 | Exact formula and monotone envelope (finding 1) | PROVED (§2) |
+| 7.3 | Score events with weights (findings 1–2) | PROVED |
+| 7.4 | Atypical V: dyadic family and split (findings 2–3) | PROVED |
+| 7.5 | Typical V: trace errors, block window (finding 3) | PROVED |
+| 7.6 | Coefficient and endpoint (finding 4) | PROVED |
+| Whole theorem | Assembly of 7.1–7.6 | **PROVED by substitution into the audited LO proof**; every changed line is written below, the unchanged lines are cited. Not audited as a whole |
+
+**The step most likely to break** was 7.5–7.6: whether the leading constants survive when the gain is weighted by W^{−1} while the mixture errors are not. They do, because every error enters through a trace and costs only the factor w_max/w_min (7.5), and the block number B of Lemma W3 can be taken **fixed** (7.6). No step broke.
+
+### 7.1 Reduction — PROVED
+
+Lemma 1 (with finding 5's fixes) is applied with f := f_min: on its event, for all δ ∈ K′, R(δ) ≥ (1 − η)M(δ) − η(f_min/4)k. Its proof uses f only in step 6, as a common lower bound for M(δ) ≥ (f/2)‖δ‖₂², so nothing changes. On K′, ‖δ‖∞ ≤ s_K, and mᵢ(δᵢ) = ∫₀^{δᵢ}(Fᵢ(s) − τ)ds ≥ fᵢδᵢ²/2 by the definition of fᵢ. Hence
+
+  −ωℛ(δ) ≤ ω⟨ψ, δ⟩ − ½δᵀWδ + ωη(f_min/4)k  on K′,
+
+and Z̃_ω(ℓ) ≤ e^{ωη(f_min/4)k}·𝒵_W + N_ℓ(K′ᶜ), with 𝒵_W of §2 (the indicator of K′ is dropped, as in LO §4.1). ωη(f_min/4)k ≤ C·η·k̄_\*.
+
+### 7.2 Envelope — PROVED
+
+By Lemma W1 and monotonicity: if Γ₋ − Ẽ ⪯ Γ_V ⪯ Γ₊ for **fixed** matrices supported on range P̃⊥, the conditional integrand is at most
+
+  C_W·exp{−½log det(I + Γ₋) + ½tr Ẽ}·exp{½‖P̃ψ̃‖² + ½ψ̃ᵀM̃₊ψ̃ − ⟨B̃₊ỹ\*, ψ̃⟩ − ½‖B̃₊^{1/2}ỹ\*‖²},  C_W := (2π)^{3/2}det(NᵀWN)^{−1/2}.
+
+Both shift terms carry a minus sign, and B̃₊ is fixed before any score event is used (finding 1). The determinant uses the lower envelope and the tangent bound log det(I + Γ_V + Ẽ) ≤ log det(I + Γ_V) + tr Ẽ.
+
+### 7.3 Score events — PROVED
+
+ψ has independent mean-zero coordinates with variance t and values in [τ − 1, τ]; for fixed symmetric Q, E ψᵀQψ = t·tr Q and Var ≤ ¼‖Q‖²_F.
+
+- **(Q1-W) main gain.** Q := ω²W^{−1/2}M̃₊W^{−1/2}, so ½ψ̃ᵀM̃₊ψ̃ = ½ψᵀQψ. ‖Q‖_op ≤ ω²/w_min, hence ‖Q‖²_F ≤ (ω²/w_min)·tr Q and P(ψᵀQψ > (1 + η)t·tr Q) ≤ ω²/(4η²t²·w_min·tr Q). Lower bound for tr Q (finding 2): M̃ is monotone, so tr Q ≥ (ω²/w_max)·tr M̃(c₊v₁L⁺) = (ω²/w_max)·Σ_r(ϱ₊/μ̃_r)/(1 + ϱ₊/μ̃_r). Since DW^{−1}Dᵀ ⪯ w_min^{−1}DDᵀ, μ̃_r ≤ μ_r/w_min, and by Lemma 2a at least min(m, ⌊k_\*^{min}c₊^{1/6}⌋ − 3) terms are ≥ ½. So the failure probability is ≤ C·Θ/(η²t²·k_\*^{min}).
+- **(Q2-W) shift.** ⟨B̃₊ỹ\*, ψ̃⟩ = ω⟨W^{−1/2}B̃₊ỹ\*, ψ⟩ has variance ≤ (ω²t/w_min)‖B̃₊ỹ\*‖² ≤ (ω²t/w_min)·x², x := ‖B̃₊^{1/2}ỹ\*‖ (B̃₊² ⪯ B̃₊). With probability ≥ 1 − 1/H: −⟨B̃₊ỹ\*, ψ̃⟩ − ½x² ≤ sup_{x≥0}[√(H·ω²t/w_min)·x − x²/2] = **H·β′_max/2**. A constant, for every truth.
+- **(Q3-W) flat part.** ‖P̃ψ̃‖² = ω²ψᵀW^{−1/2}P̃W^{−1/2}ψ has mean ω²t·tr(W^{−1/2}P̃W^{−1/2}) ≤ 3ω²t/w_min. With probability ≥ 1 − 1/K: ½‖P̃ψ̃‖² ≤ 3Kβ′_max/2. Counted once, in C_ψ := C_W·e^{3Kβ′_max/2} (finding 2). C_W ≤ (2π/w_min)^{3/2}.
+
+### 7.4 Atypical V — PROVED
+
+Dyadic family Γ^{(i)} := 2^iv₁L⁺, i ≥ 0; q_i := 2^{i/6}k_\*^{min}.
+- *Crude gain.* By Lemma W1(d) and W ⪰ w_minI: tr(W^{−1/2}M̃^{(i)}W^{−1/2}) ≤ tr((w_minI + (2^iv₁)^{−1}DᵀD)^{−1}) = w_min^{−1}[3 + Σ_r(2^iv₁w_min/μ_r)/(1 + 2^iv₁w_min/μ_r)] ≤ w_min^{−1}[(π²/6)q_i + 4] (Lemma 2a, crude gain).
+- *Events.* For 4 ≤ q_i ≤ n: (Q1-W) with factor 2; by the lower bound of 7.3 with q_i in place of k_\*^{min}, the failures sum to ≤ CΘ/k_\*^{min}. For q_i > n: deterministically ½ψ̃ᵀM̃^{(i)}ψ̃ ≤ ½‖ψ̃‖² ≤ ω²n/(2w_min). Shift: (Q2-W) with H_i := K·2^{i/6}; failures sum to < 9.2/K; cost β′_max·H_i/2 (finding 2).
+- *Result.* On these events, for all i, the non-flat score and shift exponent with Γ₊ = Γ^{(i)} is ≤ **C₂·q_i**, where C₂ is LO §4.4's constant with β′ replaced by β′_max and the additive "+1" of the crude gain replaced by "+4" (I did not re-add its terms; it is a constant depending on K, t and β′_max only).
+- *Split* (LO §4.5, with Cramér restricted to η ≤ ½, finding 3). Let c₀ := the least power of 2 above max{(4C₂k_\*^{min})^{6/5}, 8π·k_\*^{max} + 4 log 2m}, v̄ := c₀v₁.
+  - max Vⱼ ∈ (2^{i−1}v₁, 2^iv₁], 2^i > c₀: Σ_V ⪯ 2^iv₁A₀A₀ᵀ gives Γ_V ⪯ Γ^{(i)}; det^{−1/2} ≤ 1; probability ≤ m·e^{−2^{i−1}}. Since 2^{5i/6} ≥ 4C₂k_\*^{min}, the total is ≤ C_ψ·2m·e^{−c₀/4} ≤ C_ψ·e^{−2π·k_\*^{max}}.
+  - bounded maximum, some block sum off by more than η: integrand ≤ C_ψe^{C₂k_\*^{min}c₀^{1/6}}, probability ≤ (2m/w)e^{−wη²/3}; total ≤ C_ψe^{−2πk_\*^{max}} when w ≥ 3(C₂k_\*^{min}c₀^{1/6} + 2πk_\*^{max} + log 2m)/η².
+
+  Both are ≤ C_ψ·e^{−2π·k̄_\*}, below the typical term.
+
+### 7.5 Typical V — PROVED
+
+On Lemma 2b's event, by §3: Γ₋ := c₋v₁L⁺, Ẽ = P̃⊥W^{1/2}EW^{1/2}P̃⊥, Γ₊ := c₊v₁L⁺ + Ẽ′.
+- *Determinant error.* ½tr Ẽ ≤ ½w_max·γ^{−1}(v₁ + v̄)·tr 𝒟.
+- *Gain error.* From (I + X + Ẽ′)^{−1} ⪰ (I + X)^{−1} − (I + X)^{−1}Ẽ′(I + X)^{−1}: M̃(X + Ẽ′) ⪯ M̃(X) + BẼ′B with B = (I + X)^{−1}, B² ⪯ I. So tr(W^{−1/2}M̃₊W^{−1/2}) ≤ tr(W^{−1/2}M̃(c₊v₁L⁺)W^{−1/2}) + w_min^{−1}·tr Ẽ′, and the gain error is ≤ ½(1 + η)·ω²t·Θ·(1 + γ^{−1})·v̄·tr 𝒟.
+- *Block width.* With tr 𝒟 ≤ (4/3)w²n⁴, v₁ = 2/ℓ², v̄ = c₀v₁, both errors are ≤ η·k̄_\* when
+
+  w ≤ [3γη·k̄_\*·ℓ²/(8·(w_max + ω²tΘ(1 + η))·(c₀ + 1)·n⁴)]^{1/2}.
+
+  With the lower bound on w from 7.4 and c₀ ≍ q^{6/5} + log m (q = k_\*^{min}), finding 3's calculation applies with constants multiplied by powers of Θ: it suffices that ℓ/n² ≳ (q^{6/5} + log 2m)^{3/2}/√q, i.e. **ℓ ≥ C(Θ)·n^{99/43}** up to the logarithm. Same window exponent.
+- *Leading terms.* By (Q1-W), Lemma W1(d) and Lemma W3 with a **fixed** number B of equal blocks:
+
+  log(integrand/C_ψ) ≤ −½Σ_r log(1 + ϱ₋/μ̃_r) + ½(1 + η)ω²t·tr((W + ϱ₊^{−1}DᵀD)^{−1}) + K·β′_max/2 + 2η·k̄_\*
+            ≤ −(π/6)·k̄_\*·[6c₋^{1/6}(1 − ε_B⁺) − β̄′(1 + η)c₊^{1/6}(1 + ε_B⁻)/(1 − η²/2)] + K·β′_max/2 + 2ηk̄_\* + C·B·(log k̄_\* + β′_max) + (tails),
+
+  with, under (REG), **ε_B⁺ ≤ V_f/(6f_min·B)** and **ε_B⁻ ≤ (5/6)·Θ^{5/6}·V_f/(f_min·B)** (from TV(f^{1/6}) ≤ f_min^{−5/6}V_f/6, TV(f^{−5/6}) ≤ (5/6)f_min^{−11/6}V_f, and block length ⌈n/B⌉). Lemma W3 needs κ_b ≥ 4, i.e. k_\*^{min} ≥ 4πB·c₋^{−1/6}, ensured by K₀ (see 7.6). The tails are O(k̄_\*⁶/n⁵) = o(1) on the window.
+
+### 7.6 Coefficient and endpoint — PROVED
+
+- *Order of choices (finding 4).* Fix the margin 6 − β̄ > 0. Choose B so large that ε_B^± are small against it; then γ, η small (c_± → 1, β̄′ → β̄); the bracket is then ≥ (1 − ε/2)(6 − β̄). The terms 2ηk̄_\* and ωη(f_min/4)k are O(η)·k̄_\*. The remaining terms K·β′_max/2 + 3Kβ′_max/2 + C·B·(log k̄_\* + β′_max) + log C_W are O(K) + O(log n): they go into n^{C}e^{CK}, outside the decaying exponential.
+- *No growth is assumed.* Instead of "q → ∞": require k_\*^{min} ≥ q₀(B, γ, η), a numerical lower bound, ensured by the window through K₀ (the upper endpoint ℓ ≤ n³/(TVK) gives k ≥ (TVK)^{1/3}).
+- *Upper endpoint.* N_ℓ(K′ᶜ) is bounded by C1's finite numerator inequality exactly as in finding 4 (it needs ωf_min·nr²/4 + 1 + m log 2 + Vℓ/(2n²) ≤ Tn/4); the weights do not enter the cones.
+- *Sum.* Typical term + two atypical terms (each ≤ C_ψe^{−2πk̄_\*}) + N_ℓ(K′ᶜ), times e^{ωη(f_min/4)k}. This is the theorem. ∎
+
+**What was not rewritten:** Lemma 1's internal proof, C1's cones, Lemma 2a and Lemma 2b; they are used as audited. C₂'s exact value is as in LO §4.4 with the replacements stated (I did not re-add its terms).
+
+---
+
+## 8. Does Theorem U carry over to β̄?
+
+Read: `FABLE_A_uniformity.md` §0–§5 and `reviews/AUDIT_astra_U.md` (ACCEPT WITH FIXES; findings 1–9).
+
+**Answer: yes, with the node estimate replaced by its weighted form; the three reductions are untouched.** Status: **PROVED by substitution for U1–U3 and the assembly; the weighted node estimate is PROVED as far as §7 plus the three tail replacements below.** Not audited.
+
+| Step of U | Where f or β enters | With weights |
+|---|---|---|
+| U1 (ω, log-convexity) | nowhere | verbatim |
+| U2 (ℓ-grid, ratio 1 + 1/n) | nowhere | verbatim |
+| U3 (frozen bodies, Lemma 1 on panels) | f as a lower bound in C1's cone A₁ and in Lemma 1's additive term | verbatim with f := f_min; display (1) becomes Z̃_ω(ℓ) ≤ e^{ωη(f_min/4)k(ℓ)}·𝒵_{W,ω}(ℓ) + cones (7.1) |
+| N (node estimate) | **the only place β enters** | Theorem LO-β̄ with strong tails, below |
+| A (union, denominator) | κ_min | κ_min := min_j(1 − ε)(6 − β̄(ω_j))·k̄_\*(ω_j, ℓ)/(6k(ℓ)); β̄(ω) = ω·tS₋/S₊ is increasing in ω, so the condition is **β̄(ω₂) < 6** |
+
+**Tail replacements at a node.**
+- (Q1′-W) Hanson–Wright for Q = ω²W^{−1/2}M̃₊W^{−1/2}: ‖Q‖_op ≤ ω²/w_min and ‖Q‖²_F ≤ (ω²/w_min)·tr Q, so the deviation is ≤ (ω²/w_min)·[(4d·log n/c_HW)^{1/2} + 4 log n/c_HW] with d := (w_min/ω²)·tr Q ≤ C·Θ·k̄_\*; this is ≤ η·k̄_\* for n ≥ n₀, off probability 2n^{−4}.
+- (Q2′-W) Hoeffding for b = ωW^{−1/2}B̃₊ỹ\*, ‖b‖ ≤ (ω/√w_min)·x: cost sup_x[(ω/√w_min)√(2 log n)·x − x²/2] = (ω²/w_min)·log n.
+- (Q3′-W) flat part, one event for all nodes: range P̃ = range(diag(fᵢ)^{1/2}N) does **not depend on ω or ℓ**. Hoeffding on three orthonormal directions e of it, with ‖W^{−1/2}e‖ ≤ w_min^{−1/2}: ‖P̃ψ̃‖² ≤ 6ω² log n/w_min.
+- (Q4′-W) as (Q4′) with the crude gain of 7.4 and β′ → β′_max.
+
+Node proposition with weights: log 𝒵_{W,ω}(ℓ) ≤ −(1 − ε/2)(π/6)(6 − β̄(ω))·k̄_\* + C·log n, off probability C·log n·n^{−4}. The rest of U (§4–§6 there) uses only this bound, k(ℓ) ≥ c·n^{1/6}(log n)^{1/6} on the band, and V2T's denominator; so
+
+  sup_P E_P sup_{ω∈I}Π_ω(L_n ≤ λ < c₋n^{5/2}(log n)^{−1/2} | y) → 0  **under β̄(ω₂) < 6 and (REG)**,
+
+and U-σ holds under t·S₋/(S₊·(1 − ϵ)d) < 6. **For the paper's designs this now includes Gaussian τ = 0.05/0.95 and Beta τ = 0.95** (β̄ = 4.43 and 5.12 at σ₀; the interval I must keep β̄(ω₂) < 6, i.e. σ ≥ 0.74σ₀ and σ ≥ 0.86σ₀ respectively).
+
+**Caveats.**
+- **U's audit fixes carry over unchanged.** None of them touches the place where β enters: (1) dominate the whole negative square with the fixed upper envelope before expanding, and apply Hanson–Wright to the original score vector (here Q = ω²W^{−1/2}M̃₊W^{−1/2} acts on ψ itself, and M̃₊P̃ = 0 plays the role of QP_N = 0); (2) the shift parameter H_i = (2 log n + i)/t, with cost β′_max·H_i/2; (3) C₂′ in both the cutoff and the block length; (4) the frozen-body radius with W′; (7) the denominator bound "for all ω ∈ I"; (8)–(9) the learned-scale part, which uses f only as f_min in the cones. I checked these by reading, not by re-deriving the audit.
+- (REG) is a new hypothesis of both theorems.
+- The lower end of the band (n^{99/43}) and everything below it are unchanged: weights do not help there.
+
+## Theory response to §7–§8 (2026-11-23)
+
+**Status: Theorem LO and Theorem U with β̄ are PROVED by substitution (one pass), UNAUDITED.** A cross-family audit by Astra has been requested.
+
+**Checked by Theory: the scale margins.** β̄ ∝ 1/σ, so β̄(σ) < 6 ⇔ σ > σ₀·β̄(σ₀)/6.
+- Gaussian τ = 0.05/0.95: 4.43/6 = 0.738.
+- Beta τ = 0.95: 5.12/6 = 0.853.
+
+These match §8. Lemma S's learned σ concentrates at σ₀ (σ/σ₀ → 1), so U-σ's near-scale interval |s/σ₀ − 1| < ϵ fits inside the margin for ϵ < 0.14.
+
+**New hypothesis:** fᵢ = f(i/n), with f of bounded variation and bounded away from 0 and ∞. It holds for the paper's three designs.
