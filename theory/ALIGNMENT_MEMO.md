@@ -39,7 +39,10 @@
     - Gamma(n, 1) cannot reach n^{−5/6}.
     - A pinned soft floor (a_n = An, mean κn^{5/2}) gives all V0T\* conclusions with no truncation (PROVED by assembly), but it kills adaptivity.
     - **Warning for the design-specific A-rule theorem:** a weak prior is not expected to suffice at extreme τ, where the proxy sign is 6 − σ̄/σ₀ and σ̄/σ₀ ≈ 6.6–6.7 at τ = 0.05/0.95. So it may hold only at moderate τ (CONJECTURE).
-  - **Lower bound (referee point #1), skeleton by Fable B** (`FABLE_B_lowerbound.md`): E₀Π(Δ²ₙ ≤ c₀λ^{−1/3} | y) → 0 at any fixed σ, for general truths up to the oracle. That would make n^{−5/6} the exact posterior rate. **Skeleton only; expansion and a cross-family audit are needed (Tuesday).**
+  - **Lower bound, Theorem LB (referee point #1), Fable B** (`FABLE_B_lowerbound.md`; written in full; **proved, unaudited**; Astra audit running, due 17:45).
+    - **Statement:** E₀Π(Δ²ₙ ≤ c₀λ^{−1/3} | y) → 0 under (A1) and upper (A2) only, at any fixed σ, for λ up to the oracle, with an explicit finite-n bound.
+    - **Consequence:** with C\*/V0T\*, **n^{−5/6} is the exact posterior rate** at the oracle, up to (log n)^{1/6}.
+    - **Extensions:** learned σ and V0T. The 'spread around its own random centre' version needs a new lemma.
 - **Theorem H** (Fable A, `T06_Alignment/FABLE_A_theoremH.md`): Huber-body localization above any λ floor Λ₋ (n^{−3/14} at Λ₋ ≍ n^{3/4}), plus the plug-in identity Π(B | y) ≤ Π(B | y, λ ≥ Λ₋) + Π(λ < Λ₋ | y). **Status: PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES; V2T Step 2 confirmed at a general floor; a fixed-M version is possible). It is the building block for a floor-free A-rule theorem; the missing input is lower-tail control of λ (Fable A, in progress).
 - **Exact-Gibbs hyperparameter screen (MEASURED, Engineering; prior effect only, both arms exact Gibbs):**
   - **PASSES:** **A-rule λ ~ Gamma(1, b_n), b_n = 1/(5500·(n/500)^{5/2})**. It is n-only, one rule for both signals, and V2-shaped. Median MSE ratio against his current prior: 0.95 / 0.90 / 0.53 at n = 500 / 1000 / 2000; max 1.13.
