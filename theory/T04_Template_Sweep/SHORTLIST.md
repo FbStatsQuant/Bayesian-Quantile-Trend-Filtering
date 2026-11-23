@@ -13,9 +13,9 @@ The two papers below are the best **partial** blueprints. Each covers a differen
 - **Atchadé (2017)** covers the likelihood side: steps (b), (d) and (e).
 - **Bach & Klein (2022)** covers the prior side: the difference-penalty prior with an improper polynomial part, the spectral small-ball computation, and the hyperprior on the smoothing scale.
 
-The prior's Laplace-specific concentration is already covered by Agapiou, Dashti & Helin (2021, Prop. 2.15 and Thm 3.1), which is in `Papers/`.
+The prior's Laplace-specific concentration is already covered by Agapiou, Dashti & Helin (2021, Prop. 2.15 and Thm 3.1), which is in `literature/`.
 
-Both searchers who scored above 3 picked papers that were excluded: Agapiou & Wang (5/5) is already in `Papers/`, and Agapiou & Savva (4/5) is a T-01 entry. That confirms our existing library already holds the strongest prior-side templates.
+Both searchers who scored above 3 picked papers that were excluded: Agapiou & Wang (5/5) is already in `literature/`, and Agapiou & Savva (4/5) is a T-01 entry. That confirms our existing library already holds the strongest prior-side templates.
 
 ---
 
@@ -64,7 +64,7 @@ On Eₙ it bounds the posterior mass of each annulus {jMε̄ < ‖θ−θ⋆‖ 
 ## Near misses (rejected)
 
 - **Agapiou & Savva (2024), arXiv 2209.06045 (T-01 entry; scored 3–4 by S4/S5).** Its explicit Laplace-series small ball (Lemmas 3.2, D.1) and adaptive scale treatment are useful. But its series is *orthogonal with independent weighted coordinates*, whereas our walk is not: the summation operator's singular basis destroys independence (S4's point). ADH already covers the concentration side.
-- **Agapiou & Wang, arXiv 2112.05679 (scored 5/5 by S5).** Already in `Papers/`. Its Theorem 2.4, Lemma 6.3 (small ball) and Lemma 6.5 (two-level concentration) are on our reading list.
+- **Agapiou & Wang, arXiv 2112.05679 (scored 5/5 by S5).** Already in `literature/`. Its Theorem 2.4, Lemma 6.3 (small ball) and Lemma 6.5 (two-level concentration) are on our reading list.
 - **Dolera, Favaro & Giordano, arXiv 2411.06981.** A test-free route via log-concavity and Wasserstein/Poincaré bounds (Theorem 2, Lemma 5). It is attractive for L9, but relies on a product posterior that factorizes coordinatewise under a Gaussian likelihood; ours does not.
 - **Agapiou & Castillo (2024), Ann. Statist., arXiv 2308.04916.** A prior-mass-only route for non-Gaussian models (Thms 8–9), but only for tempered posteriors (ρ < 1). A fallback if a fractional Stage A were acceptable.
 - **Alquier, Li & Wintenberger (2013), arXiv 1202.4294, and Mai (2024), arXiv 2409.01687.** PAC-Bayes check-loss Gibbs bounds with Lipschitz increments. They give excess risk in expectation, not contraction, with bounded or random design.

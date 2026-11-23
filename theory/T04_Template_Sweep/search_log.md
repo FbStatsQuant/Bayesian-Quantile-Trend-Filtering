@@ -4,7 +4,7 @@ Date: 2026-11-22. Planner, filter and verifier: Head of Theory (Claude Opus 5.5)
 
 ## Searchers
 
-All five received the same brief: the target theorem, proof steps (a)–(e), criteria C1–C4, the exclusion list (`Papers/` plus T-01 entries), legitimate sources only, no proofs, and no repository writes.
+All five received the same brief: the target theorem, proof steps (a)–(e), criteria C1–C4, the exclusion list (`literature/` plus T-01 entries), legitimate sources only, no proofs, and no repository writes.
 
 | Searcher | Model | Direction |
 |---|---|---|
@@ -190,7 +190,7 @@ No checked theorem gives step (a) for the projected, thrice-summed Laplace walk.
 | Madrid Padilla & Chatterjee | W3109802576 | 37 |
 
 **Candidates** (proposed by S5 despite the exclusion list)
-1. Agapiou & Wang: excluded, already in Papers/. Thm 2.4, Lemma 6.3 (small ball), Lemma 6.5 (two-level concentration). S5 score 5/5.
+1. Agapiou & Wang: excluded, already in literature/. Thm 2.4, Lemma 6.3 (small ball), Lemma 6.5 (two-level concentration). S5 score 5/5.
 2. Agapiou & Savva (2024): T-01 row 9. Thm 2.5, Lemma 3.3. S5 score 4/5.
 3. Bhattacharya & Martin (2022, JSPI), arXiv 2002.01052: Thm 1 (root-n concentration), Thm 2 (BvM); fixed dimension. S5 score 3/5. Screened in T-01.
 

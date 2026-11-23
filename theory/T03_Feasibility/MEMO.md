@@ -338,13 +338,13 @@ E₀ Πₙ( Δ²ₙ(θ − θ\*) > Mₙ ε²ₙ | y ) → 0, with ε²ₙ = [ ω
 - Likelihood side: Atchadé's (2017) pathwise good-event / peeling structure, with Knight's identity for the check loss.
 - Prior side: ADH's p = 1 concentration, plus Bach & Klein's proper-ization of the polynomial part and their Demmler–Reinsch spectral bounds.
 
-See `Theory/T04_Template_Sweep/SHORTLIST.md`.
+See `theory/T04_Template_Sweep/SHORTLIST.md`.
 
 **Global kill criterion for the n^{−3/4} programme:** R1 fires, or neither L7 nor any alternative sieve gives matching entropy within two weeks. In either case the deliverable becomes Theorem A′ (n^{−2/3}), which is still new according to T-01.
 
 ---
 
-**Effect of the reference library (`Papers/READING_LIST.md`) on the plan.** The prior side of Theorem A is largely the p = 1 case of the Agapiou–Dashti–Helin framework, transplanted to falling-factorial coordinates:
+**Effect of the reference library (`literature/READING_LIST.md`) on the plan.** The prior side of Theorem A is largely the p = 1 case of the Agapiou–Dashti–Helin framework, transplanted to falling-factorial coordinates:
 - concentration function = shift cost (L4) + small-ball (L3);
 - sieve = Proposition 2.15 (L7);
 - prior-mass and sieve conditions = their Theorem 3.1.
@@ -545,7 +545,7 @@ Each entry is the Laplace posterior-mean bias² divided by the spline bias²:
 - the bias slope, which matches the VP law and excludes the ℓ₁ law;
 - the spread law along λ = c·n^a.
 
-**The primary rate n^{−5/6} at λ ≍ n^{5/2}/V is numerically supported.** Theoretically it rests on L4q, now drafted in `Theory/T05_Proofs/L4q_quadratic_shift.md`: it is proved conditional on L3 and on λε ≳ n^{10/7}, and is under independent check.
+**The primary rate n^{−5/6} at λ ≍ n^{5/2}/V is numerically supported.** Theoretically it rests on L4q, now drafted in `theory/T05_Proofs/L4q_quadratic_shift.md`: it is proved conditional on L3 and on λε ≳ n^{10/7}, and is under independent check.
 
 ### 8.1d Learned λ: the fixed-point formula holds, but it is not a bias-law test
 
