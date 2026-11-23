@@ -47,7 +47,7 @@
 \newcommand{\source}[1]{\par\noindent{\footnotesize\textsf{Source:} #1}\par\smallskip}
 
 \title{Posterior contraction for Bayesian quantile trend filtering:\\ what we are proving}
-\author{BQTF Writing Department (W-01)}
+\author{BQTF Writing Department (W-01, revision W-01b)}
 \date{23 November 2026 \quad (status as of commit \texttt{2ebb7cf})}
 
 \begin{document}
@@ -153,11 +153,20 @@ For $\theta\in\R^n$ write $\delta = \theta-\theta^*$ and define
 $\Delta_n^2$ is a Huber-type loss: it equals $\norm{\delta}_n^2$ when $\norm{\delta}_\infty\le1$, and it grows only linearly in large deviations. That linear growth is what lets the theory avoid moment conditions. It is also the natural loss for the check risk: under the margin condition (A2) below, the expected excess check loss $n^{-1}\sum_i\E[\rho_\tau(y_i-\theta_i)-\rho_\tau(y_i-\theta^*_i)]$ is at least $c_0\Delta_n^2(\theta,\theta^*)$, with $c_0=\min(f/2, fL/4)$.
 
 \begin{definition}[Contraction]
-Let $\Pn$ be a class of laws of $y$, let $\theta^*=\theta^*(P)$, and let $\Post(\cdot\mid y)$ be the posterior $\theta$-marginal. The posterior \emph{contracts at rate $\varepsilon_n$ in $\Delta_n$, uniformly over $\Pn$}, if for some constant $M$
+Let $\Pn$ be the class of laws of $y$ allowed by the assumptions of a given result, let $\theta^*=\theta^*(P)$, and let $\Post(\cdot\mid y)$ be the posterior $\theta$-marginal. The posterior \emph{contracts at rate $\varepsilon_n$ in $\Delta_n$} if there is a fixed constant $M$ such that, for every sequence of laws $P_n\in\Pn$,
 \[
-\sup_{P\in\Pn}\ \E_P\,\Post\big(\theta:\ \Delta_n^2(\theta,\theta^*) > M\varepsilon_n^2 \,\big|\, y\big)\ \longrightarrow\ 0 \qquad (n\to\infty).
+\Post\big(\theta:\ \Delta_n^2(\theta,\theta^*) > M\varepsilon_n^2 \,\big|\, y\big)\ \longrightarrow\ 0 \quad \text{in $P_n$-probability} \qquad (n\to\infty).
 \]
 \end{definition}
+
+\begin{remark}[Uniformity]
+The theorems below are stated, and proved, in the uniform form
+\[
+\sup_{P\in\Pn}\ \E_P\,\Post\big(\Delta_n^2(\theta,\theta^*) > M\varepsilon_n^2 \,\big|\, y\big)\ \longrightarrow\ 0 ,
+\]
+which is what the proofs bound. The two forms are equivalent. A posterior probability lies in $[0,1]$, so convergence in $P_n$-probability is the same as $\E_{P_n}\Post(\cdot\mid y)\to0$. Requiring this along every sequence $P_n\in\Pn$ is the same as the supremum tending to zero.
+\end{remark}
+
 \noindent The law of $\theta-\theta^*$ under $\Post$ does not change if a polynomial of degree $\le k$ is added to $\theta^*$, because the prior is flat in those directions. So no bound on $\norm{\theta^*}_\infty$ is ever needed.
 
 %=====================================================================
@@ -255,6 +264,76 @@ $^\dagger$ Computed for this note (\texttt{writing/W01\_Statements/gap\_ratios.R
 \end{table}
 
 \noindent\textbf{Scope, stated plainly.} Neither Theorem A nor Theorem B covers any of these laws at the paper's learned scale $\sigma_0$. For Gaussian noise the gap is the factor $\pi/2$ at $\tau=\tfrac12$, and it grows toward the tails (2.92 at $\tau=0.9$). Closing this gap is the purpose of Target~1 (A$^+$).
+
+\paragraph{The paper's simulation designs.} The simulations (paper, \S4) take $u_i=i/n$, $y_i=f(u_i)+\varepsilon_i$, and three heteroscedastic noise families:
+\begin{itemize}
+\item Gaussian, $\varepsilon_i\sim\mathcal N(0,s(u_i)^2)$ with $s(u)=(1+u^2)/4$;
+\item Beta, $\varepsilon_i\sim\mathrm{Beta}(1,11-10u_i)$;
+\item mixed normal, $\varepsilon_i\sim u_i\,\mathcal N(-0.2,0.5)+(1-u_i)\,\mathcal N(0.2,0.5)$, where the second argument is the variance.
+\end{itemize}
+The truth is $\theta^*_i=f(u_i)+F_{u_i}^{-1}(\tau)$, where $F_u$ is the error law at $u$.
+
+\noindent\textit{Convention under heteroscedasticity.} (A2) and (A4) use one $f$ and one $\sigma$ for all coordinates. So we take
+\[
+f_{\min}:=\min_{u\in[0,1]}f_u(q_u),\qquad \sbar=\frac{\tau(1-\tau)}{f_{\min}},\qquad \sigma_0:=\int_0^1\E\rho_\tau(\varepsilon_u-q_u)\,du,\qquad R=\frac{\sbar}{\sigma_0}.
+\]
+Here $q_u$ is the error quantile, $f_u(q_u)$ is the point density of the error there, and $\sigma_0$ is the limit of the paper's learned scale $n^{-1}\sum_i\E\rho_\tau(\varepsilon_i-q_{u_i})$. Taking the worst case over $u$ is the right choice, because a single $\sigma$ must give slack at every coordinate. As before, the point density makes $R$ a best case for (A4) at any fixed $L$.
+
+\noindent\textit{(A2).} (A2) holds for all three families at every $\tau$, with $L$, $f$ and $\bar f$ uniform in $u$. In each family the error density is continuous in $(x,u)$, bounded, and positive at the quantile over the compact range of $u$. The one caveat is Beta: its secant constant is close to $f_{\min}$ only for $L$ below the distance from the quantile to the edge of the support. That distance is $0.0047$ at $\tau=0.05$ (as $u\to0$) and $0.05$ at $\tau=0.95$ (at $u=1$). Beta also has $\bar f\le 11$.
+
+\begin{table}[h]
+\centering\small
+\caption{(A4) gap ratios for the paper's simulation noise, using the worst case over $u$ (all values computed for this note, \texttt{simulation\_laws.R}). $u^*$ is where the quantile density is smallest. $R$ is symmetric in $\tau\leftrightarrow1-\tau$ for the two normal families.}
+\label{tab:simnoise}
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Noise & $\tau$ & $f_{\min}$ ($u^*$) & $\sigma_0$ & $\sbar$ & $R=\sbar/\sigma_0$ \\
+\midrule
+Gaussian, $s(u)=(1+u^2)/4$ & 0.05, 0.95 & 0.206 (1) & 0.034 & 0.230 & 6.698$^\dagger$ \\
+ & 0.25, 0.75 & 0.636 (1) & 0.106 & 0.295 & 2.785$^\dagger$ \\
+ & 0.50 & 0.798 (1) & 0.133 & 0.313 & 2.356$^\dagger$ \\
+\addlinespace
+Beta$(1,11-10u)$ & 0.05 & 1.000 (1) & 0.0087 & 0.048 & 5.488$^\dagger$ \\
+ & 0.25 & 1.000 (1) & 0.037 & 0.188 & 5.086$^\dagger$ \\
+ & 0.50 & 1.000 (1) & 0.056 & 0.250 & 4.499$^\dagger$ \\
+ & 0.75 & 0.942 (0.96) & 0.050 & 0.199 & 3.958$^\dagger$ \\
+ & 0.95 & 0.407 (0.80) & 0.018 & 0.117 & 6.556$^\dagger$ \\
+\addlinespace
+Mixed normal & 0.05, 0.95 & 0.140 (0.35, 0.65) & 0.075 & 0.339 & 4.528$^\dagger$ \\
+ & 0.25, 0.75 & 0.432 (0.44, 0.56) & 0.231 & 0.434 & 1.883$^\dagger$ \\
+ & 0.50 & 0.542 (0.50) & 0.290 & 0.461 & 1.593$^\dagger$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent In every design $R$ lies between 1.59 and 6.70, so neither Theorem A nor Theorem B covers any of the paper's simulations at its learned $\sigma$. Heteroscedasticity widens the gap. For Gaussian noise at $\tau=\tfrac12$, $R=2.36=1.5\times\pi/2$, where $1.5=\max_u s(u)\big/\!\int_0^1 s(u)\,du$.
+
+\paragraph{(A3) for the paper's truths.} Table~\ref{tab:simV} gives $V=\TV_2(\theta^*)=n^2\norm{\Dthree\theta^*}_1$ for the true quantile curves $\theta^*_i=f(u_i)+F_{u_i}^{-1}(\tau)$, with
+\[
+f_{\mathrm{VS}}(u)=2+\sin(4u-2)+2\exp\{-30(4u-2)^2\},\qquad f_{\mathrm S}(u)=\sin(2\pi u).
+\]
+The Gaussian quantile shift $z_\tau(1+u^2)/4$ has zero third derivative, so it adds nothing. The mixed-normal shift changes $V$ by less than $0.1\%$. Beta changes $V$ by at most $0.5\%$ for VS, and by $-9\%$ to $+13\%$ for S.
+
+\begin{table}[h]
+\centering\small
+\caption{$V=\TV_2(\theta^*)$ for the paper's truths, given as $n=500$ / $n=8000$. The values at $n=2000$ and $n=8000$ differ by at most $0.35\%$, so $n=8000$ is within about $0.1\%$ of the limit $\int_0^1|\partial_u^3\theta^*(u)|\,du$; for S with Gaussian noise the limit is exactly $16\pi^2\approx157.9$. Computed for this note (\texttt{simulation\_laws.R}).}
+\label{tab:simV}
+\begin{tabular}{@{}llccccc@{}}
+\toprule
+Signal & Noise & $\tau=0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+VS & Gaussian & \multicolumn{5}{c}{7276 / 7283 (every $\tau$; equal to the signal alone)} \\
+ & Beta & 7283 / 7291 & 7305 / 7314 & 7311 / 7319 & 7287 / 7294 & 7289 / 7296 \\
+ & Mixed normal & \multicolumn{5}{c}{7276 / 7283 (every $\tau$; within 1 of the signal alone)} \\
+\addlinespace
+S & Gaussian & \multicolumn{5}{c}{156.4 / 157.8 (every $\tau$; equal to the signal alone)} \\
+ & Beta & 147.9 / 148.9 & 145.0 / 147.2 & 142.5 / 144.4 & 141.8 / 143.4 & 176.5 / 178.8 \\
+ & Mixed normal & 156.3 / 157.7 & 156.4 / 157.8 & 156.5 / 157.9 & 156.4 / 157.8 & 156.3 / 157.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent Both truths are $C^\infty$ in $u$, so (A3) holds with a fixed $V$. But the VS bump makes $V$ about $46$ times larger than for S, and $V$ enters both the rate constant (through $V^{1/3}$ at the oracle tuning) and the sample size $n_0(V)$ beyond which the bounds hold.
 
 %=====================================================================
 \section{Theorems and targets}
