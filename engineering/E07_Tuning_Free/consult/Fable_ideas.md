@@ -6,14 +6,57 @@
 - **Why ASIS and lamjump do not fix it.** ASIS rescales the *whole* non-polynomial part of θ (signal included), so the likelihood pins the rescale to a few %. lamjump takes a prox step with γ = δ/2, far too short to re-shrink roughness to the new λ, so its step adapts back to ≈ 1/√m (your joint smoke: s = 0.06–0.15).
 - **The fix that works** is the one your exact Gibbs already contains: move λ with θ integrated out, given the scale-mixture variables. I show below that this block can be bolted onto his P-MALA **without any Gaussian θ draw** (idea 1), and that the same construction repairs the joint design (idea 2).
 
+## Joint design
+*Critical-path answer, 2026-11-23, after attempt 1 (collapsed block acceptance 0; pCN r ≈ 0.96–0.995). Supersedes ideas 2 and 4 below.*
+
+**Pick: (iii). Exact reflective HMC for the box-truncated Gaussian θ_j | s_j, z_j, box** (Pakman & Paninski 2014). It replaces both pCN and the collapsed block. Keep the s, z, σ and conjugate-λ draws of the individual Gibbs.
+
+**Update, per level j.** Given w, r, iw as in `e07_sweep`: P = diag(w) + Dᵀdiag(iw)D, μ = P⁻¹(w∘r), box [l, u].
+1. x = θ_j − μ. Draw V ~ N(0, P⁻¹) (one banded draw, as now). Time left T = π/2.
+2. Free flight: x(t) = x cos t + V sin t, V(t) = −x sin t + V cos t. Coordinate i is A_i cos(t − φ_i), A_i = √(x_i² + V_i²), φ_i = atan2(V_i, x_i). Exit times: upper wall (φ_i − arccos((u_i − μ_i)/A_i)) mod 2π, lower wall (φ_i + arccos((l_i − μ_i)/A_i)) mod 2π (none if the wall is beyond A_i). Take the minimum over i.
+3. If it exceeds the time left, fly to the end and stop. Otherwise fly to the wall, reflect V ← V − 2 (V_i / (P⁻¹)_ii) P⁻¹e_i (one banded solve), subtract the time, go to 2.
+4. θ_j = μ + x.
+
+**Why it is valid.** The flight is the exact Hamiltonian flow of the Gaussian. The reflection is elastic in the P metric: it preserves energy and volume and is reversible. T is fixed. So the truncated Gaussian is invariant with no accept step and no step size. It is a Gibbs block for θ_j | rest; every other block is the individual conditional, because the order indicator is constant given Θ.
+
+**Measured (one-level proxy; my R prototype, one core; mechanism only).** n = 300, VS/Normal, τ = 0.98, b₀ = 0.01, 400 sweeps, 267 kept. The box is **fixed** at true quantile curves, not at moving neighbours.
+
+| Box | Bounces per trajectory, median (max) | ESS of θ at 5 points, of 267 | ESS(log λ), conjugate only |
+|---|---|---|---|
+| true 0.97 / 0.99 curves | 14 (23) | 118–167 | 23 |
+| true 0.977 / 0.983 (3.4× tighter) | 52 (75) | 247–267 | 25 |
+
+- θ is refreshed almost independently every sweep, in boxes where an unconstrained draw never lands.
+- λ then mixes on the conjugate draw alone: ESS ≈ 9% of sweeps, against 2.6–4 in 6000 sweeps for attempt 1.
+- 2-d check against rejection sampling passes (means 0.687 / 0.306 against 0.690 / 0.309).
+- Caveat: real neighbours are rougher, closer and move. Expect more bounces, and across-level creep that this proxy cannot show.
+
+**Cost.** Per level and sweep: one banded factorisation, one banded solve per bounce, O(n) for the exit times. Guess < 1 ms at n = 500 with ≤ 100 bounces, against ≈ 22 ms per level-sweep for his sampler (0.133 s / 6 in `joint/RESULTS.md`). One C++ export, `banded_rhmc(w, r, iw, theta, lo, up, xi1, xi2, T)`, ≈ 120 lines on the existing QR factor.
+
+**Why not the others.**
+- **(i) Hybrid:** it has no λ lever. z and σ were never his bottleneck (σ ratio 1.000). I tested my own T-block in this box: it is wall-limited, mean |Δ log λ| = 0.059, the conjugate step; ESS(log λ) 31 against 23. **Idea 2 fails its own kill signature. Drop it.**
+- **(ii) and v2 single-site:** single-site Gibbs is Gauss–Seidel on a sixth-order operator. Relaxation time ≈ 20·iw/w sweeps, 10⁶ or more (order-of-magnitude guess). HQ's worry is right. Windows help only when wider than the correlation length, and then each window needs a truncated-Gaussian sampler, which is this move. Do the whole level at once.
+
+**Traps.**
+- After a hit, set x_i exactly on the wall and ignore that wall for the next t < 10⁻⁸.
+- Never stop on a bounce cap: it breaks reversibility. If a budget is needed, shorten T in warm-up and freeze it.
+- Test J = 2, n = 4 against rejection sampling before any run.
+
+**Kill.**
+- Median bounces per trajectory > 2000 at any level in the real joint (cost passes his sweep).
+- At equal wall time against his joint: R̂(log λ_j) > 1.05, or the minimum ESS/s over log λ_j and θ_j at 9 points below his, at any level.
+- Paired MSE ratio per level > 1.
+
+**If the levels creep together** (R̂ of the level-averaged curve > 1.05): add the stack-shift block (idea 3), then run the same move on the **whole stack at once**, with walls θ_{j+1,i} ≥ θ_{j,i}. Same exit-time formula on the difference; the reflection uses P_{j+1}⁻¹e_i and −P_j⁻¹e_i, with denominator (P_{j+1}⁻¹)_ii + (P_j⁻¹)_ii. Untested.
+
 ## 1. Ranked ideas
 
 | # | Idea | Family | Status |
 |---|---|---|---|
 | 1 | **T-block:** collapsed λ draw + deterministic transport of θ, inside his P-MALA | proximal θ kernel; λ handling only | **mechanism smoke-tested (§5)** |
-| 2 | **T-block in the box** as the joint λ move (his joint sampler and the Gibbs joint) | both | untested |
+| 2 | **T-block in the box** as the joint λ move (his joint sampler and the Gibbs joint) | both | **failed in my proxy box (step 0.059 = conjugate); dropped, see "Joint design"** |
 | 3 | **Stack-shift Gibbs block** for the joint: all levels move by one common curve | both | untested |
-| 4 | **Gap coordinates + truncated-Gaussian kernel** (analytic elliptical slice, or reflective HMC) replacing pCN-with-rejection | non-proximal | untested |
+| 4 | **Gap coordinates + truncated-Gaussian kernel** (analytic elliptical slice, or reflective HMC) replacing pCN-with-rejection | non-proximal | superseded by per-level reflective HMC ("Joint design"), which passed a proxy check |
 | 5 | **Metric-whitened ASIS** (no augmentation; his own metric P as the non-centring weights) | proximal | untested; fallback to 1 |
 
 ### Idea 1: T-block (replaces his Block 3b ASIS)
@@ -37,7 +80,8 @@
 
 **Honest position.** Idea 1 should reproduce the exact-Gibbs MSE (same posterior, λ now mixing) at ≈ 1.2× his cost, where exact Gibbs gets there at 0.15–0.24×. With the scope widened it loses to exact Gibbs on compute for the individual model. Its value: (i) the fallback if Felipe requires P-MALA for θ; (ii) step 3 is what the joint needs (idea 2).
 
-### Idea 2: T-block in the box (joint)
+### Idea 2: T-block in the box (joint) — DROPPED
+*Proxy check (one level, fixed box at the true 0.97/0.99 curves, n = 300): mean |Δ log λ| = 0.059 against the kill line 2/√m = 0.116. The nearest wall limits the transport. Original text kept for the record.*
 Same block per level, with f(η) = −∞ whenever θ(η) leaves [θ_{j−1}, θ_{j+1}] (as `asis_box_step` does; one O(n) transport per slice evaluation). Target N(ω; 0, I)·e^{f(η)}·1{θ(ω, η) ∈ B}; slice on η | ω is exact. **Rejection-free:** the current state is feasible, so the slice always contains a neighbourhood of it.
 **Confirm:** ESS(log λ_j)/s ≥ 10× the accept-iff-in-box version at τ ≥ 0.97. **Kill:** mean |Δ log λ_j| per sweep at τ ≥ 0.97 below 2/√m ≈ 0.09, i.e. no better than the conjugate draw. **First measure** the acceptance of your independence block per level: if it is > 20% at 0.99, idea 2 is unnecessary.
 
@@ -71,7 +115,7 @@ His ASIS is the special case a → 0. Exact; decoupling only approximate (guess:
 - The collapsed block's acceptance is Pr(N(μ, P⁻¹) ∈ box), exponentially small in n. Your own smoke (`joint/RESULTS.md`) shows his P-MALA proposals, at a small local step (√δ ≈ 0.3–0.4 in his metric), already leave the box 23% of the time at 0.97 and 30% at 0.99. A full-scale draw will essentially never land inside (guess: < 10⁻³). λ_j then falls back to the conjugate draw, and his slow-λ problem returns exactly at the levels the paper cares about.
 - pCN contracts towards the **unconstrained** mean μ_j, which at tight levels can lie outside the box. His prox is box-constrained and centres proposals inside; pCN does not. Expect r → 1, θ mixing no better than his, and stalls at the walls. r also becomes a per-level tuning constant.
 - Level-at-a-time updates of a tight stack mix slowly whatever the within-level kernel.
-- **Fixes:** ideas 2, 3, 4, in that order.
+- **Fixes:** per-level reflective HMC ("Joint design"), then idea 3. Idea 2 did not survive my proxy check.
 
 **The right equal-compute comparison.**
 - Total core-seconds on one node type, single-threaded, all chains and all warm-up counted, compile time excluded.
@@ -100,9 +144,10 @@ His ASIS is the special case a → 0. Exact; decoupling only approximate (guess:
 - **pCN-with-rejection and the independence collapsed block at 0.97–0.99** without first measuring their acceptance.
 
 ## 4. Suggested order
-1. Measure, per level, the acceptance of the collapsed block and the pCN outside-rate on one VS fit at 0.90–0.99 (minutes).
-2. Implement `banded_transport`; run idea 2 and idea 3 in the Gibbs joint.
-3. Idea 1 individual pilot only if a proximal θ kernel is still required.
+*Updated after attempt 1.*
+1. Implement `banded_rhmc` (see "Joint design"); pass the J = 2, n = 4 exactness test; run the real joint at 0.90–0.99 and read bounces, R̂ and ESS/s per level.
+2. Add the stack-shift block (idea 3) if the level-averaged curve is slow; whole-stack reflective HMC after that.
+3. Idea 1 individual pilot only if a proximal θ kernel is still required. Idea 2 is dropped.
 
 ## 5. My local check (one dataset; mechanism only, not evidence on MSE)
 S / Normal, τ = 0.5, n = 300, seed 1, his priors (b₀ = 5e-4), 1200 sweeps, 400 burn-in, one chain. Prototype in R with dense Cholesky, so its time is not a timing.
