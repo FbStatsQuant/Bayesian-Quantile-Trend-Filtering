@@ -308,10 +308,10 @@ The $\lambda$-range below $\Lambda_{-,n}$ is split into pieces:
 Link & $\lambda$ range / step & Status & Source; prover / auditor \\
 \midrule
 L1 & tiny $\lambda<\ell_1:=(1-\eta)\,2t/(e\szero)\,e^{-\eta}$ & \PU{} (class-wide) & \texttt{FABLE\_A\_Arule\_lowertail.md} \S2 (I); Fable A; audit queued (Astra) \\[2pt]
-L2 & bounded $\lambda\in[\ell_1,\ell_0]$: design condition (DC) & \OP; statement and reductions \PU & \texttt{FABLE\_B\_DC.md}; Fable B. New, not audited: Gaussian design proved by analysis (\texttt{FABLE\_B\_L2\_analysis.md}); Beta, mixed SKETCH \\[2pt]
+L2 & bounded $\lambda\in[\ell_1,\ell_0]$: design condition (DC) & \OP, work in progress; statement and reductions \PU & \texttt{FABLE\_B\_DC.md}; Fable B. Certificate specified, untested \\[2pt]
 L3 & interpolating fits; extreme scales & \PU{} (class-wide) & lowertail \S2 (III-a/b), using Lemma S (audited) \\[2pt]
 L4a & $\lambda\in[\ell_0,n^{3/2}]$ & \OP; named assumption with a data check & \texttt{L4a\_assumption.md} \\[2pt]
-L4b & $\lambda\in[n^{3/2},\,C n^{2.30}]$ & \OP; reduced to one hypothesis (PM2) & \texttt{FABLE\_A\_L4b.md} (new, not audited; see below) \\[2pt]
+L4b & $\lambda\in[n^{3/2},\,C n^{2.30}]$ & \OP, work in progress; one new lemma needed & \texttt{FABLE\_A\_gap4.md}; Fable A \\[2pt]
 L5 & $\lambda\in[L_n,\Lambda_{-,n}]$: $L_n=Cn^{99/43}(\log n)^c$, $\Lambda_{-,n}=c_-n^{5/2}(\log n)^{-1/2}$ & \PA & Theorems LO, U, U-$\sigma$ with averaged $\bar\beta<6$; Fable A, Fable B / Astra \\[2pt]
 L6 & L1--L5 $\Rightarrow$ (LT) & assembly \PU{} given its inputs & lowertail \S5 \\[2pt]
 L7 & (LT) $\Rightarrow$ rate $n^{-5/6}(\log n)^{1/3}$ (V0T$^*$, $n$-dependent floor) & \PA & \texttt{FABLE\_A\_V0Tstar\_nfloor.md}; Fable A / Astra \\[2pt]
@@ -394,14 +394,9 @@ Model and assumptions of V0T$^*$, with floor $\Lambda_{-,n}:=\kappa_{-,n}n^{5/2}
 \subsection{The open links}
 
 \begin{itemize}
-\item \textbf{L2, bounded $\lambda$, (DC)} \OP. With $g_n(s,\ell):=\log(\ell/(2t))+n^{-1}\log\E_s\exp\{-\ell\norm{D(y-E)}_1\}$ and $b^*:=-1-\log\sigma_0$: (DC$_\gamma$) is ``with probability $\to1$, $\sup\{g_n(s,\ell):s>0,\ \ell_1\le\ell\le\ell_0\}\le b^*-\gamma$''. Given (DC$_\gamma$), $\Pi(\ell_1\le\lambda\le\ell_0\mid y)\le e^{-\gamma n/2}$ (\PU). The reduction to a compact rectangle is \PU. \emph{New this afternoon} (\texttt{FABLE\_B\_L2\_analysis.md}, Fable B; not audited, not yet committed by Theory): (DC$_\gamma$) is proved by analysis for Gaussian noise, for every truth and every $\tau$, on $[\ell_1,\ell_0]$ with an explicit $\ell_0$ (paper's Gaussian design: $\ell_0=790$ at $\tau=\tfrac12$, $197$ at $0.25/0.75$, $12$ at $0.05/0.95$). Beta and mixed designs: SKETCH; Beta at $\tau=0.95$ is not covered. The method stops at a constant $\ell_0$, so it does not reach L4a. The three-tier numerical certificate remains the route for the other designs.
+\item \textbf{L2, bounded $\lambda$, (DC)} \OP, work in progress. With $g_n(s,\ell):=\log(\ell/(2t))+n^{-1}\log\E_s\exp\{-\ell\norm{D(y-E)}_1\}$ and $b^*:=-1-\log\sigma_0$: (DC$_\gamma$) is ``with probability $\to1$, $\sup\{g_n(s,\ell):s>0,\ \ell_1\le\ell\le\ell_0\}\le b^*-\gamma$''. Given (DC$_\gamma$), $\Pi(\ell_1\le\lambda\le\ell_0\mid y)\le e^{-\gamma n/2}$ (\PU). The reduction to a compact rectangle is \PU. There is no proof yet at Gaussian $\tau=\tfrac12$ (work in progress). A three-tier numerical certificate is specified and untested.
 \item \textbf{L4a, $\lambda\in[\ell_0,n^{3/2}]$} \OP. No theory; even the $\beta<6$ heuristic has no justification here. Fallback: the named assumption below.
-\item \textbf{L4b, $\lambda\in[n^{3/2},Cn^{2.30}]$} \OP. \emph{New this afternoon} (\texttt{FABLE\_A\_L4b.md}, Fable A; not audited, not yet committed by Theory). Not closed, but reduced to one posterior hypothesis:
-\begin{itemize}
-\item Lemma 2b$'$ (resolvent trace) is proved. By substitution into the audited Theorem LO it moves LO/U/U-$\sigma$ down to $\lambda\ge Cn^{54/25}\,$polylog ($2.16$ instead of $2.30$). This range is unconditional.
-\item On $[Cn^{108/61}\mathrm{polylog},\,n^{54/25}]$ the LO bound holds \emph{conditional on} (PM2): $\max_i[\delta_i^2]\le s^2/(3\log n)^2$, $s\asymp\ell^{-1/18}/\log n$ (a pointwise posterior bound; open, measurable from fixed-$\lambda$ chains).
-\item On $[n^{3/2},n^{108/61}]$ nothing is available yet.
-\end{itemize}
+\item \textbf{L4b, $\lambda\in[n^{3/2},Cn^{2.30}]$} \OP, work in progress. One new lemma (a posterior bound on high-amplitude energy) is needed (\texttt{FABLE\_A\_gap4.md}). Fable A is working on it today; its status will be taken from Theory's report.
 \end{itemize}
 
 \subsection{Named assumptions and their empirical status}
@@ -418,9 +413,9 @@ Assumption & What it says & Empirical / design check \\
 (A1)--(A3), (UI), (S0) & independence; two-sided margin; roughness budget $V$; check loss UI; $\szero\ge d$ & hold for all three designs, both truths, every fixed level (W-01 note) \\[2pt]
 (REG) & a smooth secant-density profile in $u$, bounded away from 0 and $\infty$ & holds for the three designs (Theory's check) \\[2pt]
 $\bar\beta<6$ & averaged evidence condition at the learned scale & computed: $\le5.12$ on $\tau\in[0.05,0.95]$; exceeds $6$ at $0.97$ and $0.99$, where the sufficient condition is not met; no failure is proved there (Table~\ref{tab:beta}). \ME: the $\hat\kappa$ pilot (one seed, Gaussian) had the predicted sign at $0.05$--$0.5$ and lost it at $0.97$ \\[2pt]
-(DC) (L2) & no partial interpolation at bounded $\lambda$ & no data yet. Gaussian design: proved by analysis (new, not audited). Beta, mixed: Tier-3 surface map planned (Tuesday at the earliest) \\[2pt]
+(DC) (L2) & no partial interpolation at bounded $\lambda$ & no data yet; Tier-3 surface map planned (Tuesday at the earliest) \\[2pt]
 (L4a) & $\supP\Pi(\ell_0\le\lambda\le n^{3/2}(\log n)^c\mid y)\to0$ & \ME{} (A-rule screen, posterior medians only): at $\tau=0.5$, $\lambda/\lambda^*$ is stable from $n=500$ to $2000$ (S: $0.85\to1.05$; VS: $3.2\to2.8$). Zero mass below $n^{3/2}$ is \emph{not} shown, and cannot be with medians. Watch item: S at $\tau=0.95$ (Normal $0.59\to0.08$ at $n=1000$, one seed). Draws check proposed for Tuesday \\[2pt]
-L4b: (PM2) & pointwise posterior bound $\max_i[\delta_i^2]\le s^2/(3\log n)^2$ on $[n^{108/61},n^{54/25}]$; nothing yet below $n^{108/61}$ & none yet; measurable from fixed-$\lambda$ chains (\texttt{FABLE\_A\_L4b.md}). Fallback: named assumption \\
+L4b lemma & posterior bound on high-amplitude energy for $\lambda\in[n^{3/2},n^{2.30}]$ & none; named assumption as fallback \\
 \bottomrule
 \end{tabular}
 \end{table}
