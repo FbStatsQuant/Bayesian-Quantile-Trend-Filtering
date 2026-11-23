@@ -128,7 +128,7 @@ head_fig <- function(file, tr = "pq", nz = "gauss", ta = 0.5, ar = "Abar", meas 
   yr <- range(unlist(lapply(cur, function(c) c(c$lo, c$hi)))); xr <- range(unlist(lapply(cur, `[[`, "ns")))
   plot(NA, xlim = xr * c(0.9, 1.1), ylim = yr * c(0.85, 1.15), log = "xy", xaxt = "n", yaxt = "n",
        xlab = expression(n), ylab = if (meas == "d2_q95") expression(hat(q)[n] ~ "(95% posterior quantile of " * Delta[n]^2 * ")")
-                                     else expression(hat(q)[n]^perp ~ "(rough part, quadratics projected out)"))
+                                     else expression(hat(q)[n]^symbol("\136") ~ "(95% posterior quantile of the rough part of " * Delta[n]^2 * ")"))
   axis(1, at = 1000 * 2^(0:5), labels = c("1k", "2k", "4k", "8k", "16k", "32k"))
   yt <- 10^seq(floor(log10(yr[1])), ceiling(log10(yr[2]))); axis(2, at = yt, labels = sapply(log10(yt), function(e) as.expression(bquote(10^.(e)))))
   axis(2, at = as.vector(outer(2:9, yt)), labels = FALSE, tcl = -0.15)
@@ -137,9 +137,10 @@ head_fig <- function(file, tr = "pq", nz = "gauss", ta = 0.5, ar = "Abar", meas 
     curve(y0 * (x / gm)^p, from = xr[1] * 0.9, to = xr[2] * 1.1, add = TRUE, lty = 2, col = cols[[sc]], lwd = 1.1)
     arrows(c$ns, c$lo, c$ns, c$hi, angle = 90, code = 3, length = 0.025, col = cols[[sc]], lwd = 1)
     points(c$ns, c$med, pch = pchs[[sc]], col = cols[[sc]], cex = 0.9) }
-  lg <- sapply(names(cur), function(sc) { c <- cur[[sc]]; p <- PRED[[sc]]
-    sprintf("%s:  %.2f [%.2f, %.2f]  (theory %s)", c(primary = "n^{5/2}/V", fallback = "(n^3/V)^{3/4}", padilla = "Padilla")[[sc]],
-            c$slope, c$ci[1], c$ci[2], c(primary = "-5/6", fallback = "-3/4", padilla = "-5/7")[[sc]]) })
+  lg <- as.expression(lapply(names(cur), function(sc) { c <- cur[[sc]]; v <- sprintf("%.2f [%.2f, %.2f]", c$slope, c$ci[1], c$ci[2])
+    switch(sc, primary  = bquote(lambda[n] %prop% n^{5/2}/V * ":  " * .(v) ~ "(theory " * -5/6 * ")"),
+               fallback = bquote(lambda[n] %prop% (n^3/V)^{3/4} * ":  " * .(v) ~ "(theory " * -3/4 * ")"),
+               padilla  = bquote("Padilla" ~ lambda[n] * ":  " * .(v) ~ "(theory " * -5/7 * ")")) }))
   legend("bottomleft", legend = lg, col = cols[names(cur)], pch = pchs[names(cur)], lty = 2, bty = "n", cex = 0.78, inset = 0.01)
   dev.off()
 }
