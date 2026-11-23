@@ -12,7 +12,9 @@ b0_paper <- function(bl) if (bl == "VS") 1e-3 else 5e-4
 SPECS <- list(
   H_FE  = function(bl, n, tau) list(a0 = n, b0 = 1, a_s = 0.001, b_s = 0.001),              # Felipe's example
   H_SIG = function(bl, n, tau) list(a0 = 1, b0 = b0_paper(bl), a_s = 0.001, b_s = 0.001),   # sigma hyperparameters only (lambda as paper)
-  H_ONE = function(bl, n, tau) list(a0 = 1, b0 = 1e-3, a_s = 0.1, b_s = 0.1)                 # one b0 for both signals (no per-signal tuning)
+  H_ONE = function(bl, n, tau) list(a0 = 1, b0 = 1e-3, a_s = 0.1, b_s = 0.1),                # one b0 for both signals (no per-signal tuning)
+  A_H1  = function(bl, n, tau) list(a0 = 1, b0 = 1 / (5500 * (n / 500)^2.5), a_s = 0.1, b_s = 0.1),   # Astra: weak, centre L(n)
+  A_H2  = function(bl, n, tau) list(a0 = 4, b0 = 4 / (5500 * (n / 500)^2.5), a_s = 0.1, b_s = 0.1)    # Astra: shape 4, same mean
 )
 EXTRA <- Sys.getenv("SPEC_EXTRA")                                    # optional: R code defining more entries, e.g. 'SPECS$T1 <- function(bl,n,tau) ...'
 if (nzchar(EXTRA)) eval(parse(text = EXTRA))
