@@ -1,129 +1,101 @@
 # Tuesday 24 November: re-aimed attack plan (Theory)
 
-*Theory Department, 2026-11-23. DRAFT v2 (after the CT Fables and the κ̂ pilot); final by 21:00 CT. INTERNAL, for HQ.*
+*Theory Department, 2026-11-23. FINAL (written 16:50 CT, ahead of the 21:00 deadline). INTERNAL, for HQ.*
 
-## Gaps first (HQ steer, 15:xx CT)
+## 0. Aim and the state at the end of Monday
 
-Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is unaudited, and the headline. Details are in §2.
+**The method stays Felipe's** (route B is closed): σ ~ IG(0.1, 0.1) learned, λ learned under a Gamma prior, θ drawn by P-MALA. All theorems concern the posterior. No theory claim is built on his sampler's outputs.
 
-| Gap | Piece (§2) | Prover | Auditor | Fallback | Account |
-|---|---|---|---|---|---|
-| 1. LO audited | H0: **DONE** (Astra: ACCEPT WITH FIXES at fixed (ω, ℓ), 63849f0; Lemma F′/Lev also audited) | — | — | — | — |
-| 2. **Min-density loss → averaged β** | H3: **DONE**: LO and U with β̄ < 6, cross-family audited (a5453af); covers τ ∈ [0.05, 0.95] on all designs, under (REG) | — | — | — | — |
-| 3. Uniformity in σ and λ | H2: **DONE** — Theorem U/U-σ, cross-family audited (f5f05de). The band [n^{2.30}, oracle] is excluded with σ learned | — | — | — | — |
-| 4. **λ below n^{2.30}**: intermediate range G4 (sign route via κ) and bounded range G5 (certificate) | H4, H5 | Astra (H4), Fable (H5) | Fable (H4), Astra (H5) | named assumption, supported by κ̂ data (F3) | Codex (H4), CP + Engineering (H5) |
+**Headline, proved and cross-family audited.** V0T\* (his method plus a λ floor): rate n^{−5/6}(log n)^{1/6}, matched by Theorem LB at the oracle. Also C\*, J and general k. Data gate: the individual test is met; the joint τ = 0.99 cell is unresolved.
 
-**Compute.** Nothing new this evening. The only compute in the plan is H5's interval certificate, on Tuesday, sized by Engineering first.
+**Target for Tuesday: the A-rule without a floor** (λ ~ Gamma(1, 1/(5500(n/500)^{5/2})), no truncation), at τ ∈ [0.05, 0.95] on the paper's three designs.
+- Its data gate is posterior-level only: exact sampler, both arms. With his sampler it is UNTESTED.
+- **It is not a theorem yet.** The chain to Corollary P's (LT) at Λ₋ = c₋n^{5/2}(log n)^{−1/2} stands as follows.
 
-## The remaining floor-free chain (HQ steer)
-
-**Target.** Corollary P's lower-tail input (LT): Π(λ < Λ₋ | y) → 0 at Λ₋ = c₋n^{5/2}(log n)^{−1/2}, with σ learned and no floor. The λ-range below Λ₋ splits into pieces, following `FABLE_A_Arule_lowertail.md` §2:
-
-| Link | λ-range / step | Status | Prover | Auditor | Fallback |
-|---|---|---|---|---|---|
-| L1 | (I) tiny λ < 2t/(eσ₀) | PROVED, class-wide (lowertail §2) | — | Astra (with H1: RSB/LT-EM audit) | — |
-| L2 | (II) bounded λ ∈ [ℓ₁, ℓ₀]: the design condition (DC) | **DONE: PROVED and cross-family audited for all three designs** at the paper levels 0.05–0.95 (`FABLE_B_L2_analysis.md`, Theorem DC-W). Beta 0.95 has a short range [1.96, 4.1] | — | — | — |
-| L3 | (III-a/b) interpolating fits; extreme scales | PROVED, class-wide (lowertail §2; Lemma S) | — | Astra (H1) | — |
-| L4a | (III-c) λ ∈ [ℓ₀, n^{3/2}]: below the homogenization limit (`FABLE_A_gap4.md`, 9701f65) | OPEN; no theory, and β < 6 has no heuristic justification here | Fable (fresh look) | Astra | named assumption (sign of κ), with κ̂ data |
-| L4b | (III-c) λ ∈ [n^{3/2}, C·n^{2.30}] | **Cross-family audited** (1af9f8b): posterior band exclusion down to n^{21/11}; fixed-pair Occam to n^{9/5}; conditional (SN/XS) to n^{26/17}. **Open:** uniformity on [n^{9/5}, n^{21/11}]; (SN)/(XS) on [n^{26/17}, n^{9/5}]; the sliver [n^{3/2}, n^{26/17}]; the averaged-β̄ version | Fable A | Astra | named assumption on the remaining sub-range |
-| L5 | (III-c) λ ∈ [C·n^{2.30}, Λ₋] | **DONE: Theorem U-σ, audited** (f5f05de) | — | — | — |
-| L6 | L1–L5 ⇒ (LT) at Λ₋ = c₋n^{5/2}(log n)^{−1/2} | assembly (lowertail §5, PROVED given its inputs) | Fable | Astra | — |
-| L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | **DONE: PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES; `FABLE_A_V0Tstar_nfloor.md`) | — | — | the rate keeps an extra log |
-| L8 | Rate n^{−5/6}(log n)^{1/3}, with LB matching up to logs | follows from L7 + Theorem LB | — | — | — |
-
-**L4a, the named assumption (Felipe's assumptions-vs-empirics rule):** see `T06_Alignment/L4a_assumption.md`.
-- **Statement:** sup_P E_P Π(ℓ₀ ≤ λ ≤ n^{3/2}polylog | y) → 0.
-- **Finite-n proxy:** posterior λ / (n^{5/2}/V) bounded below, uniformly in n.
-- **Existing data (A-rule screen, medians only):** at τ = 0.5, λ/λ\* is stable from n = 500 to 2000 (S: 0.85 → 1.05; VS: 3.2 → 2.8).
-  - VS medians sit below n^{3/2} at paper n. This is expected, because the oracle itself is below n^{3/2} while n < V ≈ 7276.
-  - **Watch item:** S at τ = 0.95 (Normal: 0.59 → 0.08 at n = 1000, one seed).
-  - Zero mass below n^{3/2} is NOT shown.
-- **Tuesday check:** re-run A_H1 with λ draws saved, n up to 4000, 3 seeds. Engineering to price it.
-- **Referee note:** §4 of that file.
-
-**Coverage upgrade (gap 2): DONE** (a5453af). L5 now holds with averaged β̄ on the whole grid τ ∈ [0.05, 0.95]. L4a and L4b inherit whichever β the new lemma uses.
-
-**Paper hygiene (Tuesday).**
-- Clean rewrites with every audit fix written in full: LO (11 findings), U (9), LB (done).
-- The §3 node estimate of U re-read against the fixed LO text.
-- Prover: Fable A. Auditor: Astra re-reads the diff.
-
-## 0. Aim
-
-**Headline target: a floor-free theorem for the data-favoured A-rule.** The A-rule is Felipe's method with one hyperparameter changed: λ ~ Gamma(1, b_n), b_n = 1/(5500·(n/500)^{5/2}). It stays in the Gamma family, is a function of n only, and has no truncation. σ ~ IG(0.1, 0.1) is learned and θ is drawn by P-MALA.
-
-- **Target statement.** At τ ∈ [0.05, 0.95], for the paper's three noise designs, θ contracts at **n^{−5/6} up to logs**, with σ and λ both learned.
-- **Route.** Theorem H (audited) plus V0T\* (audited) reduce it to one input: **posterior lower-tail control of λ at the learned σ**, Π(λ < Λ₋ | y) → 0 with Λ₋ ≍ n^{5/2}/polylog.
-- **Why design-specific.** No class-wide theorem exists for an unfloored adaptive Gamma prior. This is the soft-floor impossibility, with two independent notes (Astra; Fable B).
-- **Extreme τ is out of scope.** At τ = 0.01/0.99 the design condition fails for every paper design (β ≈ 13–14 against ≈ 6). At those levels the paper keeps V0T\* and Theorem J.
-
-**Route B is CLOSED** (HQ, 2026-11-23): Felipe's P-MALA stays the method.
-
-**Data gate (Felipe's rule), posterior-level (exact sampler) only; with his sampler it is UNTESTED.** The A-rule has passed the exact-Gibbs screen, with both arms exact Gibbs: median MSE ratio 0.95 / 0.90 / 0.53 at n = 500 / 1000 / 2000, max 1.13. It still needs the P-MALA paired test and a joint non-crossing version before the paper can use it. That is Engineering's work, not Theory's; it is listed in §5.
-
-## 1. What is already proved and audited (fallbacks)
-
-| Fallback | Method it covers | Rate | Status |
-|---|---|---|---|
-| **F1: V0T\*** | his method + λ floor 1.6e-5·n^{5/2} | n^{−5/6}(log n)^{1/6}, exact at the oracle with LB | PROVED, cross-family audited; individual data gate met, joint τ = 0.99 unresolved |
-| **F2: C\*** | σ learned, λ deterministic at the oracle | n^{−5/6}(log n)^{1/6} | PROVED, cross-family audited |
-| **F3: conditional A-rule** | A-rule, no floor | n^{−5/6}(log n)^{1/3} | assembly PROVED under the evidence margin (E); (E) stated as an assumption with numerical support (β table, Engineering λ-drift check) |
-| Joint | V0T\* and C\* under non-crossing, fixed levels | n^{−5/6} | Theorem J, PROVED, cross-family audited |
-| General k | fixed σ/λ | n^{−(2k+1)/(2k+2)} | PROVED, cross-family audited |
-
-If the headline does not close by Tuesday night, **F3 is the paper's A-rule statement and F1 is the unconditional one.**
-
-## 2. Hard pieces of the headline
-
-**State at 15:00 CT.**
-- **Fable A, `FABLE_A_three_lemmas.md` (a854245):** Theorem LO, the local Occam bound, is PROVED at fixed (ω, ℓ) for β < 6 and ℓ ≥ n^{99/43}·polylog. It is unaudited. It uses min_i f_i, so as proved it misses Gaussian τ = 0.05/0.95 and Beta 0.95.
-- **Fable B, `FABLE_B_Arule_gauss.md` (5fb5e67):** exact identities reduce the λ lower tail to the **sign** of κ(ℓ) = m − ℓ·E_ℓ‖Dθ‖₁ (verified by Theory).
-- **κ̂ pilot, Engineering 75ad1a4; reading in `kappa_pilot_reading.md`, 3c4562a:** the sign is positive at τ = 0.05–0.5 and lost at 0.97. This supports the averaged β < 6.
-
-| # | Piece | Prover | Auditor | Fallback if it fails | Budget |
-|---|---|---|---|---|---|
-| H0 | **Audit Theorem LO** (Lemmas 1, 2a–c, 3). Lemma F′ and Lev are audited first; they are queued from Theorem H | (Fable A, done) | **Astra** | F3 (conditional theorem) | Codex |
-| H1 | Audit Lemma RSB + Prop. LT-EM (`FABLE_A_Arule_lowertail.md`) | (Fable A, done) | Astra | none needed | Codex |
-| H2 | **Uniformity of LO** in ω on a compact and in ℓ on [n^{99/43}, c₋n^{5/2}]: scalar grid + nested bodies (SKETCH in §5) | Fable (CP) | Astra | the rate keeps an extra K_n factor | CP |
-| H3 | **Averaged condition**: Lemma 2b with position-dependent fᵢ, so that β is the design average, not the worst case. This brings in Gaussian τ = 0.05/0.95 and Beta 0.95; the pilot says the sign holds there | Fable (CP) | Astra | the headline covers τ ∈ [0.25, 0.9] on all designs, plus the cells with worst-case β < 6 | CP |
-| H4 | **G4: intermediate tuning**, a large constant ≤ ℓ ≤ n^{99/43}. **Today's Astra attempt** (`astra_gap4_sign.md`, b88fb9b): pointwise sign arguments are impossible (block-bump obstruction inside the Huber body); deterministic monotonicity in ℓ fails. New tool: an exact IBP identity, score = E[Wᵢ·Cov(ωδᵢ, ωgᵢ)]. **Tuesday target:** bound that posterior covariance on score-aligned directions against the crossing term, uniformly in ℓ | Fable (fresh eyes; Astra wrote the obstruction) | Astra | named assumption, supported by κ̂ data (F3) | CP |
-| H5 | **G5: bounded tuning (DC)** for the three paper designs: a proof or a rigorous interval-arithmetic certificate | Fable | Astra | numerical certificate only, stated as such | CP + Engineering |
-| H6 | V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}, line by line (the A-rule's plug-in) | Astra | Fable | the rate loses a further log | Codex |
-
-**Order.** H0, H1 and H6 first: audits and a routine re-derivation. Then H2 and H3 in parallel. H4 is the main risk and gets the fresh-eyes Astra slot from mid-morning. H5 runs alongside, with Engineering compute for the certificate.
-
-**What "headline proved" would mean.** H0 + H2 + H3 + H6, with H4 and H5 either proved or stated as named assumptions with data. Without H4/H5 the headline is the conditional theorem F3 with a smaller assumption: only the range below n^{2.30}.
-
-## 3. Secondary pieces (each serves the headline or the paper's statement)
-
-| # | Piece | Why it serves | Prover | Auditor |
-|---|---|---|---|---|
-| S1 | LB "spread around its own random centre" | makes the lower bound about the posterior's own spread, not distance to θ\* | Fable | Astra |
-| S2 | Fixed-M Bousquet version of Theorem H | cleaner constant for the plug-in | Astra | Fable |
-| S3 | No-floor sufficiency: does σ₀ < 2τ(1−τ)R suffice at bounded tuning for smooth designs? | feeds H5 | Astra | Fable |
-| S4 | Joint small-gap item (levels whose true quantiles nearly touch) | Theorem J's caveat | Fable | Astra |
-| S5 | Necessity half of β_c (β > 6 ⇒ evidence grows ⇒ λ drifts); Fable A §5 says it needs only Lemma 1's two-sided form plus Jensen | makes the extreme-τ limitation a theorem, not a caveat; the κ̂ data at 0.97 already point that way | Astra | Fable |
-
-## 4. Old P-items: kept or retired
-
-| Item | Decision | Reason |
+| Link | λ range / step | Status |
 |---|---|---|
-| P1: log-concave ⇒ (EM) for σ > σ̄ | **RETIRED** | concerns σ > σ̄; the method lives at 0.13–0.64·σ̄ |
-| P2: uniform in σ on compacts | **DONE** | C1/C2 hold uniformly on [l, H₀], any σ |
-| P3: learned λ by hyperprior mass | **DONE with a floor** (V0T\*); its floor-free successor is the headline | — |
-| P4: squared loss n^{−2/3} + posterior-mean corollary | rate **SUPERSEDED** (C\*/V0T\* give n^{−5/6} in ‖·‖²ₙ); posterior-mean corollary **KEPT, low tier** (needs posterior uniform integrability) | serves the paper's point estimate |
-| P5: general-k exponent | **DONE** (audited) | — |
-| P6: n^{9/4} self-tuning premise | **RETIRED** | MEASURED: λ ∝ n^{3/4} under constant b₀; the A-rule replaces it |
-| P7: size of n₀(V) | **KEPT, low tier** (support model + Engineering numerics) | honesty about when the bound is in force |
+| L1 | tiny λ | PROVED, class-wide; **not audited** |
+| L2 | bounded λ (DC) | **AUDITED** for all three designs at τ ∈ {0.05, …, 0.95} (`FABLE_B_L2_analysis.md`: DC-G 845116d, DC-W 59752f3) |
+| L3 | interpolating fits, extreme scales | PROVED, class-wide; **not audited** |
+| L4a | [ℓ₀, n^{3/2}] | **OPEN**: named assumption with data check (`T06_Alignment/L4a_assumption.md`) |
+| L4b | [n^{3/2}, n^{21/11}] (min-density) or [n^{3/2}, n^{99/43}] (cells that need β̄) | **OPEN** as a posterior statement. Fixed (σ, λ): AUDITED to n^{9/5}; to n^{26/17} under (ML) + β(L) < 6 or under (XE) (`FABLE_A_L4b.md`, 1af9f8b, 58a0da8) |
+| L5 | [n^{21/11}, Λ₋] min-density; [n^{99/43}, Λ₋] averaged β̄ | **AUDITED** (Theorems U, U-σ; averaged β̄: a5453af; extension: 1af9f8b) |
+| L6 | L1–L5 ⇒ (LT) | assembly PROVED given its inputs; **not audited** |
+| L7 | (LT) ⇒ rate n^{−5/6}(log n)^{1/3} (V0T\* with an n-dependent floor) | **AUDITED** (a43bdcf) |
 
-## 5. Engineering inputs Tuesday's theory depends on
+**One shared missing input.** L4a, the posterior version of L4b below n^{21/11}, and the hypothesis (XE) all reduce to a **posterior sup-norm / forgetting lemma at the bandwidth scale**.
+- Fable B's §§10–16 (`FABLE_B_supnorm.md`) give the entry points:
+  - the strict Brascamp–Lieb gap;
+  - spike removal (B10) and most windows in the bulk (B11);
+  - balance in probability on clean windows (B14);
+  - the scale-gap stopping point, with the conjecture (SGN).
+- Fable A's §9 calls the same input (FG).
 
-- the A-rule λ-drift by β (requested; tests the β_c ≈ 6 prediction);
-- the τ = 0.01/0.99 run (running);
-- the V0T data test, n = 2000/4000 (running);
-- the H-V2 screen re-runs;
-- the A-rule P-MALA paired test and joint version (data gate for the headline method).
+## 1. Tuesday pieces: prover, auditor, fallback, account
 
-## 6. Budget split
+The rule throughout: Fable and Astra prove, and the other family audits. Opus, Sonnet and Haiku do support work only. Effort is high, never above.
 
-[TO COMPLETE at 21:00 with current usage.] Today's figures: CT Fable ~90% weekly, CW ~93%, CP 3 resets from 08:00, Codex 2 resets. **Plan: Fable proving on CP; Astra on Codex.** No CT or CW use unless HQ approves. Opus, Sonnet and Haiku do support work only (numerics scripts, consistency checks, reading). Every agent runs at effort high, never above. I alert HQ when any account passes 80% of what remains.
+| # | Piece | Why | Prover | Auditor | Fallback | Account |
+|---|---|---|---|---|---|---|
+| T1 | **Audit L1, L3, L6** (`FABLE_A_Arule_lowertail.md` §2, §5) and **Lemma RSB / Prop. LT-EM** | three links are proved but unaudited; cheap | (Fable A, written) | **Astra** | — | Codex |
+| T2 | **Posterior sup-norm / forgetting lemma** at the bandwidth scale. Entry, in order (Fable B's proposal): (i) **(SGN)**, square-root run-sums of the posterior signs of Dθ over runs ≈ h; (ii) (B2) wide runs on dense good blocks; (iii) (G2) the energy of exceptional blocks | the one input that unlocks L4a, L4b and (XE) | **Fable B** (CP) | Astra | named assumption (FG), with draws data | CP |
+| T3 | **Uniformity of the fixed-pair bound on [n^{9/5}, n^{21/11}]** (LO-low → U-low): Theorem U's grid, interpolation and per-node tails, carried to the new window | turns the audited fixed-pair result into a posterior statement on that range | **Fable A** (CP) | Astra | the posterior band starts at n^{21/11} | CP |
+| T4 | **Averaged-β̄ version below n^{99/43}** (L4b / LO-low with weights fᵢ, as in `FABLE_B_averaged_beta.md` §7) | brings Gaussian 0.05/0.95 and Beta 0.95 to n^{21/11} | **Astra** (fresh eyes on Fable B's weighted machinery) | Fable B | those cells keep [n^{3/2}, n^{99/43}] as the assumed range | Codex |
+| T5 | **Clean rewrites** of LO, U, L2 (DC-G, DC-W), L4b and L7, with every audit fix written in full; U's §3 re-read against the fixed LO text | HQ: the paper version must contain the fixes | **Fable A** (LO, U, L4b, L7), **Fable B** (L2) | Astra re-reads the diffs | — | CP |
+| T6 | **(XE) / the sliver [n^{3/2}, n^{26/17}]**, only if T2 lands | completes L4b | Fable A | Astra | named assumption | CP |
+
+**Order.**
+- **Morning:** T1 and T4 on Codex in parallel; T2 and T3 on CP in parallel. T2 is the main risk and gets the strongest slot.
+- **Afternoon:** T5, then T6 if T2 lands.
+
+**What "headline proved" means.**
+- L1, L3 and L6 audited (T1).
+- L4a and L4b closed through T2 + T3 (+ T6).
+- Without T2, the paper states the **conditional A-rule theorem**: (L4a) and the remaining L4b range are named assumptions with draws data, next to the unconditional **V0T\*** (fallback F1) and **C\*** (F2).
+
+## 2. Data inputs (Engineering), all to be priced first
+
+| Item | Serves | Status |
+|---|---|---|
+| **A-rule λ draws** (A_H1 re-run with draws saved; S and VS × three designs × τ ∈ {0.05, 0.5, 0.95} × n ∈ {500, 1000, 2000, 4000}, 3 seeds) | L4a's empirical check, plus three internal diagnostics on the same draws: covariance eigenvalue vs 1/(ωf), windowed sign balance |mean − τ| ≤ 8/K³, (SGN) run-sums | to price; priority **S at τ = 0.95** (watch item) |
+| A-rule P-MALA paired test, and a joint version | Felipe's data gate for adopting the A-rule | Engineering |
+| V2 pilot, H-V2 screen re-runs | candidate ranking | running |
+
+No compute runs tonight.
+
+## 3. Secondary pieces (only if a slot frees up)
+
+| # | Piece | Prover | Auditor |
+|---|---|---|---|
+| S1 | LB around the posterior's own centre | Fable | Astra |
+| S2 | Necessity half of β ≈ 6 (β > 6 ⇒ λ drifts): would make the extreme-τ limitation a theorem; the data point that way | Astra | Fable |
+| S3 | No-floor sufficiency on the paper designs | Astra | Fable |
+| S4 | Joint small-gap levels (Theorem J's caveat) | Fable | Astra |
+| S5 | Posterior-mean corollary (old P4) | Fable | Astra |
+
+## 4. Old P-items
+
+| Item | Decision |
+|---|---|
+| P1: log-concave ⇒ (EM) for σ > σ̄ | **RETIRED**: the method lives at 0.13–0.64·σ̄ |
+| P2: uniform in σ on compacts | **DONE** (C1/C2) |
+| P3: learned λ | **DONE with a floor** (V0T\*); the floor-free version is the target |
+| P4: n^{−2/3} rate; posterior-mean corollary | rate SUPERSEDED; the corollary is S5, low tier |
+| P5: general k | **DONE** (audited) |
+| P6: n^{9/4} self-tuning | **RETIRED** (measured: n^{3/4} under constant b₀) |
+| P7: size of n₀(V) | KEPT, low tier |
+
+## 5. Budget split
+
+**Accounts:**
+- **Fable proving on CP.** Since 16:00 Felipe's handoff moved the manager threads to CP; the Fable setup is unchanged.
+- **Astra on Codex.** Today it ran 11 audits plus one co-proof.
+- **No CT or CW use** unless HQ approves. CT was used heavily today until 16:55.
+
+**Today's headroom figures** (from this morning; please confirm current values, since today's heavy use is not reflected): CT ≈ 90% of weekly used; CW ≈ 93%; CP 3 resets from 08:00; Codex 2 resets.
+
+**Tuesday load:**
+- two Fable threads on CP (T2, T3, then T5);
+- Astra on Codex: T1, T4, and audits as results land, about 4–6 tasks.
+
+**Alerting:** I alert HQ when any account passes 80% of what remains, and before using the second Codex reset.
