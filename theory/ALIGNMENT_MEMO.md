@@ -156,6 +156,29 @@ Theorem B, with uniformity in σ as in (c)(1), needs:
 
 ---
 
+## Variants the theorems cover (Felipe's clarification, 2026-11-23)
+
+**Rule.** A theorem may cover a variant of Felipe's method only if the variant:
+1. matches his sampler on paired MSE (median ratio ≤ 1.10, no cell > 1.25);
+2. satisfies the theorem's assumptions as run;
+3. has a working joint non-crossing version.
+
+Neither σ nor λ may be user-set, and they may not both be fixed. Every variant below is **UNTESTED** until Engineering's paired runs pass.
+
+| Variant | Change to his method | Theorem that covers it exactly | Rate | Status | Test needed (Engineering) |
+|---|---|---|---|---|---|
+| **V0** = his method | none | — | — | **no theorem at any rate** (λ ∝ n^{3/4} is outside every window) | — |
+| **V1** | σ ~ IG learned (unchanged); **λ fixed by a deterministic rule** λₙ = κ·n^{5/2} | **Theorem C** (PROVED, cross-audited inputs) | n^{−4/7}(log n)^{6/7} | Theorem done | **Expected to fail on data.** The oracle λ differs ~46× between S and VS (V ≈ 156 vs 7276), so one κ cannot suit both, while the learned λ adapts. Cheap to confirm: one paired run at n = 500 with κ set at the geometric middle. Pilot cost ≈ 1 core-h. |
+| **V2 (recommended)** | σ ~ IG learned (unchanged); **λ ~ Gamma(1, b₀,ₙ) with b₀,ₙ = b₀·(500/n)^{5/2}**, b₀ = 1e-3 (VS) or 5e-4 (S). **Identical to his method at n = 500.** | Needs Theorem C extended to learned λ: the joint decomposition (d3, PROVED); C1 uniform over a λ-window J above n^{23/11} (SKETCH: use T₀ = Tn³/inf J); and **joint posterior containment of λ in J — OPEN, the Tuesday crux** | n^{−4/7}(log n)^{6/7} now; n^{−5/6} with Fable's F → C2 route (CONJECTURE) | Within reach Tuesday (Fable follow-up running) | At n = 500 it is identical, so it passes trivially. Paired runs at **n = 1000 and 2000** on the paper grid against his constant-b₀ sampler (MSE bar, coverage, ESS of log λ), plus **the joint version** (per-level b₀,ₙ) at levels 0.90–0.99. Check P-MALA convergence: at n = 2000, b₀,ₙ ≈ 3e-5 (E-05 saw non-convergence only at much smaller b₀ ∝ n^{−2}). |
+| V3 | σ learned; λ from an automatic empirical-Bayes plug-in (marginal-likelihood maximiser) | Needs C1 uniform in λ plus plug-in concentration | as C | SKETCH | Only if V2 fails on data. |
+
+**Why V2 is the smallest change.**
+- It keeps the Gamma learning of λ and his priors, and it is his exact default at n = 500.
+- Only the n-scaling of b₀ changes, from constant to ∝ n^{−5/2}. Under the T-03 fixed point this moves the posterior λ from ∝ n^{3/4} (outside every window) to ∝ n^{21/8}. That is inside C1's window n^{23/11} ≪ λ ≪ n³/V.
+- Under (EM) the same schedule is already PROVED at n^{−5/6} (Astra, Opus-audited). The missing piece is the below-σ̄ version.
+
+---
+
 ## Pending inputs
 
 - Self-check of C1 (`T06_Alignment/C1_any_sigma.md`), then a cross-model audit of C1, W and S (Fable on CP from 15:15 CT).
