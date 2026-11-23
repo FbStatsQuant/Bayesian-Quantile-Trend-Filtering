@@ -153,3 +153,20 @@ Each is monotone in n eventually for the stated sequence; none is uniform as c�
 - **(WM).** 1 − e^{−c_bκ₋,ₙ} ≍ c_bc₋(log n)^{−1/2}, so −log p₀,ₙ = O(log log n) = o(nε̄²).
 
 **Scope.** The audited κ₋-free inputs are used as stated: C1, L3, L4q, L6, L10-I, Lemma S. The internals were not re-derived; the auditor should confirm κ₋ appears nowhere inside them.
+
+## Cross-family audit response (Astra, `reviews/AUDIT_astra_V0T_nfloor.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** All eight findings are CONFIRMED, and Theory rules that they **HOLD**. All three conclusions hold for (log n)^{−A} ≤ κ₋,ₙ ≤ κ̄. At κ₋,ₙ = c₋(log n)^{−1/2} the rate is n^{−5/6}(log n)^{1/3}.
+
+| # | Fix (written in full in Tuesday's clean rewrite) |
+|---|---|
+| 1 | The envelope is read eventually; any A > ½ admits the proposed schedule; fix (η₁, γ, the interior quantile) in the standalone statement |
+| 2 | L3/L4q half-radius tests verified; specify the V = 0 branch (centre 0) |
+| 3 | Frozen body at the lower endpoint: r⁴T₀ = o(1), VΛ = o(n³); radii as claimed |
+| 4 | Lemma S uses the floor in exactly two estimates, both o(n); joint propriety via V2T's flat integral |
+| 5 | The C2-mix cancellation is exact; state (N9) divided by log(2m) |
+| 6 | One Markov event per shell and endpoint; truth shift and window cost absorbed once each |
+| 7 | (WM): −log p₀,ₙ ≤ log 2 + [log(1/z)]₊. Corollary P's conditioning identity holds above n²; **transfer to the untruncated posterior is conditional on (LT) at the same floor** |
+| 8 | **Replace "each is monotone" by "each holds eventually". Delete the polynomial-floor extrapolation** (the geometric condition is κ ≫ n^{−9/22}(log n)^{12/11}; not needed) |
+
+**Status: link L7 is PROVED and cross-family audited.**
