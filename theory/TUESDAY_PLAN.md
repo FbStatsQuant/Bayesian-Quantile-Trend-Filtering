@@ -1,6 +1,6 @@
 # Tuesday 24 November: re-aimed attack plan (Theory)
 
-*Theory Department, 2026-11-23. DRAFT (14:55 CT); final by 21:00 CT. INTERNAL, for HQ.*
+*Theory Department, 2026-11-23. DRAFT v2 (after the CT Fables and the κ̂ pilot); final by 21:00 CT. INTERNAL, for HQ.*
 
 ## 0. Aim
 
@@ -27,20 +27,24 @@ If the headline does not close by Tuesday night, **F3 is the paper's A-rule stat
 
 ## 2. Hard pieces of the headline
 
-The gap map is `T06_Alignment/FABLE_A_Arule_lowertail.md` §7. Pieces G1–G5 are its numbering.
-[TO UPDATE at 16:00 with FABLE_A_three_lemmas.md and FABLE_B_Arule_gauss.md.]
+**State at 15:00 CT.**
+- **Fable A, `FABLE_A_three_lemmas.md` (a854245):** Theorem LO, the local Occam bound, is PROVED at fixed (ω, ℓ) for β < 6 and ℓ ≥ n^{99/43}·polylog. It is unaudited. It uses min_i f_i, so as proved it misses Gaussian τ = 0.05/0.95 and Beta 0.95.
+- **Fable B, `FABLE_B_Arule_gauss.md` (5fb5e67):** exact identities reduce the λ lower tail to the **sign** of κ(ℓ) = m − ℓ·E_ℓ‖Dθ‖₁ (verified by Theory).
+- **κ̂ pilot, Engineering 75ad1a4; reading in `kappa_pilot_reading.md`, 3c4562a:** the sign is positive at τ = 0.05–0.5 and lost at 0.97. This supports the averaged β < 6.
 
 | # | Piece | Prover | Auditor | Fallback if it fails | Budget |
 |---|---|---|---|---|---|
-| H0 | Audit Lemma RSB (reverse small ball) + Prop. LT-EM (lower tail in the (EM) range) | (Fable A, done) | **Astra** | none needed; RSB is short | Codex |
-| H1 | **G1: uniform quadratic remainder** on C1's localized body | Fable (CP) | Astra | the threshold degrades; keep F3 | CP |
-| H2 | **G2: sharp Laplace transform of the prior**, constant π (Weyl asymptotics of P⊥S + log det concentration) | Astra | Fable | non-sharp constant ⇒ threshold degrades like (ratio)^{−1/6}; check which paper cells survive | Codex |
-| H3 | **G3: assembly without Cauchy–Schwarz** ⇒ provable threshold β < π/0.6 ≈ 5.2 | Fable (CP) | Astra | F3 | CP |
-| H4 | **G4: intermediate tuning** ℓ₀ ≤ ℓ ≤ n^{21/11} (no localization there; no route yet) | Astra (fresh eyes) | Fable | state (E-III) on this range as an assumption (part of F3) | Codex |
-| H5 | **G5: bounded tuning (DC)** for the three paper designs: a proof, or a rigorous numerical certificate (interval arithmetic) | Fable | Astra | numerical certificate only, stated as such | CP + Engineering compute |
-| H6 | V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}, re-derived line by line | Fable | Astra | rate loses a further log | CP |
+| H0 | **Audit Theorem LO** (Lemmas 1, 2a–c, 3). Lemma F′ and Lev are audited first; they are queued from Theorem H | (Fable A, done) | **Astra** | F3 (conditional theorem) | Codex |
+| H1 | Audit Lemma RSB + Prop. LT-EM (`FABLE_A_Arule_lowertail.md`) | (Fable A, done) | Astra | none needed | Codex |
+| H2 | **Uniformity of LO** in ω on a compact and in ℓ on [n^{99/43}, c₋n^{5/2}]: scalar grid + nested bodies (SKETCH in §5) | Fable (CP) | Astra | the rate keeps an extra K_n factor | CP |
+| H3 | **Averaged condition**: Lemma 2b with position-dependent fᵢ, so that β is the design average, not the worst case. This brings in Gaussian τ = 0.05/0.95 and Beta 0.95; the pilot says the sign holds there | Fable (CP) | Astra | the headline covers τ ∈ [0.25, 0.9] on all designs, plus the cells with worst-case β < 6 | CP |
+| H4 | **G4: intermediate tuning**, a large constant ≤ ℓ ≤ n^{99/43}. Lemma 1 has no localization there. New angle from Fable B: only κ(ℓ) ≥ 0 is needed there, not a size; try a direct sign argument on κ through (I3) | Astra (fresh eyes) | Fable | state (E-III) on this range as an assumption with the κ̂ data as support (F3) | Codex |
+| H5 | **G5: bounded tuning (DC)** for the three paper designs: a proof or a rigorous interval-arithmetic certificate | Fable | Astra | numerical certificate only, stated as such | CP + Engineering |
+| H6 | V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}, line by line (the A-rule's plug-in) | Astra | Fable | the rate loses a further log | Codex |
 
-**Order.** H0 and H6 first; they are cheap and certain. Then H1–H3 in parallel, then H4 and H5. H4 is the main risk: today it has no route.
+**Order.** H0, H1 and H6 first: audits and a routine re-derivation. Then H2 and H3 in parallel. H4 is the main risk and gets the fresh-eyes Astra slot from mid-morning. H5 runs alongside, with Engineering compute for the certificate.
+
+**What "headline proved" would mean.** H0 + H2 + H3 + H6, with H4 and H5 either proved or stated as named assumptions with data. Without H4/H5 the headline is the conditional theorem F3 with a smaller assumption: only the range below n^{2.30}.
 
 ## 3. Secondary pieces (each serves the headline or the paper's statement)
 
@@ -50,7 +54,7 @@ The gap map is `T06_Alignment/FABLE_A_Arule_lowertail.md` §7. Pieces G1–G5 ar
 | S2 | Fixed-M Bousquet version of Theorem H | cleaner constant for the plug-in | Astra | Fable |
 | S3 | No-floor sufficiency: does σ₀ < 2τ(1−τ)R suffice at bounded tuning for smooth designs? | feeds H5 | Astra | Fable |
 | S4 | Joint small-gap item (levels whose true quantiles nearly touch) | Theorem J's caveat | Fable | Astra |
-| S5 | Necessity half of β_c (β > 6 ⇒ λ drifts) | makes the extreme-τ limitation a theorem, not a caveat | Astra | Fable |
+| S5 | Necessity half of β_c (β > 6 ⇒ evidence grows ⇒ λ drifts); Fable A §5 says it needs only Lemma 1's two-sided form plus Jensen | makes the extreme-τ limitation a theorem, not a caveat; the κ̂ data at 0.97 already point that way | Astra | Fable |
 
 ## 4. Old P-items: kept or retired
 
