@@ -1,6 +1,6 @@
 # Lemma L3: centred small-ball bound for the Laplace difference prior
 
-**Status:** draft, second read done (2026-11-22). Three small fixes are listed at the end. Self-check sign-off waits only on Engineering's run of `checks/l3_singular_values.py` (owls_run refused for budget).
+**Status:** self-checked (2026-11-22). Second read done, with the fixes listed at the end; Astra's and the VP's L3 points from their final reviews of v3 are applied. The numerical check `checks/l3_singular_values.py` **passed** (Engineering, NOTS job 2857810, HEAD 97a04c2): see "Numerically checkable claims". Ready for the advisor check.
 **Depends on:** standard facts only: the Gaussian scale-mixture representation of the Laplace law, Anderson's theorem, singular values of the cumulative-sum matrix, and Horn's (Ky Fan's) product inequality.
 **Used by:** L6 (prior mass) and L4q (condition (C)).
 
@@ -15,11 +15,11 @@ Notation as in L4q:
 
 There is an absolute constant C such that, for all n ≥ 5 (so m ≥ 2), λ > 0, and ε > 0,
 
-  φ(ε) ≤ C · x^{2/5} · (log m)^{1/5} · log(e + x log m)  +  2,  where x := n^{5/2}/(λε).
+  φ(ε) ≤ 30 · x^{2/5} · (log m)^{1/5}  +  6,  where x := n^{5/2}/(λε).
 
 The relevant range is x ≥ 1, i.e. ε ≤ n^{5/2}/λ, but the bound holds for all ε.
 
-**In words.** φ(ε) ≲ (n^{5/2}/(λε))^{2/5} up to a (log n)^{6/5} factor. This is the exponent verified numerically in T-03 (the twice-integrated-walk law), with a polylog loss. That loss is absorbed by the (log n)^c in Theorem A.
+**In words.** φ(ε) ≲ (n^{5/2}/(λε))^{2/5} up to a (log n)^{1/5} factor. This is the exponent verified numerically in T-03 (the twice-integrated-walk law), with a polylog loss. That loss is absorbed by the (log n)^c in Theorem A.
 
 ## Proof
 
@@ -54,25 +54,34 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
 
   P(Σ_{r≤K} b r^{−6}ξ_r² ≤ ε²/2) ≥ ∏_{r≤K} P(ξ_r² ≤ ε²r⁶/(2Kb)) = ∏_{r≤K} P(|ξ| ≤ t_r),  with t_r := εr³/√(2Kb).
 
-  Use P(|ξ| ≤ t) ≥ 2φ(1)·min(t, 1) ≥ 0.48·min(t, 1). From K⁵ ≥ 8b/(5ε²) we get 2Kb ≤ (5/4)ε²K⁶, so t_r ≥ t₁ = ε/√(2Kb) ≥ 0.894·K^{−3}. Hence log P(head) ≥ K·log(0.48·0.894·K^{−3}) = −K(0.85 + 3 log K).
+  Use P(|ξ| ≤ t) ≥ 2φ(1)·min(t, 1) ≥ 0.48·min(t, 1). From K⁵ ≥ 8b/(5ε²) we get 2Kb ≤ (5/4)ε²K⁶, so t_r ≥ t₁ = ε/√(2Kb) ≥ 0.894·K^{−3}. Since t_r ≥ t₁r³ ≥ 0.894(r/K)³, keeping the full product (instead of bounding every factor by the worst one) gives
+
+  log P(head) ≥ Σ_{r≤K} log(0.429·(r/K)³) = K log 0.429 + 3 log(K!/K^K) ≥ −0.85K − 3K = −3.85K,
+
+  using K! ≥ (K/e)^K. **No log K factor appears.**
 - **Combining.** The head and tail are independent, so
 
-  −log γ_{v₀}(B_ε) ≤ log(4/3) + K(0.85 + 3 log K),  with K ≤ 1 + (8b/(5ε²))^{1/5} = 1 + (1.6·91.1²·2 log m)^{1/5}·x^{2/5} ≤ 1 + 7.7(log m)^{1/5}x^{2/5}.
+  −log γ_{v₀}(B_ε) ≤ log(4/3) + 3.85K,  with K ≤ 1 + (8b/(5ε²))^{1/5} = 1 + (1.6·91.1²·2 log m)^{1/5}·x^{2/5} ≤ 1 + 7.7(log m)^{1/5}x^{2/5}.
 
-**Step 7 (assembly).** Since log K ≤ log(8.7) + (2/5)log(e + x) + (1/5)log log m ≤ C log(e + x log m), we get φ(ε) ≤ log 4 + log(4/3) + C·x^{2/5}(log m)^{1/5}·log(e + x log m), and log 4 + log(4/3) ≤ 1.68 ≤ 2. (K ≥ 1 always, because of the ceiling.) ∎
+**Step 7 (assembly).** φ(ε) ≤ log 4 + log(4/3) + 3.85·(1 + 7.7(log m)^{1/5}x^{2/5}) ≤ 30·x^{2/5}(log m)^{1/5} + 6. (K ≥ 1 always, because of the ceiling.) ∎
 
 ## Remarks
 
-- **Sharpness.** The exponent 2/5 is sharp (lower-bound direction): the T-03 numerics showed the local slope tending to 0.404. Only the polylog is lost. It comes from truncating V at the 2 log m/λ² level and from the crude head bound. A Laplace-specific small-deviation argument could remove it, but that is not needed.
+- **Sharpness.** The exponent 2/5 is sharp (lower-bound direction): the T-03 numerics showed the local slope tending to 0.404. Only the factor (log m)^{1/5} is lost. It comes from truncating V at the 2 log m/λ² level. A Laplace-specific small-deviation argument could remove it, but that is not needed.
 - **This resolves the T-04 caveat.** Weighted-i.i.d. small-deviation results did not apply because the singular basis destroys independence. Conditioning on V restores Gaussianity, and Anderson's theorem dominates the non-identical variances by v₀I. **No Laplace small-deviation theory is needed.**
-- **Effect on L4q's condition (C).** Inserting L3, (C) holds once (λε)^{7/5} ≥ C·n²·(log n)^{6/5}. At the oracle tuning λε ≍ n^{25/12}, which is comfortably enough.
+- **Effect on L4q's condition (C).** Inserting L3, (C) holds once λε ≥ 51·n^{10/7}(log m)^{1/7} (L4q, R1). At the oracle tuning λε ≍ n^{25/12}, which is comfortably enough.
 
 ## Numerically checkable claims
 
 `checks/l3_singular_values.py`:
 1. the exact singular values of C_N;
 2. DS = I;
-3. σ_r(A) ≤ 91.1·n^{5/2}r^{−3}. This bound is loose; the true ratio σ₁/(n^{5/2}) is about 0.03.
+3. σ_r(A) ≤ 91.1·n^{5/2}r^{−3}.
+
+**Result (NOTS job 2857810, single thread):**
+- the singular values of C_N match the closed form to ≤ 4.0e-15 (N = 5, 50, 400);
+- ‖DS − I‖_max = 0 exactly (n = 50, 300, 1200);
+- max_r σ_r(A)/(n^{5/2}r^{−3}) = 0.104, 0.121 and 0.124 at n = 50, 300 and 1200, against the bound 91.1. The bound is loose by a factor of about 730, and the ratio at r = 1 is 0.0040.
 
 ## Second read (2026-11-22): fixes
 
@@ -81,3 +90,4 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
 3. **Constants made explicit** in Steps 6–7: t₁ ≥ 0.894K^{−3}, head cost K(0.85 + 3 log K), and K ≤ 1 + 7.7(log m)^{1/5}x^{2/5}. Step 5 needs only pointwise monotonicity.
 
 All other steps were re-verified: the scale-mixture rate λ²/2, Anderson's direction, (1 − 1/m)^m ≥ 1/4, the singular values of C_N (tridiagonal (C⁻¹)ᵀC⁻¹ with last diagonal entry 1), sin x ≥ 2x/π on the relevant range, interlacing for column deletion, the tail integral 1/(5K⁵), and Markov's inequality.
+4. **Head bound with the full product** (suggested independently by Astra and by the VP in their final reviews of v3). Keeping ∏(r/K)³ = (K!/K^K)³ ≥ e^{−3K} removes the log K factor. The bound becomes φ(ε) ≤ 30x^{2/5}(log m)^{1/5} + 6, with explicit constants and a loss of only (log m)^{1/5}. This supersedes fix 2's log(e + x log m).

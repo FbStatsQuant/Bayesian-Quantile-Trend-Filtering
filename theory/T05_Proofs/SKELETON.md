@@ -66,7 +66,7 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 |---|---|---|
 | L1 basis | coordinates | trivial (verified numerically, T-03) |
 | L2 excess risk | margins, C₁ | **advisor-checked** (Astra: accept with fixes; fixes applied) |
-| L3 small ball | φ(ε) bound | **draft, second read done** (awaiting the numerical check): proved up to a (log n)^{6/5} factor via the Gaussian scale mixture + Anderson + singular values of C³ (no Laplace small-deviation theory needed) |
+| L3 small ball | φ(ε) bound | **self-checked** (numerical check passed, NOTS 2857810): φ(ε) ≤ 30x^{2/5}(log m)^{1/5} + 6 via the Gaussian scale mixture + Anderson + singular values of C³ (no Laplace small-deviation theory needed); awaiting the advisor check |
 | L4 ℓ₁ shift | fallback prior mass | **advisor-checked** (Astra: accept) |
 | L4q quadratic shift | primary prior mass | **self-checked** (Fable adversarial check: correct with fixable gaps, all fixed); awaiting advisor check |
 | L4q-M mollification | bias term | **self-checked** (signed order-3 kernel; proof in L4q file) |
