@@ -12,11 +12,11 @@
 |---|---|---|
 | 1 | **Evidence upper bound.** At any σ in a compact [l, H₀], the evidence of {λ < Λ} relative to the good-set denominator is ≤ [P_prior(λ < Λ)/p_w]·exp{C₂n + O(nε̄²)}, C₂ = (B + 1)/l. So the needed suppression is **e^{−C₂n}**, linear in n | PROVED (§2) |
 | 2 | Inside C1's window the same ratio is ≤ exp{C·n·r_ℓ²} = exp{C·n^{8/7}ℓ^{−2/7}·polylog}, sub-exponential | PROVED from C1's cones (§2.3) |
-| 3 | **Is c₀ ≤ 0 under σ₀ < 2τ(1−τ)R with margin? Not shown, and I expect no.** That condition only rules out the full-interpolation corner (σ → 0, λ ≈ 1/R). For λ between polylog(n) and n^{5/2} the sign is that of 6 − σ̄/σ₀ (proxy), which is negative for the paper's Gaussian and Beta designs at τ ≤ 0.05 and τ ≥ 0.95 | corner: PROVED (§2.4); sign elsewhere: CONJECTURE |
-| 4 | **Soft-floor theorem.** a_n = A·n with A > 2/5 and b_n = a_n/(κn^{5/2}) (mean κn^{5/2}): all three conclusions of V0T\* hold with no floor, rate n^{−5/6}(log n)^{1/6} | PROVED by assembly (§3), given two one-line extensions of audited steps, written in §3.2 |
+| 3 | **Is c₀ ≤ 0 under σ₀ < 2τ(1−τ)R with margin? Not shown, and I expect no.** That condition only rules out the full-interpolation corner (σ → 0, λ ≈ 1/R). For λ between polylog(n) and n^{5/2} the sign is that of 6 − σ̄/σ₀ (proxy), which is negative for the paper's Gaussian and Beta designs at τ ≤ 0.05 and τ ≥ 0.95 | corner: PROVED in skeleton (§2.4; the denominator is that of Proposition R, unaudited); sign elsewhere: CONJECTURE |
+| 4 | **Soft-floor theorem.** a_n = A·n (any A > 0) and b_n = a_n/(κn^{5/2}) (mean κn^{5/2}): all three conclusions of V0T\* hold with no floor, rate n^{−5/6}(log n)^{1/6} | PROVED by assembly (§3), given two short extensions of audited steps, written in §3.2 |
 | 5 | **Threshold.** Class-wide, a_n ≥ C·n/log n is sufficient (C large) and a_n ≤ c·n/log n is fatal (c small): below it Astra's law defeats the method for every polynomial mean | necessity: PROVED by substitution (§4); sufficiency for C·n/log n: SKETCH |
 | 6 | **Adaptivity is lost.** Any shape that passes the threshold has relative prior s.d. ≤ (log n/n)^{1/2}, while the evidence moves by only e^{±O(n^{1/6})} across the oracle scale. The posterior of λ is pinned at the prior mean: the method becomes "deterministic λ = κn^{5/2}" | lower pin: SKETCH; upper bound λ ≤ (1+η)(m + a_n)/b_n: PROVED (§5) |
-| 7 | **Felipe's a = n, b = 1 is not covered, and cannot be.** No interpolation, but λ is pinned in [n/K, 2.1n], far below n^{21/11}; by Theorem LB its posterior is no faster than c·n^{−1/3} | pinning: PROVED given σ-containment (§6); rate floor: PROVED at fixed σ given `FABLE_B_lowerbound.md` (unaudited) |
+| 7 | **Felipe's a = n, b = 1 is not covered, and cannot be.** No interpolation, but λ is pinned in [n/K, 2.1n], far below n^{21/11}; by Theorem LB its posterior is no faster than c·n^{−1/3} | pinning: PROVED (§6); rate floor: PROVED given `FABLE_B_lowerbound.md` (unaudited) |
 | 8 | Same family, right scale: **a = n, b_n = n^{−3/2}/κ**, i.e. b_n = b₅₀₀·(500/n)^{3/2} | covered by item 4 (A = 1) |
 | 9 | b_n ≍ b₀(500/n)^{5/2} with fixed shape: not rescued by any choice of b₀ | PROVED (audited no-floor scope) |
 
@@ -126,7 +126,7 @@ The other steps of S §2 (upper tail; {s < l, Q ≥ qn}) use only that the u-pri
 
 ### 3.3 How weak can the shape be?
 
-- **a_n·log n/n → ∞** (for instance n/√(log n)): Lemma SF1 gives Π(λ < μ_n·n^{−γ_n} | y) → 0 with γ_n → 0 — PROVED from §2.2 given σ-containment in the volume form (SKETCH). The floor is then n^{5/2−o(1)}, inside C1's window; reaching the exact rate needs the slab refinement (SKETCH).
+- **a_n·log n/n → ∞** (for instance n/√(log n)): Lemma SF1 gives Π(λ < μ_n·n^{−γ_n} | y) → 0 with γ_n → 0 — PROVED from §2.2, with σ-containment by (G2). The floor is then n^{5/2−o(1)}, inside C1's window; reaching the exact rate needs the slab refinement (SKETCH).
 - **a_n = C·n/log n:** works for C larger than (22/13)(C₂ + 1) with W′, (22/9)(C₂ + 1) with audited W (the first-pass floor μ_n·n^{−(C₂+1)/C} must stay inside C1's window) — SKETCH.
 - **a_n ≤ c·n/log n, c small:** fails class-wide (§4).
 
@@ -160,7 +160,7 @@ So the threshold n/log n of §3.3 is sharp up to the constant. With an n-depende
 - **No interpolation, σ contained — PROVED by (G2).** The condition a_n·log(n/b_n) ≥ C′n reads n log n ≥ C′n: true. So σ ∈ [l, H₀] and Q(θ) ≥ qn with posterior mass → 1, and §4's obstruction does not apply. (The audited S §2 route would not suffice here: P_p(λ < C log n) = e^{−n log n(1−o(1))} is the boundary case against the IG moment e^{n log n + O(n)}. The volume form is what settles it.)
 - **λ is pinned at order n.**
   - Upper: λ | θ ≤_st Gamma(m + n, 1), so Π(λ > 2.1n | y) ≤ e^{−cn} for every data vector — PROVED.
-  - Lower: Lemma SF1 with a_n·I(K) = n·I(K) ≥ (C₂ + η)n + log 4, i.e. Π(λ < n/K | y) → 0 for K = exp{2 + C₂ + η} — PROVED given σ-containment.
+  - Lower: Lemma SF1 with a_n·I(K) = n·I(K) ≥ (C₂ + η)n + log 4, i.e. Π(λ < n/K | y) → 0 for K = exp{2 + C₂ + η} — PROVED, with σ-containment by (G2). The denominator window is [n/2, n] with the L4 centre u_h = u\* (shift cost ≤ 2nV/n² → 0; L4q's hypothesis (R1) fails at ℓ ≍ n and is not used); its cost is e^{−O(n^{2/3}(log n)^{1/6})} = e^{−o(n)}.
 - **Not covered.** λ ≍ n is below every window: C1 needs n^{21/11} (W′) or n^{23/11} (audited). No upper rate is proved at λ ≍ n for σ below σ̄; Theorem H (SKETCH) would give a Huber rate n^{−2/7}·polylog.
 - **Cannot reach n^{−5/6}.** By Theorem LB (`FABLE_B_lowerbound.md`) on {λ ≤ 2.1n}: Π(Δ²ₙ(θ − θ\*) ≤ c₀(2.1n)^{−1/3} | y) → 0. So the posterior is **no faster than n^{−1/3}**, whatever the truth, quadratic truths included. Status: PROVED at fixed σ modulo the audit of that note; with σ learned it also needs the σ-containment above.
 - **The fix inside Felipe's family.** Keep a = n and scale the rate: **b_n = n^{−3/2}/κ**, mean κn^{5/2}. This is Theorem SF with A = 1. In the paper's normalization: b_n = b₅₀₀·(500/n)^{3/2}, with b₅₀₀ = 500^{−3/2}/κ = 8.9·10⁻⁵/κ. For κ = 1/V: b₅₀₀ ≈ 0.014 (S, V ≈ 156) and ≈ 0.65 (VS, V ≈ 7276). Felipe's b = 1 at n = 500 corresponds to κ = 8.9·10⁻⁵, i.e. mean 500, close to the VS oracle (≈ 768) but 70× below the S oracle (≈ 3.6·10⁴).
