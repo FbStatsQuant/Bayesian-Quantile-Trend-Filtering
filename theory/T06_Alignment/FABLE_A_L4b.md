@@ -348,3 +348,31 @@ By T1, a coordinate with |δᵢ| > L sits in a peak above L/2 of width ≲ ℓ^{
 **Ruling: HOLDS.** This is the key new tool. It removes the need for sup-norm localization in the remainder.
 
 **Not checked:** the precision-side sandwich (§3), Lemma LK's unnamed constant (§4.2), and Theorem H-sharp (§4.6). An Astra audit is requested, in Fable A's suggested order.
+
+## Cross-family audit response (Astra, `reviews/AUDIT_astra_L4b.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** All eleven findings are CONFIRMED, and Theory rules that they **HOLD**.
+
+**What is now established (audited):**
+- **Fixed-pair LO (β < 6), unconditional.** It holds for ℓ ≥ n^{9/5}, up to logs, at a fixed inverse scale with a strict common lower-secant margin.
+- **Conditional extension.** Under (SN) or (XS) it extends down to n^{26/17}, up to logs.
+- **Uniform U / U-σ (the posterior band statement).** These now hold down to **n^{21/11}** (with W′) up to logs, improved from n^{99/43}. **Below n^{21/11} only the fixed-pair result holds.** The posterior band exclusion on [n^{9/5}, n^{21/11}] is therefore still open.
+- **Lemma CA** holds as stated. **Lemma LK** holds with C₀ = 36, C_LK = 256.
+
+**Fixes (applied by reference; written in full in Tuesday's clean rewrite):**
+- **H-sharp is narrowed (finding 8).** It is valid for ℓ/[K⁶(log n)^{27/2}] → ∞, ℓ ≤ n²; the claim "throughout Theorem H's range" is OPEN. This does not affect any polynomial window.
+- **Findings 1–7, 9 and 10:** specifications of constants and quantifiers.
+  - The sup-norm consequence holds for ℓ/[n^{9/5}(log n)^{1/5}] → ∞.
+  - Use C1's numerator cones in the uniform substitution.
+- **Finding 11:** the plateau claim (§5.2) needs a template-count condition, g ≥ 2 log(C(n/w + 1)). It does not enter the Occam proof.
+
+**Status of L4b after the audit:**
+
+| Range | Fixed-pair Occam bound | Posterior band exclusion |
+|---|---|---|
+| [n^{21/11}, n^{99/43}] | AUDITED | **AUDITED (uniform U / U-σ)** |
+| [n^{9/5}, n^{21/11}] | AUDITED | OPEN (uniformity) |
+| [n^{26/17}, n^{9/5}] | AUDITED conditional on (SN)/(XS) | OPEN |
+| [n^{3/2}, n^{26/17}] | SKETCH | OPEN |
+
+All rows are in the min-density version; the averaged-β̄ version is still to be done.
