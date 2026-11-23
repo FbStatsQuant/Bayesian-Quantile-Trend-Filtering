@@ -52,3 +52,13 @@ Theory has not verified any of these. Writing did not try to verify them either.
 - P7. Fable F10: n₀(V) ≈ 10⁶ (S), 10⁸ (VS).
 
 Not listed: Astra's "(EM) infimum exactly τ(1−τ)/d", a refinement of the necessity statement already in the document.
+
+## Part 2: σ section (Felipe approved the plan)
+
+The Target 3 subsection is replaced by §4.5 "The scale σ", with four parts: (1) default; (2) what is proved; (3) paired simulations; (4) planned targets. There is a new Targets box (Tier 1–3), a summary row "B, uniform in σ" marked pending, D2 and D4 updated, and Target 3's rates marked pending.
+
+- **(EM) is monotone in σ** (Fable F3, first bullet). Checked by Writing; it holds. By Jensen, E e^{−X/σ′} ≤ (E e^{−X/σ})^{σ/σ′}. So Theorem B holds at every fixed σ above any σ₁ where (EM) holds. This is used as a proved one-line fact.
+- **The range "σ ≥ σ̄/(1−η)" is the (A4) form, but B needs (EM).** For the paper's families, the proved range is "above the Proposition 2 threshold". Starting it at σ̄/(1−η) needs P1 (log-concave ⇒ (EM) for σ > σ̄). It is marked pending.
+- **Uniform in σ over an interval** (Fable F3, other bullets): PENDING THEORY VERIFICATION, as instructed.
+- **Astra option (e)** is the Target 3 route. Step (i) must work below σ̄, so it rests on Target 1, not on P2.
+- **Astra "E-02 0.97–1.01"**: the E-02 σ check is kept, worded as a numerical check that presupposes nothing about contraction.

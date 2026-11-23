@@ -489,25 +489,31 @@ uniformly over the class, with $V$ unknown to the prior.
 \plainly{The method chooses its own smoothing level and still attains $n^{-3/4}$ over the whole bounded-variation class, without knowing $V$, provided the hyperprior on $\lambda$ is chosen as in (H1) or (H2).}
 
 %---------------------------------------------------------------------
-\subsection{\texorpdfstring{Target 3: learned $\sigma$ \quad \stPROPOSED}{Target 3: learned sigma [PROPOSED]}}
+\subsection{\texorpdfstring{The scale $\sigma$: default, what is proved, what is shown, what is planned}{The scale sigma: default, proved, shown, planned}}
+\label{sec:sigma}
 
-$\sigma\sim\mathrm{IG}(a_\sigma,b_\sigma)$ with fixed hyperparameters. In version 3a $\lambda$ is fixed at the oracle $n^{5/2}/V$ (regime (ii)); in version 3b $\lambda$ is learned as in Target~2 (regime (iv), the method as run).
+\noindent\textbf{1. The paper's default.} The paper learns $\sigma$ with $\sigma\sim\mathrm{IG}(a_\sigma,b_\sigma)$, and that default stays. Its learned scale sits near $\sigma_{0,n}=n^{-1}\sum_i\E\rho_\tau(\varepsilon_i-q_i)$, the minimiser of $\log\sigma+\sigma_{0,n}/\sigma$. For all three of the paper's noise families $\sigma_0<\sbar$ at every $\tau$ (Proposition~\ref{prop:logconcave}; Tables~\ref{tab:simnoise} and~\ref{tab:simjoint}, up to $R\approx21$ at $\tau=0.99$). So no current theorem covers the learned-$\sigma$ posterior.
+
+\medskip\noindent\textbf{2. What is proved now: Theorem B at a fixed $\sigma$ in a range.}
+(EM) is monotone in $\sigma$. If it holds at $\sigma_1$ with constant $b$, it holds at every $\sigma\ge\sigma_1$ with the same $b$: by Jensen, $\E e^{-X/\sigma}\le(\E e^{-X/\sigma_1})^{\sigma_1/\sigma}\le e^{-(b/\sigma)\min(\delta^2,|\delta|)}$. Hence Theorem B holds at \emph{every} fixed $\sigma\ge\sigma_1$, with $M$ as in the theorem at that $\sigma$. For the paper's three families, Proposition~2 gives (EM) for all $\sigma$ above an explicit, possibly large, threshold (each family has an exponential moment and satisfies (A2)). That the range starts at $\sbar/(1-\eta)$, the (A4) form, needs P1 (log-concave $\Rightarrow$ (EM) for every $\sigma>\sbar$) and is \textcolor{progress}{\textbf{pending Theory verification}}. On this range the result covers a plug-in $\sigma$ fixed in advance, as in the E-06 design ($\sigma=1.1\sbar$).
+
+\noindent\textit{Uniform in $\sigma$ over an interval} \textcolor{progress}{\textbf{(PENDING THEORY VERIFICATION, Tuesday morning)}}. The claim (P2) is $\sup_P\E_P\sup_{\sigma\in[\sigma_{\mathrm{lo}},\sigma_{\mathrm{hi}}]}\Pi_{n,\sigma}(\Delta_n^2>M\varepsilon_n^2\mid y)\to0$ for a compact interval inside the range, with $M$ depending on the interval. If it holds, it covers a data-chosen plug-in $\sigma$ in the interval, and a $\sigma$ prior truncated to it, because the $\theta$-marginal is then a mixture of the $\Pi_{n,\sigma}$. Not claimed until Theory checks it.
+
+\medskip\noindent\textbf{3. What the paper shows empirically: paired simulations.} The same fits are run at a covered $\sigma$ and at the learned scale $\sigma_0$, on the same data. Holding the product $\Lambda=\lambda\sigma$ fixed keeps the posterior mode unchanged, so the two arms differ only in posterior spread, and the comparison measures how much the results depend on $\sigma$. E-06 already runs this design ($\sigma=1.1\sbar$ against $\sigma_0$; $n$ from $10^3$ to $3.2\times10^4$; five homoscedastic laws). A paired run on the paper's own noise families would link it to the paper's tables. These are finite-$n$ comparisons, not proofs. The E-02 posterior mean of $\sigma$ was within 3\% of $\sigma_0$; this is a numerical check of where the learned scale sits, and it presupposes nothing about contraction.
+
+\medskip\noindent\textbf{4. Planned results (targets; no claims).}
+\begin{itemize}
+\item \emph{Target 1 (A$^+$), any fixed $\sigma$:} see above. It would cover a fixed $\sigma=\sigma_0$, not a learned one.
+\item \emph{Target 3, learned $\sigma$ with the IG prior unchanged.} Route (Astra, option e) in two steps. (i) A local uniform theorem on a compact neighbourhood $I$ of $\sigma_{0,n}$ at fixed oracle $\lambda$: $\E\sup_{\sigma\in I}\Pi_{n,\sigma}(\text{bad}\mid y)\to0$. This must work \emph{below} $\sbar$, so it rests on Target~1. (ii) Scale mixing: $\E\,\Post(\sigma\notin I\mid y)\to0$, using $\sigma\mid\theta,y\sim\mathrm{IG}(n+a_\sigma,\,b_\sigma+Q(\theta))$ and (M). The two bounds add up to a bound for the hierarchical posterior. Version 3a fixes $\lambda$ (regime (ii)); version 3b also learns $\lambda$ (regime (iv), the method as run).
+\end{itemize}
 
 \begin{named}{Target 3 (proposed)}
-Assume (A1)--(A3) and (M). Then the posterior of $\sigma$ concentrates around $\sigma_{0,n}$, and
-\[
-\sup_{P}\ \E_P\,\Post\big(\Delta_n^2(\theta,\theta^*)>M\varepsilon_n^2\,\big|\,y\big)\to0,
-\]
-with, in version 3a, the A$^+$ rate at $\sigma=\sigma_{0,n}$:
-\[
-\varepsilon_n^2 = (\log n)^c\,(\sigma_{0,n}/f)^{5/6}\,\big(1\vee\sbar/\sigma_{0,n}\big)\,V^{1/3}\,n^{-5/6},
-\]
-and, in version 3b, the Target~2 rate $C(\log n)^cV^{1/4}n^{-3/4}$.
+Assume (A1)--(A3) and (M). Then the posterior of $\sigma$ concentrates around $\sigma_{0,n}$, and $\sup_P\E_P\,\Post(\Delta_n^2>M\varepsilon_n^2\mid y)\to0$. Rates (\textcolor{progress}{\textbf{pending}}; not verified by Theory): in 3a, the A$^+$ rate at $\sigma=\sigma_{0,n}$, $\varepsilon_n^2=(\log n)^c(\sigma_{0,n}/f)^{5/6}(1\vee\sbar/\sigma_{0,n})V^{1/3}n^{-5/6}$; in 3b, the Target~2 rate.
 \end{named}
 
-\noindent\textit{Remarks.} (a) Since $\sigma_0<\sbar$ for every law in Table~\ref{tab:noise} ($R\ge1$), Target~3 builds on Target~1 (A$^+$), not on Theorem A. Through Theorem A it could reach only laws with $R<1-\eta$ (noise sharply peaked at the quantile). (b) Cauchy noise is excluded by (M). (c) In E-02 the posterior mean of $\sigma$ was within 3\% of $\sigma_0$.
+\noindent\textit{Remarks.} (a) Through Theorem A, Target~3 could reach only laws with $R<1-\eta$; the paper's families all have $R>1$, so it builds on Target~1. (b) Cauchy noise is excluded by (M). (c) Step (i) is not a corollary of the pending uniform-in-$\sigma$ result in point~2, because $I$ lies below $\sbar$.
 
-\plainly{Learning the ALD scale, as the paper does, costs nothing in rate as long as the noise has a finite mean; the learned scale converges to the average check loss at the truth.}
+\plainly{Today the paper's learned $\sigma$ is outside every theorem. What is proved is the rate at a fixed, deliberately large $\sigma$. The simulations show how much the fits change between that $\sigma$ and the learned one. Covering the learned $\sigma$ itself is Target~3, which needs Target~1 first.}
 
 %---------------------------------------------------------------------
 \subsection{\texorpdfstring{Target 6: general order $k$ \quad \stPROPOSED}{Target 6: general order k [PROPOSED]}}
@@ -541,7 +547,8 @@ Theorem B & (A1), (A2$^\uparrow$), (A3), (EM); $\lambda,\sigma$ fixed & $(\log n
 Theorem A & (A1)--(A4); $\lambda,\sigma$ fixed & $(\log n)^c(\sigma/f)^{5/6}V^{1/3}n^{-5/6}$ (oracle); $\varepsilon^2(\lambda)$ on $\Lambda_n$; also in $\norm{\cdot}_n^2$ & \textcolor{progress}{\textbf{In progress}}: one step open (sup-norm localization) \\[2pt]
 Target 1 (A$^+$) & (A1)--(A3); any fixed $\sigma$ & as A, spread term $\times(1\vee\sbar/\sigma)$ & \textcolor{target}{\textbf{Target}}; plan only \\[2pt]
 Target 2 & as B or A; $\lambda\sim$ (H1) or (H2) & $(\log n)^cV^{1/4}n^{-3/4}$, $V$ unknown & \textcolor{proposed}{\textbf{Proposed}} \\[2pt]
-Target 3 & (A1)--(A3), (M); $\sigma\sim\mathrm{IG}$ & A$^+$ rate at $\sigma_0$ (3a); $n^{-3/4}$ (3b) & \textcolor{proposed}{\textbf{Proposed}}; needs Target 1 \\[2pt]
+B, uniform in $\sigma$ & as B, $\sigma\in[\sigma_{\mathrm{lo}},\sigma_{\mathrm{hi}}]$ in the (EM) range & as B & \textcolor{progress}{\textbf{Pending Theory verification}} (P2) \\[2pt]
+Target 3 & (A1)--(A3), (M); $\sigma\sim\mathrm{IG}$ & A$^+$ rate at $\sigma_0$ (3a); Target 2 rate (3b); both pending & \textcolor{proposed}{\textbf{Proposed}}; needs Target 1 \\[2pt]
 Target 6 & (A1), (A2), (A3$_k$), (A4) or (EM) & $n^{-r_k}$, $r_k$ to be derived; $r_2=5/6$ & \textcolor{proposed}{\textbf{Proposed}} \\
 \bottomrule
 \end{tabular}
@@ -554,11 +561,22 @@ Target 6 & (A1), (A2), (A3$_k$), (A4) or (EM) & $n^{-r_k}$, $r_k$ to be derived;
 %=====================================================================
 \vspace{1em}
 \noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Targets: priorities for Tuesday 24 November (approved by Felipe)}\\[2pt]
+Every rate and condition below is \textcolor{progress}{\textbf{pending Theory verification}} unless it is already in Theorem B.
+\begin{enumerate}[leftmargin=*, label=\textbf{Tier \arabic*.}]
+\item (a) Learned $\lambda$ under $\mathrm{Gamma}(a_0,c\,n^{-5/2})$, aiming at $n^{-5/6}$ with $V$ unknown (P3). (b) Theorem B uniform in $\sigma$ over a compact interval (P2). (c) Theorem B for general $k$, exponent $r_k=(2k+1)/(2k+2)$ at $\lambda_{k,n}\asymp n^{k+1/2}/V$ (P5).
+\item Theorem A for general $k$ (Target~6, moment-free version).
+\item Target~1 (A$^+$, any fixed $\sigma$) and Target~3 (learned $\sigma$).
+\end{enumerate}
+\end{minipage}}
+
+\vspace{1em}
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
 \textbf{Pending Theory verification (proposed by the reviewers; not results of this note)}\\[2pt]
-Each item has a short derivation in \texttt{writing/W01\_Statements/reviews/}. None has been checked by Theory. None is used above.
+Each item has a short derivation in \texttt{writing/W01\_Statements/reviews/}. None has been checked by Theory. None is used as a result above.
 \begin{enumerate}[leftmargin=*, label=\textbf{P\arabic*.}]
 \item \emph{Log-concave noise implies (EM) for every $\sigma>\sbar$.} The log-concave envelopes of Proposition~\ref{prop:logconcave} satisfy Proposition~1. This would make (EM) checkable for all three simulation families.
-\item \emph{Uniformity in $\sigma$.} Theorem B holds uniformly over $\sigma$ in a compact interval above $\sbar$. It would then cover any prior on $\sigma$ supported there.
+\item \emph{Uniformity in $\sigma$.} Theorem B holds uniformly over $\sigma$ in a compact interval of the (EM) range. It would then cover a plug-in $\sigma$ or any prior on $\sigma$ supported there (Section~\ref{sec:sigma}, point~2).
 \item \emph{Learned $\lambda$ by hyperprior mass.} Under (EM), a hyperprior that puts mass $\ge e^{-c_1n\varepsilon_n^2}$ on the oracle window gives the oracle rate. Two consequences are claimed: $n^{-5/6}$ with $V$ unknown under $\mathrm{Gamma}(a_0,c\,n^{-5/2})$, and a proved $(b_0/n)^{1/4}$-type bound for fixed $b_0$. This contradicts Target~2 and D1--D2 as written.
 \item \emph{Squared loss from B.} $\norm{\theta-\theta^*}_n^2\lesssim n\varepsilon_n^4\asymp n^{-2/3}(\log n)^{1/3}$. A posterior-mean version at the same rate is also proposed.
 \item \emph{Target 6 exponent.} $r_k=(2k+1)/(2k+2)$ at $\lambda_{k,n}\asymp n^{k+1/2}/V$, which gives $r_2=5/6$.
@@ -572,9 +590,9 @@ Each item has a short derivation in \texttt{writing/W01\_Statements/reviews/}. N
 \textbf{Decisions for Felipe}
 \begin{enumerate}[leftmargin=*, label=\textbf{D\arabic*.}]
 \item \textbf{Hyperprior on $\lambda$ (Target 2).} (H1) Gamma$(a_0, s_y n^{-\beta})$ with $\beta=2$ or $5/2$ (tested in E-02; conjugate; needs a data scale $s_y$; P-MALA did not converge at $b_0\propto n^{-2}$ for $n\gtrsim2000$ in the paper's run length, the Gibbs sampler did) \emph{or} (H2) a polynomial-tailed prior such as the compound Gamma (no $n$-scaling, untested; its scale $d_1$ still carries units). If $s_y$ is estimated from the same data, (H1) is empirical Bayes. If the learned-$\lambda$ corollary in the box above is verified, D1 and D2 change: Target~2B would then reach $n^{-5/6}$ under $b_{0,n}\propto n^{-5/2}$. Linked: whether the paper's default should change, since the current fixed $b_0$ predicts only about $n^{-1/4}$.
-\item \textbf{Learned-$\lambda$ rate target.} Aim for $n^{-3/4}$ uniformly over the class (what kinked truths self-tune to; recommended in the Theory memo), or also try for $n^{-5/6}$ (which would need $b_0\lesssim n^{-7/3}$ heuristically and is unsupported for kinked truths).
+\item \textbf{Learned-$\lambda$ rate target.} (The Tier~1 priorities now include the $n^{-5/6}$ version under $\mathrm{Gamma}(a_0,c\,n^{-5/2})$.) Aim for $n^{-3/4}$ uniformly over the class (what kinked truths self-tune to; recommended in the Theory memo), or also try for $n^{-5/6}$ (which would need $b_0\lesssim n^{-7/3}$ heuristically and is unsupported for kinked truths).
 \item \textbf{Moment condition for learned $\sigma$ (Target 3).} Accept (M), $\E|\varepsilon|^{1+\gamma}<\infty$, which excludes Cauchy noise from the learned-$\sigma$ result (Cauchy stays covered at fixed $\sigma$ by A and A$^+$).
-\item \textbf{Order of the targets after Theorem A.} Target 3 needs Target 1 to cover Gaussian noise at $\sigma_0$. Possible orders: 1 $\to$ 3 $\to$ 2 (the method's practice first), or 2B first (it builds on the proved Theorem B and is the cheapest new result), then 1 $\to$ 3; Target 6 last.
+\item \textbf{Order of the targets.} \emph{Decided} (Felipe approved the $\sigma$ plan): the tiers in the Targets box. The paper's IG default for $\sigma$ stays.
 \item \textbf{General $k$ in the paper.} State Target 6 as a theorem for all $k$, or keep $k=2$ (the paper's default) as the theorem and general $k$ as a remark, depending on what $r_k$ Theory derives on Tuesday.
 \item \textbf{Headline if Theorem A's open step fails.} Already decided by HQ: Theorem B becomes the main theorem and moment-free contraction is a conjecture supported by the $t_2$ and Cauchy simulations. Confirm.
 \end{enumerate}
