@@ -9,7 +9,7 @@ The target is the theorem's own quantity: posterior contraction of θ in Δ²ₙ
 | factor | levels |
 |---|---|
 | λ schedule (Λ = λσ = Λ\*·(n/500)^a) | primary a = 5/2, i.e. n^{5/2}/V (pred. −5/6); fallback a = 9/4, i.e. (n³/V)^{3/4} (pred. −3/4); Padilla a = 15/7 (pred. −5/7) |
-| calibration | Λ\* = argmin over Λ of the mean Δ²(MAP − θ\*) at n₀ = 500, over 10 seeds and a 49-point log grid from 1 to 1e6, per truth × noise × τ (the E-02 method). λ = Λ/σ, so the two σ arms share the MAP and differ only in posterior temperature |
+| calibration | Λ\* = argmin over Λ of the mean Δ²(MAP − θ\*) at n₀ = 500, over 10 seeds and a 49-point log grid from 1 to 1e6, per truth × noise × τ (the E-02 method). It is **restricted to the many-mode regime**: λ₀ ≤ (1000/10)³/2^{5/2} for both σ arms, so n·λ^{−1/3} ≥ 10 in every cell. Without the restriction, pq at τ = 0.9 picks Λ\* ≈ 7.5×10⁵, a near-parametric quadratic fit with n·λ^{−1/3} ≈ 4 (first calibration, job 2858645; the main array was cancelled after 1 min). λ = Λ/σ, so the two σ arms share the MAP and differ only in posterior temperature |
 | σ arm | **Abar**: σ = 1.1σ̄, with σ̄ = τ(1−τ)/f(q_τ), inside Theorem A. **S0**: σ = σ₀ = E ρ_τ(ε − q_τ), the paper's scale, which probes A⁺. Cauchy has no σ₀, so its S0 arm uses the Gaussian σ₀/σ̄ at the same τ (equal κ) |
 | noise | Gaussian, Laplace, t₃, t₂, Cauchy. All are scaled to the same density at the median, f(0) = 0.798 (N(0, 0.5²)), so they differ only in their tails |
 | τ | 0.5, 0.9 |
