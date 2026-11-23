@@ -39,6 +39,11 @@
     - Gamma(n, 1) cannot reach n^{−5/6}.
     - A pinned soft floor (a_n = An, mean κn^{5/2}) gives all V0T\* conclusions with no truncation (PROVED by assembly), but it kills adaptivity.
     - **Warning for the design-specific A-rule theorem:** a weak prior is not expected to suffice at extreme τ, where the proxy sign is 6 − σ̄/σ₀ and σ̄/σ₀ ≈ 6.6–6.7 at τ = 0.05/0.95. So it may hold only at moderate τ (CONJECTURE).
+  - **A-rule lower tail (Fable A, `FABLE_A_Arule_lowertail.md`, unaudited):**
+    - **PROVED:** a floor-free A-rule result at fixed σ in the (EM) range. The posterior mass of {λ < c₋n^{5/2}(log n)^{−1/2}} → 0, via a new reverse small-ball lemma.
+    - **At the learned σ:** conditional on one explicit evidence inequality ("under-smoothed pairs cost code length").
+    - **Proxy design condition:** β = τ(1−τ)/(f₀σ₀) < β_c ≈ 6 (CONJECTURE). It **predicts that the A-rule's λ drifts below its prior mean at Gaussian τ = 0.01/0.99 and Beta τ = 0.99**; a cheap data check has been requested from Engineering.
+    - Three lemmas would close the gap for 1 < β < 6 on C1's window (SKETCH).
   - **Lower bound, Theorem LB (referee point #1), Fable B** (`FABLE_B_lowerbound.md`; written in full; **proved, unaudited**; Astra audit running, due 17:45).
     - **Statement:** E₀Π(Δ²ₙ ≤ c₀λ^{−1/3} | y) → 0 under (A1) and upper (A2) only, at any fixed σ, for λ up to the oracle, with an explicit finite-n bound.
     - **Consequence:** with C\*/V0T\*, **n^{−5/6} is the exact posterior rate** at the oracle, up to (log n)^{1/6}.
