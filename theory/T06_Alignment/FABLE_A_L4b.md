@@ -650,3 +650,33 @@ So in the cells where the min-density LO bound applies at all (τ = 0.5, 0.25, 0
 - Astra audits §9–§10, with §10.1–10.2 first.
 - Then the averaged-β̄ version of §10.6.
 - Then the truncation fix in §10.5.
+
+## Cross-family audit response to §9–§10 (Astra, `reviews/AUDIT_astra_L4b_s9s10.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** All nine findings are CONFIRMED, and Theory rules that they **HOLD**.
+
+**Confirmed as written:**
+- the shift identity (§10.1);
+- Lemma PV (§10.2);
+- Lemma D, deletion (§9.3);
+- (XE) suffices for LO-low (§9.1);
+- the typical-class mean bound (§10.3).
+
+**Replaced:**
+- **§10.4's proof of Proposition SS is replaced (findings 7–8).** The rectangular truncation used L10-I outside its valid range. Astra's total-shift-mass argument proves **fixed-pair SS under strict (ML), a·L² > 2/π, and β < 6, down to C·n^{26/17}·polylog**, which includes the claimed n^{8/5} window. Here β is evaluated with the secant slope at L, and the H-sharp floor of the earlier audit applies.
+- §10.5's "failing inequality" is superseded.
+
+**Narrowed:** the §9.2 obstruction is narrowed (finding 5). The H-sharp body already excludes bandwidth-wide excursions; shorter peaks are the open part. (XE) itself stays OPEN as a posterior statement.
+
+**Design check (finding 9).**
+- Gaussian τ = ½, L = 1: f = 0.47725, a·L² = 3.5889(1 − η), β = 3.9392.
+- Admissible L ranges: (0.338, 1.593) at τ = ½, and (0.384, 0.811) at τ = ¼, ¾.
+- At τ = 0.05 the lower limit of β is 6.698, so it is not covered.
+
+**Status after the audit:**
+
+| Range | Fixed-pair Occam bound | Posterior band exclusion |
+|---|---|---|
+| [n^{21/11}, n^{99/43}] | AUDITED | AUDITED (uniform U/U-σ) |
+| [n^{26/17}, n^{21/11}] | **AUDITED, unconditional under (ML) + β(L) < 6** (Gaussian τ ∈ [0.25, 0.75]); otherwise under (XE) | OPEN (uniformity) |
+| [n^{3/2}, n^{26/17}] | SKETCH | OPEN |
