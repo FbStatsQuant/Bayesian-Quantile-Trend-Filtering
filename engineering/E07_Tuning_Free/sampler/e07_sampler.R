@@ -102,7 +102,8 @@ bqtf_tf <- function(y, tau, sigma_mode = c("P", "F"), sigma_F = NA, move = c("ex
   u <- seq_len(n) / n; Qp <- qr.Q(qr(cbind(1, u, u^2))); idx <- unique(pmax(1L, round(n * (1:9) / 10)))
   sig0 <- if (is.na(sig_fix)) mean(rho_tau(x - median(x), tau)) else sig_fix
   chains <- min(chains, length(lambda0_mult))
-  th0 <- list(x, stats::smooth.spline(u, x)$y, x + rnorm(n, 0, sd(x) / 2), rep(median(x), n))       # dispersed theta starts (S0)
+  qfit <- drop(Qp %*% crossprod(Qp, x))                                                           # least-squares quadratic
+  th0 <- list(x, qfit, qfit, stats::smooth.spline(u, x)$y)          # dispersed theta starts (S0; VP: two from the quadratic fit)
   ST <- lapply(seq_len(chains), function(cc) list(theta = th0[[(cc - 1L) %% 4L + 1L]], lambda = m * lambda0_mult[cc], sigma = sig0, z = rep(sig0, n),
                                                   delta = 0.2, adapt = TRUE, it = 0L, acc = NA, nev = 0L))
   stride <- max(1L, as.integer(ceiling(max_sweeps * n / 5e6)))                                     # ONE fixed stored-theta stride (S0)
