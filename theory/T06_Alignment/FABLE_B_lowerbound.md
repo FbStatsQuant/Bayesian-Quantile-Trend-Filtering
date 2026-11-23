@@ -1,12 +1,14 @@
 # Theorem LB: the posterior is not faster than its spread λ^{−1/3}
 
-*Fable, research sub-agent for Theory, 2026-11-23. Full write-up, replacing the earlier skeleton. Pure mathematics, by hand. No simulation was run; the numerical constants (square roots, fifth roots) were evaluated with a calculator. **Not audited.** Written for the cross-family audit.*
+*Fable, research sub-agent for Theory, 2026-11-23. Full write-up, replacing the earlier skeleton. Pure mathematics, by hand. No simulation was run; the numerical constants (square roots, fifth roots) were evaluated with a calculator.*
+
+**Audit status (Theory, 2026-11-23): PROVED and cross-family audited** (Astra, `reviews/AUDIT_astra_LB.md`: ACCEPT WITH FIXES). All eleven confirmed fixes and the plausible one are applied in this file; each change is marked **[Fix n]** and listed in the response table at the end.
 
 **Labels.** PROVED = every step is written here and rests only on elementary facts or on audited statements, each cited where used. SKETCH = argument given, a step not written. Anything that needs a lemma not yet available is flagged **NEW LEMMA NEEDED**.
 
 ## 0. Result and status
 
-**Claim.** At any fixed σ and deterministic λ, E₀Π(Δ²ₙ(θ − θ\*) ≤ c₀λ^{−1/3} | y) → 0, for a constant c₀ > 0, for every truth with TV⁽³⁾(θ\*) ≤ V and every λ up to the oracle order n^{5/2}/V. With the audited upper bounds this makes n^{−5/6} the exact posterior rate at the oracle, up to (log n)^{1/6} on the upper side.
+**Claim.** At any fixed σ and deterministic λ, E₀Π(Δ²ₙ(θ − θ\*) ≤ c₀λ^{−1/3} | y) → 0, for a constant c₀ > 0, for every truth with TV⁽³⁾(θ\*) ≤ V and every λ with **λ → ∞ (eventually λ ≥ (32Σ)³) and λ ≤ a₂n^{5/2}/V** (so D = nλ^{−1/3} → ∞). Assumptions: (A1) and the upper half of (A2) only. **[Fix 7]** With an applicable upper theorem (C\* or V0T\* under full (A2); Theorem B under (EM)) this makes n^{−5/6} the exact posterior rate at the oracle, up to (log n)^{1/6} on the upper side. **[Fix 8]** Above the oracle the statement holds only inside the β-dependent tuning window of §8.3.
 
 **Method.** A prior-mass argument (in the style of Castillo's lower bounds for Gaussian priors): the prior puts too little mass on a small ball around the truth for the evidence to compensate. It is **not** an anti-concentration argument for the posterior, and it uses no singular vectors and no Gaussian twin.
 
@@ -20,7 +22,7 @@
 | 6 | Denominator comparison (L6 with three centre routes) | PROVED (§7), from audited L6, L4, L4q, L4q-M |
 | 7 | **Theorem LB** (fixed σ, deterministic λ), explicit finite-n bound | PROVED (§8) |
 | 8 | Uniform in σ on compacts; σ learned at deterministic λ | PROVED (§9.1–9.2), from audited L6 and Lemma S §2 |
-| 9 | λ mixed: lower bound on {λ ≤ λ_max}; V0T with constant b₀ | PROVED (§9.3), with a factor (log n)^{−5/6}; log-free version SKETCH |
+| 9 | λ mixed: lower bound on {λ ≤ λ_max}; V0T with constant b₀ | PROVED (§9.3), **log-free** (closed by the audit, [Fix 11]) |
 | 10 | Posterior-dependent centre (true "spread" statement) | Partial result PROVED (§10); general statement **NEW LEMMA NEEDED** |
 | 11 | Sharp lower bound above the oracle (bias-dominated λ) | **NEW LEMMA NEEDED** (§11) |
 | 12 | Upper-side logarithm for any σ | SKETCH (§11) |
@@ -182,9 +184,11 @@ So μ_q ≤ b·q^{−6} for all q ≥ 1, with b := 486b₁ = 1944·C_F²·n⁵/�
 
 *Step 5 (series).* Increasing weights and appending terms only decrease the probability, so on Ω_V, by (L3-6): P(‖Au‖₂ ≤ r | V) ≥ P(Σ_{q≥1}b·q^{−6}ζ_q² ≤ r²) ≥ (3/4)e^{−3.85K₀}, K₀ := ⌈(8b/(5r²))^{1/5}⌉.
 
-*Step 6 (assembly).* Π_λ(B_r) ≥ P(Ω_V)·(3/4)e^{−3.85K₀} ≥ (3/8)e^{−3.85K₀}. With C_F = 29.1: (8b/5)^{1/5} = (3110.4·846.81)^{1/5}·(n⁵/λ²)^{1/5} = 19.24·(n⁵/λ²)^{1/5}, so K₀ ≤ 1 + 19.24·x^{2/5} and
+*Step 6 (assembly).* Π_λ(B_r) ≥ P(Ω_V)·(3/4)e^{−3.85K₀} ≥ (3/8)e^{−3.85K₀}. With C_F = 29.1: (8b/5)^{1/5} = (3110.4·846.81)^{1/5}·(n⁵/λ²)^{1/5} < 19.24·(n⁵/λ²)^{1/5} **[Fix 4]** (rigorous: 3110.4·846.81 = 2 633 917.8 < 19.24⁵ = 2 636 485.2, by raising to the fifth power), so K₀ ≤ 1 + 19.24·x^{2/5} and
 
   φ(r) ≤ log(8/3) + 3.85 + 74.1·x^{2/5} ≤ 75·x^{2/5} + 5. ∎
+
+**Remark [Fix 4].** The argument holds also when the Gaussian-series cutoff K₀ exceeds m: (L3-6) is applied to the infinite series Σ_{q≥1}b q^{−6}ζ_q², which dominates the finite one.
 
 **Remark.** With V ≡ 1 Steps 2 and 4 give σ_q(A) ≲ n^{5/2}q^{−3} without Horn's inequality; this is not used.
 
@@ -206,6 +210,8 @@ Hence E e^{−ωXᵢ(δᵢ)} ≤ exp(min{ω²δᵢ²/8, ω|δᵢ|}) ≤ exp(c_ω
 **Consequence.** For the deterministic set ℋ_r centred at θ\*, Tonelli gives
 
   E₀N_ω(ℋ_r) = ∫_{ℋ_r}E₀e^{−ωℛ(δ)}dν ≤ e^{c_ω nr²}·ν(ℋ_r).
+
+Tonelli applies because the integrand is nonnegative and ν is σ-finite. **[Fix 5]** It applies also to a jointly measurable data-dependent indicator, but then the indicator stays inside the expectation, and no pointwise bound by e^{c_ω nr²}ν(·) follows; this is why the bad set is the deterministic ball around θ\* (see §10). mᵢ ≥ 0 holds also when Fᵢ has an atom at 0 (quantile optimality).
 
 This replaces "E₀(likelihood ratio) ≤ 1", which fails for σ < σ̄. The price e^{c_ω nr²} is negligible because r² is a small multiple of λ^{−1/3}.
 
@@ -235,6 +241,8 @@ Throughout, **ε_d² := λ^{−1/3}** and **D := nλ^{−1/3} = nε_d²**. Then 
 
   Dividing by D and using ε_d² = λ^{−1/3}: **β = C_b·(Vλ/n^{5/2})^{12/5}**. With λε_d = λ^{5/6}, (h2) reads λ ≥ 102^{6/5}·n^{12/7}(log m)^{6/35}. For fixed V > 0, (h3) holds for n ≥ n₀(V) whenever λ → ∞ and λ ≤ a₂n^{5/2}/V.
 
+**[Fix 6]** Remarks: (R0) has zero shift charge; (h2) implies L4q's column-increment condition; along (R2) w/n → 0, and at the oracle w grows at least like n^{5/6} for fixed V.
+
 **Coverage.** (R1) covers every λ ≤ (β₀n³/V)^{3/4} ≍ n^{9/4}; (R2) covers n^{12/7}(log n)^{6/35} ≲ λ ≤ a₂n^{5/2}/V with β ≤ C_b·a₂^{12/5}. Since 12/7 < 9/4 the two ranges overlap: **every λ → ∞ with λ ≤ a₂n^{5/2}/V is β-admissible with β ≤ max{β₀, C_b·a₂^{12/5}}**, for n ≥ n₀(V, a₂, β₀).
 
 ---
@@ -251,7 +259,7 @@ If **(32Σ)³ ≤ λ ≤ (n/42)³**, then
 
   **E₀Π(Δ²ₙ(θ − θ\*) ≤ c₀·λ^{−1/3} | y) ≤ 1.44/D + 8·D^{3/2}·exp{5 − (Σ + 1)·D}.**
 
-In particular, along any sequence with λ_n → ∞ and λ_n = o(n³) for which β stays bounded, the left side → 0, uniformly over the laws with the given (L, f̄) and over the β-admissible truths. Since {‖δ‖²ₙ ≤ r²} ⊂ {Δ²ₙ(δ) ≤ r²}, the same holds for ‖θ − θ\*‖²ₙ.
+In particular, along any sequence with λ_n → ∞ and λ_n = o(n³) (so D → ∞) for which β stays bounded, the left side → 0, uniformly over the laws with the given (L, f̄) and over the β-admissible truths. **[Fix 7]** For the uniform statement take one c₀ computed from a common upper bound β̄ ≥ β over the class; the lower restriction (32Σ)³ ≤ λ then holds eventually because λ_n → ∞. Since {‖δ‖²ₙ ≤ r²} ⊂ {Δ²ₙ(δ) ≤ r²}, the same holds for ‖θ − θ\*‖²ₙ.
 
 No lower margin, no (EM), no moment condition, no condition σ ≥ σ̄.
 
@@ -279,7 +287,7 @@ The prefactor is V₃D³/(V₃(√D/2)³) = 8D^{3/2}. The bracket equals 2Σ −
 
 - **Truths.** Any θ\* ∈ ℝⁿ enters the numerator (§4 has no condition on the centre). The truth enters only through β: quadratic truths (β = 0); truths with TV⁽³⁾(θ\*) ≤ V through (R1) or (R2).
 - **λ.** (32Σ)³ ≤ λ ≤ (n/42)³ and β-admissibility. With §7's coverage: **all deterministic λ_n → ∞ with λ_n ≤ a₂n^{5/2}/V** (V > 0 fixed), and **all λ_n → ∞ with λ_n = o(n³)** for quadratic truths.
-- **Above the oracle.** The theorem is still valid for λ ≫ n^{5/2}/V, with β = C_b(Vλ/n^{5/2})^{12/5} → ∞, hence c₀ ≍ β^{−5}. The bound is then far from the true (bias-dominated) rate; see §11.
+- **Above the oracle [Fix 7].** For λ ≫ n^{5/2}/V, β → ∞ and Σ grows with β, so **both** tuning restrictions, (32Σ)³ ≤ λ and λ ≤ (n/42)³, must be re-checked at the growing budget; they are not automatic. Example: with the (R2) budget β = C_b(Vλ/n^{5/2})^{12/5}, λ = n^{59/20} and V fixed give β ≍ n^{27/25}, while λ^{1/3} = n^{59/60}, so (32Σ)³ ≤ λ fails and the theorem certifies nothing there. Where both restrictions do hold, c₀ ≍ Σ^{−5} and the bound is far from the true (bias-dominated) rate; see §11.
 - **σ.** Any fixed ω > 0. c₀ depends on ω through Σ.
 
 ### 8.4 Corollary: the exact rate at the oracle
@@ -288,11 +296,16 @@ Let a₁n^{5/2}/V ≤ λ ≤ a₂n^{5/2}/V. Then λ^{−1/3} ≥ (V/a₂)^{1/3}n
 
   c₀·(V/a₂)^{1/3}·n^{−5/6} ≤ Δ²ₙ(θ − θ\*) ≤ M·(log n)^{1/6}·V^{1/3}·n^{−5/6}
 
-with posterior mass → 1. The lower bound is Theorem LB (any fixed σ). The upper bound is Theorem B under (EM), or Theorem C\* at any σ under full (A2), as audited. **The exponent 5/6 is exact; the gap is the factor (log n)^{1/6} on the upper side** (§11).
+with posterior mass → 1. The lower bound is Theorem LB (any fixed σ; (A1) and upper (A2) only). **[Fix 8]** The upper bound requires more:
+- at a fixed σ in the (EM) range: Theorem B;
+- at an arbitrary fixed σ: the fixed-scale steps C\*-3 and C\*-4 of `FABLE_A_n56.md` §2.2, applied on a compact ω-interval containing 1/σ, under full (A2), (A3) and the oracle tuning conditions;
+- at the learned σ: Theorem C\* itself, which adds the scale-containment hypotheses of Lemma S.
+
+So **under (A1) and upper (A2) alone only the lower conclusion is established.** The two-sided statement holds in Δ²ₙ, the loss of LB; since Δ²ₙ ≤ ‖·‖²ₙ, the upper bound transfers from ‖·‖²ₙ to Δ²ₙ, and the lower bound transfers from Δ²ₙ to ‖·‖²ₙ, so it holds in ‖·‖²ₙ as well. **The exponent 5/6 is exact; the gap is the factor (log n)^{1/6} on the upper side** (§11).
 
 ### 8.5 Remark: dependence of the constant on σ — SKETCH
 
-c₀ ≈ 10^{−25} is crude (from 75, 466 and the choice ε_d² = λ^{−1/3}). Taking ε_d² = a·λ^{−1/3} and the ℓ₂ form, the exponent is −D[c^{−1/5}/117 − ω²c/8 − 99a^{−1/5} − β_a − ω(1.44C₁ + 1)a]; minimizing 99a^{−1/5} + ω(1.44C₁ + 1)a over a gives 72.2·(ω(1.44C₁ + 1))^{1/6}. So for β = 0 and small ω the admissible constant scales as **c ∝ ω^{−5/6}**, which reproduces the memo's spread law κ^{−5/6}λ^{−1/3}. For large ω the tilt term forces c ≲ ω^{−5/3}. Not written out.
+c₀ ≈ 10^{−25} is crude (from 75, 466 and the choice ε_d² = λ^{−1/3}). Taking ε_d² = a·λ^{−1/3} and the ℓ₂ form, the exponent is −D[c^{−1/5}/117 − ω²c/8 − 99a^{−1/5} − β_a − ω(1.44C₁ + 1)a]; minimizing 99a^{−1/5} + Aa over a, A := ω(1.44C₁ + 1), gives the formal optimum a = (99/(5A))^{5/6} and cost 6(99/5)^{5/6}A^{1/6} ≈ 72.2·A^{1/6} **[Fix 12]**; if ω varies, the radius and tuning restrictions must be re-checked. So for β = 0 and small ω the admissible constant scales as **c ∝ ω^{−5/6}**, which reproduces the memo's spread law κ^{−5/6}λ^{−1/3}. For large ω the tilt term forces c ≲ ω^{−5/3}. Not written out.
 
 ---
 
@@ -304,11 +317,11 @@ Let 0 < ω₁ ≤ ω₂ < ∞ and define Σ, c₀ with ω := ω₂ (note c_ω is
 
   E₀ sup_{ω∈[ω₁,ω₂]}Π_ω(ℋ_r | y) ≤ 1.44/D + 16·D^{3/2}·exp{5 − (Σ + 1)D}.
 
-*Proof.* For every real t, ω ↦ e^{−ωt} is convex, so N_ω(ℋ_r) ≤ N_{ω₁}(ℋ_r) + N_{ω₂}(ℋ_r); apply Lemma N at the two endpoints. L6's event is {∫ℛ dν_G ≤ (1.44C₁ + 1)nε_d²}, which does not involve ω, and on it N_ω(ℝⁿ) ≥ ν(G)e^{−ω(1.44C₁+1)nε_d²} ≥ 𝔏(ω₂) for every ω ≤ ω₂ (this ω-free form is the one used in the audited C1, Step 7). The supremum is measurable by continuity in ω, as in C1. ∎
+*Proof.* For every real t, ω ↦ e^{−ωt} is convex, so N_ω(ℋ_r) ≤ N_{ω₁}(ℋ_r) + N_{ω₂}(ℋ_r); apply Lemma N at the two endpoints. L6's event is {∫ℛ dν_G ≤ (1.44C₁ + 1)nε_d²}, which does not involve ω, and on it N_ω(ℝⁿ) ≥ ν(G)e^{−ω(1.44C₁+1)nε_d²} ≥ 𝔏(ω₂) for every ω ≤ ω₂ (this ω-free form is the one used in the audited C1, Step 7). The supremum is measurable by continuity in ω: **[Fix 9]** use the uncentred likelihoods, which on [ω₁, ω₂] are dominated by the integrable likelihood at ω₁. ∎
 
 ### 9.2 σ learned, λ deterministic — PROVED from Lemma S §2
 
-Model: σ ~ IG(a, b), penalty σ-free. Assume in addition the hypotheses of Lemma S §2 (row-average uniform integrability, σ₀,ₙ ≥ d, (A3) or a bounded truth, λ/log n → ∞). Then there is a fixed interval I = [l, H₀] with sup_P E_P Π(σ ∉ I | y) → 0, and S §2 uses no trend localization. By the disintegration of S §3,
+Model: σ ~ IG(a, b), penalty σ-free. Assume in addition the hypotheses of Lemma S §2 (row-average uniform integrability, σ₀,ₙ ≥ d, (A3) or a bounded truth, λ/log n → ∞), **and [Fix 9] those of Theorem LB used asymptotically: a bounded shift budget β, λ → ∞ and D → ∞ (λ = o(n³))**, or the eventual finite-window conditions with D → ∞. A bounded truth gives scale containment but no bounded shift budget by itself, and λ/log n → ∞ alone allows e.g. λ = n⁴, outside LB's window. Then there is a fixed interval I = [l, H₀] with sup_P E_P Π(σ ∉ I | y) → 0, and S §2 uses no trend localization. By the disintegration of S §3,
 
   Π(ℋ_r | y) ≤ sup_{s∈I}Π_s(ℋ_r | y) + Π(σ ∉ I | y),
 
@@ -326,14 +339,14 @@ Let p be any prior on λ, ν̄ = ∫p(dℓ)ν_ℓ, N̄_ω(B) = ∫p(dℓ)N_{ω,�
 
 **Why a cap is needed.** As ℓ → ∞ the prior mass of every ball around a quadratic truth tends to 1. So without an upper control of λ the statement "not faster than Λ^{−1/3}" cannot be derived from prior mass, and for V = 0 it may be false. Whether the posterior exploits this was not examined.
 
-**V0T with constant b₀ — PROVED, with a logarithmic factor.** Prior: Gamma(1, b₀) truncated to [Λ₋, ∞), Λ₋ = κ₋n^{5/2}, σ ~ IG.
+**V0T with constant b₀ — PROVED; log-free after item 3 [Fix 11].** Prior: Gamma(1, b₀) truncated to [Λ₋, ∞), Λ₋ = κ₋n^{5/2}, σ ~ IG.
 1. *λ sits at the floor.* For every u, s: ∫e^{−Q/s}dc ≤ C_k s³ (S §2's flat bound), so the uncentred joint evidence of {λ > 2Λ₋} is ≤ p_n(λ > 2Λ₋)·C_k·E_IG[s^{3−n}] = e^{−b₀Λ₋}·C_k·b^{3−n}Γ(n + a − 3)/Γ(a) = exp{−b₀κ₋n^{5/2} + O(n log n)}. The joint evidence is ≥ e^{−Cn} on the event of V2T Step 2(a). Hence **Π(λ > 2Λ₋ | y) → 0** in probability. (More precisely, λ ≤ Λ₋ + C′n log n/b₀.)
 2. *Lower bound.* Π(ℋ_r | y) ≤ Π(λ > 2Λ₋ | y) + Π(σ ∉ I | y) + sup_{s∈I}Π_s(ℋ_r ∩ {λ ≤ 2Λ₋} | y). Numerator: Lemma LB-mix with λ_max = 2Λ₋, at the two endpoints of I. Denominator: V2T eq. (2), N̄_ω(ℝⁿ) ≥ V₃(ε̄√n/2)³p₀,ₙexp{−(3 + ω(1.25C₁ + 1))nε̄²} on Ω_D. With D₋ := nΛ₋^{−1/3} and r² = cΛ₋^{−1/3}: n(2rΛ₋)^{−2/5} = 2^{−2/5}c^{−1/5}D₋ and nε̄² = C_ε[(log m)^{1/6} + κ₋²V²]·D₋. So the ratio → 0 once
 
   c^{−1/5} ≥ 466·2^{2/5}·2·{c_{ω₂} + (3 + ω₂(1.25C₁ + 1))·C_ε·[(log m)^{1/6} + κ₋²V²]},
 
-  i.e. for **c = c₁·(log n)^{−5/6}**. Result: Π(Δ²ₙ ≤ c₁(log n)^{−5/6}·Λ₋^{−1/3} | y) → 0 for Felipe's method with the floor.
-3. *Removing the logarithm — SKETCH.* Substitute L3⁺ for L3 in V2T Step 3 (ε̄² := C′n^{−5/6}[κ₋^{−1/3} + κ₋^{5/3}V²]); then c is a constant. The substituted Step 3 has not been rewritten.
+  i.e. for **c = c₁·(log n)^{−5/6}**. Result: Π(Δ²ₙ ≤ c₁(log n)^{−5/6}·Λ₋^{−1/3} | y) → 0 for Felipe's method with the floor. **[Fix 10]** Details: a mixed posterior probability uses the mixed denominator (V2T eq. (2)), not a fixed-ℓ one; on I use the two endpoint numerators and V2T's common event; the window mass 1 − e^{−b₀Λ₋} → 1. With c = c₁(log n)^{−5/6} the numerator exponent is of order D₋(log n)^{1/6} = o(n), so the n/16 cap is inactive, and the block-fit and radius restrictions hold eventually. Inherited hypotheses (state them): those of V2T, including the common uniform-integrability modulus and the positive lower bound on the scale σ₀,ₙ ≥ d.
+3. *Removing the logarithm — PROVED [Fix 11]* (argument of the audit, verified by Theory). Fix κ₋ and V. Take ε² := Λ₋^{−1/3}, D₋ := nε², and the §7 mollified centre at that ε for every ℓ ∈ [Λ₋, 2Λ₋] (centre 0 if V = 0). The half-radius hypotheses hold eventually at the floor, hence on the window. L3⁺ costs ≤ 99D₋ + 5 throughout; the shift costs ≤ 4C_b(Vκ₋)^{12/5}D₋ by the upper endpoint 2Λ₋. The normalized mixture on V2T's good set has the same mean and variance bounds, so on an event of failure probability ≤ 1.25/D₋ the evidence is ≥ V₃(√D₋/2)³p₀,ₙexp(−5 − KD₋), K := 99 + 4C_b(Vκ₋)^{12/5} + ω₂(1.25C₁ + 1). Take a fixed 0 < c < min(1, 2^{−1/3}/168) so small that 2^{−2/5}c^{−1/5}/466 > K + c_{ω₂} + 1. With r² = cΛ₋^{−1/3}, the block-fit and n/16 restrictions hold eventually (Λ₋^{1/3} = o(n), D₋ = o(n)); the endpoint numerator ratio is O(D₋^{3/2}e^{−D₋}), and the scale and tuning tails vanish by item 1 and S §2. **Result: Π(Δ²ₙ ≤ c·Λ₋^{−1/3} | y) → 0, c a constant, for his method with the floor (constant b₀, fixed V, κ₋).**
 
 For the scaled hyperprior (b_n ∝ n^{−5/2}) there is no upper containment of λ, and only the statement on {λ ≤ λ_max} is available.
 
@@ -366,11 +379,11 @@ What would be needed is a variance (Fisher-information-type) lower bound for the
 1. **Posterior-dependent centre.** §10. NEW LEMMA NEEDED.
 2. **Above the oracle (λ ≫ n^{5/2}/V).** Theorem LB holds but with c₀ ≍ (Vλ/n^{5/2})^{−12}, while the true rate there should be the bias V²λ^{5/3}n^{−5}. A sharp statement needs a **lower bound on the bias**: for truths with a genuine third-order kink, a non-centred small-ball upper bound Π_λ(u\* + B_r) ≤ exp{−φ(r) − c·λ²·dist²}, or a direct argument that the posterior mean over-smooths. NEW LEMMA NEEDED; it is a statement about specific truths, not the class.
 3. **Upper-side logarithm.**
-   - Theorem B (under (EM)): substituting L3⁺ in join J5 gives the spread ratio 99·a₁^{−2/5}C^{−6/5} with ε² = C·V^{1/3}n^{−5/6}, so the log exponent c = 0 becomes admissible and the rate is exactly n^{−5/6} on both sides. SKETCH: a substitution into an audited proof (J5; J6 and R1 are unaffected because they are sufficient conditions); not re-audited.
-   - Theorems C\*, V0T\* (any σ): the logarithm also enters C2's fine term through Σtⱼ² ≤ m·t_∞². Bounding Σtⱼ² by Markov (E Σtⱼ² ≤ ¼Σ‖w_j‖₂²) instead gives the rate M_n·λ^{−1/3} for every M_n → ∞. SKETCH.
+   - Theorem B (under (EM)) — SKETCH, **[Fix 12]**: J7's shift now consumes a fixed multiple of nε² depending on C and a₂, so C_pr must be enlarged accordingly. Substituting L3⁺ in join J5 gives the spread ratio 99·a₁^{−2/5}C^{−6/5} with ε² = C·V^{1/3}n^{−5/6}, so the log exponent c = 0 becomes admissible and the rate is exactly n^{−5/6} on both sides. SKETCH: a substitution into an audited proof (J5; J6 and R1 are unaffected because they are sufficient conditions); not re-audited.
+   - Theorems C\*, V0T\* (any σ): the logarithm also enters C2's fine term through Σtⱼ² ≤ m·t_∞². Bounding Σtⱼ² by Markov (E Σtⱼ² ≤ ¼Σ‖w_j‖₂²) instead gives the rate M_n·λ^{−1/3} for every M_n → ∞. SKETCH; **[Fix 12]** a diverging Markov threshold and control of the largest fine score are still required.
 4. **λ mixed without an upper cap** (scaled hyperprior, soft floors with small shape). The lower bound may fail for quadratic truths; see §9.3. An upper containment of λ would be the missing input.
 5. **Constants.** c₀ is not sharp, and its dependence on ω is only sketched (§8.5).
-6. **Suggested numerical checks (not run).** (i) L_k(Su) = Σw_h(j)u_{i_k+j} on random u, a few (n, h). (ii) −log Π_λ(B_r)/x^{2/5} for small n by Monte Carlo: it should stay inside [1/117, 75] with no log growth. (iii) The eigenvalue bound μ_q ≤ b·q^{−6} of §5 on simulated V.
+6. **Suggested numerical checks (not run).** (i) L_k(Su) = Σw_h(j)u_{i_k+j} on random u, a few (n, h). (ii) −log Π_λ(B_r) for small n by Monte Carlo, against the two-sided bound min{n/8, x^{2/5}/117} ≤ φ(r) ≤ 75x^{2/5} + 5 **[Fix 12]** (not a universal interval for the ratio φ/x^{2/5}: the lower bound has a minimum, and dividing the upper bound by x^{2/5} adds 5/x^{2/5}); no log growth expected. (iii) The eigenvalue bound μ_q ≤ b·q^{−6} of §5 on simulated V.
 
 ## 12. Audit guide: the steps most worth a second reader
 
@@ -402,3 +415,22 @@ What would be needed is a variance (Fisher-information-type) lower bound for the
 - (12) The ancillary sketches stay sketches.
 
 **Status: Theorem LB is PROVED and cross-family audited. Together with C\* / V0T\*, n^{−5/6} is the exact posterior rate at the oracle, up to the upper-side (log n)^{1/6}.**
+
+### Fixes applied (Theory, 2026-11-23, before 18:00 CT)
+
+Each finding was re-derived by Theory before the change was made.
+
+| # | Finding | Ruling | Change in this file |
+|---|---|---|---|
+| 1 | Innovation blocks, independence (§2) | HOLDS (confirmation) | none needed |
+| 2 | Density bound, translations (§3) | HOLDS (confirmation) | none needed |
+| 3 | Both small-ball bounds (§4) | HOLDS (confirmation) | none needed |
+| 4 | Rigorous rounding 19.24; cutoff > m | HOLDS (checked: 3110.4·846.81 = 2 633 917.8 < 19.24⁵ = 2 636 485.2) | §5 Step 6 "<" with the check; remark on the cutoff |
+| 5 | Tonelli on a random-ball indicator; atom case | HOLDS | §6 remark; explains why the bad set is the truth ball |
+| 6 | Shift costs; (h2) ⇒ column-increment; w/n → 0 | HOLDS | §7 remark |
+| 7 | State λ → ∞ (eventually ≥ (32Σ)³) and D → ∞; one c₀ from a common β̄; above the oracle both restrictions must be kept (λ = n^{59/20} counterexample) | HOLDS (checked: β ≍ n^{27/25} > λ^{1/3} = n^{59/60}) | §0 claim, §8.1, §8.3 |
+| 8 | Oracle corollary: correct upper citations; (A1)+(upper A2) gives the lower half only | HOLDS | §0, §8.4 rewritten; two-sided in Δ²ₙ and in ‖·‖²ₙ (Theory's addition: Δ²ₙ ≤ ‖·‖²ₙ transfers each side) |
+| 9 | Measurability via dominated uncentred likelihoods; learned σ needs bounded β, λ → ∞, D → ∞ | HOLDS | §9.1, §9.2 |
+| 10 | Mixed denominator; V2T hypotheses; n/16 cap inactive | HOLDS | §9.3 item 2 |
+| 11 | Log-free V0T lower bound closes | HOLDS (argument re-derived: exponent 2^{−2/5}c^{−1/5}/466 beats K + c_ω₂ + 1 for small fixed c) | §9.3 item 3: SKETCH → PROVED; table row 9 |
+| 12 | (PLAUSIBLE) ancillary sketches: optimum a, C_pr enlargement, Markov threshold, interval [1/117, 75] | HOLDS (checked a = (99/(5A))^{5/6}, cost 6(99/5)^{5/6}A^{1/6} = 72.2A^{1/6}) | §8.5, §11 items 3 and 6; sketches stay sketches |
