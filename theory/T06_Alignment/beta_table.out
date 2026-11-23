@@ -1,3 +1,26 @@
-# beta_table.py, owls_run -j 1, 2026-11-23
-owls_run: REFUSED: 3 owls_run jobs already running (max 3)
-owls_run: wait for running jobs to finish, or move this work to NOTS (see /home/fb31/.config/bvs-hq/owls/POLICY.md).
+# beta_table.py, owls_run -j 1, 2026-11-23 (verbatim stdout of the successful run; a repeat run was refused by owls_run for slots)
+design     tau  b_worst   b_avg  b_harm   (proxy threshold ~6, conjectural)
+Gaussian  0.01    20.91   13.31   13.94   worst:FAIL avg:FAIL
+Gaussian  0.05     6.70    4.26    4.47   worst:FAIL avg:ok
+Gaussian  0.25     2.79    1.77    1.86   worst:ok   avg:ok
+Gaussian  0.50     2.36    1.50    1.57   worst:ok   avg:ok
+Gaussian  0.75     2.79    1.77    1.86   worst:ok   avg:ok
+Gaussian  0.90     4.38    2.79    2.92   worst:ok   avg:ok
+Gaussian  0.95     6.70    4.26    4.47   worst:FAIL avg:ok
+Gaussian  0.99    20.91   13.31   13.94   worst:FAIL avg:FAIL
+Beta      0.01     5.56    0.93    1.35   worst:ok   avg:ok
+Beta      0.05     5.49    0.95    1.36   worst:ok   avg:ok
+Beta      0.25     5.09    1.08    1.47   worst:ok   avg:ok
+Beta      0.50     4.50    1.33    1.69   worst:ok   avg:ok
+Beta      0.75     3.96    1.95    2.23   worst:ok   avg:ok
+Beta      0.90     4.85    3.29    3.50   worst:ok   avg:ok
+Beta      0.95     6.56    4.96    5.15   worst:FAIL avg:ok
+Beta      0.99    17.09   12.67   14.32   worst:FAIL avg:FAIL
+Mixed     0.01    14.13   13.92   13.92   worst:FAIL avg:FAIL
+Mixed     0.05     4.53    4.46    4.46   worst:ok   avg:ok
+Mixed     0.25     1.88    1.86    1.86   worst:ok   avg:ok
+Mixed     0.50     1.59    1.57    1.57   worst:ok   avg:ok
+Mixed     0.75     1.88    1.86    1.86   worst:ok   avg:ok
+Mixed     0.90     2.96    2.92    2.92   worst:ok   avg:ok
+Mixed     0.95     4.53    4.46    4.46   worst:ok   avg:ok
+Mixed     0.99    14.13   13.92   13.92   worst:FAIL avg:FAIL

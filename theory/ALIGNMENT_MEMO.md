@@ -60,9 +60,9 @@
     - **At the learned σ:** conditional on one explicit evidence inequality ("under-smoothed pairs cost code length").
     - **Proxy design condition:** β = τ(1−τ)/(f₀σ₀) < β_c ≈ 6 (CONJECTURE). It **predicts that the A-rule's λ drifts below its prior mean at Gaussian τ = 0.01/0.99 and Beta τ = 0.99**; a cheap data check has been requested from Engineering.
     - Three lemmas would close the gap for 1 < β < 6 on C1's window (SKETCH).
-  - **Lower bound, Theorem LB (referee point #1), Fable B** (`FABLE_B_lowerbound.md`; written in full; **proved, unaudited**; Astra audit running, due 17:45).
+  - **Lower bound, Theorem LB (referee point #1), Fable B** (`FABLE_B_lowerbound.md`; **PROVED and cross-family audited**, Astra: ACCEPT WITH FIXES).
     - **Statement:** E₀Π(Δ²ₙ ≤ c₀λ^{−1/3} | y) → 0 under (A1) and upper (A2) only, at any fixed σ, for λ up to the oracle, with an explicit finite-n bound.
-    - **Consequence, CONDITIONAL on Astra's audit (due 17:45):** with C\*/V0T\*, n^{−5/6} would be the exact posterior rate at the oracle, up to (log n)^{1/6}. If the audit is not back by 18:00, the headline reads 'upper bound, and a matching lower bound pending audit'.
+    - **Consequence (audit-backed):** with C\*/V0T\*, **n^{−5/6} is the exact posterior rate at the oracle**, up to the upper-side (log n)^{1/6}. Above-oracle claims keep the β-dependent window.
     - **Extensions:** learned σ and V0T. The 'spread around its own random centre' version needs a new lemma.
 - **Theorem H** (Fable A, `T06_Alignment/FABLE_A_theoremH.md`): Huber-body localization above any λ floor Λ₋ (n^{−3/14} at Λ₋ ≍ n^{3/4}), plus the plug-in identity Π(B | y) ≤ Π(B | y, λ ≥ Λ₋) + Π(λ < Λ₋ | y). **Status: PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES; V2T Step 2 confirmed at a general floor; a fixed-M version is possible). Fixes applied in the commit that adds this note (see git log: 'Theorem H fixes applied'). It is the building block for a floor-free A-rule theorem; the missing input is lower-tail control of λ (Fable A, in progress).
 - **Exact-Gibbs hyperparameter screen (MEASURED, Engineering; prior effect only, both arms exact Gibbs):**

@@ -381,3 +381,24 @@ What would be needed is a variance (Fisher-information-type) lower bound for the
 - §6: mᵢ ≥ 0 without (A2), and the two-sided use of Hoeffding and the trivial bound.
 - §7 (R2): the hypotheses (h1)–(h3) and the exponent 12/5.
 - §8.2: the arithmetic (rλ)^{2/5} = λ^{1/3}/(932Σ) and the bracket 2Σ − (Σ − 1).
+
+---
+
+## Theory Department: cross-family audit response (Astra, `reviews/AUDIT_astra_LB.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** Eleven findings are CONFIRMED and one is PLAUSIBLE; Theory rules that all **HOLD**.
+- **Core confirmed:**
+  - innovation blocks and their independence;
+  - the density bound at every centre and translations;
+  - both small-ball upper bounds;
+  - the log-free L3 via Lemma F;
+  - the Tonelli step on the truth ball;
+  - the denominator and shift costs;
+  - the theorem constants and tuning range.
+- **Scope fixes:**
+  - (7, 8) Above-oracle claims keep the β-dependent tuning window. The oracle exponent 5/6 needs an applicable upper theorem (C\*, V0T\*, or B under (EM)).
+  - (9) The learned-σ limit needs a bounded shift budget and D → ∞.
+- **Improvement:** (11) the **log-free lower bound for constant-b₀ V0T is closed** by the audit.
+- (12) The ancillary sketches stay sketches.
+
+**Status: Theorem LB is PROVED and cross-family audited. Together with C\* / V0T\*, n^{−5/6} is the exact posterior rate at the oracle, up to the upper-side (log n)^{1/6}.**
