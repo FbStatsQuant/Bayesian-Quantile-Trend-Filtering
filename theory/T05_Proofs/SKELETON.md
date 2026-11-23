@@ -7,7 +7,7 @@
 **Theorem A (milestone, strict slack ω ≤ (1−η)ω̄, ω̄ = f/(τ(1−τ)), i.e. σ ≥ σ̄/(1−η)).** Fix V and the constants of (A2). Set λₙ := n^{5/2}/V (primary version) or λₙ := (n³/V)^{3/4} (fallback version), and
 
 - εₙ² := (log n)^c · κ^{−5/6} · V^{1/3} n^{−5/6}  (primary),
-- εₙ² := (log n)^c · κ^{−7/8} · V^{1/4} n^{−3/4}  (fallback).
+- εₙ² := (log n)^c · κ^{−5/6}(1 + κ^{−1/6}) · V^{1/4} n^{−3/4}  (fallback, at the κ-free tuning λₙ = (n³/V)^{3/4}; i.e. (σ/f)^{5/6} up to the factor 1 + (σ/f)^{1/6}). *(Corrected 2026-11-23: the earlier κ^{−7/8} is the value at the κ-tuned λ = (κ^{1/6}n³/V)^{3/4}, not at the stated tuning.)*
 
 Then, for a large constant M,
 

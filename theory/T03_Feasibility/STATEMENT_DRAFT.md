@@ -110,7 +110,7 @@ The second statement follows from the first, because L10 is part of the proof: o
 - Where condition (C) of L4q holds (λε ≳ n^{10/7}·polylog via L3, or λε ≥ 8n² log(2n) elementarily), the quadratic shift (L4q, L4q-M) gives V²λ^{5/3}n^{−5}.
 - Where (C) fails, i.e. at the low end of the window, the ℓ₁ shift (L4) gives λVn^{−3}. This is ≲ λ^{−1/3} there, so it is absorbed by the spread term (Astra).
 - At fixed V the two regions overlap and cover the window.
-- **Fallback label A-fb:** if L4q failed, the bias term would be κ^{−1/6}λVn^{−3}, with best rate κ^{−7/8}V^{1/4}n^{−3/4} at λ ≍ (n³/V)^{3/4}.
+- **Fallback label A-fb:** if L4q failed, the bias term would be κ^{−1/6}λVn^{−3}, with rate κ^{−5/6}(1 + κ^{−1/6})V^{1/4}n^{−3/4} at the κ-free tuning λ = (n³/V)^{3/4}, i.e. (σ/f)^{5/6} up to the factor 1 + (σ/f)^{1/6}. (The value κ^{−7/8} holds only at the κ-tuned λ = (κ^{1/6}n³/V)^{3/4}; corrected 2026-11-23.)
 
 **Corollaries and remarks.**
 - **Corollary A1 (oracle tuning).** λₙ ≍ n^{5/2}/V gives ε² ≍ (log n)^c κ^{−5/6} V^{1/3} n^{−5/6}. This is the **linear-smoother minimax rate** for this class (Donoho–Johnstone, as cited in Tibshirani 2014). The minimax rate is n^{−6/7}.
