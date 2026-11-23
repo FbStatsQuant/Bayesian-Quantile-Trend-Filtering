@@ -124,6 +124,11 @@ For a general hyperprior density $\pi_n$ on $\lambda$ (Target~2), replace the la
 \int_0^\infty\lambda^m e^{-\lambda\norm{\Dk\theta}_1}\pi_n(\lambda)\,d\lambda .
 \]
 
+\begin{proposition}[Propriety]
+Let $a_0,a_\sigma>0$ and $m\ge1$. The joint posterior \eqref{eq:joint} is proper for every data vector if and only if $b_0>0$ and $b_\sigma>0$.
+\end{proposition}
+\noindent\textit{Proof sketch.} For sufficiency, integrate $\lambda$ first: its factor is $\Gamma(a_0+m)\{b_0+\norm{\Dk\theta}_1\}^{-(a_0+m)}\le\Gamma(a_0+m)\,b_0^{-(a_0+m)}$. Next, $\int_{\R^n}e^{-Q(\theta)/\sigma}d\theta=\{\sigma/(\tau(1-\tau))\}^n$, which cancels $\sigma^{-n}$. What is left is $\int_0^\infty\sigma^{-a_\sigma-1}e^{-b_\sigma/\sigma}d\sigma=\Gamma(a_\sigma)b_\sigma^{-a_\sigma}<\infty$. For necessity, the $\theta$-marginal (iv) behaves like $\norm{\theta-y}_1^{-(n+a_\sigma)}$ near $\theta=y$ if $b_\sigma=0$, and like $\norm{\Dk\theta}_1^{-(a_0+m)}$ near $\{\Dk\theta=0\}$ if $b_0=0$. Neither is integrable, because $a_\sigma,a_0>0$. The same argument covers regimes (ii) and (iii). The paper's settings ($b_\sigma=0.1$; $b_0\in\{10^{-3},5\times10^{-4}\}$ in the simulations) satisfy both conditions. Propriety gives no rate.
+
 \begin{table}[h]
 \centering\small
 \caption{What is fixed and what is learned in each result.}
@@ -132,7 +137,7 @@ For a general hyperprior density $\pi_n$ on $\lambda$ (Target~2), replace the la
 \toprule
 Result & order $k$ & $\lambda$ & $\sigma$ & posterior regime \\
 \midrule
-Theorem B & 2 & fixed, oracle (deterministic) & fixed, any & (i) \\
+Theorem B & 2 & fixed, oracle (deterministic) & fixed, with (EM) & (i) \\
 Theorem A & 2 & fixed, oracle or window & fixed, $\sigma\ge\sbar/(1-\eta)$ & (i) \\
 Target 1 (A$^+$) & 2 & fixed, oracle or window & fixed, any & (i) \\
 Target 2 & 2 & learned (hyperprior) & fixed & (iii) \\
@@ -153,18 +158,19 @@ For $\theta\in\R^n$ write $\delta = \theta-\theta^*$ and define
 $\Delta_n^2$ is a Huber-type loss: it equals $\norm{\delta}_n^2$ when $\norm{\delta}_\infty\le1$, and it grows only linearly in large deviations. That linear growth is what lets the theory avoid moment conditions. It is also the natural loss for the check risk: under the margin condition (A2) below, the expected excess check loss $n^{-1}\sum_i\E[\rho_\tau(y_i-\theta_i)-\rho_\tau(y_i-\theta^*_i)]$ is at least $c_0\Delta_n^2(\theta,\theta^*)$, with $c_0=\min(f/2, fL/4)$.
 
 \begin{definition}[Contraction]
-Let $\Pn$ be the class of laws of $y$ allowed by the assumptions of a given result, let $\theta^*=\theta^*(P)$, and let $\Post(\cdot\mid y)$ be the posterior $\theta$-marginal. The posterior \emph{contracts at rate $\varepsilon_n$ in $\Delta_n$} if there is a fixed constant $M$ such that, for every sequence of laws $P_n\in\Pn$,
+Let $\Pn$ be the class of laws of $y$ allowed by the assumptions of a given result, let $\theta^*=\theta^*(P)$, and let $\Post(\cdot\mid y)$ be the posterior $\theta$-marginal. The definition is stated for sequences of laws because the truth $\theta^*\in\R^n$ changes with $n$; even ``a fixed true curve'' is a triangular array. The posterior \emph{contracts at rate $\varepsilon_n$ in $\Delta_n$} if there is a fixed constant $M$ such that, for every triangular sequence of laws $P_n\in\Pn$,
 \[
 \Post\big(\theta:\ \Delta_n^2(\theta,\theta^*) > M\varepsilon_n^2 \,\big|\, y\big)\ \longrightarrow\ 0 \quad \text{in $P_n$-probability} \qquad (n\to\infty).
 \]
 \end{definition}
+\noindent A single fixed $M$ is stronger than the textbook form, which allows any $M_n\to\infty$. Rates are always quoted on the squared scale: ``rate $n^{-5/6}$'' means $\varepsilon_n^2\asymp n^{-5/6}$, the radius for $\Delta_n^2$.
 
 \begin{remark}[Uniformity]
 The theorems below are stated, and proved, in the uniform form
 \[
 \sup_{P\in\Pn}\ \E_P\,\Post\big(\Delta_n^2(\theta,\theta^*) > M\varepsilon_n^2 \,\big|\, y\big)\ \longrightarrow\ 0 ,
 \]
-which is what the proofs bound. The two forms are equivalent. A posterior probability lies in $[0,1]$, so convergence in $P_n$-probability is the same as $\E_{P_n}\Post(\cdot\mid y)\to0$. Requiring this along every sequence $P_n\in\Pn$ is the same as the supremum tending to zero.
+which is what the proofs bound. The two forms are equivalent. A posterior probability lies in $[0,1]$, so convergence in $P_n$-probability is the same as $\E_{P_n}\Post(\cdot\mid y)\to0$. Requiring this along every triangular sequence $P_n\in\Pn$, with the same $M$, is the same as the supremum tending to zero: choose $P_n$ to nearly attain the supremum.
 \end{remark}
 
 \noindent The law of $\theta-\theta^*$ under $\Post$ does not change if a polynomial of degree $\le k$ is added to $\theta^*$, because the prior is flat in those directions. So no bound on $\norm{\theta^*}_\infty$ is ever needed.
@@ -264,6 +270,20 @@ $^\dagger$ Computed for this note (\texttt{writing/W01\_Statements/gap\_ratios.R
 \end{table}
 
 \noindent\textbf{Scope, stated plainly.} Neither Theorem A nor Theorem B covers any of these laws at the paper's learned scale $\sigma_0$. For Gaussian noise the gap is the factor $\pi/2$ at $\tau=\tfrac12$, and it grows toward the tails (2.92 at $\tau=0.9$). Closing this gap is the purpose of Target~1 (A$^+$).
+(A4) and (EM) are conditions of the proofs, not properties of the method. Failing them does not make the method inconsistent. It means no theorem here speaks to the paper's learned scale.
+
+Two more limits on scope. First, the paper tunes the $\lambda$ hyperprior per signal: $b_0=10^{-3}$ for VS and $5\times10^{-4}$ for S (default $10^{-2}$). This is tuning by hand, and no result here models it. Second, the paper's joint sampler fits six levels $\tau\in\{0.90,0.93,0.96,0.97,0.98,0.99\}$ together. No theorem or target here covers that joint posterior; all statements are for one $\tau$ at a time.
+
+\begin{proposition}[Log-concave noise]\label{prop:logconcave}
+Let the error have a log-concave density $g$ with $\tau$-quantile $q$ and $g(q)>0$. Then
+\[
+\sigma_0=\E\rho_\tau(\varepsilon-q)\ \le\ \frac{\tau(1-\tau)}{g(q)}=\sbar,
+\]
+with equality if and only if $\varepsilon-q$ has an asymmetric Laplace law. The same holds for heteroscedastic noise with $\sigma_0=\int_0^1\E\rho_\tau(\varepsilon_u-q_u)\,du$ and $\sbar=\tau(1-\tau)/f_{\min}$.
+\end{proposition}
+\noindent\textit{Proof.} Write $\E\rho_\tau(\varepsilon-q)=\tau\int_q^\infty(1-F)+(1-\tau)\int_{-\infty}^qF$. For log-concave $g$, both $\log(1-F)$ and $\log F$ are concave. Their tangent lines at $q$ give $1-F(x)\le(1-\tau)e^{-g(q)(x-q)/(1-\tau)}$ for $x>q$ and $F(x)\le\tau e^{-g(q)(q-x)/\tau}$ for $x<q$. Integrating, the risk is at most $\{\tau(1-\tau)^2+(1-\tau)\tau^2\}/g(q)=\tau(1-\tau)/g(q)$. Equality forces both tangent bounds to be exact, which is the asymmetric Laplace law. For heteroscedastic noise, apply this at each $u$ and use $g_u(q_u)\ge f_{\min}$. \hfill$\square$
+
+\noindent Gaussian, Laplace, Beta$(1,\beta)$ with $\beta\ge1$, and the paper's mixed normal (equal variances $0.5$, means $\pm0.2$) are all log-concave. So for all three simulation families $\sigma_0<\sbar$ at every $\tau$, and the learned $\sigma$, which sits near $\sigma_0$, fails (A4). It also fails (EM), which forces $\sigma>\sbar$ whenever $F$ is differentiable at the quantile. This is a fact about the assumptions, not a measured gap that could close at larger $n$.
 
 \paragraph{The paper's simulation designs.} The simulations (paper, \S4) take $u_i=i/n$, $y_i=f(u_i)+\varepsilon_i$, and three heteroscedastic noise families:
 \begin{itemize}
@@ -306,7 +326,22 @@ Mixed normal & 0.05, 0.95 & 0.140 (0.35, 0.65) & 0.075 & 0.339 & 4.528$^\dagger$
 \end{tabular}
 \end{table}
 
-\noindent In every design $R$ lies between 1.59 and 6.70, so neither Theorem A nor Theorem B covers any of the paper's simulations at its learned $\sigma$. Heteroscedasticity widens the gap. For Gaussian noise at $\tau=\tfrac12$, $R=2.36=1.5\times\pi/2$, where $1.5=\max_u s(u)\big/\!\int_0^1 s(u)\,du$.
+\begin{table}[h]
+\centering\small
+\caption{$R=\sbar/\sigma_0$ at the levels of the paper's joint sampler, same convention as Table~\ref{tab:simnoise} (computed for this note, \texttt{simulation\_laws.R}).}
+\label{tab:simjoint}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Noise & $\tau=0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Gaussian, $s(u)=(1+u^2)/4$ & 4.38$^\dagger$ & 5.42$^\dagger$ & 7.76$^\dagger$ & 9.43$^\dagger$ & 12.54$^\dagger$ & 20.91$^\dagger$ \\
+Beta$(1,11-10u)$ & 4.85$^\dagger$ & 5.60$^\dagger$ & 7.35$^\dagger$ & 8.61$^\dagger$ & 10.94$^\dagger$ & 17.09$^\dagger$ \\
+Mixed normal & 2.96$^\dagger$ & 3.66$^\dagger$ & 5.24$^\dagger$ & 6.37$^\dagger$ & 8.48$^\dagger$ & 14.13$^\dagger$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent At the five levels of Table~\ref{tab:simnoise}, $R$ lies between 1.59 and 6.70. At the joint-sampler levels it grows to about 21 (Gaussian, $\tau=0.99$). So neither Theorem A nor Theorem B covers any of the paper's simulations at its learned $\sigma$. Heteroscedasticity widens the gap. For Gaussian noise at $\tau=\tfrac12$, $R=2.36=1.5\times\pi/2$, where $1.5=\max_u s(u)\big/\!\int_0^1 s(u)\,du$. For Beta, much of the gap comes from the worst case over $u$: the local ratio $\tau(1-\tau)/\{f_u(q_u)\,\E\rho_\tau(\varepsilon_u-q_u)\}$ ranges over $[1.12,2.00]$ at $\tau=0.05$, against $R=5.49$. It is still above 1 at every $u$, as Proposition~\ref{prop:logconcave} requires.
 
 \paragraph{(A3) for the paper's truths.} Table~\ref{tab:simV} gives $V=\TV_2(\theta^*)=n^2\norm{\Dthree\theta^*}_1$ for the true quantile curves $\theta^*_i=f(u_i)+F_{u_i}^{-1}(\tau)$, with
 \[
@@ -316,7 +351,7 @@ The Gaussian quantile shift $z_\tau(1+u^2)/4$ has zero third derivative, so it a
 
 \begin{table}[h]
 \centering\small
-\caption{$V=\TV_2(\theta^*)$ for the paper's truths, given as $n=500$ / $n=8000$. The values at $n=2000$ and $n=8000$ differ by at most $0.35\%$, so $n=8000$ is within about $0.1\%$ of the limit $\int_0^1|\partial_u^3\theta^*(u)|\,du$; for S with Gaussian noise the limit is exactly $16\pi^2\approx157.9$. Computed for this note (\texttt{simulation\_laws.R}).}
+\caption{$V=\TV_2(\theta^*)$ for the paper's truths, given as $n=500$ / $n=8000$. Since $\TV_2(\theta^*)\le\int_0^1|\partial_u^3\theta^*(u)|\,du$ for every $n$, the values rise toward this limit; for S with Gaussian noise the limit is exactly $16\pi^2\approx157.9$. Computed for this note (\texttt{simulation\_laws.R}).}
 \label{tab:simV}
 \begin{tabular}{@{}llccccc@{}}
 \toprule
@@ -333,7 +368,7 @@ S & Gaussian & \multicolumn{5}{c}{156.4 / 157.8 (every $\tau$; equal to the sign
 \end{tabular}
 \end{table}
 
-\noindent Both truths are $C^\infty$ in $u$, so (A3) holds with a fixed $V$. But the VS bump makes $V$ about $46$ times larger than for S, and $V$ enters both the rate constant (through $V^{1/3}$ at the oracle tuning) and the sample size $n_0(V)$ beyond which the bounds hold.
+\noindent For a truth $\theta^*_i=g(u_i)$ with $g\in C^3[0,1]$, the third difference is $\Delta^3g(u_i)=n^{-3}\int M(s)\,g'''(u_i+s/n)\,ds$, where $M$ is the quadratic B-spline (integral 1, shifts summing to 1). Summing over $i$ gives $\TV_2(\theta^*)\le\int_0^1|g'''|\le\sup|g'''|$ for every $n$. Both truths are $C^\infty$ in $u$, so (A3) holds with a fixed $V$. (A3) is an upper bound: any $V>0$ is allowed, even for a quadratic truth with $\TV_2(\theta^*)=0$. But the VS bump makes $V$ about $46$ times larger than for S, and $V$ enters both the rate constant (through $V^{1/3}$ at the oracle tuning) and the sample size $n_0(V)$ beyond which the bounds hold.
 
 %=====================================================================
 \section{Theorems and targets}
@@ -358,6 +393,12 @@ Let $C_1:=\max(\bar f/2,\,1/L)$ and $C_{\mathrm{pr}} := 39.6\,a_1^{-2/5}C^{-6/5}
 \end{named}
 
 \noindent\textit{Constants.} $C_{\mathrm{pr}}$ (the prior-mass constant) is free of $V$ and of $P$; $V$ enters only through the sample size $n_0(V,a_1,a_2,C)$ beyond which the bounds hold. The factor $(\log n)^{1/6}$ may be replaced by $(\log n)^c$ for any $c\ge1/6$, and for $c>1/6$ any $C_{\mathrm{pr}}>0$ works. No bound is uniform as $b\to0$. The radii carry no margin constant $f$, because B does not use the lower half of (A2).
+
+\noindent\textit{Finite-sample form.} For $n\ge n_0$ the proof gives
+\[
+\E_P\,\Post\big(\Delta_n^2>M\varepsilon_n^2\mid y\big)\ \le\ \frac{1.44}{n\varepsilon_n^2}\;+\;\frac{C_3(b/\sigma)}{V_3}\Big(\frac{2}{\varepsilon_n\sqrt n}\Big)^{3}\exp\Big\{-\Big[\frac{bM}{2}-1.44C_1-1-\sigma C_{\mathrm{pr}}\Big]\frac{n\varepsilon_n^2}{\sigma}\Big\},
+\]
+uniformly over $\Pn^B$. Here $C_3(\cdot)$ is an explicit integral over the polynomial directions and $V_3$ is the volume of the unit ball in $\R^3$. The first term dominates, so the convergence is polynomial, of order $n^{-1/6}$ up to logs at the oracle tuning, not exponential.
 
 \noindent\textit{Scope.} The result is in $\Delta_n$ only. A squared-loss version is not claimed (its sketch needs $\lambda/n^{9/5}\to\infty$, which both tunings satisfy, plus posterior control of $\TV_2(\theta-\theta^*)$). By the necessary consequences of (EM), B excludes polynomial tails and excludes Gaussian noise at $\sigma_0$; it covers none of the paper's runs as executed. B can cover laws that A excludes for every margin interval only when $F_i$ is not differentiable at the quantile (verified example: a dyadic staircase law at $\tau=\tfrac12$).
 
@@ -395,7 +436,7 @@ $\varepsilon_n^2 = (\log n)^c(\sigma/f)^{5/6}V^{1/3}n^{-5/6}$. At the fallback t
 
 \noindent\textit{Status: one step open.} Every other step is proved and reviewer-checked: the evidence lower bound, the prior small-ball and shift bounds that produce the $n^{-5/6}$ bias law, and the numerator bound on the region where $\norm{\theta-\theta^*}_\infty\le\Delta$. The open step is \textbf{sup-norm localization}: show, without moment conditions, that $\E_P\Post(\norm{\theta-\theta^*}_\infty>\Delta\mid y)\to0$ for a fixed small $\Delta$. Its deterministic half is proved: $\norm{\delta}_\infty\le6\norm{\delta}_n+7.06\,\norm{\delta}_n^{4/5}\TV_2(\delta)^{1/5}$. The missing half is posterior control of $\TV_2(\theta-\theta^*)$ together with the far region; the planned route needs $\lambda/n^{21/11}\to\infty$, which is why the window starts at $n^2$.
 
-\plainly{The same $n^{-5/6}$ rate as Theorem B, but with no moment or tail condition at all, so Cauchy noise is allowed. The price is the scale condition (A4): $\sigma$ must exceed $\sbar=\tau(1-\tau)/f$ with slack. This is the main theorem if the open step closes; if it does not, Theorem B is the main theorem and moment-free contraction is stated as a conjecture supported by the $t_2$ and Cauchy simulations.}
+\plainly{If the open step closes: the same $n^{-5/6}$ rate as Theorem B, but with no moment or tail condition at all, so Cauchy noise is allowed. The price is the scale condition (A4): $\sigma$ must exceed $\sbar=\tau(1-\tau)/f$ with slack. This is the main theorem if the open step closes; if it does not, Theorem B is the main theorem and moment-free contraction is stated as a conjecture supported by the $t_2$ and Cauchy simulations.}
 
 \source{\texttt{theory/T03\_Feasibility/STATEMENT\_DRAFT.md} v3.1 (Theorem A, (A4)); \texttt{theory/T05\_Proofs/SKELETON.md} (status board; the open step is ``L10, Stage 1'').}
 
@@ -414,7 +455,7 @@ and with $c$, $M$ allowed to depend also on $\sigma$.
 
 \noindent\textit{Status.} It needs Theorem A's open step plus one new step: on the localized set, bound the \emph{realized} likelihood ratio rather than its expectation, because the expectation argument fails above $1/\sbar$. A plan exists (a Knight decomposition with a Cauchy--Schwarz split); it is not started.
 
-\plainly{This is the theorem that covers the method's practice: it allows the scale the paper actually learns, including Gaussian noise at $\sigma_0$ and extreme quantiles, where the gap to (A4) is largest.}
+\plainly{If proved, this would cover a \emph{fixed} $\sigma$ equal to the paper's population scale $\sigma_0$, including Gaussian noise and extreme quantiles, where the gap to (A4) is largest. Covering the \emph{learned} $\sigma$ also needs Target~3.}
 
 \source{\texttt{STATEMENT\_DRAFT.md} v3.1, Theorem A$^+$ and ``Plan for Theorem A$^+$''.}
 
@@ -435,13 +476,13 @@ Under the assumptions of Theorem B (version 2B), or of Theorem A (version 2A), w
 uniformly over the class, with $V$ unknown to the prior.
 \end{named}
 
-\noindent\textit{Why $n^{-3/4}$ and not $n^{-5/6}$.} The $\lambda$-update responds to the $\ell_1$ norm of the posterior draws, not to the bias. On kinked truths the learned $\lambda$ settles at the fallback tuning $(n^3/V)^{3/4}\asymp n^{9/4}$, where the rate is $n^{-3/4}$ (E-02, $b_0=n^{-5/2}$: slope of $\bar\lambda$ in $n$ is $2.14$ on a kinked truth and $2.54$ on a smooth one). So $n^{-3/4}$ is the honest uniform target, and $n^{-5/6}$ stays an oracle-tuning statement. The rate $n^{-3/4}$ does not require knowing $V$, which answers the referee point that the oracle $\lambda$ depends on $V$.
+\noindent\textit{Why $n^{-3/4}$ and not $n^{-5/6}$.} The $\lambda$-update responds to the $\ell_1$ norm of the posterior draws, not to the bias. In E-02 ($b_0=n^{-5/2}$, $n\le8000$, at $\sigma=\sigma_0$) the slope of $\bar\lambda$ in $n$ was $2.14$ [2.02, 2.27] on a kinked truth and $2.54$ on a smooth one. The kinked slope is consistent with the fallback tuning $(n^3/V)^{3/4}\asymp n^{9/4}$, where the rate is $n^{-3/4}$. That is one slope, measured outside the theorems' assumptions; whether kinked truths really settle at $n^{9/4}$ is pending Theory verification (box below). On that premise, $n^{-3/4}$ is the cautious uniform target and $n^{-5/6}$ stays an oracle-tuning statement. The rate $n^{-3/4}$ does not require knowing $V$, which answers the referee point that the oracle $\lambda$ depends on $V$.
 
 \noindent\textit{Why not the paper's current fixed $b_0$.} With $b_0$ fixed in $n$, the learned $\lambda$ settles at
 \[
 \lambda\approx\{0.27\,n\,(f/\sigma)^{1/6}/b_0\}^{3/4}\asymp n^{3/4}
 \]
-(confirmed in E-02, slope $0.745$; it also matches the paper's own $\lambda\approx50$--$75$ at $n=500$ under Gamma(1,1)). That predicts a rate of only about $n^{-1/4}$. This is a heuristic, not a theorem.
+(confirmed in E-02, slope $0.745$; it also matches the paper's report of $\lambda\approx50$--$75$ on a pilot configuration at $n=500$ under Gamma(1,1)). That predicts a rate of only about $n^{-1/4}$. This is a heuristic, not a theorem. The formula ignores the truth's own $\ell_1$ norm, so it does not apply when $\norm{\Dthree\theta^*}_1=V/n^2$ is large against $b_0$, as for VS ($0.029$ against $10^{-3}$). The paper's reported runs are not the problem: at $n=500$ their learned $\lambda$ is of the oracle order (VS: $\bar\lambda\approx2.1\times10^3$ in E-02, against $n^{5/2}/V\approx770$ and $(n^3/V)^{3/4}\approx1500$). What fails is the scaling in $n$.
 
 \noindent\textit{Proof needs.} Contraction of the hyperposterior of $\lambda$ onto a window where the fixed-$\lambda$ bound holds. Uniform bounds for deterministic $\lambda$ cannot simply be plugged in. Version 2B is the natural first step, since B is proved.
 
@@ -506,16 +547,31 @@ Target 6 & (A1), (A2), (A3$_k$), (A4) or (EM) & $n^{-r_k}$, $r_k$ to be derived;
 \end{tabular}
 \end{center}
 
-\noindent\textbf{Not claimed anywhere:} frequentist coverage of credible sets (the posterior spread is set by $\sigma$ and the prior, not by the sampling variance), a Bernstein--von Mises theorem, adaptation to the fast-rate class, or a lower bound. A lower bound is a stated conjecture: $\Post(\Delta_n^2<c\lambda^{-1/3}\mid y)\to0$, which would make the posterior strictly slower than its mode at every $\lambda$.
+\noindent\textbf{Not claimed anywhere:} frequentist coverage of credible sets (the posterior spread is set by $\sigma$ and the prior, not by the sampling variance), a Bernstein--von Mises theorem, adaptation to the fast-rate class, or a lower bound. A lower bound is a stated conjecture: $\Post(\Delta_n^2<c\lambda^{-1/3}\mid y)\to0$, which would make the posterior strictly slower than its mode at every $\lambda$. E-02 points the same way: at $\lambda=n^{15/7}$ the slope of the mode's error was $-0.90$ against $-0.69$ for the posterior. The mode depends on $\lambda\sigma$ only.
 
-\noindent\textbf{Numerical support} (Engineering E-02, sampler certified by E-04): the posterior spread follows $\lambda^{-1/3}$ (slopes $-0.37$ and $-0.34$ against $-1/3$); the bias on kinked truths follows the $\lambda^{5/3}n^{-5}$ law and excludes the cruder $\ell_1$ law at every tuning tested; the spread law carries over to $\tau=0.9$ and to Cauchy noise.
+\noindent\textbf{Numerical support} (Engineering E-02, sampler certified by E-04): the posterior spread follows $\lambda^{-1/3}$ (slopes $-0.37$ and $-0.34$ against $-1/3$); the bias on kinked truths follows the $\lambda^{5/3}n^{-5}$ law and excludes the cruder $\ell_1$ law at every tuning tested; the spread law carries over to $\tau=0.9$ and to Cauchy noise. These are slopes at finite $n$. They are evidence, not proofs of the theorems or of sharpness. The E-02 Gaussian arms run at $\sigma=\sigma_0$, which is outside A and B.
 
 %=====================================================================
 \vspace{1em}
 \noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Pending Theory verification (proposed by the reviewers; not results of this note)}\\[2pt]
+Each item has a short derivation in \texttt{writing/W01\_Statements/reviews/}. None has been checked by Theory. None is used above.
+\begin{enumerate}[leftmargin=*, label=\textbf{P\arabic*.}]
+\item \emph{Log-concave noise implies (EM) for every $\sigma>\sbar$.} The log-concave envelopes of Proposition~\ref{prop:logconcave} satisfy Proposition~1. This would make (EM) checkable for all three simulation families.
+\item \emph{Uniformity in $\sigma$.} Theorem B holds uniformly over $\sigma$ in a compact interval above $\sbar$. It would then cover any prior on $\sigma$ supported there.
+\item \emph{Learned $\lambda$ by hyperprior mass.} Under (EM), a hyperprior that puts mass $\ge e^{-c_1n\varepsilon_n^2}$ on the oracle window gives the oracle rate. Two consequences are claimed: $n^{-5/6}$ with $V$ unknown under $\mathrm{Gamma}(a_0,c\,n^{-5/2})$, and a proved $(b_0/n)^{1/4}$-type bound for fixed $b_0$. This contradicts Target~2 and D1--D2 as written.
+\item \emph{Squared loss from B.} $\norm{\theta-\theta^*}_n^2\lesssim n\varepsilon_n^4\asymp n^{-2/3}(\log n)^{1/3}$. A posterior-mean version at the same rate is also proposed.
+\item \emph{Target 6 exponent.} $r_k=(2k+1)/(2k+2)$ at $\lambda_{k,n}\asymp n^{k+1/2}/V$, which gives $r_2=5/6$.
+\item \emph{Kinked truths self-tune to $n^{9/4}$.} This premise of Target~2 is questioned: under P3 a hyperprior that allows $n^{5/2}/V$ would not stay at $n^{9/4}$.
+\item \emph{Size of $n_0(V)$.} The primary bound may start only near $n\approx10^6$ (S) or $10^8$ (VS). At the paper's $n$ only the fallback bound B-ii would be in force.
+\end{enumerate}
+\end{minipage}}
+
+\vspace{1em}
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
 \textbf{Decisions for Felipe}
 \begin{enumerate}[leftmargin=*, label=\textbf{D\arabic*.}]
-\item \textbf{Hyperprior on $\lambda$ (Target 2).} (H1) Gamma$(a_0, s_y n^{-\beta})$ with $\beta=2$ or $5/2$ (tested in E-02; conjugate; needs a data scale $s_y$; P-MALA did not converge at $b_0\propto n^{-2}$ for $n\gtrsim2000$ in the paper's run length, the Gibbs sampler did) \emph{or} (H2) a polynomial-tailed prior such as the compound Gamma (no $n$-scaling, no units issue, untested). Linked: whether the paper's default should change, since the current fixed $b_0$ predicts only about $n^{-1/4}$.
+\item \textbf{Hyperprior on $\lambda$ (Target 2).} (H1) Gamma$(a_0, s_y n^{-\beta})$ with $\beta=2$ or $5/2$ (tested in E-02; conjugate; needs a data scale $s_y$; P-MALA did not converge at $b_0\propto n^{-2}$ for $n\gtrsim2000$ in the paper's run length, the Gibbs sampler did) \emph{or} (H2) a polynomial-tailed prior such as the compound Gamma (no $n$-scaling, untested; its scale $d_1$ still carries units). If $s_y$ is estimated from the same data, (H1) is empirical Bayes. If the learned-$\lambda$ corollary in the box above is verified, D1 and D2 change: Target~2B would then reach $n^{-5/6}$ under $b_{0,n}\propto n^{-5/2}$. Linked: whether the paper's default should change, since the current fixed $b_0$ predicts only about $n^{-1/4}$.
 \item \textbf{Learned-$\lambda$ rate target.} Aim for $n^{-3/4}$ uniformly over the class (what kinked truths self-tune to; recommended in the Theory memo), or also try for $n^{-5/6}$ (which would need $b_0\lesssim n^{-7/3}$ heuristically and is unsupported for kinked truths).
 \item \textbf{Moment condition for learned $\sigma$ (Target 3).} Accept (M), $\E|\varepsilon|^{1+\gamma}<\infty$, which excludes Cauchy noise from the learned-$\sigma$ result (Cauchy stays covered at fixed $\sigma$ by A and A$^+$).
 \item \textbf{Order of the targets after Theorem A.} Target 3 needs Target 1 to cover Gaussian noise at $\sigma_0$. Possible orders: 1 $\to$ 3 $\to$ 2 (the method's practice first), or 2B first (it builds on the proved Theorem B and is the cheapest new result), then 1 $\to$ 3; Target 6 last.

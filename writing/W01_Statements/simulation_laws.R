@@ -16,6 +16,7 @@
 # The (A3) constant is V = TV_2(theta*) = n^2 ||D^(3) theta*||_1, at n = 500, 2000, 8000.
 
 taus <- c(0.05, 0.25, 0.50, 0.75, 0.95)
+taus_joint <- c(0.90, 0.93, 0.96, 0.97, 0.98, 0.99)   # levels of the paper's joint sampler
 ug <- seq(0, 1, length.out = 2001)
 sdm <- sqrt(0.5)
 
@@ -45,7 +46,7 @@ check_risk <- function(F, tau, u) {          # E rho_tau(eps - q)
 }
 
 cat("== (A2)/(A4): worst-case point density, sigma0, gap ratio R ==\n")
-for (nm in names(fam)) for (tau in taus) {
+for (nm in names(fam)) for (tau in c(taus, taus_joint)) {
   F <- fam[[nm]]
   qs <- sapply(ug, function(u) F$q(tau, u))
   dens <- mapply(function(x, u) F$d(x, u), qs, ug)
@@ -53,8 +54,9 @@ for (nm in names(fam)) for (tau in taus) {
   s0 <- sum((head(s0u, -1) + tail(s0u, -1)) / 2) * diff(ug)[1]    # trapezoid in u
   fmin <- min(dens); sbar <- tau * (1 - tau) / fmin
   edge <- if (nm == "Beta") sprintf(" min dist to support edge=%.4f", min(pmin(qs, 1 - qs))) else ""
-  cat(sprintf("%-8s tau=%.2f f_min=%.4f (u=%.2f) f_max=%.4f sigma0=%.4f sigma_bar=%.4f R=%.3f%s\n",
-              nm, tau, fmin, ug[which.min(dens)], max(dens), s0, sbar, sbar / s0, edge))
+  rloc <- tau * (1 - tau) / dens / s0u      # local ratio sigma_bar(u)/sigma0(u)
+  cat(sprintf("%-8s tau=%.2f f_min=%.4f (u=%.2f) f_max=%.4f sigma0=%.4f sigma_bar=%.4f R=%.3f local=[%.2f,%.2f]%s\n",
+              nm, tau, fmin, ug[which.min(dens)], max(dens), s0, sbar, sbar / s0, min(rloc), max(rloc), edge))
 }
 
 fVS <- function(u) 2 + sin(4 * u - 2) + 2 * exp(-30 * (4 * u - 2)^2)
