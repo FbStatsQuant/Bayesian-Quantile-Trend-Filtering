@@ -9,7 +9,7 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 | Gap | Piece (§2) | Prover | Auditor | Fallback | Account |
 |---|---|---|---|---|---|
 | 1. LO audited | H0: **DONE** (Astra: ACCEPT WITH FIXES at fixed (ω, ℓ), 63849f0; Lemma F′/Lev also audited) | — | — | — | — |
-| 2. **Min-density loss → averaged β.** Today: condition β̄ = ωtΣf^{−5/6}/Σf^{1/6} < 6 and the key inequality PROVED (`FABLE_B_averaged_beta.md`, f5f05de, unaudited); paper values ≤ 5.12 at τ ∈ [0.05, 0.95]. **Tuesday:** rewrite LO's remaining steps with weights fᵢ (constants in max f/min f, f of bounded variation), then extend U | H3 | Fable | Astra | headline at τ ∈ [0.25, 0.9] on every design, plus the cells whose worst-case β < 6 | CP |
+| 2. **Min-density loss → averaged β** | H3: **DONE**: LO and U with β̄ < 6, cross-family audited (a5453af); covers τ ∈ [0.05, 0.95] on all designs, under (REG) | — | — | — | — |
 | 3. Uniformity in σ and λ | H2: **DONE** — Theorem U/U-σ, cross-family audited (f5f05de). The band [n^{2.30}, oracle] is excluded with σ learned | — | — | — | — |
 | 4. **λ below n^{2.30}**: intermediate range G4 (sign route via κ) and bounded range G5 (certificate) | H4, H5 | Astra (H4), Fable (H5) | Fable (H4), Astra (H5) | named assumption, supported by κ̂ data (F3) | Codex (H4), CP + Engineering (H5) |
 
@@ -31,7 +31,7 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 | L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | H6: CT Fable A writing it today (`FABLE_A_V0Tstar_nfloor.md`) | Fable A | Astra | the rate keeps an extra log |
 | L8 | Rate n^{−5/6}(log n)^{1/3}, with LB matching up to logs | follows from L7 + Theorem LB | — | — | — |
 
-**Coverage upgrade (gap 2, in parallel).** Every link that uses β (L4, L5) is currently min-density. The averaged β̄ (H3) upgrades coverage to the whole grid τ ∈ [0.05, 0.95].
+**Coverage upgrade (gap 2): DONE** (a5453af). L5 now holds with averaged β̄ on the whole grid τ ∈ [0.05, 0.95]. L4a and L4b inherit whichever β the new lemma uses.
 
 **Paper hygiene (Tuesday).**
 - Clean rewrites with every audit fix written in full: LO (11 findings), U (9), LB (done).

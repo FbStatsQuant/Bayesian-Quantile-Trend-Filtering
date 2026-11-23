@@ -74,9 +74,15 @@
     - **This is NOT yet a floor-free theorem.** That needs gap 4 (λ below n^{2.30}) and hence (LT) of Theorem H's Corollary P.
     - The nine audit fixes are applied by reference tonight; the paper version (Tuesday rewrite) will contain them in full.
     - **Still open:** λ below n^{2.30}. Astra's attempt today proved obstructions (`astra_gap4_sign.md`); Fable is working on it.
-  - **Averaged β** (Fable B, `T06_Alignment/FABLE_B_averaged_beta.md`). The condition is β̄ = ωt·Σfᵢ^{−5/6}/Σfᵢ^{1/6} < 6, and the key inequality is PROVED, unaudited. LO with β̄ is SKETCH.
-    - **Values:** Gaussian 0.05/0.95: 4.43; Beta 0.95: 5.12; Mixed 0.05/0.95: 4.46. So if the sketch closes, **the whole paper grid τ ∈ [0.05, 0.95] is covered**.
-    - **Crossing:** all designs cross 6 between τ = 0.96 and 0.97, consistent with the κ̂ pilot.
+  - **Averaged β** (Fable B, `T06_Alignment/FABLE_B_averaged_beta.md`). **LO and U / U-σ hold with β̄ < 6: PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES, a5453af).
+    - **The condition:** β̄ = ωt·Σfᵢ^{−5/6}/Σfᵢ^{1/6}, the averaged condition in place of the worst-case density. It needs a smooth density profile, plus a class-uniform margin.
+    - **Values, reproduced independently by Astra:** Gaussian 0.05/0.95: 4.43; Beta 0.95: 5.12; Mixed 0.05/0.95: 4.46.
+    - **Consequence: the A-rule's middle-band exclusion covers the whole paper grid τ ∈ [0.05, 0.95] on all three designs.**
+    - The sufficient comparison crosses 6 at τ ≈ 0.96–0.97. Beyond that the theorem says nothing either way; data: the κ̂ pilot and the extreme-τ run.
+  - **Gap 4, λ below n^{2.30}: OPEN.**
+    - Astra (`astra_gap4_sign.md`) and Fable A (`FABLE_A_gap4.md`) have proved obstructions and partial routes.
+    - Below λ ≈ n^{3/2} even the β < 6 heuristic has no justification.
+    - Until this closes, there is no floor-free theorem.
   - **Sign reduction** (Fable B, `T06_Alignment/FABLE_B_Arule_gauss.md`, 5fb5e67; identities verified by Theory). The λ lower tail reduces to the sign of a posterior mean, κ(ℓ) = m − ℓ·E_ℓ‖Dθ‖₁. At τ = ½ no diverging floor is proved; this is a negative result.
   - **MEASURED, internal (κ̂ pilot):** Engineering 75ad1a4, 0.29 core-h; Theory's reading is `T06_Alignment/kappa_pilot_reading.md`, 3c4562a.
     - On the Gaussian design, one seed, κ̂ > 0 at τ = 0.05, 0.25 and 0.5.
