@@ -153,3 +153,14 @@ Then Theorem J's conclusions 2–4 would hold with M increased by a multiple of 
 - **Dependence on single-level inputs.** Theorem J inherits every assumption of V0T\* at every level, in particular full (A2) at each τⱼ. At extreme levels (τ = 0.99) the constants f, d are small, so M and n₀ are driven by the worst level.
 - **Composite, not a likelihood.** Π_C is not a Bayes posterior for any joint model of y. Nothing here needs it to be; all statements are about the measure as defined.
 - **Not verified.** The internals of V0T\* and C\* (used as stated; cross-audited by Astra); the paper's exact joint hyperprior specification beyond "each πⱼ is the single-level posterior".
+
+---
+
+## Theory Department: cross-family audit response (Astra, `reviews/AUDIT_astra_joint.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** Theory verified the core before the audit: the product structure given y; the conditioning identity Π_C(B) ≤ Π^⊗(B)/Π^⊗(C); the separation min(L, Δτ/f̄) from upper (A2); and Π^⊗(C) → 1 via sup-norm. Theory rules that the audit's findings **HOLD**:
+- The gap holds at every design index, including endpoints, for heteroscedastic laws.
+- The bound holds with level-specific σⱼ and λⱼ, and the TV identity sharpens the factor 2 to 1.
+- **Scope:** the levels are fixed. Moving levels Δτₙ → 0 need extra uniformity, and the small-gap / realistic-n rates (items 4–5) remain CONJECTURE.
+
+**Status: Theorem J (fixed levels) is PROVED and cross-family audited.**
