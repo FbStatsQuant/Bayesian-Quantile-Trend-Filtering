@@ -723,3 +723,98 @@ For the wide-run statement (B2) of §11.4, Theorem B10 proves its premise on non
 1. F2, crossing regularity, on clean windows.
 2. (B2), wide runs, on dense good blocks.
 3. (G2), the energy of exceptional blocks.
+
+---
+
+## 15. F2: crossing regularity on clean windows
+
+*Appended 2026-11-23, about 16:30 CT, same author. Not audited. By hand, no compute. To avoid the clash of §13–§14: **G := K·h** is the bump scale (b = 1_G^{∗4}, Σbᵢ = G⁴, ‖Db‖₁ = 8G, support 4G − 3 points) and **g** is the block length of §14. Noise assumption used: Zᵢ = yᵢ − θ\*ᵢ independent, P(Zᵢ ≤ 0) = τ, densities ≤ f̄ everywhere and ≥ f on [−L, L]. Fᵢ is the distribution function of Zᵢ. Two elementary facts about the bump: ‖b‖∞ ≤ G³, and G⁷/4 ≤ ‖b‖₂² ≤ G⁷ (Cauchy–Schwarz on the support; ‖b‖∞·Σbᵢ).*
+
+### 15.0 Outcome
+
+**F2 is routine and is proved. With it, the mean balance becomes balance in probability on every fibre that passes through a clean window. This is still not a sup-norm bound; the reason is stated in §15.4.**
+
+| # | Claim | Status |
+|---|---|---|
+| 1 | **Uniform law of large numbers:** with data-probability ≥ 1 − n^{−C}, for all windows and all shapes "piecewise quadratic + multiple of the bump ± ā": \|φ_b(θ) − Φ̄_b(δ)\| ≤ εₙ := t + 7f̄·ā, t² ≈ 6·log(2L/ā)/g + C·log n/(2G) | PROVED (Lemma B12) |
+| 2 | **Crossing regularity, two-sided:** f·u·‖b‖₂² − 2εₙG⁴ ≤ crossing mass on (T, T+u] ≤ f̄·u·‖b‖₂² + 2εₙG⁴ | PROVED (Corollary B13) |
+| 3 | **Balance in probability:** P(fibre clean and \|φ_b(θ) − τ\| > βₙ \| y) ≤ 2n^{−C}, βₙ := εₙ + (f̄/f)(εₙ + 8/K³) + 2f̄·√(C·log n/(ωf·G)) | PROVED (Theorem B14) |
+| 4 | Resolution: εₙ ≪ K^{−3} needs ā ≪ 1/(f̄K³) and g ≫ K⁶·log(L/ā); compatible with Corollary B11 when h ≫ K⁷·K₂^{1/3}·log K and K₂ ≫ K³ | PROVED arithmetic (§15.3) |
+| 5 | What it does not give: the sup-norm, or any control of oscillation between blocks inside a window | named gap (§15.4) |
+
+### 15.1 The uniform law of large numbers — PROVED
+
+Fix a window W = supp b, covered by M ≤ 4G/g + 1 blocks of length g ≥ 8. **Shape class** 𝒮_W: all δ on W of the form δ = 𝗉 + T·b + e, with 𝗉 quadratic on each block, ‖𝗉‖∞ ≤ L, |T|·‖b‖∞ ≤ L, ‖e‖∞ ≤ ā. For any δ on W put φ_b(δ) := Σᵢbᵢ1{Zᵢ < δᵢ}/G⁴ (this is φ_b(θ) of §12) and Φ̄_b(δ) := Σᵢbᵢ·Fᵢ(δᵢ)/G⁴.
+
+**Lemma B12.** Let t² := [(3M + 1)·log(2L/ā + 2) + (C + 1)·log n + log 2]/(2G). With probability ≥ 1 − n^{−C} over the data, simultaneously for all ≤ n windows and all δ ∈ 𝒮_W:
+
+  **|φ_b(δ) − Φ̄_b(δ)| ≤ εₙ := t + 7f̄·ā.**
+
+*Proof.*
+1. *Net.* On a block with points 0, …, g−1 use the nodes x₀ = 0, x₁ = ⌊(g−1)/2⌋, x₂ = g−1. The Lagrange basis satisfies |ℓ₀|, |ℓ₂| ≤ 1 and |ℓ₁| ≤ (g−1)²/((g−1)² − 1) ≤ 49/48 on the block, so rounding the three nodal values of 𝗉 to the grid āℤ moves 𝗉 by ≤ 3.1·ā/2 on the block. Rounding T·‖b‖∞ to āℤ moves T·b by ≤ ā/2. So there is a net 𝒩 of functions 𝗉′ + T′b, of cardinality N ≤ (2L/ā + 2)^{3M+1}, with ‖(𝗉 + Tb) − (𝗉′ + T′b)‖∞ ≤ 2.05·ā.
+2. *Brackets.* With ε₀ := 3.5·ā and ν := 𝗉′ + T′b: ν − ε₀ ≤ δ ≤ ν + ε₀ pointwise (2.05ā + ā ≤ 3.5ā), so φ_b(ν − ε₀) ≤ φ_b(δ) ≤ φ_b(ν + ε₀).
+3. *Fixed functions.* For a deterministic ν, φ_b(ν) is a sum of independent terms in [0, bᵢ/G⁴] with mean Φ̄_b(ν). Hoeffding: P(φ_b(ν) − Φ̄_b(ν) > t) ≤ exp(−2t²·G⁸/‖b‖₂²) ≤ exp(−2t²G). Apply to the 2N functions ν ± ε₀ (one side each) and the ≤ n windows: failure probability ≤ 2nN·e^{−2t²G} = n^{−C}.
+4. *Means.* Fᵢ(νᵢ + ε₀) ≤ Fᵢ(δᵢ + 2ε₀) ≤ Fᵢ(δᵢ) + 2f̄ε₀, and symmetrically. So φ_b(δ) ≤ Φ̄_b(δ) + t + 7f̄ā, and the same below. ∎
+
+No structure of the posterior enters: the statement is uniform over the class, hence valid for data-dependent shapes. This is the content of F2. The size: t² ≤ 6·log(2L/ā + 2)/g + [(C + 1)·log n + 4·log(2L/ā + 2) + 1]/(2G). **The resolution is set by the block length g, not by the window length.**
+
+**Corollary B13 (crossing regularity).** On the data event of Lemma B12, let θ⁰ + T·b and θ⁰ + (T + u)·b both have δ ∈ 𝒮_W with |δᵢ| ≤ L on W. Then the crossing mass (§12.2) satisfies
+
+  **f·u·‖b‖₂² − 2εₙG⁴ ≤ Σᵢbᵢ1{tᵢ ∈ (T, T + u]} ≤ f̄·u·‖b‖₂² + 2εₙG⁴.**
+
+*Proof.* The crossing mass is G⁴·[φ_b(δ + ub) − φ_b(δ)] (up to the convention at ties, a null event), and Φ̄_b(δ + ub) − Φ̄_b(δ) = Σᵢbᵢ[Fᵢ(δᵢ + ubᵢ) − Fᵢ(δᵢ)]/G⁴ ∈ [f·u‖b‖₂²/G⁴, f̄·u‖b‖₂²/G⁴]. ∎
+
+So (CR) of §13.3 holds with η for u ≥ u₀ := 2εₙG⁴/(η·f·‖b‖₂²) ≤ 8εₙ/(η·f·G³), i.e. level resolution ≤ 8εₙ/(ηf). The upper bound is the estimate asked for in §12.3(2).
+
+### 15.2 Balance in probability on clean fibres — PROVED
+
+Let A₁ := f·L/(8f̄). Call θ **clean on W at level A₁** if every block of W is good and slaved (§14) and ‖δ_W‖∞ ≤ A₁; Corollary B11 with A₁ in place of L/2 (same proof, constants rescaled) gives this on all but a vanishing fraction of windows. Assume ā ≤ A₁. A fibre {θ⁰ + T·b} is **clean** if it contains a clean point θ⁰ + T₀b. Along a clean fibre write δ_T := δ of θ⁰ + T·b and Ψ(T) := Φ̄_b(δ_T) − τ, a nondecreasing function fixed by θ⁰.
+
+**Theorem B14.** On the data event of Lemma B12, for every window:
+
+  **Π( fibre of θ clean on W and |φ_b(θ) − τ| > βₙ | y ) ≤ 2n^{−C},**
+  **βₙ := εₙ + (f̄/f)·(εₙ + 8/K³) + 2f̄·√(C·log n/(ω·f·G)),**
+
+provided the deviation d below satisfies d·G³ ≤ L/4; this holds when K³ ≥ 256/(f·L) and n is large (it is a condition on K, not only on n).
+
+*Proof.*
+1. *Range.* Let u₁ := (L − A₁)/‖b‖∞ ≥ 3L/(4G³). For |T − T₀| ≤ u₁, δ_T = δ_{T₀} + (T − T₀)b lies in 𝒮_W (by Lemma B8, δ_{T₀} = 𝗉 + e with ‖𝗉‖∞ ≤ A₁ + ā ≤ L) and |δ_T| ≤ L. So Lemma B12 applies, and Ψ has slope between f‖b‖₂²/G⁴ and f̄‖b‖₂²/G⁴ there.
+2. *Balance level.* |Ψ(T₀)| ≤ f̄·A₁, so Ψ has a zero T̄ with |T̄ − T₀| ≤ f̄A₁G⁴/(f‖b‖₂²) ≤ 4f̄A₁/(fG³) = L/(2G³) < u₁.
+3. *Drift.* By §12.2, V′(T) = ω·G⁴·(φ_b − τ) + (penalty term in [−8Gℓ, 8Gℓ]). For T ∈ [T̄, T₀ + u₁]: V′(T) ≥ ωf‖b‖₂²·(T − T̄) − ωG⁴εₙ − 8Gℓ. Let λ := (C·log n·ωf‖b‖₂²)^{1/2} and T₁ := T̄ + (ωG⁴εₙ + 8Gℓ + λ)/(ωf‖b‖₂²); T₁ ≤ T₀ + u₁ for large n. Then V′ ≥ λ on [T₁, ∞) by convexity.
+4. *Tail.* For convex V with V′ ≥ λ on [T₁, ∞): ∫_{T₁+x}^∞e^{−V} ≤ e^{−λx}∫_{T₁}^∞e^{−V}. With x := C·log n/λ: P(T > T̄ + d | fibre) ≤ n^{−C}, where d := (G⁴εₙ + 8Gℓ/ω)/(f‖b‖₂²) + 2·(C·log n/(ωf‖b‖₂²))^{1/2}. Symmetrically below.
+5. *Conclusion.* For |T − T̄| ≤ d the point is in the range of step 1, so |φ_b − τ| ≤ εₙ + |Ψ(T)| ≤ εₙ + f̄‖b‖₂²·d/G⁴ ≤ εₙ + (f̄/f)(εₙ + 8ℓ/(ωG³)) + 2f̄·(C·log n·‖b‖₂²/(ωf))^{1/2}/G⁴, and ‖b‖₂² ≤ G⁷, ℓ/(ωG³) = K^{−3}. "Fibre clean" is a function of θ⁰, so integrating the fibre bound over θ⁰ gives the claim. ∎
+
+**Reading.** On a clean fibre the weighted sign fraction is τ ± [(f̄/f)·8/K³ + O(εₙ) + O(√(log n/(ωG)))] with conditional probability ≥ 1 − 2n^{−C}: the mixture obstruction of §12.3(1) is excluded there. Equivalently the bump coordinate T is within d of the balance level T̄(θ⁰), i.e. **level error ≤ d·G³ ≲ (8/K³ + εₙ)·4/f + 4·√(C·log n/(ωf·G))**.
+
+### 15.3 Resolution — PROVED arithmetic
+
+To see the balance one needs εₙ ≲ K^{−3}: (i) ā ≤ 1/(7f̄K³), and (ii) g ≥ 6K⁶·log(2L/ā + 2) (and G ≥ K⁶·C·log n, automatic for ℓ ≥ polylog). With ā ≈ (4.5K₂ + 5.6)·g³/ℓ, (i) is g ≲ h/(K·(32f̄K₂/ω)^{1/3}), so (ii) holds when **h ≫ K⁷·K₂^{1/3}·log K**. The fraction of non-clean windows is then ≲ M·(2T/K₂ + 2r²/A²) with M ≈ 4G/g ≍ K²·K₂^{1/3}: it → 0 when **K₂ ≫ K³** (and r² → 0 polynomially). All of this holds for fixed or slowly growing K as ℓ → ∞; not for bounded ℓ.
+
+### 15.4 What is still missing
+
+1. **Theorem B14 controls one functional per bump.** It says the b-weighted average of Fᵢ(δᵢ) − τ is ≤ βₙ on clean fibres. That is a weak-norm (local average at scale G) localization. It does not bound ‖δ_W‖∞: block quadratics of opposite signs can cancel inside the window. Passing to the sup-norm needs smoothness **across** blocks at scale G, i.e. the roughness of the coarse values at the bandwidth scale. This is statement (ρ) at the top scale (§12.4), now the only link of the loop without a proof on clean windows. Candidate: apply B14 to the bumps at all shifts and at scales G′ between g and G; a function that is piecewise quadratic ± ā and whose averages against all such bumps are small is small in sup-norm (a deterministic approximation lemma). **Not written; SKETCH.**
+2. **"Fibre clean" versus "θ clean".** B14 is stated for clean fibres; a clean θ has a clean fibre, so the statement covers every θ that is clean on W. It says nothing about the non-clean windows, which are (G2) of §14.4.
+3. **Level bias.** The balance level T̄(θ⁰) is where the b-weighted mean of Fᵢ(δᵢ) equals τ. It is the truth only up to the bias 8/K³ of the penalty term, hence the term (f̄/f)·8/K³ that does not vanish for fixed K. K = Kₙ → ∞ is needed for consistency, and the conditions of §15.3 allow it.
+
+### 15.5 Flags
+
+- Lemma B12, Corollary B13 and Theorem B14 are new and unaudited. Constants (7, 3.1, the factor 4 from ‖b‖₂² ≥ G⁷/4) are crude.
+- The noise assumption (independent, densities ≤ f̄ globally and ≥ f on [−L, L]) is the note's standing one; f̄ is used globally in step 4 of Lemma B12.
+- Theorem B14 needs K³ ≥ 256/(f·L); for smaller K the balance level may leave the range where the uniform law applies.
+- B14 is at fixed (ω, ℓ), like §11–§14. "Corollary B11 at level A₁" is asserted by the same proof with rescaled constants; I did not rewrite it.
+- The data event has probability ≥ 1 − n^{−C} under the truth; the posterior statement is deterministic on it.
+
+## Theory response to §15 (2026-11-23)
+
+**Status: progress, UNAUDITED.**
+
+**PROVED:**
+- **Lemma B12 (F2, crossing regularity).** A finite net plus brackets plus Hoeffding. It is uniform over data-dependent shapes.
+- **Corollary B13.** Two-sided crossing regularity.
+- **Theorem B14.** **Balance in probability on clean windows.** This excludes the mixture obstruction of §12.3.
+
+**Remaining on clean windows:** smoothness across blocks at the bandwidth scale. The candidate is B14 at all shifts and scales plus a deterministic approximation lemma (sketch).
+
+**Remaining elsewhere:** non-clean windows (G2). The "B11 at level A₁" step is asserted, not rewritten.
+
+**For Tuesday:** a cross-family audit of §9–§15 (Astra), then the approximation lemma, then G2.
