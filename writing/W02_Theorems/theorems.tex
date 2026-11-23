@@ -1,0 +1,467 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage[colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+
+\setlist{itemsep=2pt, topsep=3pt}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\norm}[1]{\lVert #1\rVert}
+\newcommand{\Dthree}{D^{(3)}}
+\newcommand{\TV}{\mathrm{TV}}
+\newcommand{\sbar}{\bar\sigma}
+\newcommand{\szero}{\sigma_{0,n}}
+\newcommand{\IG}{\mathrm{IG}}
+\newcommand{\Ga}{\mathrm{Gamma}}
+\newcommand{\supP}{\sup_{P}\E_P\,}
+\newcommand{\ind}{\mathbf{1}}
+
+\definecolor{proved}{rgb}{0.0,0.45,0.15}
+\definecolor{progress}{rgb}{0.75,0.45,0.0}
+\definecolor{open}{rgb}{0.60,0.10,0.10}
+\newcommand{\stPA}{\textcolor{proved}{\textsf{\textbf{[PROVED + AUDITED]}}}}
+\newcommand{\stPU}{\textcolor{progress}{\textsf{\textbf{[PROVED, NOT AUDITED]}}}}
+\newcommand{\stOPEN}{\textcolor{open}{\textsf{\textbf{[OPEN]}}}}
+\newcommand{\stTARGET}{\textcolor{open}{\textsf{\textbf{[TARGET, IN PROGRESS]}}}}
+\newcommand{\PA}{\textcolor{proved}{\textbf{proved + audited}}}
+\newcommand{\PU}{\textcolor{progress}{\textbf{proved, not audited}}}
+\newcommand{\OP}{\textcolor{open}{\textbf{open}}}
+\newcommand{\ME}{\textbf{measured}}
+
+\theoremstyle{plain}
+\newcommand{\mythmname}{}
+\newtheorem*{namedx}{\mythmname}
+\newenvironment{named}[1]{\renewcommand{\mythmname}{#1}\begin{namedx}}{\end{namedx}}
+
+\newcommand{\plainly}[1]{\par\smallskip\noindent\textit{In plain words.} #1\par\smallskip}
+\newcommand{\covers}[1]{\par\noindent\textit{Method variant covered.} #1\par}
+\newcommand{\status}[1]{\par\smallskip\noindent{\small\textsf{Status:} #1}\par\smallskip}
+
+\title{Posterior contraction for Bayesian quantile trend filtering:\\ the theorems, as proved on 23 November}
+\author{BQTF Writing Department (W-02), for Felipe's review}
+\date{23 November 2026, draft built from \texttt{theory/ALIGNMENT\_MEMO.md} at commit \texttt{0356909}}
+
+\begin{document}
+\sloppy
+\maketitle
+
+\begin{abstract}
+\noindent This note states the contraction theorems for the BQTF posterior as Theory proved them on 23 November, and the one theorem still in progress. It replaces the $\sigma$ discussion of the W-01 note: the theorems below cover $\sigma$ \emph{learned} under the paper's IG prior, with no condition $\sigma\ge\sbar$. Every statement is copied from the proof file named in its status line. Every claim carries one of three labels:
+\stPA{} (proof complete; checked by an auditor from the other model family);
+\stPU{} (proof written, no audit yet);
+\stOPEN{} (no proof).
+Numbers from simulations are marked \ME. Rates are on the squared scale: ``rate $n^{-5/6}$'' means $\varepsilon_n^2\asymp n^{-5/6}$ up to the stated logarithms. The note contains no proofs and nothing from Engineering's sampler work.
+\end{abstract}
+
+\tableofcontents
+
+%=====================================================================
+\section{The model and the method}
+\label{sec:model}
+
+\paragraph{Data and truth.} $y_1,\dots,y_n$ are observed at $u_i=i/n$. At a fixed level $\tau\in(0,1)$ the truth $\theta^*\in\R^n$ is the vector of conditional $\tau$-quantiles. Write $Z_i:=y_i-\theta^*_i$, $F_i$ for the cdf of $Z_i$ (so $F_i(0)=\tau$), $\rho_\tau(x)=x(\tau-\ind\{x<0\})$ for the check loss, $Q(\theta):=\sum_i\rho_\tau(y_i-\theta_i)$, $t:=\tau(1-\tau)$, $D:=\Dthree$ (third differences, $m=n-3$ rows), $\TV(\theta):=n^2\norm{D\theta}_1$, $\delta:=\theta-\theta^*$, $\norm{\delta}_n^2:=n^{-1}\sum_i\delta_i^2$ and $\Delta_n^2(\delta):=n^{-1}\sum_i\min(\delta_i^2,|\delta_i|)$.
+
+\paragraph{Felipe's method (the paper's default).}
+\[
+\pi(\theta,\lambda,\sigma\mid y)\ \propto\ \sigma^{-n}e^{-Q(\theta)/\sigma}\cdot\lambda^{m}e^{-\lambda\norm{D\theta}_1}\cdot\Ga(\lambda;1,b_0)\cdot\IG(\sigma;0.1,0.1),
+\]
+with a flat prior on quadratics (the null space of $D$).
+\begin{itemize}
+\item \emph{Likelihood:} the asymmetric Laplace (ALD) working likelihood with scale $\sigma$.
+\item \emph{Trend prior:} Laplace on $D\theta$ with rate $\lambda$ (the paper's $k=2$).
+\item \emph{$\lambda$:} learned, $\lambda\sim\Ga(1,b_0)$ with a constant rate $b_0=10^{-3}$ (VS) or $5\times10^{-4}$ (S).
+\item \emph{$\sigma$:} learned, $\sigma\sim\IG(0.1,0.1)$.
+\item \emph{Joint version:} several levels ($\tau\in\{0.90,0.93,0.96,0.97,0.98,0.99\}$ in the paper) fitted together, with the posterior restricted to the non-crossing set $C:=\{\Theta:\theta_{i1}\le\dots\le\theta_{iq}\text{ for all }i\}$.
+\end{itemize}
+All theorems concern this \emph{posterior}. They say nothing about how well a particular sampler reaches it.
+
+\paragraph{The variants the theorems cover.}
+\begin{itemize}
+\item \textbf{V0T} (``his method plus a floor''): Felipe's method with $\lambda$ restricted to $\lambda\ge\Lambda_-:=\kappa_-n^{5/2}$, $\kappa_-=1.6\times10^{-5}$ (the Gamma prior truncated below). At $n=500$ the floor is $89$; the smallest posterior $5\%$ quantile of $\lambda$ over 90 fits was $267$ (\ME, memo). So at the paper's $n$ the floor never binds.
+\item \textbf{A-rule}: Felipe's method with one change, $\lambda\sim\Ga(1,b_n)$, $b_n=1/(5500\,(n/500)^{5/2})$. It depends on $n$ only, is the same for both signals, and has no truncation.
+\item \textbf{Oracle $\lambda$} (Theorems C, C$^*$): $\sigma$ learned as in the method, $\lambda$ a deterministic sequence $\lambda\asymp n^{5/2}/V$.
+\end{itemize}
+
+\begin{table}[h]
+\centering\footnotesize
+\caption{Method against theorem. ``Interior $\tau$'' means any fixed $\tau\in(0,1)$ at which the assumptions hold; $C$ is the non-crossing set.}
+\label{tab:method}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{2.0cm}p{1.4cm}p{2.7cm}p{1.9cm}p{2.0cm}p{1.1cm}p{1.5cm}p{2.3cm}@{}}
+\toprule
+ & $\sigma$ & $\lambda$ & floor & hyper\-parameters & joint & $\tau$ range & vs.\ the method \\
+\midrule
+Felipe's method & learned, IG & learned, $\Ga(1,b_0)$ & none & $b_0$ const.; IG$(0.1,0.1)$ & yes, on $C$ & 0.05--0.95; joint 0.90--0.99 & --- (no theorem at any rate) \\[2pt]
+Thm C & learned, IG & deterministic, oracle window & --- & IG$(a,b)$, any $a,b>0$ & no & interior & differs: $\lambda$ not learned \\[2pt]
+Thm C$^*$ & learned, IG & deterministic, $\asymp n^{5/2}/V$ & --- & IG$(a,b)$ & no (yes via J) & interior & differs: $\lambda$ not learned \\[2pt]
+Thm V0T / V0T$^*$ & learned, IG & learned, $\Ga(1,b_0)$ or $\Ga(1,c_bn^{-5/2})$, trunc. & $\lambda\ge\kappa_-n^{5/2}$, $\kappa_-{=}1.6{\cdot}10^{-5}$ & as the method & no (yes via J) & interior & differs by the floor only; identical at $n=500$ (\ME) \\[2pt]
+Thm J & as V0T$^*$ or C$^*$, per level & as V0T$^*$ or C$^*$ & as V0T$^*$ & per level & yes, on $C$ & fixed levels & as V0T$^*$, jointly \\[2pt]
+Thm LB & any fixed, or learned & deterministic; or V0T & --- or V0T & --- & no & interior & lower bound only \\[2pt]
+A-rule target & learned, IG$(0.1,0.1)$ & learned, $\Ga(1,b_n)$ & none & $b_n=\frac{1}{5500}(\frac{500}{n})^{5/2}$ & no & 0.05--0.95 & differs in $b_n$ only; \OP \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%=====================================================================
+\section{Assumptions}
+\label{sec:assumptions}
+
+All constants are fixed; ``$\sup_P$'' is over every law of $y$ that satisfies the listed assumptions with these constants.
+\begin{description}[leftmargin=0pt]
+\item[(A1)] $y_1,\dots,y_n$ are independent.
+\item[(A2)] Two-sided secant margin at the quantile: $f|x|\le|F_i(x)-F_i(0)|\le\bar f|x|$ for $|x|\le L$, all $i$. ``Upper (A2)'' is the right-hand inequality alone.
+\item[(A3)] $\TV(\theta^*)=n^2\norm{D\theta^*}_1\le V$.
+\item[(UI)] $\rho_\tau(Z_i)$ is uniformly integrable on row average, with a common modulus.
+\item[(S0)] $d\le\szero\le B$ with $d>0$, where $\szero:=n^{-1}\sum_i\E\rho_\tau(Z_i)$ is the population check risk (the value the learned $\sigma$ converges to).
+\end{description}
+No exponential moments, no (EM) and no condition $\sigma\ge\sbar=t/f$ appear in Section~\ref{sec:main}.
+
+\noindent\textit{For the paper's designs} (Gaussian, Beta, mixed normal; VS and S truths), (A1)--(A3), (UI) and (S0) hold at every fixed level; $\szero\in[0.0046,0.29]$ (W-01 note, Tables 4--6; THEOREM\_C.md). The learned $\sigma$ sits at $0.13$--$0.64\,\sbar$ (\ME, memo), so results that need $\sigma\ge\sbar$ (Theorem B of W-01) do not reach it.
+
+%=====================================================================
+\section{Main results: proved and cross-family audited}
+\label{sec:main}
+
+\subsection{\texorpdfstring{Theorem C: $\sigma$ learned, $\lambda$ deterministic, rate $n^{-4/7}$}{Theorem C: sigma learned, lambda deterministic}}
+
+\plainly{With $\sigma$ learned exactly as in the paper and $\lambda$ set by a deterministic rule near the oracle, the posterior of the trend contracts, in sup-norm too, and the learned $\sigma$ settles on the population check risk $\szero$. The rate $n^{-4/7}$ is slower than the oracle rate; Theorem C$^*$ improves it.}
+
+\begin{named}{Theorem C}
+Model: $\pi(\theta,\sigma\mid y)\propto\sigma^{-n}e^{-Q(\theta)/\sigma}\,e^{-\lambda\norm{D\theta}_1}\,\IG(\sigma;a,b)$, flat prior on quadratics, any fixed $a,b>0$, penalty free of $\sigma$. Assume (A1), (A2) (both halves, constants $L,f,\bar f$), (A3), (UI) and $\szero\ge d>0$. Let $\lambda$ be deterministic, $\lambda\asymp n^{5/2}/V$; more generally any deterministic $\lambda$ with $n^{23/11}(\log n)^{12/11}\ll\lambda\ll n^{108/41}V^{-42/41}$ for which C1's denominator hypothesis (ii) holds. With $r_n^2:=C\,n^{1/7}\lambda^{-2/7}(\log n)^{6/7}$, i.e.\ $r_n^2\asymp n^{-4/7}(\log n)^{6/7}$ at the oracle, for every fixed $\eta>0$:
+\begin{enumerate}[label=\arabic*.]
+\item $\supP\Pi(\norm{\theta-\theta^*}_n^2>r_n^2\mid y)\to0$;
+\item $\supP\Pi(\norm{\theta-\theta^*}_\infty>\eta\mid y)\to0$;
+\item $\supP\Pi(|\sigma/\szero-1|>\eta\mid y)\to0$.
+\end{enumerate}
+\end{named}
+\covers{$\sigma$ exactly as the method learns it. $\lambda$ is not learned.}
+\status{\stPA. Assembly by Theory from C1 and Lemma W (both audited by Astra) and Lemma S (written by an Astra assistant, audited by Opus: ACCEPT WITH FIXES). Final read by Fable: ACCEPT at the oracle; the window's upper end was corrected to $n^{108/41}V^{-42/41}$. File \texttt{THEOREM\_C.md}, commit \texttt{574407c}.}
+
+\subsection{\texorpdfstring{Theorem C$^*$: $\sigma$ learned, oracle $\lambda$, rate $n^{-5/6}$}{Theorem C*: sigma learned, oracle rate}}
+
+\plainly{The same setting as Theorem C, now at the oracle rate $n^{-5/6}$ (up to $(\log n)^{1/6}$). This is the first theorem at the best rate that learns $\sigma$ the way the paper does. It needs no light tails and no lower bound on $\sigma$.}
+
+\begin{named}{Theorem C$^*$}
+Model and assumptions of Theorem C: fixed interior $\tau$; (A1); (A2) in secant form with $(L,f,\bar f)$; (A3) with $V$; (UI) with a common modulus; $d\le\szero\le B$, $d>0$. $\lambda$ deterministic, $a_1n^{5/2}/V\le\lambda\le a_2n^{5/2}/V$. Put $\varepsilon^2:=C(\log n)^{1/6}V^{1/3}n^{-5/6}$. Then for every $M>M^*$ (an explicit constant, \texttt{FABLE\_A\_n56.md} \S2.1) and every fixed $\eta>0$:
+\begin{enumerate}[label=\arabic*.]
+\item $\supP\Pi(\norm{\theta-\theta^*}_n^2>M\varepsilon^2\mid y)\to0$, i.e.\ rate $n^{-5/6}(\log n)^{1/6}$;
+\item $\supP\Pi(\norm{\theta-\theta^*}_\infty>s^*\mid y)\to0$, with $s^*:=6\sqrt M\varepsilon+7.06(\sqrt M\varepsilon)^{4/5}T_0^{1/5}$, $T_0:=Tn^3/\lambda$, $T\ge4$; $s^*\asymp n^{-7/30}(\log n)^{1/15}$;
+\item $\supP\Pi(|\sigma/\szero-1|>\eta\mid y)\to0$.
+\end{enumerate}
+No (EM), no $\sigma\ge\sbar$, no moments beyond uniform integrability.
+\end{named}
+\covers{$\sigma$ exactly as the method learns it, at the oracle rate; $\lambda$ deterministic.}
+\status{\stPA. Assembly by Theory, written independently by Fable A (\texttt{FABLE\_A\_n56.md}). Inputs Lemma F, W$'$ and C2 by Fable, audited by Opus (ACCEPT; C2 shells ACCEPT WITH FIXES). Cross-family audit by Astra: Theorem C$^*$ ACCEPT. Files \texttt{THEOREM\_C\_STAR.md}, \texttt{FABLE\_A\_n56.md}; commit \texttt{4350530}.}
+
+\subsection{\texorpdfstring{Theorems V0T and V0T$^*$: his method plus a $\lambda$ floor}{Theorems V0T and V0T*: his method plus a lambda floor}}
+\label{sec:v0t}
+
+\plainly{Felipe's method, with $\sigma$ \emph{and} $\lambda$ learned, plus one change: $\lambda$ may not fall below $1.6\times10^{-5}n^{5/2}$. Then the trend contracts at the oracle rate $n^{-5/6}(\log n)^{1/6}$, and the learned $\sigma$ settles on $\szero$. At $n=500$ the floor never binds, so there the method is unchanged. This is the main theorem available now.}
+
+\noindent\textbf{Model (both theorems).} $\pi(\theta,\lambda,\sigma\mid y)\propto\sigma^{-n}e^{-Q(\theta)/\sigma}\,\lambda^me^{-\lambda\norm{D\theta}_1}\,p_n(\lambda)\,\IG(\sigma;a,b)$, flat prior on quadratics, $a,b>0$ fixed, $p_n$ a probability law on $[\Lambda_-,\infty)$, $\Lambda_-:=\kappa_-n^{5/2}$, $\kappa_->0$ fixed. $J_0:=[\Lambda_-,2\Lambda_-]$, $p_{0,n}:=p_n(J_0)$.
+\begin{itemize}
+\item V0T (Felipe + floor): $p_n=\Ga(1,b_0)$ truncated to $[\Lambda_-,\infty)$, $b_0$ constant; $p_{0,n}=1-e^{-b_0\Lambda_-}\to1$.
+\item Scaled version: $b_n=c_bn^{-5/2}$; $p_{0,n}=1-e^{-c_b\kappa_-}$, a constant.
+\item In general: any $p_n$ on $[\Lambda_-,\infty)$ with $-\log p_{0,n}=o(n\bar\varepsilon^2)$.
+\end{itemize}
+\textbf{Assumptions (both).} Those of Theorem C$^*$, with no condition on $\lambda$ and no relation between $\kappa_-$ and $V$.
+
+\begin{named}{Theorem V0T}
+Fix $T\ge4$; $T_0:=Tn^3/\Lambda_-=(T/\kappa_-)\sqrt n$; $r^2:=C_r(T/\kappa_-)^{2/7}n^{-4/7}(\log n)^{6/7}$. For every fixed $\eta>0$:
+\begin{enumerate}[label=\arabic*.]
+\item $\supP\Pi(\norm{\theta-\theta^*}_n>r\text{ or }\TV(\theta-\theta^*)>T_0\mid y)\to0$;
+\item $\supP\Pi(\norm{\theta-\theta^*}_\infty>s_K\mid y)\to0$, $s_K:=6r+7.06\,r^{4/5}T_0^{1/5}\asymp n^{-9/70}(\log n)^{12/35}$;
+\item $\supP\Pi(|\sigma/\szero-1|>\eta\mid y)\to0$.
+\end{enumerate}
+No (EM), no $\sigma\ge\sbar$, no moments beyond uniform integrability, and no containment statement for $\lambda$ is needed or claimed.
+\end{named}
+
+\begin{named}{Theorem V0T$^*$}
+Put $\bar\varepsilon^2:=C_\varepsilon n^{-5/6}[\kappa_-^{-1/3}(\log m)^{1/6}+\kappa_-^{5/3}V^2]$. For every $M>\bar M^*$ (an explicit constant, \texttt{FABLE\_A\_n56.md} \S3.1) and every fixed $\eta>0$:
+\begin{enumerate}[label=\arabic*.]
+\item $\supP\Pi(\norm{\theta-\theta^*}_n^2>M\bar\varepsilon^2\mid y)\to0$, i.e.\ rate $n^{-5/6}(\log n)^{1/6}$, with constant $\propto\kappa_-^{-1/3}+\kappa_-^{5/3}V^2/(\log n)^{1/6}$;
+\item $\supP\Pi(\norm{\theta-\theta^*}_\infty>\bar s^*\mid y)\to0$, $\bar s^*:=6\sqrt M\bar\varepsilon+7.06(\sqrt M\bar\varepsilon)^{4/5}T_0^{1/5}\asymp n^{-7/30}(\log n)^{1/15}$;
+\item $\supP\Pi(|\sigma/\szero-1|>\eta\mid y)\to0$.
+\end{enumerate}
+No containment statement for $\lambda$ is needed or claimed. At $\kappa_-=1/V$ the constant is the oracle's $V^{1/3}$; the theorem is rate-optimal for every $\kappa_-$, but adaptive to $V$ only in that case.
+\end{named}
+\covers{V0T: Felipe's method (constant $b_0$) plus the floor $\kappa_-=1.6\times10^{-5}$; also the scaled schedule. Rate $n^{-4/7}(\log n)^{6/7}$ (V0T) and $n^{-5/6}(\log n)^{1/6}$ (V0T$^*$).}
+\status{V0T: \stPA. Prover Fable (as Theorem V2T, which covers V0T). Auditor Astra: ACCEPT WITH FIXES (ten editorial findings, all held). File \texttt{FABLE\_V2T\_proof.md}, commit \texttt{ee516f3}.\\
+V0T$^*$: \stPA. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (eight editorial findings, all held; Lemma C2-mix ACCEPT WITH FIXES). File \texttt{FABLE\_A\_n56.md} \S3, commit \texttt{afae478}.}
+
+\subsection{\texorpdfstring{Theorem J: the joint non-crossing posterior}{Theorem J: the joint non-crossing posterior}}
+
+\plainly{For a fixed set of levels, the paper's joint non-crossing posterior inherits V0T$^*$ (or C$^*$) at every level at once, at $n^{-5/6}(\log n)^{1/6}$, with no extra separation condition. The reason is that the true quantile curves are separated (upper (A2) forces it) and each level's posterior concentrates in sup-norm, so the ordering constraint becomes inactive. So the theorem says the constraint does no harm asymptotically. It does not say the constraint helps, and at the paper's $n$ the constraint is probably still active.}
+
+\begin{named}{Theorem J}
+Assumptions: $q\ge2$ fixed levels; for each $j$ the assumptions of Theorem V0T$^*$ hold at level $\tau_j$ ((A1); full (A2) in secant form; (A3); (UI) of $\rho_{\tau_j}(y_i-\theta^*_{ij})$; $d_j\le\sigma_{0,n,j}\le B_j$; floor $\Lambda_{-,j}=\kappa_{-,j}n^{5/2}$ and $p_n$ as in V0T$^*$, constant or scaled $b_0$), with common constants. $\Pi^\otimes$ is the product of the single-level posteriors; $\Pi_C$ is the joint posterior on $C$; $\bar\varepsilon_j^2$, $\bar M^*_j$, $\bar s^*_j$ are those of V0T$^*$ at level $j$; $M>\max_j\bar M^*_j$. For every fixed $\eta>0$, as $n\to\infty$:
+\begin{enumerate}[label=\arabic*.]
+\item $\supP\Pi^\otimes(C^c\mid y)\to0$; equivalently $\supP\norm{\Pi_C-\Pi^\otimes}_{TV}\to0$;
+\item $\supP\Pi_C(\norm{\theta_j-\theta^*_j}_n^2>M\bar\varepsilon_j^2\text{ for some }j\mid y)\to0$: rate $n^{-5/6}(\log n)^{1/6}$ at every level simultaneously;
+\item $\supP\Pi_C(\norm{\theta_j-\theta^*_j}_\infty>\bar s^*_j\text{ for some }j\mid y)\to0$;
+\item $\supP\Pi_C(|\sigma_j/\sigma_{0,n,j}-1|>\eta\text{ for some }j\mid y)\to0$.
+\end{enumerate}
+The same holds with Theorem C$^*$ in place of V0T$^*$. Separation is implied, not assumed (Lemma J0): $\theta^*_{i,j+1}-\theta^*_{ij}\ge g_0:=\min(L,\Delta\tau/\bar f)$.
+\end{named}
+\covers{The paper's joint non-crossing fit, with V0T$^*$ (or C$^*$) at each level.}
+\status{\stPA. Prover Fable B. Auditor Astra: ACCEPT WITH FIXES. File \texttt{FABLE\_B\_joint.md}, commit \texttt{6697527}. Scope: fixed levels only. Levels that approach each other with $n$, and the realistic-$n$ regime where the constraint is active, are SKETCH/CONJECTURE. The argument needs $n\gtrsim(c\bar f/\Delta\tau)^{30/7}$, far beyond the paper's $n$ for level gaps of a few hundredths.}
+
+\subsection{\texorpdfstring{Theorem LB: the matching lower bound}{Theorem LB: the matching lower bound}}
+
+\plainly{The posterior cannot contract faster than $\lambda^{-1/3}$. At the oracle $\lambda\asymp n^{5/2}/V$ this is $n^{-5/6}$, so together with C$^*$ or V0T$^*$ the exponent $5/6$ is exact. The only remaining gap is the factor $(\log n)^{1/6}$ on the upper side. The lower bound needs very little: independence and the upper half of (A2).}
+
+\begin{named}{Theorem LB}
+Assume (A1) and upper (A2) (constants $L,\bar f$; $C_1=\max(\bar f/2,1/L)$). Let $n\ge5$, $\omega=1/\sigma>0$, $\lambda>0$, and let $(\theta^*,\lambda)$ be $\beta$-admissible (a shift budget $\beta$, defined in \texttt{FABLE\_B\_lowerbound.md} \S7). Put
+\[
+\Sigma:=100+\beta+\omega(1.44C_1+1)+c_\omega,\qquad c_0:=(932\,\Sigma)^{-5},\qquad D:=n\lambda^{-1/3}.
+\]
+If $(32\Sigma)^3\le\lambda\le(n/42)^3$, then
+\[
+\E_0\,\Pi\big(\Delta_n^2(\theta-\theta^*)\le c_0\lambda^{-1/3}\mid y\big)\ \le\ 1.44/D+8D^{3/2}\exp\{5-(\Sigma+1)D\}.
+\]
+Along any sequence with $\lambda_n\to\infty$, $\lambda_n=o(n^3)$ and $\beta$ bounded, the left side tends to $0$, uniformly over the laws with the given $(L,\bar f)$ and the $\beta$-admissible truths. The same holds for $\norm{\theta-\theta^*}_n^2$. No lower margin, no (EM), no moments, no $\sigma\ge\sbar$.
+\end{named}
+
+\noindent\textbf{Exact scope.}
+\begin{itemize}
+\item \emph{Noise:} (A1) and upper (A2) only.
+\item \emph{$\sigma$:} any fixed $\sigma>0$ ($c_0$ depends on $\sigma$); uniformly on compact $\sigma$-intervals; and $\sigma$ learned under IG, given Lemma S's hypotheses ((UI), $\szero\ge d$, (A3) or a bounded truth) plus a bounded shift budget, $\lambda\to\infty$ and $D\to\infty$.
+\item \emph{$\lambda$, deterministic:} under (A3), every $\lambda_n\to\infty$ with $\lambda_n\le a_2n^{5/2}/V$; for quadratic truths, every $\lambda_n=o(n^3)$. Above the oracle both tuning restrictions must be re-checked at the growing budget, and they can fail (e.g.\ $\lambda=n^{59/20}$ is not certified).
+\item \emph{$\lambda$, learned:} his method plus the floor (V0T: constant $b_0$, fixed $V$ and $\kappa_-$) gives $\Pi(\Delta_n^2\le c\Lambda_-^{-1/3}\mid y)\to0$ with a constant $c$, log-free. Not covered: unfloored scaled hyperpriors (A-rule, V2).
+\item \emph{Centre:} a ball around the truth $\theta^*$, not around a posterior-dependent centre.
+\end{itemize}
+
+\noindent\textbf{Two-sided statement at the oracle.} For $a_1n^{5/2}/V\le\lambda\le a_2n^{5/2}/V$, with posterior mass $\to1$,
+\[
+c_0(V/a_2)^{1/3}n^{-5/6}\ \le\ \Delta_n^2(\theta-\theta^*)\ \le\ M(\log n)^{1/6}V^{1/3}n^{-5/6},
+\]
+in $\Delta_n^2$ and in $\norm{\cdot}_n^2$. The upper half needs more than LB: full (A2), (A3), (UI) and $\szero\ge d$, through C$^*$ (learned $\sigma$, oracle $\lambda$), V0T$^*$ (his method + floor), the fixed-scale steps of C$^*$ (a fixed $\sigma$), or Theorem B (a fixed $\sigma$ in the (EM) range). Under (A1) and upper (A2) alone, only the lower half is established.
+\covers{Any fixed or learned $\sigma$; deterministic $\lambda$; V0T. Not the A-rule.}
+\status{\stPA. Prover Fable B. Auditor Astra: ACCEPT WITH FIXES (eleven confirmed findings and one plausible, all held; all applied in commit \texttt{efc0a09}). File \texttt{FABLE\_B\_lowerbound.md}.}
+
+\subsection{\texorpdfstring{The no-floor obstruction}{The no-floor obstruction}}
+\label{sec:obstruction}
+
+\plainly{Without a floor (or another change), no theorem can cover Felipe's method for \emph{every} law in the class. There is one bounded, smooth noise law at $\tau=0.05$, inside the class of C, C$^*$ and V0T$^*$, on which the exact no-floor posterior fails to contract: fits that nearly interpolate the data carry more evidence than the truth. The floor is \emph{one} repair that works. It is not shown to be the only one. The paper's own designs are not of this kind: they meet the necessary condition with a wide margin.}
+
+\begin{named}{Obstruction (necessary condition)}
+Write $k=\min(\tau,1-\tau)$, $R_n=\norm{Dy}_1/n$. Suppose that with probability tending to one $R_n\le r$ and $Q(\theta^*)/n\ge s_*$, for fixed $r>0$ and $s_*>2tr$. For every $2tr<q<s_*$ there is a fixed $c>0$ such that, on these data events and for all large $n$, $\Pi(Q(\theta)\ge nq\mid y)\le e^{-cn}$. Consequently, when $R_n\to R>0$ and $Q(\theta^*)/n\to\sigma_0$ in probability, consistency of the exact posterior requires
+\[
+\sigma_0\ \le\ 2\tau(1-\tau)R .
+\]
+\end{named}
+\noindent\textbf{Counterexample.} $\tau=0.05$, $\theta^*=0$, i.i.d.\ errors from the uniform mixture $0.049\cdot U[-0.02,-0.01]+0.002\cdot U[-0.005,0.005]+0.949\cdot U[1,1.001]$. It satisfies (A1), full (A2) ($L=0.004$, slopes $0.2$), (A3) and (UI), with $\sigma_0/\sbar\approx0.20$. For every fixed $b_0>0$ and the IG$(0.1,0.1)$ prior, the exact joint posterior puts exponentially vanishing mass on a fixed neighbourhood of the truth. The same holds for the unfloored scaled rate $b_n=c\,n^{-5/2}$.
+
+\noindent\textbf{The paper's designs.} The ratio $\sigma_0/(2\tau(1-\tau)R)$ is $0.22$--$0.38$ (Gaussian), $0.18$--$0.47$ (Beta) and $0.22$--$0.38$ (mixed), at $\tau\in\{0.01,0.05,0.25,0.5,0.75,0.95,0.99\}$ (computed: MC for $R$, quadrature for $\sigma_0$; \texttt{noFloor\_necessary.out}, commit \texttt{51b7163}). So the obstruction does not apply to them. \textbf{Whether the condition, with margin, is also sufficient is \OP.}
+\covers{Shows that the unmodified method (constant $b_0$, or unfloored $b_n\propto n^{-5/2}$) has no class-wide theorem.}
+\status{\stPA. Prover Astra (an assistant). Auditor Fable: ACCEPT WITH FIXES (19 findings, all held; the wording ``the floor excludes exactly these configurations'' was withdrawn). File \texttt{astra\_noFloor.md}, commit \texttt{7baa5b4}. The Gaussian margin is confirmed in closed form; the Beta and mixed margins are numerical.}
+
+\subsection{\texorpdfstring{Order $k$: the rate $n^{-(2k+1)/(2k+2)}$}{Order k}}
+
+\plainly{The same chain works for every trend-filtering order $k\ge1$. The oracle tuning is $\lambda=n^{k+1/2}/V$ and the rate is $n^{-(2k+1)/(2k+2)}$ ($k=2$: $n^{-5/6}$). At $k=0$ (the fused lasso) only Theorem B survives.}
+
+\noindent For $k\ge1$, with $D=D^{(k+1)}$, a flat prior on polynomials of degree $\le k$ and (A3$_k$): $n^k\norm{D\theta^*}_1\le V$, the oracle tuning is $\lambda_{k,n}=n^{k+1/2}/V$ and
+\[
+\varepsilon_n^2=C(\log n)^{1/(2k+2)}V^{1/(k+1)}n^{-(2k+1)/(2k+2)}.
+\]
+C1, C2 and V0T/V2T with the floor $\Lambda_-=\kappa_-n^{k+1/2}$ carry over for $k\ge1$ by substitution into the audited proofs; Lemma S carries over for every $k\ge0$. At $k=1$ the C1 window margin is thin ($n^{1/14}(\log n)^{-4/7}$) but sufficient. At $k=0$ sup-norm localization fails on the proposed body; only Theorem B (under (EM)) survives.
+\status{\stPA{} for $k\ge1$. Prover Fable B. Auditor Astra: ACCEPT WITH FIXES (eleven findings, all held; the Christoffel constant $(k+1)^2$ is now proved for every degree). File \texttt{FABLE\_B\_general\_k.md}, commit \texttt{3fee362}.}
+
+%=====================================================================
+\section{Target: the A-rule without a floor \quad \stTARGET}
+\label{sec:arule}
+
+\plainly{The A-rule changes one hyperparameter of Felipe's method and adds no floor. Its rate $b_n$ shrinks with $n$ so that the prior keeps pace with the oracle $\lambda$. Eight links lead from the proved pieces to the target. Five are proved, the assembly is proved, and three are open (L2, L4a, L4b). \textbf{It is not a theorem until the open links close.}}
+
+\begin{named}{Target (A-rule, floor-free)}
+Model: Felipe's method with $\lambda\sim\Ga(1,b_n)$, $b_n=1/(5500\,(n/500)^{5/2})$, $\sigma\sim\IG(0.1,0.1)$ learned, no truncation. At $\tau\in[0.05,0.95]$, for the paper's three noise designs, $\theta$ contracts at $n^{-5/6}$ up to logs (via L7: $n^{-5/6}(\log n)^{1/3}$), with $\sigma$ and $\lambda$ both learned.
+\end{named}
+
+\noindent\textbf{Why it must be design-specific.} By the obstruction (Section~\ref{sec:obstruction}) and the soft-floor notes (Astra; Fable B, unaudited), no class-wide theorem exists for an unfloored adaptive Gamma prior. So the target is for the paper's three designs only, at $\tau\in[0.05,0.95]$.
+
+\noindent\textbf{Route.} Corollary P (Theorem H file) gives, for every event $B$ and every data vector,
+\[
+\Pi(B\mid y)\ \le\ \Pi(B\mid y,\lambda\ge\Lambda_-)+\Pi(\lambda<\Lambda_-\mid y).
+\]
+The first term is V0T$^*$ with an $n$-dependent floor (L7, proved). Everything else is the lower-tail input
+\[
+\textbf{(LT)}\qquad \supP\Pi(\lambda<\Lambda_{-,n}\mid y)\to0,\qquad \Lambda_{-,n}=c_-n^{5/2}(\log n)^{-1/2}.
+\]
+The $\lambda$-range below $\Lambda_{-,n}$ is split into pieces:
+
+\begin{table}[h]
+\centering\small
+\caption{The chain L1--L8 (memo executive summary and \texttt{TUESDAY\_PLAN.md}, status at 17:05 CT).}
+\label{tab:chain}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{0.9cm}p{4.4cm}p{3.6cm}p{5.6cm}@{}}
+\toprule
+Link & $\lambda$ range / step & Status & Source; prover / auditor \\
+\midrule
+L1 & tiny $\lambda<\ell_1:=(1-\eta)\,2t/(e\szero)\,e^{-\eta}$ & \PU{} (class-wide) & \texttt{FABLE\_A\_Arule\_lowertail.md} \S2 (I); Fable A; audit queued (Astra) \\[2pt]
+L2 & bounded $\lambda\in[\ell_1,\ell_0]$: design condition (DC) & \OP; statement and reductions \PU & \texttt{FABLE\_B\_DC.md}; Fable B. New, not audited: Gaussian design proved by analysis (\texttt{FABLE\_B\_L2\_analysis.md}); Beta, mixed SKETCH \\[2pt]
+L3 & interpolating fits; extreme scales & \PU{} (class-wide) & lowertail \S2 (III-a/b), using Lemma S (audited) \\[2pt]
+L4a & $\lambda\in[\ell_0,n^{3/2}]$ & \OP; named assumption with a data check & \texttt{L4a\_assumption.md} \\[2pt]
+L4b & $\lambda\in[n^{3/2},\,C n^{2.30}]$ & \OP; reduced to one hypothesis (PM2) & \texttt{FABLE\_A\_L4b.md} (new, not audited; see below) \\[2pt]
+L5 & $\lambda\in[L_n,\Lambda_{-,n}]$: $L_n=Cn^{99/43}(\log n)^c$, $\Lambda_{-,n}=c_-n^{5/2}(\log n)^{-1/2}$ & \PA & Theorems LO, U, U-$\sigma$ with averaged $\bar\beta<6$; Fable A, Fable B / Astra \\[2pt]
+L6 & L1--L5 $\Rightarrow$ (LT) & assembly \PU{} given its inputs & lowertail \S5 \\[2pt]
+L7 & (LT) $\Rightarrow$ rate $n^{-5/6}(\log n)^{1/3}$ (V0T$^*$, $n$-dependent floor) & \PA & \texttt{FABLE\_A\_V0Tstar\_nfloor.md}; Fable A / Astra \\[2pt]
+L8 & rate $n^{-5/6}(\log n)^{1/3}$, matched by LB up to logs & follows from L7 and LB & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The proved links}
+
+\begin{named}{Theorem H (Huber-body localization above any floor)}
+At fixed $\sigma$ ($\omega=1/\sigma$), let $p$ be any probability law on $[\Lambda_-,\infty)$, $J_0=[\Lambda_-,2\Lambda_-]$, $p_0:=p(J_0)>0$. Assume (A1), full (A2) in secant form, (A3) with $V$; no moments, no (EM), no condition on $\sigma$. With the Huber function $h_L$, $\mathbf h(\delta)=\sum_ih_L(\delta_i)$, $T\ge4$, $T_0:=Tn^3/\Lambda_-$ and $r^2:=C_HK^{12/7}(T/\Lambda_-)^{2/7}(\log2n)^{6/7}$, $C_H:=(605/f)^{12/7}$: for $K=K_n\to\infty$ with $K_n^6(\log n)^3=o(\Lambda_-)$, $\Lambda_-\le n^2$ and $-\log p_0=o(nr^2)$,
+\[
+\supP\sup_{\omega\in[\omega_1,\omega_2]}\Pi_\omega\big(\mathbf h(\theta-\theta^*)/n>r^2\text{ or }\TV(\theta-\theta^*)>T_0\mid y\big)\to0 .
+\]
+\end{named}
+\noindent The learned-$\sigma$ version (H-$\sigma$) holds under Lemma S's assumptions. \textit{Corollary P}: if (LT) holds at some $\Lambda_{-,n}$ with $K_n^6(\log n)^3\ll\Lambda_{-,n}\le n^2$ and the window-mass condition (WM) holds, the conclusions of H-$\sigma$ hold for the untruncated posterior.
+\status{\stPA. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (nine findings, all held; the denominator event was replaced by Astra's common event). File \texttt{FABLE\_A\_theoremH.md}, commit \texttt{0e7e7c6}.}
+
+\begin{named}{Theorem LO (local Occam bound, at fixed $(\omega,\ell)$)}
+Assume (A1), full (A2) in secant form with $(L,f,\bar f)$, (A3) with $V$; $\omega=1/s$ fixed; $\beta:=\omega t/f$. Let $\beta<6$. There are $\varepsilon\in(0,1)$, $C<\infty$ and $K_0$ (depending on $6-\beta$ and the class constants) such that for every $K\ge K_0$ and every $\ell$ with $C(K)n^{99/43}(\log n)^c\le\ell\le n^3/(\TV\cdot K)$, with probability $\ge1-C/K-C/k_*-P_0(\Omega_G^c)$,
+\[
+\tilde Z_\omega(\ell)\ \le\ n^Ce^{CK}\exp\{-(1-\varepsilon)(\pi/6)(6-\beta)k_*\},\qquad k_*:=(2\omega f')^{1/6}n\ell^{-1/3}/\pi .
+\]
+Here $\tilde Z_\omega(\ell)$ is the centred evidence at tuning $\ell$, and $k_*$ the effective number of fitted modes.
+\end{named}
+\status{\stPA{} at fixed $(\omega,\ell)$. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (eleven findings, all held). File \texttt{FABLE\_A\_three\_lemmas.md}, commit \texttt{63849f0}.}
+
+\begin{named}{Theorems U and U-$\sigma$ (uniformity; the middle band of $\lambda$)}
+For the A-rule ($\lambda\sim\Ga(1,b_n)$, $b_n=c_bn^{-5/2}$, untruncated), under the assumptions of Theorem LO, with $L_n:=Cn^{99/43}(\log n)^c$ and $\Lambda_{-,n}:=c_-n^{5/2}(\log n)^{-1/2}$:
+\begin{itemize}
+\item (U, fixed scale interval $I=[\omega_1,\omega_2]$ with $\beta_2:=\omega_2t/f<6$) $\ \supP\sup_{\omega\in I}\Pi_\omega(L_n\le\lambda<\Lambda_{-,n}\mid y)\to0$;
+\item (U-$\sigma$, $\sigma\sim\IG(a,b)$ learned, Lemma S's assumptions, condition (LO): $t/(f(1-\epsilon)d)<6$ for some $\epsilon\in(0,\tfrac12)$) $\ \supP\Pi(L_n\le\lambda<\Lambda_{-,n}\mid y)\to0$ for the joint posterior.
+\end{itemize}
+\end{named}
+\status{\stPA. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (nine findings, all held; applied by reference, written in full in Tuesday's clean rewrite). File \texttt{FABLE\_A\_uniformity.md}, commit \texttt{f5f05de}.}
+
+\begin{named}{Averaged condition $\bar\beta<6$ (replaces the worst-case $\beta$)}
+Let $f_i>0$ be the lower secant slope of $F_i$ at the quantile, $\omega=1/\sigma$, and
+\[
+\bar\beta:=\omega\,t\,\frac{\sum_if_i^{-5/6}}{\sum_if_i^{1/6}} .
+\]
+Under (REG) ($f_i=f(i/n)$, a deterministic secant profile valid on all frozen panel bodies, $0<f_{\min}\le f\le f_{\max}$, $\TV(f)\le V_f$, with a class-uniform margin $\inf(6-\bar\beta(\omega_2))>0$), Theorem LO and Theorems U/U-$\sigma$ hold with $\bar\beta<6$ in place of $\beta<6$. Always $\bar\beta\le$ plain average of $\omega t/f_i\le\omega t/\min_if_i$.
+\end{named}
+\status{\stPA. Prover Fable B. Auditor Astra: ACCEPT WITH FIXES (nine confirmed and one plausible, all held; Astra reproduced the design values). File \texttt{FABLE\_B\_averaged\_beta.md}, commit \texttt{a5453af}.}
+
+\begin{table}[h]
+\centering\small
+\caption{The condition at the learned scale $\sigma=\sigma_0$ for the paper's designs. Worst case $t/(\sigma_0\min_if_i)$ and averaged $\bar\beta$, both from \texttt{FABLE\_B\_averaged\_beta.md} \S1.3 (audited values; worst case also in \texttt{beta\_table.out}).}
+\label{tab:beta}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Design & $\tau$ & worst case & $\bar\beta$ & $\bar\beta<6$? \\
+\midrule
+Gaussian & 0.05, 0.95 & 6.70 & 4.43 & yes \\
+ & 0.25, 0.75 & 2.79 & 1.84 & yes \\
+ & 0.50 & 2.36 & 1.56 & yes \\
+ & 0.96 / 0.97 & 7.76 / 9.43 & 5.13 / 6.24 & yes / no \\
+Beta & 0.05 & 5.49 & 1.27 & yes \\
+ & 0.95 & 6.56 & 5.12 & yes \\
+ & 0.96 / 0.97 & 7.35 / 8.61 & 5.85 / 6.97 & yes / no \\
+Mixed & 0.05, 0.95 & 4.53 & 4.46 & yes \\
+ & 0.96 / 0.97 & 5.24 / 6.37 & 5.17 / 6.28 & yes / no \\
+\addlinespace
+\multicolumn{5}{@{}l}{At $\tau=0.99$: $\bar\beta=13.8$ (Gaussian), $14.2$ (Beta), $13.9$ (mixed); far above 6.}\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent So L5 covers every level $\tau\in[0.05,0.95]$ on all three designs ($\bar\beta\le5.12$). The sufficient comparison crosses 6 at $\tau\approx0.96$--$0.97$; beyond that the theorem says nothing either way.
+
+\begin{named}{L7: Theorem V0T$^*$-n (V0T$^*$ with an $n$-dependent floor)}
+Model and assumptions of V0T$^*$, with floor $\Lambda_{-,n}:=\kappa_{-,n}n^{5/2}$ and $(\log n)^{-A}\le\kappa_{-,n}\le\bar\kappa$. If $-\log p_{0,n}=o(D_n)$, $D_n:=n\bar\varepsilon_n^2$, then conclusions 1--3 of V0T$^*$ hold with $\kappa_{-,n}$ in place of $\kappa_-$. For $\kappa_{-,n}=c_-(\log n)^{-1/2}$: $\bar\varepsilon_n^2\le C_\varepsilon c_-^{-1/3}n^{-5/6}(\log n)^{1/3}(1+o(1))$, sup-norm radius $\asymp(\log n/n)^{7/30}$.
+\end{named}
+\noindent \textit{Corollary (the use in the chain).} For the untruncated A-rule, (LT) at $\Lambda_{-,n}=c_-n^{5/2}(\log n)^{-1/2}$ implies conclusions 1--3 for the untruncated posterior, at $n^{-5/6}(\log n)^{1/3}$.
+\status{\stPA. Prover Fable A. Auditor Astra: ACCEPT WITH FIXES (eight findings, all held; transfer to the untruncated posterior is conditional on (LT) at the same floor). File \texttt{FABLE\_A\_V0Tstar\_nfloor.md}, commit \texttt{a43bdcf}.}
+
+\noindent\textit{L1 and L3} (class-wide, \PU). Tiny $\lambda$: $\Pi(\lambda<\ell_1\mid y)\le e^{-\eta n/2}$ with probability $\to1$ (Gaussian design at $\tau=0.5$: $2t/(e\sigma_0)=1.38$). Interpolating fits and extreme scales are exponentially excluded via Lemma S. File \texttt{FABLE\_A\_Arule\_lowertail.md} \S2 (commit \texttt{78dd957}); audit by Astra queued.
+
+\subsection{The open links}
+
+\begin{itemize}
+\item \textbf{L2, bounded $\lambda$, (DC)} \OP. With $g_n(s,\ell):=\log(\ell/(2t))+n^{-1}\log\E_s\exp\{-\ell\norm{D(y-E)}_1\}$ and $b^*:=-1-\log\sigma_0$: (DC$_\gamma$) is ``with probability $\to1$, $\sup\{g_n(s,\ell):s>0,\ \ell_1\le\ell\le\ell_0\}\le b^*-\gamma$''. Given (DC$_\gamma$), $\Pi(\ell_1\le\lambda\le\ell_0\mid y)\le e^{-\gamma n/2}$ (\PU). The reduction to a compact rectangle is \PU. \emph{New this afternoon} (\texttt{FABLE\_B\_L2\_analysis.md}, Fable B; not audited, not yet committed by Theory): (DC$_\gamma$) is proved by analysis for Gaussian noise, for every truth and every $\tau$, on $[\ell_1,\ell_0]$ with an explicit $\ell_0$ (paper's Gaussian design: $\ell_0=790$ at $\tau=\tfrac12$, $197$ at $0.25/0.75$, $12$ at $0.05/0.95$). Beta and mixed designs: SKETCH; Beta at $\tau=0.95$ is not covered. The method stops at a constant $\ell_0$, so it does not reach L4a. The three-tier numerical certificate remains the route for the other designs.
+\item \textbf{L4a, $\lambda\in[\ell_0,n^{3/2}]$} \OP. No theory; even the $\beta<6$ heuristic has no justification here. Fallback: the named assumption below.
+\item \textbf{L4b, $\lambda\in[n^{3/2},Cn^{2.30}]$} \OP. \emph{New this afternoon} (\texttt{FABLE\_A\_L4b.md}, Fable A; not audited, not yet committed by Theory). Not closed, but reduced to one posterior hypothesis:
+\begin{itemize}
+\item Lemma 2b$'$ (resolvent trace) is proved. By substitution into the audited Theorem LO it moves LO/U/U-$\sigma$ down to $\lambda\ge Cn^{54/25}\,$polylog ($2.16$ instead of $2.30$). This range is unconditional.
+\item On $[Cn^{108/61}\mathrm{polylog},\,n^{54/25}]$ the LO bound holds \emph{conditional on} (PM2): $\max_i[\delta_i^2]\le s^2/(3\log n)^2$, $s\asymp\ell^{-1/18}/\log n$ (a pointwise posterior bound; open, measurable from fixed-$\lambda$ chains).
+\item On $[n^{3/2},n^{108/61}]$ nothing is available yet.
+\end{itemize}
+\end{itemize}
+
+\subsection{Named assumptions and their empirical status}
+
+\begin{table}[h]
+\centering\small
+\caption{Each assumption of the target, what it says, and whether it is checked on the paper's designs.}
+\label{tab:assump}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}p{2.2cm}p{5.6cm}p{6.6cm}@{}}
+\toprule
+Assumption & What it says & Empirical / design check \\
+\midrule
+(A1)--(A3), (UI), (S0) & independence; two-sided margin; roughness budget $V$; check loss UI; $\szero\ge d$ & hold for all three designs, both truths, every fixed level (W-01 note) \\[2pt]
+(REG) & a smooth secant-density profile in $u$, bounded away from 0 and $\infty$ & holds for the three designs (Theory's check) \\[2pt]
+$\bar\beta<6$ & averaged evidence condition at the learned scale & computed: $\le5.12$ on $\tau\in[0.05,0.95]$; fails at $0.97$ and $0.99$ (Table~\ref{tab:beta}). \ME: the $\hat\kappa$ pilot (one seed, Gaussian) had the predicted sign at $0.05$--$0.5$ and lost it at $0.97$ \\[2pt]
+(DC) (L2) & no partial interpolation at bounded $\lambda$ & no data yet. Gaussian design: proved by analysis (new, not audited). Beta, mixed: Tier-3 surface map planned (Tuesday at the earliest) \\[2pt]
+(L4a) & $\supP\Pi(\ell_0\le\lambda\le n^{3/2}(\log n)^c\mid y)\to0$ & \ME{} (A-rule screen, posterior medians only): at $\tau=0.5$, $\lambda/\lambda^*$ is stable from $n=500$ to $2000$ (S: $0.85\to1.05$; VS: $3.2\to2.8$). Zero mass below $n^{3/2}$ is \emph{not} shown, and cannot be with medians. Watch item: S at $\tau=0.95$ (Normal $0.59\to0.08$ at $n=1000$, one seed). Draws check proposed for Tuesday \\[2pt]
+L4b: (PM2) & pointwise posterior bound $\max_i[\delta_i^2]\le s^2/(3\log n)^2$ on $[n^{108/61},n^{54/25}]$; nothing yet below $n^{108/61}$ & none yet; measurable from fixed-$\lambda$ chains (\texttt{FABLE\_A\_L4b.md}). Fallback: named assumption \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textbf{Referee note on (L4a)} (\texttt{L4a\_assumption.md} \S4). The conclusion is about $\theta$; (L4a) is about the hyperparameter posterior on one delimited range. The other ranges are proved. It is stated in checkable posterior terms, and its companion condition $\bar\beta<6$ predicted where $\lambda$ collapses. The honest framing is: ``assumed; supported by the posterior-$\lambda$ trend in simulations; proved above $n^{2.30}$''.
+
+\noindent\textbf{Fallback F3, the conditional A-rule theorem} (\texttt{FABLE\_A\_Arule\_lowertail.md} \S5, assembly \PU). Under the assumptions of V0T$^*$ and an evidence margin (E) (covering the bounded and growing $\lambda$ ranges), the A-rule satisfies (LT) at $c_-n^{5/2}(\log n)^{-1/2}$, hence, by L7, the rate $n^{-5/6}(\log n)^{1/3}$. (E) is stated as an assumption with numerical support.
+
+\medskip
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Not a theorem yet.} The A-rule target becomes a theorem only when L2, L4a and L4b are proved, and L1, L3 and L6 are audited. Until then it may be stated only conditionally: on (DC), (L4a) and the L4b lemma as named assumptions (or on (E), fallback F3).
+\end{minipage}}
+
+%=====================================================================
+\section{What is not covered}
+\label{sec:notcovered}
+
+\begin{itemize}
+\item \textbf{Felipe's exact method (no floor, constant $b_0$).} There is no contraction theorem at any rate. Class-wide, none can exist (the obstruction). Under constant $b_0$ the learned $\lambda$ grows like $n^{3/4}$ (\ME, memo), outside every window. A design-specific theorem for it is \OP.
+\item \textbf{Class-wide floor-free results.} Impossible for unfloored Gamma priors, constant or scaled (the obstruction). Soft floors through Gamma shape parameters either pin $\lambda$ at its prior mean or fail class-wide (Astra; Fable B; not audited).
+\item \textbf{$\tau=0.01$ and $0.99$ under the A-rule.} $\bar\beta\approx13$--$14$ against $6$ for all three designs, so this route is expected not to cover them. V0T$^*$ and Theorem J are not subject to this limitation.
+\item \textbf{The joint version of the A-rule.} Theorem J is proved for V0T$^*$ and C$^*$ only.
+\item \textbf{The joint fit at the paper's $n$.} Theorem J works by showing that the constraint becomes inactive. Where the constraint is active (realistic $n$, nearby levels), nothing is proved.
+\item \textbf{Coverage of credible bands; Bernstein--von Mises.} Not claimed anywhere. $\sbar$ matters for calibration, not for the rate (memo, item (a)).
+\item \textbf{Lower bound around the posterior's own centre}, and a sharp lower bound above the oracle: new lemmas needed. The upper side keeps a $(\log n)^{1/6}$ factor.
+\item \textbf{A posterior-mean (point estimate) corollary.} Kept as a low-tier item; it needs posterior uniform integrability.
+\item \textbf{Order $k=0$} (fused lasso): only Theorem B, under (EM).
+\item \textbf{Size of $n_0$.} The sample size beyond which the bounds are in force is not quantified (low tier). The sup-norm condition (N10) of V0T$^*$ is the slowest: $n\gtrsim s_0^{-70/9}$ up to logs.
+\item \textbf{The no-floor sufficiency question.} Whether $\sigma_0\le2\tau(1-\tau)R$ with margin suffices on the paper's designs is \OP.
+\end{itemize}
+
+%=====================================================================
+\section*{Decisions for Felipe}
+\addcontentsline{toc}{section}{Decisions for Felipe}
+
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\begin{enumerate}[leftmargin=*, label=\textbf{D\arabic*.}]
+\item \textbf{Main theorem now.} Present V0T$^*$ (his method plus the floor $\lambda\ge1.6\times10^{-5}n^{5/2}$; $\sigma$ and $\lambda$ learned; $n^{-5/6}(\log n)^{1/6}$; matched by LB) as the main theorem, with the A-rule as the stated target. Together with Theorem J for the joint fit and Theorem LB for exactness.
+\item \textbf{Adopt the A-rule as the paper's $\lambda$ prior?} Its data case is the exact-Gibbs screen: median MSE ratio against the current prior $0.95$ / $0.90$ / $0.53$ at $n=500$ / $1000$ / $2000$, max $1.13$ (\ME, memo). Before the paper can use it, it still needs the P-MALA paired test and a joint non-crossing version (Engineering). No theorem covers it yet.
+\item \textbf{Fallbacks if the target does not close.} F1: V0T$^*$ is the unconditional statement (proved + audited). F2: C$^*$ ($\sigma$ learned, oracle $\lambda$; proved + audited). F3: the conditional A-rule theorem (assembly proved, not audited) under the evidence margin (E), or under (DC), (L4a) and the L4b lemma as named assumptions. Plan: if the headline does not close by Tuesday night, F3 is the paper's A-rule statement and F1 the unconditional one.
+\end{enumerate}
+\end{minipage}}
+
+\end{document}
