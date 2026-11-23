@@ -22,7 +22,7 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 | Link | λ-range / step | Status | Prover | Auditor | Fallback |
 |---|---|---|---|---|---|
 | L1 | (I) tiny λ < 2t/(eσ₀) | PROVED, class-wide (lowertail §2) | — | Astra (with H1: RSB/LT-EM audit) | — |
-| L2 | (II) bounded λ ∈ [ℓ₁, ℓ₀]: the design condition (DC) | **Gaussian design: PROVED and cross-family audited** at the paper levels 0.05–0.95 (`FABLE_B_L2_analysis.md`); ℓ₀ = 790 / 196 / 12. Mixed and Beta: open (Fable B, today until 16:55). Beta at τ = 0.95 is not covered by this method | Fable B | Astra | Mixed/Beta: certificate Tier 3 → Tier 1/2 (`FABLE_B_DC.md`) |
+| L2 | (II) bounded λ ∈ [ℓ₁, ℓ₀]: the design condition (DC) | **DONE: PROVED and cross-family audited for all three designs** at the paper levels 0.05–0.95 (`FABLE_B_L2_analysis.md`, Theorem DC-W). Beta 0.95 has a short range [1.96, 4.1] | — | — | — |
 | L3 | (III-a/b) interpolating fits; extreme scales | PROVED, class-wide (lowertail §2; Lemma S) | — | Astra (H1) | — |
 | L4a | (III-c) λ ∈ [ℓ₀, n^{3/2}]: below the homogenization limit (`FABLE_A_gap4.md`, 9701f65) | OPEN; no theory, and β < 6 has no heuristic justification here | Fable (fresh look) | Astra | named assumption (sign of κ), with κ̂ data |
 | L4b | (III-c) λ ∈ [n^{3/2}, C·n^{2.30}]: LO extension via truncation (Fable A today) | OPEN; one new lemma (a posterior bound on high-amplitude energy) | Fable A | Astra | named assumption |

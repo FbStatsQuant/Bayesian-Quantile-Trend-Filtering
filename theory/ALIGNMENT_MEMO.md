@@ -24,7 +24,7 @@
 | Link | λ range / step | Status |
 |---|---|---|
 | L1 | tiny λ | PROVED, class-wide |
-| L2 | bounded λ (design condition DC) | **Gaussian design: PROVED and cross-family audited** at τ ∈ {0.05, 0.25, 0.5, 0.75, 0.95} (Fable B / Astra, `T06_Alignment/FABLE_B_L2_analysis.md`); ℓ₀ = 790 / 196 / 12 at τ = ½ / 0.25 / 0.05. Not "every τ": the method fails at extreme quantiles. Mixed and Beta: open. Beta at τ = 0.95: not covered by this method |
+| L2 | bounded λ (design condition DC) | **PROVED and cross-family audited for all three paper designs** at τ ∈ {0.05, 0.25, 0.5, 0.75, 0.95} (Fable B / Astra, `T06_Alignment/FABLE_B_L2_analysis.md` incl. Theorem DC-W). ℓ₀ at τ = ½: Gaussian 1223, Mixed 1194, Beta 49.75; tails: Gaussian 18.9, Mixed 10.08, Beta 0.05: 378, Beta 0.95: 4.1 (short range). Uses (A3). Not "every τ" |
 | L3 | interpolating fits, extreme scales | PROVED, class-wide |
 | L4a | [ℓ₀, n^{3/2}] | OPEN; named assumption with data check (`T06_Alignment/L4a_assumption.md`) |
 | L4b | [n^{3/2}, n^{2.30}] | OPEN; one new lemma needed (CT Fable A until 16:55) |
