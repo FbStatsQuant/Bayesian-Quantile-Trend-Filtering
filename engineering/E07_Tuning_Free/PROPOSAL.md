@@ -137,3 +137,20 @@ Arms on the same data and seeds:
 | H5 | F-auto: Hall–Sheather h, quadratic design, include the endpoints, reject crossings, abstain at sparse tails; report landing, undershoot, overshoot and abstention separately; convexity gives no one-sided guarantee for the fitted quadratic at a boundary | Correct. My v1 text overstated the bias argument for the fitted boundary | **Accept**: S2c implements and reports exactly this |
 | H6 | A coherent P is IG(1, L) restricted to [L, 2L], with L from the F rule | It is valid, but it is effectively F with a little jitter | **Test as an extra P arm in S2a** only if the VP memo does not supersede it |
 | H7 | Validate stopped estimates and band endpoints against long independent runs with combined MCSE | — | **Accept** (S0) |
+
+### 7b. VP review (`hq_reviews/VP_E07.md`): rulings
+| # | VP finding | My check | Ruling |
+|---|---|---|---|
+| V1 | The collapsed block is correct; test the log-det at n = 8k (λ² ≈ 10¹⁶–10²²) | The banded QR works on the stacked matrix, whose condition number is √cond(P), the same path that stays stable to λ ≈ 1e9 in E-02. Not tested in the collapsed slice at 8k | **Accept**: one n = 8k cell is added to S0 (log-det against a high-precision reference, and λ̄ against E-02 Gibbs) |
+| V2 | The exact θ move, and the hybrid, are an augmented Gibbs sampler, not P-MALA | Agree. The hybrid's P-MALA move sits on top of an exact draw | **Accept**: it is named "augmented Gibbs" in all E-07 outputs; the hybrid stays as the C arm for the ablation only |
+| V3 | The λ prior is effectively flat at n = 500 (rate ≈ 5e-8 against ‖Dθ‖₁ ≥ 6e-4). Its content is that it does not cap λ | Agree. This is consistent with the smoke finding that the paper's b₀ caps λ on S (b₀λ ≈ 8) | **Accept**; the write-up will say so |
+| V4 | The nats claim is worded too strongly: an n-strength prior IG(κn, κn·σ_ref) does move σ, but needs σ̄ | Agree | **Accept** the rewording; the conclusion is unchanged |
+| V5a | Stopping: start two chains from the quadratic fit | Cheap, and it targets the θ-trap | **Accept**: starts are y, the LS quadratic ×2, and the smoothing-spline fit |
+| V5b | G3 "within 0.1 sd" fails by chance; use a pass rate | 0.1 sd ≈ 2 MCSE at ESS 400, so about 5% of estimates fail by chance | **Accept**: pass if ≥ 90% of estimates lie within 0.1 sd and none lies beyond 0.25 sd |
+| V5c | Stored θ covers the wrong window beyond 8k sweeps | Was real in the prototype (re-thinning) | **Already fixed** in S0 (4733a4d): one fixed stride with iteration indices |
+| V6a | Plug-in without abstention: σ̄(τ) ≤ (τ/p)σ̄(p) above the median (mirror below) | Re-derived: (1−t)·s(t) = 1/hazard(F⁻¹(t)), and log-concave ⇒ increasing hazard ⇒ σ̄(t)/t non-increasing for t ≥ ½ | **Accept**; implemented in S2c and reported against the abstention variant |
+| V6b | Cap: σ̄ ≤ √3·max(τ, 1−τ)·sd | Follows from V6a at p = ½ and Bobkov's f(med)²·Var ≥ 1/12 for log-concave laws (quoted; Theory is confirming) | **Accept** as an upper clip; reported (landing, over- and undershoot) in S2c |
+| V7 | Coherent P is IG(0.1, 0.1·s_y) truncated to [σ̂_F, cap]; τ-only hyperparameters cannot work (R depends on the law) | Agree | **Accept**: P-trunc gets one cell to show it equals F; the smooth-prior P arm stays as the "learned σ" comparison |
+| V8 | Key risk: F costs point accuracy (larger λσ, more smoothing) | — | **Measured first**: the σ sprint (paper sampler, L vs F, paired, 5 seeds) is running now; S2a repeats it with the new sampler at 10 seeds by τ, reporting MSE, coverage, width and λσ per arm. Also tests the VP's (σ_F/σ₀)^{5/6} prediction |
+| V9 | Re-run the paper's tables under the new λ default | — | **Felipe's decision after S1/S2** (HQ); no action |
+| V10 | Theory: the learned-λ theorem needs the supremum over σ ∈ I and over c inside the expectation | — | Relayed to HQ; for Theory |
