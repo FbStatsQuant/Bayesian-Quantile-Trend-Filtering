@@ -80,6 +80,8 @@
 
 **General k:** rate n^{−(2k+1)/(2k+2)} at λ = n^{k+1/2}/V, for every k ≥ 1. **PROVED and cross-family audited** (Fable B; Astra: ACCEPT WITH FIXES). The Christoffel constant (k+1)² is proved for every degree. k = 1 has a thin but sufficient margin. At k = 0 only Theorem B survives.
 
+**Extreme-τ limitation (stated honestly):** the planned floor-free A-rule theorem targets τ ∈ [0.05, 0.95], which covers every level of the paper's single-level grid. At τ = 0.01/0.99 the design condition fails for all three designs (β ≈ 13–14 against ≈ 6), so this route is expected NOT to cover those levels. A data check (Engineering, τ = 0.01/0.99) is running. V0T\* (with the floor) and Theorem J are not subject to this limitation.
+
 **Caveat for the paper:** all theorems concern the POSTERIOR. His P-MALA λ is not converged at n ≥ 1000 (Engineering aca7214).
 
 **Still arriving:** Fable A and an independent Astra co-prover (the no-floor method), the Astra audit of general k, the VP's reply, the V1/V2/V0T data.
