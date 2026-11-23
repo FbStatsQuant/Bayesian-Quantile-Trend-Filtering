@@ -1,6 +1,6 @@
 # Theorem B (light-tail fallback, "A-LT"): oracle contraction in Δ²ₙ under a global MGF condition
 
-**Status:** self-checked (2026-11-22). Every step was re-derived; two fixes were made (the 1/V₃ factor in step 4, and the n ≥ n₀(V) condition for the primary prior mass). Ready for the advisor check. The mixture-row numbers depend on `checks/global_threshold.py`, which Engineering has queued.
+**Status:** advisor-checked (2026-11-22), Astra (`reviews/ASTRA_B_L6.md`). Propositions 1 and 2: ACCEPT. Assembly: ACCEPT WITH FIXES, all applied (see "Response to the advisor check"). B is fully checked once L3 passes its advisor check (Fable, running). The mixture-row numbers are re-verified (NOTS job 2858270).
 - **Source.** Written after the two light-tail opinions, Astra (`../T03_Feasibility/reviews/LIGHT_TAIL_astra.md`) and Fable/VP (`../T03_Feasibility/reviews/LIGHT_TAIL_fable.md`). Both say ADOPT WITH CHANGES. Felipe approved it as the fallback theorem, and HQ has decided to prove **B first, before L10**.
 - **Structure (HQ decision).**
   - The hypothesis is the VP's (EM).
@@ -18,12 +18,12 @@
 
 where Xᵢ(δ) = ρ_τ(Zᵢ − δ) − ρ_τ(Zᵢ) and Zᵢ = yᵢ − θ\*ᵢ.
 
-**B does not relax the scale restriction; it adds to it.** (EM) is a condition on the pair (law, σ). It implies three constraints on σ:
-- **Local.** If fᵢ(q) exists, the expansion of L8′(c), log E e^{−ωX} = ½(ω²τ(1−τ) − ωfᵢ(q))δ² + o(δ²) ≤ −bωδ², forces fᵢ(q) ≥ ωτ(1−τ) + 2b. Hence ω < fᵢ(q)/(τ(1−τ)), i.e. **σ > σ̄** (point density), with margin 2b.
-- **Tail.** The noise must be lighter-tailed than the working ALD: a right-tail rate > ωτ and a left-tail rate > ω(1−τ). Otherwise a constant shift through the flat c gives E₀N(ℝⁿ) = ∞ (VP).
+**What (EM) implies about the scale (Astra, B/L6 review #3).** (EM) is a condition on the pair (law, σ). It has three consequences:
+- **Local: a strict point-density threshold.** If Fᵢ is differentiable at the quantile, comparing quadratic coefficients in the expansion of L8′(c) gives **Fᵢ′(q) ≥ ωτ(1−τ) + 2b**. This is a strict point-density threshold, and Gaussian noise at σ₀ is still excluded. It does **not** imply A4's secant-based condition. *Counterexample (Astra):* uniform errors on [−1, 1], τ = ½, ω = 1. Proposition 1 applies with b₊ = b₋ = 1, since (1−t)₊ ≤ e^{−t}. But on the valid A2 interval L = 4 the best lower secant is 1/8, which gives A4's σ̄ = 2 > σ = 1. **So B covers some cases that Theorem A, with its secant constant, does not.**
+- **Tail necessity.** For d ≥ 1, the event {Zᵢ > d} alone contributes e^{ωτd}P(Zᵢ > d) to the MGF. So (EM) forces **P(Zᵢ > d) ≤ e^{−ω(τ+b)d}**, and reflection gives P(Zᵢ < −d) ≤ e^{−ω(1−τ+b)d}. This alone excludes polynomial tails. *(The earlier claim that failure of (EM) gives infinite expected evidence is withdrawn. Astra's counterexample: a density ∝ e^{−ω|z|/2}/(1+|z|)², at the critical rate, has finite expected evidence.)*
 - **Mid-range.** The bound must also hold at intermediate δ (Astra's bounded counterexample: an atom at ±4 breaks it at δ = 4).
 
-**Coverage.** B covers none of the paper's runs as executed: t₂ and Cauchy noise are excluded by the tail constraint, and Gaussian noise at σ₀ < σ̄ is excluded exactly as in Theorem A.
+**Coverage.** B covers none of the paper's runs as executed. t₂ and Cauchy noise are excluded by tail necessity, and Gaussian noise at σ₀ is excluded by the point-density threshold.
 
 ## Proposition 1 (Astra's envelope ⇒ (EM))
 
@@ -84,20 +84,31 @@ Set C_V := max{e^{c/2}, 16K/(ce)²}. Then (EM) holds with b = c₀/2 whenever
 
 **Sharp local constant (optional).** On |δ| ≤ Δ₀, L8′(b) gives log E e^{−ωX} ≤ −(η/2)ω·m(δ) under ω ≤ (1−η)ω̄, with the sharp local threshold. One can use it near 0 and the bound above for |δ| > Δ₀. That relaxes c₀/C_V only on |δ| ≤ Δ₀, so the global threshold σ̄_B is unchanged. The proposition above is the simple version.
 
-**How strict is σ̄_B?** By the VP's check, the exact global threshold equals the local ω̄ (within grid tolerance) for Gaussian, Laplace, logistic and uniform noise. For the mixture 0.9N(0, 0.1²) + 0.1N(0, 3²) it is much stricter: σ̄_B ≈ 3.6σ₀ at τ = ½. *Re-verification pending:* `checks/global_threshold.py` is queued (owls_run refused); the VP's script was not saved.
+**How strict is the exact critical scale?** Write σ_crit for the numerically estimated critical scale of (EM), i.e. the smallest σ for which E e^{−ωX(δ)} ≤ 1 for all δ. This is a different object from the sufficient bound σ̄_B = 1/ω_B proved above, and the proposition proves only σ̄_B. By the VP's check, σ_crit equals the local point-density threshold (within grid tolerance) for Gaussian, Laplace, logistic and uniform noise. For the mixture 0.9N(0, 0.1²) + 0.1N(0, 3²) it is much stricter: σ_crit ≈ 3.6σ₀ at τ = ½.
+
+**Re-verified independently** with `checks/global_threshold.py` (8e2565b; Engineering, NOTS job 2858270; δ ∈ [−40, 40], 4×10⁵ grid points per side). In the script output the column labelled "sigma_bar_B" is σ_crit.
+- Gaussian, Laplace, logistic and uniform at τ ∈ {½, ¾, 0.9}: ω_crit/ω_loc = 0.994–0.999.
+- Mixture: ω_crit/ω_loc = 0.125, 0.076 and 0.063, i.e. **σ_crit/σ₀ = 3.58, 6.22 and 10.44** at τ = ½, ¾ and 0.9 (the local value is 0.45–0.66).
+
+These match the VP's figures.
 
 ## Theorem B
 
-**Assumptions.**
-- (A1); (A3) with fixed V; (EM) with the given ω.
-- The upper half of (A2), which L6 needs for C₁ (mᵢ(δ) ≤ C₁δ² near 0). Neither (EM) nor the envelope gives this, because both bound tails or MGFs, not densities.
-- λ deterministic, either λₙ ≍ n^{5/2}/V (primary) or λₙ ≍ (n³/V)^{3/4} (fallback). Correspondingly εₙ² = (log n)^c V^{1/3}n^{−5/6} or (log n)^c V^{1/4}n^{−3/4}.
+**Law class (fixed before the supremum; Astra #1).** Fix ω > 0, b > 0, τ, the upper-margin constants (L, f̄), V > 0, and the comparison constants of the oracle tuning. 𝒫ₙᴮ is the class of independent laws satisfying (A1), the upper half of (A2) with (L, f̄), (A3) with V, and (EM) with **this common b**: the same b for every law in the class, every coordinate, every n and every δ ∈ ℝ.
 
-**Conclusion (Δ²ₙ).** There is M = M(b, ω, f̄, L, C_pr) such that
+**Assumptions.**
+- (A1); (A3) with fixed V; (EM) with the given ω and the common b.
+- The upper half of (A2), which L6 needs for C₁ (mᵢ(δ) ≤ C₁δ² near 0). Neither (EM) nor the envelope gives this, because both bound tails or MGFs, not densities.
+- λ deterministic, either λₙ ≍ n^{5/2}/V (primary) or λₙ ≍ (n³/V)^{3/4} (fallback), with fixed comparison constants. Correspondingly εₙ² = C(log n)^c V^{1/3}n^{−5/6} or C(log n)^c V^{1/4}n^{−3/4}, with **c ≥ 1/6**.
+  - *Why c ≥ 1/6.* At half radius L3 gives φ(ε/2) ≲ nλ^{−2/5}ε^{−2/5}(log m)^{1/5} + 6, which is ≤ nε² when ε² ≳ λ^{−1/3}(log m)^{1/6}.
+  - *Matching orders.* The log-free spread λ^{−1/3} and the bias term are both of order V^{1/3}n^{−5/6} at the primary tuning (L4q-M route), and both of order V^{1/4}n^{−3/4} at the fallback (L4 route).
+  - *B does not use κ.* These radii are stated directly. Theorem A's κ contains a lower secant constant that B does not assume.
+
+**Conclusion (Δ²ₙ).** Any M > (2/b)(1.44C₁ + 1 + C_pr/ω) works. Here C_pr depends on V and the comparison constants, and **no bound is uniform as b → 0**. For such M,
 
   sup_P E_P Πₙ( Δ²ₙ(θ − θ\*) > M ε² | y ) → 0.
 
-The supremum is over all laws satisfying the assumptions.
+The supremum is over 𝒫ₙᴮ.
 
 **Proof.** Write H(δ) := nΔ²ₙ(δ) = Σᵢ min(δᵢ², |δᵢ|) and E := {H > Mnε²}.
 
@@ -117,7 +128,8 @@ The supremum is over all laws satisfying the assumptions.
    N(ℝⁿ) ≥ V₃(ε√n/2)³ · Π_λ(u_h + B_{ε/2}) · e^{−ω(1.44C₁+1)nε²}.
 
    The prior-mass bound is −log Π_λ(u_h + B_{ε/2}) ≤ C_pr nε². This comes from L3 together with the half-radius L4q and L4q-M (primary), or from L3 and L4 with u_h = u\* (fallback).
-   - *Primary route, conditions:* δ_A ≤ λε/4 and K′ = K(λε/2) ≤ 1. Both hold for n ≥ n₀(V), because λε ≍ n^{25/12}V^{−5/6} at the oracle and R1 needs λε ≥ 102·n^{10/7}(log m)^{1/7}.
+   - *Primary route, conditions (large-n admissibility; Astra #2):* δ_A ≤ λε/4 and K′ = K(λε/2) ≤ 1. At the primary oracle λε ≍ n^{25/12}V^{−5/6}(log n)^{c/2}, which eventually exceeds the half-radius threshold 102·n^{10/7}(log m)^{1/7} of R1 and gives δ_A ≤ n/√3 ≤ λε/4. The bandwidth w ≍ n(ε/V)^{2/5} satisfies w → ∞ and w/n → 0. So both uses of L4q-M are admissible for n ≥ n₀(V).
+   - *Volume term.* It is kept exactly, as −log[V₃(ε√n/2)³]. At either oracle nε² → ∞ and this term is O(log n).
    - *Uniformity:* the prior side does not depend on the law P, so uniformity over P is unaffected.
 4. *Combine.*
 
@@ -125,7 +137,7 @@ The supremum is over all laws satisfying the assumptions.
 
    This uses Πₙ(E | y) ≤ N(E)·1_Ω/L + 1_{Ωᶜ}, where L is the deterministic lower bound of step 3 and Ω its event.
 
-   Since nε² → ∞, the first term → 0 once M > (2/b)[1.44C₁ + 2 + C_pr/ω], and the second → 0. ∎
+   Since nε² → ∞, the first term → 0 once M > (2/b)(1.44C₁ + 1 + C_pr/ω), so that the bracket is positive. The second term → 0. ∎
 
 ## Corollaries and remarks
 
@@ -133,9 +145,9 @@ The supremum is over all laws satisfying the assumptions.
   - Fubini on {λ‖u − u\*‖₁ > Tm} gives TV⁽³⁾(δ) ≲ n³/λ in posterior probability.
   - Interpolation, now non-circular because Δ²ₙ ≲ ε² is already known, then gives ‖δ‖∞ → 0, and hence ‖δ‖²ₙ ≲ Mε², for λ ≥ n^{3/2+}.
   - This is checked at the level of exponents only, and the TV step needs the same flat-part integration with an extra λ‖u‖₁ tilt. **To be written only if it closes cleanly; flagged until then.**
-- **Window.** a₀ is no longer set by L10; the lower end of the window comes from the prior side only.
+- **Window (prospective).** B is proved only at the two oracle tunings. A wider λ-window, whose lower end would come from the prior side only rather than from L10, is prospective until its endpoints, radius and uniform prior budget are supplied.
 - **Learned λ (unchecked remark).** The numerator bound is free of λ, so a hyperprior on λ integrates inside Fubini. Learned λ at fixed σ would then need only hyperprior mass ≥ e^{−nε²} near the oracle: a fixed-b₀ Gamma fails this, a polynomial tail passes (VP). Not pursued now.
-- **Positioning (HQ decision).** If Theorem A is proved, B becomes the warm-up proposition, kept for its distinct conclusions (wider window, possible learned-λ corollary). If A is not proved, B is the main theorem, and moment-free contraction is a conjecture supported by the t₂ and Cauchy simulations.
+- **Positioning (HQ decision).** If Theorem A is proved, B becomes the warm-up proposition, kept for its distinct conclusions: it **covers some cases A does not** (A4's secant constant can be strictly worse than the point density, e.g. the uniform-error example); a prospective wider window; a possible learned-λ corollary. If A is not proved, B is the main theorem, and moment-free contraction is a conjecture supported by the t₂ and Cauchy simulations.
   - *Referee question "why exponential moments for a quantile method?":* the honest answer is that the assumption belongs to the proof technique.
 - **Odds (advisors), for Δ²ₙ at one oracle tuning, up to logs:** Astra 95% at n^{−3/4} and 85% at n^{−5/6}; Fable 90% and 80%. The remaining risk is on the prior side and in L6.
 - **Status of the inputs.**
@@ -145,3 +157,13 @@ The supremum is over all laws satisfying the assumptions.
   - L6: draft, self-checked.
   - L8′: numerical check PASSED (NOTS job 2857877).
   - **New here:** Propositions 1 and 2, and the assembly.
+
+## Response to the advisor check (Astra, `reviews/ASTRA_B_L6.md`)
+
+Verdicts: assembly ACCEPT WITH FIXES; Proposition 1 ACCEPT; Proposition 2 ACCEPT. All fixes concern wording and scope; no mathematics changed.
+
+1. **Law class.** ω, b, τ, (L, f̄), V and the oracle comparison constants are fixed first, and (EM) holds with one common b across the class. Any M > (2/b)(1.44C₁ + 1 + C_pr/ω) works; no bound is uniform as b → 0.
+2. **Radii.** c ≥ 1/6, from the small-ball logarithm at half radius. The radii are stated directly, without κ. Large-n admissibility of L4q-M at the primary oracle is recorded. The wider window is marked prospective.
+3. **Scale claim.** This is now the exact implication F′(q) ≥ ωτ(1−τ) + 2b, a strict point-density threshold. B does not imply A4's secant condition (Astra's uniform example), so B covers some cases A does not. The positioning line and the MEMO addendum are corrected.
+4. **Infinite-evidence claim: deleted.** Tail necessity P(Z > d) ≤ e^{−ω(τ+b)d} (d ≥ 1), with its reflection, is kept.
+5. **Symbols.** σ_crit is the numerically estimated critical scale; σ̄_B = 1/ω_B is the proved sufficient bound.

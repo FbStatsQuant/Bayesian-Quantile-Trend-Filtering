@@ -65,9 +65,9 @@ So the per-coordinate MGF is below 1 near 0 **iff ω < f(q)/(τ(1−τ))**.
 | t₃ | 0.50 | 1.234 |
 | t₂ | 0.50 | 1.000 (**not covered**: strict slack) |
 | Uniform | 0.50 | 2.000 |
-| 0.9 N(0, 0.1²) + 0.1 N(0, 3²) | 0.50 | 0.446 locally, **but not covered**. ω̄(Δ) falls 14.4 → 6.7 → 2.3 as Δ grows, and the exact global threshold is σ̄_B ≈ 3.6σ₀ (VP's light-tail check; re-verification queued). |
+| 0.9 N(0, 0.1²) + 0.1 N(0, 3²) | 0.50 | 0.446 locally, **but not covered**. ω̄(Δ) falls 14.4 → 6.7 → 2.3 as Δ grows, and the numerically estimated critical scale for (EM) is σ_crit = 3.58σ₀ (6.22 at τ = ¾, 10.44 at τ = 0.9). These are the VP's figures, re-verified independently: `../T05_Proofs/checks/global_threshold.py`, NOTS job 2858270. |
 
-Theorem A covers the paper's σ₀ only when R < 1 with room for the slack and the secant. For the light-tailed laws checked (Gaussian, Laplace, logistic, uniform), the global threshold equals the local one within grid error (VP; re-verification queued). For Gaussian noise it misses σ₀ by a factor of π/2 at the median, and the factor grows toward the tails. Source: `scratch/omega_bar_exact.out`.
+Theorem A covers the paper's σ₀ only when R < 1 with room for the slack and the secant. For the light-tailed laws checked (Gaussian, Laplace, logistic, uniform; τ ∈ {½, ¾, 0.9}), the global threshold equals the local one within grid error, ratio 0.994–0.999 (VP; re-verified, NOTS job 2858270). For Gaussian noise it misses σ₀ by a factor of π/2 at the median, and the factor grows toward the tails. Source: `scratch/omega_bar_exact.out`.
 
 **Dependence on κ = f/σ.**
 - *Theorem A.* The rate carries κ^{−5/6}: ε² ∝ κ^{−5/6}[λ^{−1/3} + V²λ^{5/3}n^{−5}]. **M can be taken free of σ**, because both the evidence budget and the Chebyshev term in L6 scale with κnε².
@@ -123,17 +123,17 @@ The second statement follows from the first, because L10 is part of the proof: o
 
 **Checkable sufficient conditions.**
 - **Proposition 1 (primary; Astra's envelope).** P(Zᵢ > t) ≤ (1−τ)e^{−b₊t} and P(Zᵢ < −t) ≤ τe^{−b₋t} for all t ≥ 0, with b₊ > ωτ and b₋ > ω(1−τ). Heteroscedastic laws are allowed. The prefactors are essential.
-- **Proposition 2 (alternative; VP).** (A2), sup E e^{c|Zᵢ|} ≤ K, and σ ≥ σ̄_B(τ, L, f, c, K).
+- **Proposition 2 (alternative; VP).** (A2), sup E e^{c|Zᵢ|} ≤ K, and σ ≥ σ̄_B := 1/ω_B(τ, L, f, c, K), the proved sufficient bound. It is distinct from the numerically estimated critical scale σ_crit.
 
-**Statement.** Assume (A1), the upper half of (A2) (for C₁ in L6), (A3) and (EM), with deterministic λ at the oracle λₙ ≍ n^{5/2}/V (or at the fallback λₙ ≍ (n³/V)^{3/4}). Then sup_P E_P Πₙ(Δ²ₙ(θ − θ\*) > Mε² | y) → 0, with the same ε² as Theorem A (resp. A-fb).
+**Statement.** Fix ω, b > 0, τ, (L, f̄), V and the oracle comparison constants. Let 𝒫ₙᴮ be the class of laws satisfying (A1), the upper half of (A2) (for C₁ in L6), (A3) and (EM) with this **common** b. Take deterministic λ at the oracle λₙ ≍ n^{5/2}/V, with **εₙ² = C(log n)^{1/6}V^{1/3}n^{−5/6}**, or at the fallback λₙ ≍ (n³/V)^{3/4}, with **εₙ² = C(log n)^{1/6}V^{1/4}n^{−3/4}**. Then sup_{𝒫ₙᴮ} E_P Πₙ(Δ²ₙ(θ − θ\*) > Mε² | y) → 0 for any M > (2/b)(1.44C₁ + 1 + C_pr/ω). No bound is uniform as b → 0. These radii carry no κ, because B assumes no lower secant constant. [Advisor-checked: Astra, ASTRA_B_L6.md.]
 
 **Loss.** Δ²ₙ only. A squared-loss corollary for λ ≥ n^{3/2+} (posterior TV control by Fubini, then interpolation) is flagged and not claimed.
 
 **Proof (T-05).** Fubini on all of ℝⁿ. The flat quadratic integral is bounded by C₃(bω), free of n, λ, u and θ\*. Then L6. **L7, L9 and L10 are not needed.** L2, L3, L4/L4q, L5 and L6 are used as in Theorem A.
 
-**Scope.** B **does not relax the scale restriction; it adds to it.** (EM) forces σ > σ̄ (point density, with margin), a tail rate lighter than the working ALD's, and a mid-range condition. So B covers none of the paper's runs as executed: t₂ and Cauchy noise are excluded, and Gaussian noise at σ₀ < σ̄ is excluded exactly as in A.
+**Scope.** (EM) implies the strict point-density threshold **F′(q) ≥ ωτ(1−τ) + 2b**, tail necessity P(Z > d) ≤ e^{−ω(τ+b)d} (d ≥ 1) with its reflection, and a mid-range condition. Gaussian noise at σ₀ is therefore still excluded, as are t₂ and Cauchy noise; B covers none of the paper's runs as executed. **But B does not imply A4's secant condition:** for uniform errors on [−1, 1], τ = ½, ω = 1, B applies while A4's σ̄ = 2 > σ (Astra). So B covers some cases A does not.
 
-**Positioning.** If A is proved, B is the warm-up proposition, kept for its distinct conclusions (wider window; a possible learned-λ corollary, unchecked). If A is not proved, B is the main theorem, and moment-free contraction is a conjecture supported by the t₂ and Cauchy simulations.
+**Positioning.** If A is proved, B is the warm-up proposition, kept for its distinct conclusions: it covers some cases A does not (the secant versus point-density example); a **prospective** wider window (endpoints, radius and uniform prior budget not yet supplied); a possible learned-λ corollary (unchecked). If A is not proved, B is the main theorem, and moment-free contraction is a conjecture supported by the t₂ and Cauchy simulations.
 
 **Odds (advisors):** Astra 95% at n^{−3/4} and 85% at n^{−5/6}; Fable 90% and 80%.
 
