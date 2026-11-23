@@ -617,3 +617,109 @@ The first is the more concrete, and it is where I would start: it is a bootstrap
 - F3 (open): the exceptional rough blocks.
 
 **Next entry (sketch).** Bootstrap in the out-of-bulk *fraction* ϑ per window, with contraction from the spike lemma. **This is the Tuesday entry point for the posterior sup-norm lemma** that serves L4a, L4b and (SN).
+
+---
+
+## 14. The bootstrap in the out-of-bulk fraction ϑ
+
+*Appended 2026-11-23, about 16:25 CT, same author. Not audited. By hand, no compute. Inputs quoted, not re-proved: Theorem H's bodies as used in §13 (‖Dθ‖₁ ≤ Θ := Tn/ℓ + V/n², Huber energy 𝐡(δ) ≤ n·r², r² ≍ ℓ^{−2/7}·polylog), and ‖Dθ\*‖₁ ≤ V/n². Notation of §11–§13. Blocks I now have length g with 8 ≤ g and g(g+1)² ≤ ℓ/(ωk̄) (the hypothesis of Lemma B1); "good" means ℓρ_I ≤ K₂g. ϑ(A) := n^{−1}·#{i : |δᵢ| > A}.*
+
+### 14.0 Outcome
+
+**The ϑ-step is proved, and it removes F1. It is a one-shot step, not a contraction: its fixed points are plateaus of width ≳ (ℓ·a/K₂)^{1/3} at amplitude a, and rough blocks. The loop is entered but not closed.**
+
+| # | Claim | Status |
+|---|---|---|
+| 1 | A slaved good block is a quadratic up to ā ≈ (4.5K₂ + 5.6)·g³/ℓ | PROVED (Lemma B8) |
+| 2 | Three-point Remez: a quadratic that is ≤ B on a fraction κ₀ of a block is ≤ (32/κ₀²)·B on the whole block | PROVED (Lemma B9) |
+| 3 | **Spike removal.** With posterior probability ≥ Π(Theorem H's bodies) − (n/g)e^{−g}: every block is entirely within 257·max(A, ā), except at most a fraction 2T/K₂ + 2r²/A² of the blocks | PROVED (Theorem B10) |
+| 4 | **F1 is resolved on most windows:** all but a fraction ≲ (4K/c)(2T/K₂ + 2r²/A²) → 0 of the windows of length 4K·h lie entirely in the bulk \|δ\| ≤ L/2 | PROVED (Corollary B11), for ℓ ≥ C·K₂·(log n)³ |
+| 5 | The step does not iterate: ϑ(257·max(A, ā)) ≤ 2ϑ(A) + 2T/K₂, with factor 2 > 1 | PROVED statement of what the step gives; the non-improvability is an arithmetic remark (§14.3) |
+| 6 | F3: the exceptional blocks are countable: at Fable A's threshold s the rough ones can be made a fraction ≲ ℓ^{−1/3} of all blocks and the dense ones are ≲ ℓ^{−11/63}·polylog; their **energy** is not controlled | count PROVED; energy open (§14.4) |
+| 7 | With F1 gone, what remains is: (G1) the likelihood-margin exclusion of dense good blocks, which is the wide-run statement (B2) with its premise now proved; (G2) the energy of rough blocks; and F2 for the fine level | SKETCH (§14.3–14.5) |
+
+### 14.1 Two lemmas — PROVED
+
+**Lemma B8 (a slaved good block is nearly quadratic).** Let I = {p+1, …, p+g}, q and q\* the quadratics through θ and θ\* at p−2, p−1, p, and 𝗉 := q − q\*. If ℓρ_I ≤ K₂g and ‖θ_I − θ′_I‖∞ ≤ a\* := 2(2K₂ + 2.8)·g(g+1)²/ℓ, then for every i ∈ I:
+
+  |δᵢ − 𝗉ᵢ| ≤ ā := (4.5K₂ + 5.6)·g(g+1)²/ℓ + (g+1)²V/(2n²).
+
+*Proof.* δᵢ − 𝗉ᵢ = (θ − θ′)ᵢ + (θ′ − q)ᵢ − (θ\* − q\*)ᵢ. θ′ − q vanishes at p−2, p−1, p and D(θ′ − q) = Dθ′, so by Newton's formula (step 1 of Lemma B1) |(θ′ − q)ᵢ| ≤ (g(g+1)/2)·Σ_{j∈𝒥_I}|(Dθ′)_j| = (g(g+1)/2)·ρ_I ≤ K₂g(g+1)²/(2ℓ). The same for θ\* with ‖Dθ\*‖₁ ≤ V/n². Add a\*. ∎
+
+**Lemma B9 (three-point Remez for quadratics).** Let 𝗉 be a quadratic on g consecutive integers and S a subset with m := |S| ≥ max(4, κ₀g) on which |𝗉| ≤ B. Then |𝗉| ≤ (32/κ₀²)·B on the whole block.
+
+*Proof.* Let x₀ = min S, x₂ = max S, x₁ the ⌈m/2⌉-th element of S. Then x₁ − x₀ ≥ ⌈m/2⌉ − 1 ≥ m/4, x₂ − x₁ ≥ ⌊m/2⌋ ≥ m/4, x₂ − x₀ ≥ m/2. Lagrange interpolation at x₀, x₁, x₂, with |x − x_j| < g: the three basis functions are bounded by g²/((m/4)(m/2)), g²/(m/4)², g²/((m/2)(m/4)), sum 32g²/m². ∎
+
+(The sharp continuous constant is T₂(2/κ₀ − 1), i.e. 17 at κ₀ = ½; the crude 128 is used below.)
+
+### 14.2 Spike removal and bulk confinement — PROVED
+
+**Theorem B10.** Fix κ₀ = ½, K₂ ≥ 1, 0 < A ≤ 1, and a partition into blocks of length g as above. Let Ω_slav := {every good block I has ‖θ_I − θ′_I‖∞ ≤ a\*}.
+1. Π(Ω_slavᶜ | y) ≤ (n/g)·e^{−g}, for every data vector.
+2. On Ω_slav ∩ {‖Dθ‖₁ ≤ Θ} ∩ {𝐡(δ) ≤ n·r²}:
+
+  **#{I : ‖δ_I‖∞ > 257·max(A, ā)} ≤ 2Θℓ/(K₂g) + 2n·r²/(g·A²),**
+
+  i.e. a fraction ≤ **2T/K₂·(1 + o(1)) + 2ϑ̄(A)**, ϑ̄(A) := r²/A² ≥ ϑ(A), of the n/g blocks.
+
+*Proof.* (1) "I is good" is a function of θ_{Iᶜ}. On it, Lemma B1 with a = a\* has exponent 2K₂g + 1.8g − (2K₂ + 2.8)g = −g. Sum over blocks. (2) Call I *rough* if not good and *dense* if more than g/2 of its coordinates have |δᵢ| > A. Rough blocks: ≤ 2Θ/(K₂g/ℓ) by Lemma B6. Dense blocks: ≤ ϑ(A)·n/(g/2), and ϑ(A)·n ≤ 𝐡(δ)/A² since min(δ², |δ|) ≥ A² when |δ| > A and A ≤ 1. If I is neither, S := {i ∈ I : |δᵢ| ≤ A} has ≥ g/2 ≥ 4 points, on which |𝗉| ≤ A + ā by Lemma B8; so |𝗉| ≤ 128(A + ā) on I by Lemma B9 and |δ| ≤ 128(A + ā) + ā ≤ 257·max(A, ā). The inclusion is deterministic, so no conditioning problem arises from "dense" being a property of θ_I. ∎
+
+*This is the precise form of "a high coordinate next to low neighbours is a spike":* in a good block whose majority is low, there is **no** coordinate above 257·max(A, ā). It answers the objection in F1 (§13.4) that the interpolant "may be steep": a quadratic cannot be steep and low on half of the block.
+
+**Corollary B11 (F1 on all but a vanishing fraction of windows).** Take A := L/514 and g := the largest integer with (4.5K₂ + 5.6)·g(g+1)² ≤ ℓ·L/520 (so ā ≤ L/514 for large n, and g ≈ c·h with c³ = ωL/(520(4.5K₂ + 5.6)); this g satisfies Lemma B1's hypothesis when ω·k̄·L ≤ 5000, otherwise take the smaller of the two; L ≤ 514 is assumed so that A ≤ 1). Group the blocks into windows of M := ⌈4K·h/g⌉ consecutive blocks. Then, on the event of Theorem B10,
+
+  **all windows satisfy ‖δ_W‖∞ ≤ L/2, except a fraction ≤ ϱ := M·(2T/K₂ + 2·514²·r²/L²)(1 + o(1)).**
+
+With K₂ = K₂,ₙ → ∞ slowly: M·2T/K₂ ≍ K·K₂^{−2/3} → 0, and M·r² ≍ K·K₂^{1/3}·ℓ^{−2/7}·polylog → 0. The event has posterior probability ≥ Π(bodies | y) − n^{−1} as soon as g ≥ 2·log n, i.e. **ℓ ≥ C·K₂·(log n)³**. For ℓ below polylog the blocks are too short for the union bound; that range is not covered.
+
+*Amplitude version.* With A = Aₙ → 0 and g such that ā ≤ Aₙ: all but a fraction 2T/K₂ + 2r²/Aₙ² of the blocks have ‖δ_I‖∞ ≤ 257·Aₙ. E.g. Aₙ = r^{2/3}: sup-norm ≲ ℓ^{−2/21}·polylog off a fraction ≲ ℓ^{−2/21}·polylog + 2T/K₂ of the blocks.
+
+### 14.3 Why the step does not iterate
+
+In terms of ϑ the theorem reads **ϑ(257·max(A, ā)) ≤ 2ϑ̄(A) + 2T/K₂**: the fraction is multiplied by 2 (by 1/(1 − κ₀) in general, never below 1) and the threshold by 257. Feeding the output back changes nothing, because the three inputs (energy count, TV count, slaving) are unchanged. The step moves the high set, it does not shrink it: afterwards **the high set is a union of whole blocks that are dense or rough.** Isolated spikes and all features narrower than g/2 are gone; plateaus of length ≥ g/2 pass through untouched.
+
+Going up in scale does not help either. Lemma B1 stops at g³ ≈ ℓ/(ωk̄), and ā ∝ K₂·g³/ℓ, so features of amplitude a can be removed only up to width ≈ (ℓ·a/(5K₂))^{1/3} = c(a)·h with c(a) → 0 as a → 0. *Arithmetic remark, not a claim about the posterior:* a path that is 0 except for plateaus of height a and width ≥ c(a)·h, with transitions of the same width, on a fraction r²/a² of the bandwidth cells, satisfies all three inputs. Excluding it requires the likelihood.
+
+**Precise failing step (G1).** A contraction of ϑ needs: *a good block of length g ≍ (ℓ·a/K₂)^{1/3} whose majority is above a has small posterior probability.* Slaving cannot see such a block: the prior cost of a plateau of height a and width w is ≍ ℓ·a/w², which is within the roughness budget K₂·w of a good block exactly when w ≳ (ℓ·a/K₂)^{1/3}. So the likelihood margin ≈ ω·f·a²·w/2 has to do the work, against data-aligned gains and uniformly over shapes. That is the wide-run statement (B2) of §11.4, **whose premise Theorem B10 now proves** (on a dense good block δ is a quadratic ± ā, three parameters per block). *Arithmetic, SKETCH:* the net-and-union argument has room when a²·w ≫ log n, i.e. a^{7/3}·ℓ^{1/3} ≫ K₂^{1/3}·log n, i.e. **amplitudes a ≫ ℓ^{−1/7}·polylog** for slowly growing K₂ (a ≫ ℓ^{−2/21}·polylog with K₂ = ℓ^{1/3}; Fable A's s = ℓ^{−1/18}/log n is above both). Below that amplitude, down to the sup-norm scale ℓ^{−1/6}, only the level localization of §12–§13.3 (forgetting in probability) can work. So the ϑ-bootstrap enters the loop of §12.4 with the entry problem F1 removed, and its contraction step is (B2), not written.
+
+### 14.4 The exceptional blocks (F3)
+
+**Countable: yes — PROVED.** Exceptional = rough or dense. Rough: a fraction ≤ 2T/K₂. Dense: a fraction ≤ 2r²/A². The trade-off is only ā ∝ K₂·g³/ℓ, and g can be as small as 2·log n. So K₂ may be taken polynomially large: with K₂ = ℓ^{1/3} and threshold s = ℓ^{−1/18}/log n (Fable A's), g ≍ (ℓ^{2/3}·s)^{1/3} = ℓ^{11/54}/polylog, **the rough blocks are a fraction ≤ 2T·ℓ^{−1/3} of all blocks**, and the dense ones a fraction ≲ r²/s² = ℓ^{−11/63}·polylog.
+
+**Excludable: no.** Counting bounds the number of exceptional blocks, not what they carry. The whole Huber energy n·r² may sit on them. For Fable A's target (Π(E_s > ηk | y) ≤ ½, §11.3) one needs *energy*: Σ over rough blocks of ‖δ_I‖₂² ≤ ηk/2. A rough block has prior cost ℓ‖(Dθ)_{𝒥_I}‖₁ ≥ ℓρ_I > K₂g by definition, so "many rough blocks with large amplitude" is expensive, but turning that into a posterior bound is again an evidence comparison on a block (a local version of Theorem H), **not written**. This is failing step **(G2)**.
+
+### 14.5 What the entry buys — SKETCH
+
+On a clean window (Corollary B11) every block is a quadratic ± ā and |δ| ≤ L/2 throughout. Then:
+- the noise density at every crossing is ≥ f, which is what §13.3 needed;
+- the shape family on the window is piecewise quadratic with M pieces, VC dimension O(M) = O(K/c), sample size ≍ 4K·h, so crossing regularity (CR) at resolution u₀ ≫ ā/(peak of b) follows from a uniform law of large numbers when h ≫ (log n)/c. **Not written; this is F2, now without its dependence on F1.**
+- §13.3 then gives the level of each clean window within 11/(f·K³) + log n/√(ωf·g) + u₀ of its balance level, conditionally on the outside.
+
+For the wide-run statement (B2) of §11.4, Theorem B10 proves its premise on non-rough blocks: the high set at threshold s consists of whole blocks of length g ≍ (ℓs/K₂)^{1/3} on which δ is a quadratic ± ā, and s²·g ≫ log n still holds with K₂ = ℓ^{1/3} (s²g ≍ ℓ^{5/54}/polylog). So the net-and-union argument of (B2) has the geometry it assumed.
+
+**Order of attack I would propose:** (1) write F2 on clean windows (routine, finite-dimensional); (2) (B2) on dense good blocks with the geometry of B10; (3) (G2), the energy of rough blocks, which is the one step with no partial result; (4) only then the sup-norm on every window, which needs (G1) with exponentially small probability.
+
+### 14.6 Flags
+
+- Lemmas B8, B9, Theorem B10 and Corollary B11 are new and unaudited. Constants (257, 514, 520) are crude and unoptimized; only their finiteness is used.
+- Theorem B10(1) is unconditional in the data. Part (2) is deterministic on the stated event. The posterior probability of the event is Theorem H's, quoted from §13, not re-derived here.
+- Range: ℓ ≥ C·K₂·(log n)³ (g ≥ 2·log n). Bounded ℓ is not covered. With K₂ = ℓ^{1/3} (§14.4) this reads ℓ ≥ polylog of a higher power.
+- Blocks within three coordinates of either end of {1, …, n} are excluded from the partition (Lemma B1 needs three outside coordinates on each side).
+- The threshold a ≫ ℓ^{−1/7}·polylog in (G1) is scale bookkeeping only.
+- Corollary B11 is a statement about a fraction of windows. It is **not** a sup-norm bound, and gives nothing for the exceptional windows.
+- §14.3's "does not iterate" describes what the three inputs permit; it is not a proof that no other iteration exists.
+
+## Theory response to §14 (2026-11-23)
+
+**Status: OPEN. UNAUDITED.** The loop is entered but not closed.
+
+**PROVED:**
+- **Theorem B10, spike removal.** It rests on two lemmas: a slaved good block is a quadratic ± ā, and the three-point Remez bound.
+- **Corollary B11.** For ℓ ≥ C·K₂(log n)³, all but a vanishing fraction of windows lie entirely in the bulk. **This resolves F1 on most windows.**
+
+**What fails:** the fraction bootstrap does not contract (ϑ ↦ 2ϑ + 2T/K₂).
+
+**Tuesday order of attack** (Fable B's proposal, adopted for the plan):
+1. F2, crossing regularity, on clean windows.
+2. (B2), wide runs, on dense good blocks.
+3. (G2), the energy of exceptional blocks.
