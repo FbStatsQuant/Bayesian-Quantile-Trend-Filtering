@@ -524,3 +524,129 @@ N the largest number of cluster coordinates on the good set. Hence:
 **Stopping point:** the sup-norm of the comparison mean on the atypical variance classes. (FG), forgetting in probability, is the shared missing input with Fable B's sup-norm program (`FABLE_B_supnorm.md` §§12–16).
 
 **Fable A final status today:** L4b is cross-family audited, and the posterior band exclusion reaches n^{21/11} (1af9f8b). The fixed-pair Occam bound holds to n^{9/5}. §9 is committed and unaudited.
+
+---
+
+## 10. Assembly of the sparse-shift comparison
+
+*Appended 2026-11-23, 16:33–16:50 CT, Fable A. Not audited. Notation of §3 and §9: f′ = (1 − η)f, a = ωf′, ϱ = a·v₁, κ = ϱ^{1/6}n/π, G_V := I − DᵀH_V^{−1}D = a·C_V (0 ⪯ G_V ⪯ I), μ_V := G_Vψ/f′ the comparison mean of δ given V, shift vector s (called z in §9.4), B_n the sup-norm bound of the body, B_n ≍ n^{3/5}ℓ^{−1/3}·polylog (corollary of §4.6).*
+
+### 10.0 Outcome
+
+| # | Claim | Status |
+|---|---|---|
+| 1 | Exact shift identity in the precision-side formula of §3.1; per-V ratio ≤ e^{a⟨s, μ_V⟩} | PROVED (§10.1) |
+| 2 | Pointwise variance without eigenvectors: (G_V)ᵢᵢ ≤ 9/w′ + 4a·w′⁴·Σ_{j∈window}Vⱼ for every V and every window length w′ | PROVED (§10.2) |
+| 3 | On the typical class (and row 2 of §3.5): ‖μ_V‖∞ ≤ C·κ/(f′√n) → 0 for ℓ ≫ n^{3/2} | PROVED given the score events of §3.4 (§10.3) |
+| 4 | Truncated pointwise inequality (shifts in [0, 2B_n]) with the same constant c_θ(1 − o(1)) | PROVED (§10.4) |
+| 5 | **Atypical classes close by truncation iff k′·κ·B_n ≪ n, i.e. ℓ ≫ n^{8/5}·polylog** | SKETCH: every inequality is written; exponents done once by hand (§10.4) |
+| 6 | **Conclusion:** under (ML) a·L² > 2/π (strict), Theorem LO-low holds on **[C·n^{8/5}·polylog, n^{9/5}] with no hypothesis**. With §4.6 the fixed-pair LO bound is then unconditional for ℓ ≥ n^{8/5} | SKETCH (rests on 5) |
+| 7 | **The inequality that fails on [n^{26/17}, n^{8/5}]:** k′·κ·B_n ≤ n^{1−c}. It is a truncation cost on the atypical classes only | named (§10.5) |
+| 8 | (ML) holds in the paper's Gaussian cells at τ = 0.5 and τ = 0.25 / 0.75, at the learned scale, for a range of admissible L | hand-computed, UNTESTED (§10.6) |
+
+### 10.1 The exact shift identity — PROVED
+
+Centre the prior at the truth (e^{−ℓ‖u‖₁} ≤ e^{ℓ‖u\*‖₁}e^{−ℓ‖u − u\*‖₁}; cost e^{ℓV/n²} = e^{o(k)}), so that Dz = Dψ/f′ in §3.1. Since ω = a/f′,
+
+  ω⟨ψ, δ⟩ − (a/2)‖δ − s‖² = −(a/2)‖δ − ζ_s‖² + (ω/(2f′))‖ψ‖² + ω⟨ψ, s⟩,  ζ_s := ψ/f′ + s.
+
+So the shifted comparison integral is the formula of §3.1 with pseudo-data ζ_s and the extra factor e^{ω⟨ψ,s⟩}:
+
+  𝒵(s) = (2π/a)^{3/2}e^{(ω/(2f′))‖ψ‖²}·E_V[(det T/det H_V)^{1/2}·exp{−(a/2)(Dψ/f′)ᵀH_V^{−1}(Dψ/f′)}·exp{a⟨s, μ_V⟩ − (a/2)(Ds)ᵀH_V^{−1}(Ds)}].
+
+(The cross term is −ω·sᵀDᵀH_V^{−1}Dψ, and ω⟨s, ψ − DᵀH_V^{−1}Dψ⟩ = a⟨s, μ_V⟩.) The last quadratic is ≤ 0. Hence, V by V, **the integrand of 𝒵(s) is at most the integrand of 𝒵(0) times e^{a‖s‖₁‖μ_V‖∞}.** The determinant and the gain are untouched.
+
+### 10.2 Pointwise variance — PROVED
+
+**Lemma PV.** Let V > 0 and i ∈ {1, …, n}. If c ∈ ℝⁿ and κ ∈ ℝᵐ satisfy eᵢ = c − Dᵀκ, then **(G_V)ᵢᵢ ≤ ‖c‖₂² + a·κᵀVκ.**
+
+*Proof.* G_V = a(aI + DᵀV^{−1}D)^{−1} (Woodbury). eᵢᵀ(aI + DᵀV^{−1}D)^{−1}eᵢ = sup_x[2⟨eᵢ, x⟩ − a‖x‖² − (Dx)ᵀV^{−1}(Dx)] = sup_x[2⟨c, x⟩ − a‖x‖² − 2⟨κ, Dx⟩ − (Dx)ᵀV^{−1}(Dx)] ≤ ‖c‖²/a + κᵀVκ. ∎
+
+**Choice.** c := the weights of the local quadratic fit at i on a window W ∋ i of length w′: ‖c‖₂² ≤ 9/w′ (Christoffel constant), ‖c‖₁ ≤ 3. The functional ⟨c − eᵢ, ·⟩ vanishes on quadratics and lives on W, so by Newton's formula it equals ⟨κ, D·⟩ with κ supported on the stencils inside W and |κⱼ| ≤ (‖c‖₁ + 1)·w′²/2 = 2w′². Hence
+
+  **(G_V)ᵢᵢ ≤ 9/w′ + 4a·w′⁴·Σ_{j∈W}Vⱼ.**
+
+- On Ω^{(t)} (block sums ≤ t|b|v₁, blocks of length ≥ w), for w′ ≥ 4w: Σ_{j∈W}Vⱼ ≤ t(w′ + 4w)v₁ ≤ 2t·w′·v₁, and w′ := (tϱ)^{−1/6} gives **(G_V)ᵢᵢ ≤ 17·t^{1/6}·ϱ^{1/6} = 17π·t^{1/6}·κ/n.**
+- On {maxⱼVⱼ ≤ 2^iv₁}, with no block event: (G_V)ᵢᵢ ≤ 13π·2^{i/6}·κ/n.
+
+No eigenvector of T is used. The operator envelope H₊ of Lemma 2b″ would give only ε on the diagonal.
+
+### 10.3 The comparison mean on the typical class — PROVED given §3.4's score events
+
+|μ_{V,i}| = |eᵢᵀG_Vψ|/f′ ≤ ((G_V)ᵢᵢ·ψᵀG_Vψ)^{1/2}/f′, and G_V ⪯ G₊ := I − DᵀH₊^{−1}D on each class (H_V ⪯ H₊). ψᵀG₊ψ = ψᵀ(I − P⊥)ψ + ψᵀ(aM₊)ψ ≤ C log n + C·d₊ ≤ C·κ on the score events of §3.4 (fixed matrices). With §10.2 at t = 2:
+
+  **‖μ_V‖∞ ≤ C·κ/(f′·√n) on Ω^{(2)} ∩ {max Vⱼ ≤ c₀v₁}**, which covers the typical class and row 2 of §3.5.
+
+This → 0 iff κ = o(√n), i.e. ℓ ≫ n^{3/2}. On these classes each cluster coordinate costs C_x of §9.4 with m̄ → 0, which is ≤ 1 under (ML) with a strict margin.
+
+### 10.4 Atypical classes: truncation — SKETCH (inequalities complete, exponents by hand)
+
+**Truncated pointwise inequality — PROVED.** On the body |δᵢ| ≤ B_n. For θL ≤ x ≤ B_n: e^{−a·h_L(x)} ≤ c_θ^{−1}(1 − e^{−aB_n²/2})^{−1}∫₀^{2B_n}e^{−(a/2)(x − z)² − aLz}dz (the proof of §9.4 with s ∈ [0, B_n] retained). So all shifts have ‖s‖∞ ≤ 2B_n, and the admissible sets have |S| ≤ N₀ := 16Mk′/L² (§9.2(a)).
+
+**Brute-force bound on a class with ‖μ_V‖∞ ≤ μ_c.** ∫_{[0,2B_n]^S}e^{−aL‖s‖₁ + aμ_c‖s‖₁}ds ≤ (2B_n)^{|S|}·e^{2a·B_n·μ_c·|S|}. So the class pays at most **exp{N₀·[log(2B_n/c_θ) + 2a·B_n·μ_c]}** more than in §3.5, with μ_c ≤ C(τ_c^{1/6}·κ·g_c/n)^{1/2} from §10.2–10.3 (τ_c the variance level of the class, g_c its gain bound in the table of §3.5).
+
+| Class of §3.5 | μ_c | Extra cost exponent | Probability exponent | Closes when |
+|---|---|---|---|---|
+| Row 1, max ∈ (2^{i−1}, 2^i]v₁, 2^i > c₀ | C·κ·2^{i/6}/√n | C·k′[log n + B_nκ2^{i/6}/√n] | 2^{i−1} | c₀ ≥ C·k′ log n and c₀^{5/6} ≥ C·k′B_nκ/√n |
+| Row 3, 2^i ≤ c·n/κ² | C·κ·2^{i/2}/√n ≤ C√c, below the (ML) margin for c small | none (mean bound; factor C_x ≤ 1) | — | always |
+| Row 3, 2^i > c·n/κ² | C·κ·2^{i/2}/√n | C·k′ log n + C·(k′κB_n/n)·κ2^i | w·2^i/16 | k′κB_n ≤ c·n and w ≥ C·κ |
+| Row 4 | C·κ·c₀^{1/6}/√n | C·k′[log n + B_nκc₀^{1/6}/√n] | w/(16ε) | w/ε ≥ C·k′B_nκc₀^{1/6}/√n |
+
+The cutoff c₀ is free upward as long as ε^{5/6}(c₀/θ)^{1/6} ≤ cη (§3.4), i.e. c₀ ≤ c·(n/(κw))^{30}. With ℓ = n^x, κ ≍ n^{1−x/3}, B_n ≍ n^{3/5−x/3}, w ≍ κ·polylog:
+- k′κB_n/n ≍ n^{8/5 − x}·polylog. This is the binding condition: **x > 8/5.**
+- Row 1 then needs c₀ ≥ n^{3/5}·polylog, allowed since (n/κ²)^{30} = n^{20x−30} ≥ n² at x = 8/5.
+- Row 4: w/ε ≍ n^{11x/3 − 5} ≥ n^{0.86}, against a cost ≤ n^{0.6}·polylog.
+
+**Proposition SS — SKETCH.** Let (ML) hold strictly, β < 6, and C·n^{8/5}·polylog ≤ ℓ ≤ n^{9/5}. On the events of §3–§4 and of H-sharp: Z̃_ω(ℓ) ≤ 2·e^{4ωηk + o(k)}·[bound of §3.6], with no hypothesis (XS), (XE) or (XN). *Assembly:* halving lemma with 𝒢 = body; §9.1; the cluster sum of §9.4 with at most (2en)^{2R} = e^{o(k)} sets; §10.1 inside E_V; §10.3 on the typical classes (factor C_x^{|S|} ≤ 1); the table on the others.
+
+### 10.5 The exact inequality that fails below n^{8/5}
+
+**k′·κ·B_n ≤ n^{1−c}**, with B_n the a priori sup-norm bound on the body. It enters only in the brute-force bound e^{2a·B_n·μ_c·|S|} on the atypical classes: shifts as large as B_n, on up to N₀ ≍ k′ coordinates, against a comparison mean of size κ2^{i/2}/√n. Three ways to lower the threshold, none done:
+1. Keep the discarded term −(a/2)(Ds)ᵀH_V^{−1}(Ds) of §10.1. For a shift supported on short clusters it is ≈ −(a/2)‖s‖², which makes the s-integral Gaussian and removes B_n from the cost.
+2. A better B_n (any improvement of the body's sup-norm bound moves the threshold: the condition is n^{13/5}/ℓ ≪ n with the present B_n).
+3. A sharper μ_c on rows 3–4 (the Cauchy–Schwarz step of §10.3 is crude there).
+
+The typical-class part needs only ℓ ≫ n^{3/2}. So the sparse-shift route has no obstruction of principle down to the mixture window n^{26/17}.
+
+### 10.6 (ML) in the paper's designs — hand-computed, UNTESTED
+
+Design (from `FABLE_B_Arule_gauss.md` §1): εᵢ ~ N(0, s(uᵢ)²), s(u) = (1 + u²)/4 ∈ [¼, ½]; learned scale σ₀ = φ(z_τ)/3, ω₀ = 1/σ₀. L is the level of (A2) and is **free**; f is the common lower-secant slope at that level, attained at s = ½ on the tail side: f(L) = [τ − Φ(z_τ − 2L)]/L for τ ≤ ½. Then a = ω(1 − η)f(L).
+
+| τ | ω₀ | Admissible L (both β < 6 and a·L² > 2/π at ω₀) | Example |
+|---|---|---|---|
+| 0.5 | 7.52 | 0.35 ≲ L ≲ 1.59 | L = 1: f = 0.477, a = 3.59, a·L² = 3.59, β = 3.94. L = 0.35: f = 0.737, a = 5.54, a·L² = 0.68, β = 2.55 |
+| 0.25 / 0.75 | 9.44 | 0.40 ≲ L ≲ 0.8 | L = 0.4: f = 0.450, a = 4.24, a·L² = 0.68, β = 3.94 |
+| 0.05 / 0.95 | 29.1 | none in the min-density version | β ≥ 6.70 > 6 for every L already (density at the quantile, s = ½). (ML) is not the binding condition; this cell needs the averaged-β̄ version |
+| 0.01 / 0.99 | 112.6 | none | β ≥ 13.9, outside LO |
+
+So in the cells where the min-density LO bound applies at all (τ = 0.5, 0.25, 0.75, Gaussian), **(ML) holds at the learned scale with room**, and for every ω in a compact interval around ω₀ after adjusting L within the range shown. The price is that β is evaluated with the secant slope f(L), not the density at the quantile: 2.55–3.94 instead of 2.36 at τ = 0.5. The Beta(1, 11) cells are **not checked**. No numerics; all values from normal tables by hand.
+
+### 10.7 Flags
+
+- New and short: Lemma PV (§10.2) and the shift identity (§10.1). Both are two-line proofs; audit them first.
+- §10.3 uses the score events of §3.4 as stated there (ψᵀ(aM₊)ψ ≤ C·d₊); I did not re-read their constants.
+- §10.4's table is exponent arithmetic done once. The gain bounds g_c are those of the table in §3.5; I used ψᵀG₊ψ ≤ C·g_c on each class without re-deriving it for rows 3–4.
+- Proposition SS is fixed-(ω, ℓ). Uniformity is not addressed.
+- (ML) changes the statement of the theorem: β must be computed with the secant slope at a level L satisfying a·L² > 2/π. UNTESTED against the simulation cells; pilot cost nil (a table of f(L) per cell).
+
+## Theory response to §10 (2026-11-23). Fable A's final status today.
+
+**Status: UNAUDITED.**
+
+**PROVED:**
+- **§10.1–10.2:** the shift identity and Lemma PV, the pointwise variance bound. Each is a two-line proof; the audit should read them first.
+- **§10.3, given §3.4's score events:** ‖μ_V‖∞ → 0 on the typical class.
+
+**SKETCH:** Proposition SS. LO-low holds on [n^{8/5}, n^{9/5}] with **no hypothesis**, when a·L² > 2/π.
+
+**Failing inequality on [n^{26/17}, n^{8/5}]:** k′κB_n ≤ n^{1−c}. This is only a truncation cost.
+
+**Design check (§10.6), hand-computed and UNTESTED:**
+- Gaussian τ = 0.5 and 0.25/0.75 admit an L with both β < 6 and a·L² > 2/π.
+- τ = 0.05/0.95 does not admit one in the min-density form; it needs the averaged-β̄ version.
+- Beta was not checked.
+
+**Tuesday:**
+- Astra audits §9–§10, with §10.1–10.2 first.
+- Then the averaged-β̄ version of §10.6.
+- Then the truncation fix in §10.5.
