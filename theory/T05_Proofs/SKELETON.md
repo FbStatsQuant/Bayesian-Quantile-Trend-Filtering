@@ -79,6 +79,6 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 | L8′ bounded numerator | Theorem A | **self-checked** (`L8p_bounded_numerator.md`; numerical check passed, NOTS 2857877): exact MGF identity, log E e^{−ωX} ≤ −Bω·m(δ) on \|δ\| ≤ Δ with B ≥ η/2 for ω ≤ (1−η)ω̄; Step 2 closed given L6; awaiting the advisor check |
 | L8-b realized numerator | Theorem A⁺ | plan only |
 | L9-a far region | both | to attempt |
-| L10-I interpolation | L10 (deterministic part) | **self-checked** (`L10I_interpolation.md`): ‖δ‖∞ ≤ 6‖δ‖ₙ + 7.06‖δ‖ₙ^{4/5}TV⁽³⁾^{1/5}; Huber corollary; numerical check passed |
-| L9-c, L10 sup-norm | both | open (crux) |
+| L10-I interpolation | L10 (deterministic part; Stage 2) | **advisor-checked** (Astra; C = 9 exactly): ‖δ‖∞ ≤ 6‖δ‖ₙ + 7.06‖δ‖ₙ^{4/5}TV⁽³⁾^{1/5}; Stage 2 closes given Stage 1 for λ/n^{21/11} → ∞ |
+| L10 Stage 1 (posterior TV ball + Δ²ₙ ≲ λ^{−2/7}, in-probability) | both | **open: the remaining crux** (main thread and the Fable child) |
 | B: Props 1–2 + assembly | Theorem B (light tails) | **advisor-checked** (Astra: Props 1, 2 ACCEPT; assembly ACCEPT WITH FIXES, applied); fully checked once L3 passes its advisor check |
