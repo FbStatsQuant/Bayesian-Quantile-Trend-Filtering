@@ -1,5 +1,7 @@
 # The rate gap n^{−4/7} → n^{−5/6} below σ̄: where it is lost, and the route to recover it
 
+> **SUPERSEDED** by `FABLE_lemmaF_C2.md` (proofs) and `THEOREM_C_STAR.md` (assembly). Kept as the planning record.
+
 *Fable, planning consult for Theory, 2026-11-23. Exponent-level only. **Nothing here is proved**; each claim is marked SKETCH or CONJECTURE. Notation as in `C1_any_sigma.md`; oracle λ = n^{5/2}/V; nε² ≍ (n log n)^{1/6}V^{1/3}.*
 
 **Bottom line.** The gap is two separate losses: n^{−4/7} → n^{−5/7} (one line of Lemma W) and n^{−5/7} → n^{−5/6} (the supremum in C1 Step 3). One new elementary lemma (F) repairs the first and is the only missing input for the second, via Hölder–Knight (C2) on C1's localized body. I found no exponent obstruction to n^{−5/6}(log n)^{1/6} with σ learned and λ deterministic.

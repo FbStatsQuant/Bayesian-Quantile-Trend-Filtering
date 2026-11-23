@@ -70,6 +70,17 @@ This is a failure of the route, not a counterexample to contraction (see (b)).
 
 ---
 
+## HEADLINE (updated 14:20 CT)
+
+- **Theorem C\*, σ learned under the IG prior, at the oracle rate n^{−5/6}(log n)^{1/6}** (`T06_Alignment/THEOREM_C_STAR.md`).
+  - No σ̄ condition, no exponential moments.
+  - λ is deterministic at the oracle.
+  - PROVED by assembling cross-audited parts: C1 (Astra), Lemma F, W′ and C2 (Opus), Lemma S (Opus).
+- **Theorem V0T, Felipe's method plus a λ floor, σ AND λ learned, at n^{−4/7}(log n)^{6/7}** (`FABLE_V2T_proof.md`; Astra: ACCEPT WITH FIXES).
+  - The floor never binds at n = 500 (measured).
+  - The n^{−5/6} version (V0T\*) is in preparation (Fable A).
+  - The V0T data test is built and awaits HQ's OK.
+
 ## (c) Learned σ
 
 **Decomposition (PROVED, one line).** For any interval I and any event E,
