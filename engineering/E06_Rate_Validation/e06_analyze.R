@@ -8,7 +8,7 @@ LOGC <- as.numeric(Sys.getenv("E06_LOGC", as.character(1/6)))   # Theory: headli
 B <- 2000L; MS <- c(1, 2, 4)
 dir.create(file.path(E06_RES, "tables"), showWarnings = FALSE); dir.create(file.path(E06_RES, "figs"), showWarnings = FALSE)
 files <- list.files(file.path(E06_OUT, "grid"), pattern = "\\.rds$", recursive = TRUE, full.names = TRUE)
-files <- files[!grepl("/smoke/", files)]
+files <- files[!grepl("/smoke/", files)]   # main + supp_r (+ supp if ever run)
 obj <- lapply(files, readRDS)
 R <- do.call(rbind, lapply(obj, `[[`, "row"))
 R$cfg <- with(R, paste(truth, noise, sprintf("t%03d", round(100 * tau)), sched, arm, sep = "_"))

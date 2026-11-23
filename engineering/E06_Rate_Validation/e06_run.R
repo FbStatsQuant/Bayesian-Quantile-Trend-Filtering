@@ -17,6 +17,7 @@ g <- function(sched, arm, tau, n = NS, seed = SEEDS, noise = NOISES)
 tasks <- switch(phase,
   main  = rbind(g("primary", c("Abar", "S0"), c(0.5, 0.9)), g("fallback", "Abar", c(0.5, 0.9)), g("padilla", "Abar", 0.5)),
   supp  = rbind(g(c("fallback", "padilla"), "S0", c(0.5, 0.9)), g("padilla", "Abar", 0.9)),
+  supp_r = g("padilla", "Abar", 0.9),                       # HQ 2026-11-23: reduced supp only (10 configs, guard 26 core-h)
   smoke = g("primary", "Abar", c(0.5, 0.9), n = 1000, seed = 1),
   stop("unknown phase"))
 out_root <- file.path(OUT, "grid", phase); dir.create(out_root, recursive = TRUE, showWarnings = FALSE)
