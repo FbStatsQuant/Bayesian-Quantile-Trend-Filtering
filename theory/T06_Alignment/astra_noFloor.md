@@ -70,3 +70,15 @@ at τ ∈ {0.01, 0.05, 0.25, 0.5, 0.75, 0.95, 0.99}.
 So the obstruction does not apply to the paper's designs. **Whether the condition, with margin, is also SUFFICIENT is OPEN** (Tuesday).
 
 **Audit status:** Theory-verified. The cross-family audit by Fable is pending (Tuesday's first slot).
+
+## Cross-family audit (Fable, `reviews/AUDIT_fable_noFloor.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** No mathematical error. All 19 findings were checked by Theory and **HOLD**.
+- **Numbers confirmed:** σ₀ = 0.04817, σ₀/σ̄ = 0.2028, 2tr = 0.04028 < q = 0.043 < 0.047; (A2) is exact with slope 0.2.
+- **Scope (corrects Theory's wording above).** What is proved is that the **unmodified** method (any Gamma/IG hyperprior, constant b₀ **or** the unfloored scaled b_n = c·n^{−5/2}) has **no class-wide contraction theorem**. The floor is **one sufficient repair**; it is not shown to be necessary. The phrase "the floor excludes exactly these configurations" is withdrawn.
+- The law lies in the classes of C, C\* and V0T\*, so all three conclusions of V0T\* fail without the floor.
+- The factor 2 in σ₀ ≤ 2τ(1−τ)R is correct. The no-interpolation sketch in FABLE_joint_V2.md lacks the 2 and is superseded on that point.
+- The example's proof-level n₀ is ≈ 10⁴, so it will not show at n = 500. Rescaling Y by 1000 might bring this to ≈ 10³ (a hand estimate, UNTESTED).
+- The Gaussian design margin is confirmed in closed form; the Beta and Mixed margins are PLAUSIBLE (numerical).
+
+**Status: the obstruction is PROVED and cross-family audited (Astra wrote it; Fable audited it).**
