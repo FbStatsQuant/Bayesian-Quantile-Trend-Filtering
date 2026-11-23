@@ -1,6 +1,6 @@
 # Lemma L8′: exact-MGF inequality and the bounded-region numerator (Theorem A, Step 2)
 
-**Status:** draft (2026-11-22). The proof is complete and elementary. The numerical check `checks/l8p_mgf.py` is queued, because owls_run refused (CPU budget); it will be retried or sent to Engineering.
+**Status:** self-checked (2026-11-22). The proof is complete and elementary. The numerical check `checks/l8p_mgf.py` **passed** on all 14 valid rows (Engineering, NOTS job 2857877); see "Numerical check". Ready for the advisor check. Consistent with v3.1: A4 now requires the strict slack ω ≤ (1−η)ω̄ assumed here.
 **Depends on:** L2 (the increment identity and margin), L5 (normalization, finite c-sections), L6 (the evidence bound).
 **Used by:** SKELETON Step 2, i.e. Theorem A (σ ≥ σ̄). Theorem A⁺ replaces this lemma by L8-b.
 
@@ -105,9 +105,16 @@ Insert (d), the volume ratio (√nΔ)³/(ε√n/2)³ = (2Δ/ε)³, and the prior
 - **Why the bounded region is needed (no moments).** For |δ| ≫ 1 the identity (a) gives E e^{−ωX} ≥ e^{−ω(1−τ)δ}(1 + ω∫₀^δ e^{ωs}(1 − Fᵢ(s)) ds), which exceeds 1 under heavy right tails (e.g. Cauchy). So the Fubini route cannot handle E₂ = {‖δ‖∞ > Δ}. That is L10's job.
 - **Constant.** f/2 in (d) is the local margin. The Huber margin c₀ of L2 is not needed here, because on E₁ every coordinate lies in the quadratic regime.
 
-## Numerical check (queued)
+## Numerical check (passed)
 
 `checks/l8p_mgf.py`:
 1. sup|ψ‴| = 1/(6√3) over τ;
 2. the exact MGF (a) against Monte Carlo;
 3. inequality (b) on a grid of δ ∈ [−Δ, Δ], η ∈ {0.1, 0.3}, Δ ∈ {0.02, …, 0.5}, τ ∈ {0.05, 0.5, 0.9}, for Normal, Cauchy, Laplace, t₂ and lognormal noise. Here f is the minimum density on [−0.5, 0.5] around the quantile.
+
+**Result (NOTS job 2857877).**
+- sup|ψ‴| = 0.09623 = 1/(6√3).
+- Inequality (b) holds on every grid point for Normal, Cauchy, Laplace, t₂ and lognormal noise at τ ∈ {0.05, 0.5, 0.9}.
+- The exact MGF matches Monte Carlo to within 1–2 MC standard errors (se ≈ 2×10⁻⁴ at N = 4×10⁵).
+- **Excluded row:** lognormal at τ = 0.05. The window [q ± 0.5] around q ≈ 0.085 extends below the support, so f = 0 and (A2) fails with L = 0.5. B is NaN there, and the script's comparison was vacuous. That row is outside the lemma's hypotheses and is **not** counted as a pass. The script now guards against f = 0.
+- *Print quirk (cosmetic):* the printed "m" column is the exact m at δ = 0.5, while the MC value is at δ = 0.3. Both were checked by hand (normal, τ = ½: m(0.3) ≈ 0.0179, m(0.5) ≈ 0.0487).

@@ -43,6 +43,8 @@ for name, dist in dists.items():
         # local margin constants on [-L, L], L = 0.5: f = min density, fbar = max density
         L = 0.5; ss = np.linspace(-L, L, 2001)
         f = dist.pdf(q+ss).min()
+        if f <= 1e-8:
+            print(f"{name:9s} tau={tau:4.2f}  f=0 on [q-L, q+L]: outside (A2), skipped"); continue
         wbar = f/(tau*(1-tau))
         # MC agreement at one point
         v, m = exact_mgf(dist, tau, 0.7*wbar, 0.3)
