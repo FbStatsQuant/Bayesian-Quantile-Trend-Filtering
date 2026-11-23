@@ -57,18 +57,24 @@ Arms on the same data and seeds:
 - This looks like the E-05 mechanism: λ starts low and drifts up slowly.
 - **If S1 confirms it with validated diagnostics, the paper's S results are under-converged in λ. That is a finding HQ and Felipe need, whatever is adopted.**
 
-## 3. Extension to the joint (ordered, box-constrained) sampler
-- **Joint target:** in the paper, each θ_j is drawn from its conditional restricted to the box B_j between its neighbours.
-- **Key fact (exact):** suppose a proposal is reversible with respect to the unconstrained Gaussian (or collapsed) conditional. Then targeting that conditional restricted to B_j is an exact MH move whose acceptance probability is the indicator 1_B(proposal). The truncation constant cancels, as it does for the paper's box P-MALA.
+## 3. Joint non-crossing extension of each change (Felipe's requirement; ALL UNTESTED)
+- **Requirement:** a change qualifies for the paper only if a working joint, non-crossing extension exists and holds up head to head against Felipe's original joint sampler (`method/joint/Joint_Sampler_PMALA_Augmented.R`).
+- **Joint design to test on:** VS, n = 500 × 3 noises × τ ∈ {0.90, 0.93, 0.96, 0.97, 0.98, 0.99}, 30k sweeps.
+- **Scheduled after S1, not today.**
+- **What the original does:** level j's θⱼ is drawn from its conditional restricted to the box Bⱼ = [θⱼ₋₁, θⱼ₊₁], held fixed during level j's update. It uses P-MALA with a box-constrained prox (interior point), rejecting proposals outside Bⱼ, plus a constrained ASIS.
+- **The exact fact every design below uses:** let q be a proposal that is reversible with respect to the *unconstrained* conditional π. Then for the target π·1_B, MH acceptance is exactly 1_B(θ′), and the truncation constant cancels.
 
-| Change | Extends to joint? | How | Open question (measured in S5) |
+| Change | Joint design (concrete) | What could make it fail | Pilot that tests it (cost, UNTESTED) |
 |---|---|---|---|
-| Exact θ draw (h = 2) | **Not directly.** It would be a truncated MVN draw | Use the same family at h < 2: θ′ = μ + r(θ − μ) + √(1 − r²)P^{−1/2}ξ, reject if θ′ ∉ B_j. Exact, and the r-adaptation targets an acceptance rate | Acceptance when the box is tight (levels 0.96–0.99) |
-| Collapsed (λ, θ) block | **Not exactly** (the marginal would need an orthant probability) | Use it as an independence proposal from the unconstrained block and accept iff θ′ ∈ B_j (exact). Fall back to the paper's constrained ASIS when acceptance is low | The acceptance rate per level |
-| λ prior, σ rule | **Yes**, per level | Per level unchanged | — |
-| Banded O(n) cost | **Yes** | The same banded QR | — |
+| **θ move** (augmented Gibbs) | Per level, given (zⱼ, sⱼ, λⱼ, σⱼ), the conditional is N(μⱼ, Pⱼ⁻¹) truncated to Bⱼ. Use the implicit-Langevin (pCN) proposal θ′ = μⱼ + r(θⱼ − μⱼ) + √(1−r²)Pⱼ^{−1/2}ξ and accept iff θ′ ∈ Bⱼ. Adapt r in burn-in toward an acceptance rate of ≈ 0.3; r = 0 (the exact draw) when the box is slack. The cost is one banded QR per proposal, O(n) | At tight levels (0.97–0.99, gaps ≈ 0.02–0.05 σ-units) the acceptance of a full n-vector inside the box may collapse; then r → 1 and the move is slow. **Fallback:** a block-wise version that moves windows of ≈ 50 coordinates with the conditional Gaussian of the window (banded), each accepted iff inside the box | Acceptance and ESS/s per level on the joint design, 3 noises × 2 seeds, against the original joint sampler. ≈ 3 core-h (the original joint cost is not yet measured; estimate 6 levels × ≈ 5–8 ms/sweep × 30k ≈ 15–25 min per fit, so 6 fits ≈ 2 h; the new move ≈ 1 h) |
+| **Collapsed (λⱼ, θⱼ) block** | Draw (λⱼ′, θⱼ′) from the unconstrained collapsed block (slice on log λ with θ integrated out, then the exact θ draw). Use it as an independence proposal for the box-restricted target, accepted iff θⱼ′ ∈ Bⱼ (exact). When it is rejected, keep the current (λⱼ, θⱼ) and still do the ordinary conjugate λ \| θ draw | The independence proposal ignores the box, so its acceptance equals P(θ ∈ Bⱼ) under the unconstrained conditional, which may be ≈ 0 at tight levels. Then λ mixing falls back to the conjugate draw alone (the E-05 problem). **Fallback:** the paper's constrained ASIS (existing), or a collapsed proposal with θ moved by the pCN step above at the new λ and accepted with the joint MH ratio | Acceptance rate per level and ESS(log λⱼ) on the same pilot (shared runs, +0.5 core-h) |
+| **λ prior** (Gamma(2, s_y·n^{−5/2}) or an automatic centre) | Per level, unchanged: each λⱼ has its own prior and conjugate draw | None structural. The per-level centres must not reorder curves, but ordering is enforced by the box anyway | Comes with the pilots above |
+| **σ rule** (fixed 1.1σ̄ or plug-in) | Per level: σⱼ fixed (no σ \| θ block) | The plug-in at 0.99 (sparse tail): use the VP's extrapolation from the nearest estimable level | Comes with the pilots above |
+| **Banded O(n) cost** | Same banded QR per level and proposal | — | Cost per sweep against J ∈ {2, 4, 6} levels, both samplers: ≈ 1 core-h |
 
-**Plainly:** the individual-sampler gains carry over to the joint sampler only as MH-within-box moves whose efficiency must be measured. No joint sampler is changed in this plan.
+- **Joint gate (after S1):** ≈ 5 core-h in total.
+- **Pass:** the new joint arm (i) never crosses (by construction), (ii) has MSE per level no worse than the original's (paired), and (iii) has ESS/s ≥ the original's at every level.
+- **A change that wins individually but fails this gate is reported as a remark, not as a method.**
 
 ## 4. Benchmarks and measures (the paper's own)
 **Benchmarks:**
@@ -111,7 +117,7 @@ Arms on the same data and seeds:
 | **S3** | Peak detection: 30 replications × 3 levels; O vs the adopted arm(s) | Whether the paper's application-style benchmark holds | **5** |
 | **S4** | SPod (n = 8640, 3 levels; O at the paper's settings with 2 chains, the new sampler with 4) and Dutch boys (5 levels) | Mixing and runtime on real data | **7** |
 | **S5** | Scalability: n = 500…16k, 3 replications; ms/sweep and s/ESS for O vs the adopted sampler | n-scaling claim | **4** |
-| S6 | Joint variant prototype (box-rejection moves, §3) and J-scaling: **not costed here**; a separate proposal after S1 | — | — |
+| **S6** | **Joint gate (§3), after S1:** prototype the box-restricted moves; pilot against the original joint sampler on the joint design; J-scaling | Whether the individual gains have a working joint extension | **≈ 5** |
 | **Total S0–S5** | | | **≈ 51** (59 with S2b) |
 
 - **Already spent on E-07:** 1.3 core-h (G0, cancelled).
