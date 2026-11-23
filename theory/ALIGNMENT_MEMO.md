@@ -39,6 +39,22 @@
     - Gamma(n, 1) cannot reach n^{−5/6}.
     - A pinned soft floor (a_n = An, mean κn^{5/2}) gives all V0T\* conclusions with no truncation (PROVED by assembly), but it kills adaptivity.
     - **Warning for the design-specific A-rule theorem:** a weak prior is not expected to suffice at extreme τ, where the proxy sign is 6 − σ̄/σ₀ and σ̄/σ₀ ≈ 6.6–6.7 at τ = 0.05/0.95. So it may hold only at moderate τ (CONJECTURE).
+  - **β per paper design and level** (computed; `T06_Alignment/beta_table.out`). β = τ(1−τ)/(f·σ₀); proxy condition β < ~6, which is CONJECTURAL. Columns are β with the worst-case density, then β with the design-averaged density.
+
+    | τ | Gaussian | Beta | Mixed |
+    |---|---|---|---|
+    | 0.01 | 20.9 / 13.3 ✗ | 5.6 / 0.9 ✓ | 14.1 / 13.9 ✗ |
+    | 0.05 | 6.7 / 4.3 (avg ✓) | 5.5 / 1.0 ✓ | 4.5 / 4.5 ✓ |
+    | 0.25 | 2.8 / 1.8 ✓ | 5.1 / 1.1 ✓ | 1.9 / 1.9 ✓ |
+    | 0.5 | 2.4 / 1.5 ✓ | 4.5 / 1.3 ✓ | 1.6 / 1.6 ✓ |
+    | 0.75 | 2.8 / 1.8 ✓ | 4.0 / 2.0 ✓ | 1.9 / 1.9 ✓ |
+    | 0.9 | 4.4 / 2.8 ✓ | 4.9 / 3.3 ✓ | 3.0 / 2.9 ✓ |
+    | 0.95 | 6.7 / 4.3 (avg ✓) | 6.6 / 5.0 (borderline) | 4.5 / 4.5 ✓ |
+    | 0.99 | 20.9 / 13.3 ✗ | 17.1 / 12.7 ✗ | 14.1 / 13.9 ✗ |
+
+    - **Reading:** on the design-averaged β, every paper level from 0.05 to 0.95 is inside the proxy region, with Beta 0.95 borderline. τ = 0.01/0.99 is outside for all designs.
+    - **MEASURED (Engineering, existing exact Gibbs):** the A-rule's λ ratio drops at the tails in the predicted direction, most at Beta 0.95 (β = 6.0). The dominant effect, though, is the signal: the λ ratio is ≈ 3–10 on S and ≈ 0.2–0.8 on VS.
+    - **So the A-rule is a natural Tuesday target for τ ∈ [0.05, 0.95]**, and the extreme levels 0.01/0.99 are likely out of reach of this route.
   - **A-rule lower tail (Fable A, `FABLE_A_Arule_lowertail.md`, unaudited):**
     - **PROVED:** a floor-free A-rule result at fixed σ in the (EM) range. The posterior mass of {λ < c₋n^{5/2}(log n)^{−1/2}} → 0, via a new reverse small-ball lemma.
     - **At the learned σ:** conditional on one explicit evidence inequality ("under-smoothed pairs cost code length").
@@ -46,9 +62,9 @@
     - Three lemmas would close the gap for 1 < β < 6 on C1's window (SKETCH).
   - **Lower bound, Theorem LB (referee point #1), Fable B** (`FABLE_B_lowerbound.md`; written in full; **proved, unaudited**; Astra audit running, due 17:45).
     - **Statement:** E₀Π(Δ²ₙ ≤ c₀λ^{−1/3} | y) → 0 under (A1) and upper (A2) only, at any fixed σ, for λ up to the oracle, with an explicit finite-n bound.
-    - **Consequence:** with C\*/V0T\*, **n^{−5/6} is the exact posterior rate** at the oracle, up to (log n)^{1/6}.
+    - **Consequence, CONDITIONAL on Astra's audit (due 17:45):** with C\*/V0T\*, n^{−5/6} would be the exact posterior rate at the oracle, up to (log n)^{1/6}. If the audit is not back by 18:00, the headline reads 'upper bound, and a matching lower bound pending audit'.
     - **Extensions:** learned σ and V0T. The 'spread around its own random centre' version needs a new lemma.
-- **Theorem H** (Fable A, `T06_Alignment/FABLE_A_theoremH.md`): Huber-body localization above any λ floor Λ₋ (n^{−3/14} at Λ₋ ≍ n^{3/4}), plus the plug-in identity Π(B | y) ≤ Π(B | y, λ ≥ Λ₋) + Π(λ < Λ₋ | y). **Status: PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES; V2T Step 2 confirmed at a general floor; a fixed-M version is possible). It is the building block for a floor-free A-rule theorem; the missing input is lower-tail control of λ (Fable A, in progress).
+- **Theorem H** (Fable A, `T06_Alignment/FABLE_A_theoremH.md`): Huber-body localization above any λ floor Λ₋ (n^{−3/14} at Λ₋ ≍ n^{3/4}), plus the plug-in identity Π(B | y) ≤ Π(B | y, λ ≥ Λ₋) + Π(λ < Λ₋ | y). **Status: PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES; V2T Step 2 confirmed at a general floor; a fixed-M version is possible). Fixes applied in the commit that adds this note (see git log: 'Theorem H fixes applied'). It is the building block for a floor-free A-rule theorem; the missing input is lower-tail control of λ (Fable A, in progress).
 - **Exact-Gibbs hyperparameter screen (MEASURED, Engineering; prior effect only, both arms exact Gibbs):**
   - **PASSES:** **A-rule λ ~ Gamma(1, b_n), b_n = 1/(5500·(n/500)^{5/2})**. It is n-only, one rule for both signals, and V2-shaped. Median MSE ratio against his current prior: 0.95 / 0.90 / 0.53 at n = 500 / 1000 / 2000; max 1.13.
   - **FAILS:** Gamma(n, 1): median ×1.85, up to ×6.1, as predicted.

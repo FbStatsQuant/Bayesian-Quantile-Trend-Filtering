@@ -304,3 +304,9 @@ For fixed (L, f, f̄, V, T ≥ 4, K ≥ 1, ω₁ ≤ ω₂):
 - **(9) Improvement.** L10-I controls the envelope well enough for a **fixed-multiplier Bousquet bound**, i.e. a fixed large M rather than only M_n → ∞. To be written in the clean version.
 
 **Status: Theorem H is PROVED and cross-family audited.**
+
+### Fixes applied (Theory, 2026-11-23, after the Astra audit)
+
+- **§6.3, denominator event.** Ω_D is replaced by Astra's common event (AUDIT_astra_theoremH.md, finding 5). It is built on a fixed window and restriction that do not depend on the hyperprior p, with the stated constants. Every later use of Ω_D refers to this event.
+- **§4.3, width constant.** The rounding correction is applied (finding 3); the constant 18.9 is unchanged.
+- **§§1 and 9.** The sup-norm statement is restricted as in finding 8. Finding 9 (a fixed-M Bousquet bound) is recorded as an improvement for the clean version, not yet written.
