@@ -33,6 +33,7 @@
   - **(ii)** V2 (constant shape, scaled rate) **fails class-wide**, even on a bounded design satisfying the strict margin. So the margin condition is NOT sufficient.
   - **(iii)** Felipe's Gamma(n, 1) gives no RMS contraction at any radius o(n^{−1/3}).
   - **Consequence:** for an adaptive λ prior (data-passing), any theorem must be **design-specific** (the paper's smooth noise families). That is OPEN, and it is Tuesday's target.
+- **Theorem H** (Fable A, `T06_Alignment/FABLE_A_theoremH.md`): Huber-body localization above any λ floor Λ₋ (n^{−3/14} at Λ₋ ≍ n^{3/4}), plus the plug-in identity Π(B | y) ≤ Π(B | y, λ ≥ Λ₋) + Π(λ < Λ₋ | y). **Status: proved, unaudited.** The Astra audit is running, due 17:30, including the reliance on V2T Step 2 at a general floor. It is the building block for a floor-free A-rule theorem; the missing input is lower-tail control of λ (Fable A, in progress).
 - **Exact-Gibbs hyperparameter screen (MEASURED, Engineering; prior effect only, both arms exact Gibbs):**
   - **PASSES:** **A-rule λ ~ Gamma(1, b_n), b_n = 1/(5500·(n/500)^{5/2})**. It is n-only, one rule for both signals, and V2-shaped. Median MSE ratio against his current prior: 0.95 / 0.90 / 0.53 at n = 500 / 1000 / 2000; max 1.13.
   - **FAILS:** Gamma(n, 1): median ×1.85, up to ×6.1, as predicted.
