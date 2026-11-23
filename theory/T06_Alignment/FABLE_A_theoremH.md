@@ -290,3 +290,17 @@ For fixed (L, f, f̄, V, T ≥ 4, K ≥ 1, ω₁ ≤ ω₂):
 - The Ledoux–Talagrand contraction with absolute values (factor 2) is quoted, as in C1 Step 3.
 - All constants (2.85, 9/h, 18.9, 605, 21.5) were computed by hand once.
 - No numerical check of Lemma Lev or Lemma F′ (suggested: max_i(P_H)ᵢᵢ·h ≤ 9 and max_j‖w_j‖₂/h^{5/2} ≤ 2.85 for a few (n, h)).
+
+---
+
+## Theory Department: cross-family audit response (Astra, `reviews/AUDIT_astra_theoremH.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** All nine findings are CONFIRMED; Theory rules that they **HOLD**.
+- **(1)–(4)** The margin, translations, cones, trimming and leverage bound, the width and Markov exponents (with one rounding correction that keeps the constant 18.9), and the cone integrals are all confirmed.
+- **(5) Repair.** The denominator event Ω_D depended on the hyperprior p. Astra constructs a common event with the stated constants; adopted.
+- **(6)** Asymptotics and conditioning are confirmed.
+- **(7)** V2T Step 2 extends to a general floor, so **the learned-σ conclusion holds** under Lemma S's assumptions.
+- **(8) Improvement.** L10-I gives sup-norm contraction on the part of the window where M_n²n³Λ₋^{−11/7}(log)… → 0.
+- **(9) Improvement.** L10-I controls the envelope well enough for a **fixed-multiplier Bousquet bound**, i.e. a fixed large M rather than only M_n → ∞. To be written in the clean version.
+
+**Status: Theorem H is PROVED and cross-family audited.**
