@@ -1,0 +1,448 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{caption}
+\usepackage[colorlinks=true, linkcolor=blue!50!black, citecolor=blue!50!black, urlcolor=blue!50!black]{hyperref}
+
+\setlist{itemsep=2pt, topsep=3pt}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\renewcommand{\P}{\mathbb{P}}
+\newcommand{\norm}[1]{\lVert #1\rVert}
+\newcommand{\Dk}{D^{(k+1)}}
+\newcommand{\Dthree}{D^{(3)}}
+\newcommand{\TV}{\mathrm{TV}}
+\newcommand{\sbar}{\bar\sigma}
+\newcommand{\Pn}{\mathcal{P}_n}
+\newcommand{\Post}{\Pi_n}
+\newcommand{\ind}{\mathbb{1}}
+
+\definecolor{proved}{rgb}{0.0,0.45,0.15}
+\definecolor{progress}{rgb}{0.75,0.45,0.0}
+\definecolor{target}{rgb}{0.15,0.30,0.70}
+\definecolor{proposed}{rgb}{0.60,0.10,0.10}
+\newcommand{\stPROVED}{\textcolor{proved}{\textsf{\textbf{[PROVED]}}}}
+\newcommand{\stPROGRESS}{\textcolor{progress}{\textsf{\textbf{[PROOF IN PROGRESS]}}}}
+\newcommand{\stTARGET}{\textcolor{target}{\textsf{\textbf{[TARGET: statement fixed, not proved]}}}}
+\newcommand{\stPROPOSED}{\textcolor{proposed}{\textsf{\textbf{[PROPOSED, NOT PROVED]}}}}
+
+\theoremstyle{plain}
+\newcommand{\mythmname}{}
+\newtheorem*{namedx}{\mythmname}
+\newenvironment{named}[1]{\renewcommand{\mythmname}{#1}\begin{namedx}}{\end{namedx}}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\newcommand{\plainly}[1]{\par\smallskip\noindent\textit{In plain words.} #1\par\smallskip}
+\newcommand{\source}[1]{\par\noindent{\footnotesize\textsf{Source:} #1}\par\smallskip}
+
+\title{Posterior contraction for Bayesian quantile trend filtering:\\ what we are proving}
+\author{BQTF Writing Department (W-01)}
+\date{23 November 2026 \quad (status as of commit \texttt{2ebb7cf})}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent This note states, end to end, the model, the loss, the assumptions and the theorems of the BQTF contraction programme. It contains no proofs. Each result carries a status label:
+\stPROVED{} (complete proof, independently audited);
+\stPROGRESS{} (statement fixed, proof complete except for a named step);
+\stTARGET{} (statement fixed by Theory, proof plan only);
+\stPROPOSED{} (statement drafted here for discussion, consistent with Theorems A and B).
+All rates are stated on the squared scale: ``rate $n^{-5/6}$'' means $\varepsilon_n^2 \asymp n^{-5/6}$ up to logarithms. Open choices are collected in the box at the end.
+\end{abstract}
+
+%=====================================================================
+\section{Model}
+\label{sec:model}
+
+\paragraph{Data and target.} We observe independent $y_1,\dots,y_n$ on the equispaced design $x_i = i/n$. Let $F_i$ be the distribution function of $y_i$ and fix $\tau\in(0,1)$. The target is the vector of true $\tau$-quantiles
+\[
+\theta^*_i := F_i^{-1}(\tau) = \inf\{t : F_i(t)\ge\tau\}, \qquad i=1,\dots,n,
+\]
+and we write $y_i = \theta^*_i + \varepsilon_i$, so that each error $\varepsilon_i$ has $\tau$-quantile zero. All probabilities and expectations are under the true product law $P$ of $y=(y_1,\dots,y_n)$. The asymmetric Laplace distribution below is a \emph{working} likelihood only; the data are never assumed to be ALD.
+
+\paragraph{Differences and the order convention.} Let $D^{(1)}\in\R^{(n-1)\times n}$ be the first-difference matrix and $D^{(j+1)} := D^{(1)}D^{(j)}$ (with $D^{(1)}$ of matching size). As in the paper (\S2.1.1), the penalty uses
+\[
+D := \Dk \in \R^{m\times n}, \qquad m = n-k-1,
+\]
+whose null space is the set of polynomials of degree at most $k$ evaluated on the grid. The paper's default is $k=2$: \emph{third} differences, piecewise-quadratic fits. We write
+\[
+\TV_k(\theta) := n^{k}\,\norm{\Dk\theta}_1,
+\]
+the discrete total variation of the $k$-th derivative: if $\theta_i = g(i/n)$ then $\TV_k(\theta)\approx \TV(g^{(k)})$. This is Tibshirani's (2014) normalization, and the paper's $k$ is Tibshirani's $k$.
+
+\begin{center}
+\fbox{\begin{minipage}{0.92\textwidth}
+\textbf{Correspondence with the Theory files.} Theory writes $D=D^{(3)}$, $m=n-3$, ``$\mathrm{TV}^{(3)}(\theta) = n^2\norm{D\theta}_1$'' and ``$r=3$'' (Padilla--Chatterjee's order). All of these are the paper's $k=2$: $D^{(3)} = D^{(k+1)}$, $\mathrm{TV}^{(3)} = \TV_2$, and $r = k+1$. Theorems A, B and Targets 1--3 are for $k=2$; Target~6 is general $k$.
+\end{minipage}}
+\end{center}
+
+\paragraph{Working likelihood.} The ALD with scale $\sigma>0$ and skewness $\tau$ has density $p_{\mathrm{ALD}}(u\mid\tau,\sigma) = \tau(1-\tau)\sigma^{-1}\exp\{-\rho_\tau(u)/\sigma\}$, with check function $\rho_\tau(u) = u\{\tau-\ind(u<0)\}$. The likelihood of $\theta\in\R^n$ is
+\[
+\prod_{i=1}^n p_{\mathrm{ALD}}(y_i-\theta_i\mid\tau,\sigma) \;\propto\; \sigma^{-n}\exp\Big\{-\frac1\sigma\sum_{i=1}^n\rho_\tau(y_i-\theta_i)\Big\}.
+\]
+
+\paragraph{Prior.} Given $\lambda>0$,
+\[
+\pi(\theta\mid\lambda) \propto \lambda^{m}\exp\{-\lambda\norm{\Dk\theta}_1\}, \qquad \theta\in\R^n .
+\]
+Equivalently: write $\theta = Nc + Su$, where the columns of $N\in\R^{n\times(k+1)}$ are an orthonormal basis of the polynomial null space, $u = \Dk\theta\in\R^m$, and $S$ is a fixed right inverse of $\Dk$. This is a linear bijection with constant Jacobian, and the prior is
+\[
+dc \otimes \Pi_\lambda(du), \qquad \Pi_\lambda := \mathrm{Laplace}(\lambda)^{\otimes m}\ \ (\text{density } (\lambda/2)^m e^{-\lambda\norm{u}_1}).
+\]
+So the entries of $\Dk\theta$ are i.i.d.\ Laplace with rate $\lambda$, a \emph{probability} measure, and the prior is flat (Lebesgue, improper) on the polynomial part $c$ only. The hyperpriors are
+\[
+\lambda\sim\mathrm{Gamma}(a_0,b_0)\ \ (\text{shape, rate}), \qquad \sigma\sim\mathrm{IG}(a_\sigma,b_\sigma).
+\]
+
+\paragraph{Posterior.} Integrating out the paper's latent exponential variables (a sampling device that leaves the model unchanged), the joint posterior is
+\begin{equation}
+\pi(\theta,\lambda,\sigma\mid y) \;\propto\; \sigma^{-n-a_\sigma-1}\exp\Big\{-\frac{b_\sigma+\sum_i\rho_\tau(y_i-\theta_i)}{\sigma}\Big\}\;\lambda^{a_0+m-1}\exp\{-\lambda(b_0+\norm{\Dk\theta}_1)\}.
+\label{eq:joint}
+\end{equation}
+The theorems concern the posterior \emph{$\theta$-marginal} $\Post(\cdot\mid y)$ in four regimes. Write $Q(\theta) := \sum_{i}\rho_\tau(y_i-\theta_i)$.
+\begin{enumerate}[label=(\roman*)]
+\item \emph{$\lambda,\sigma$ fixed:} \ $\displaystyle \Post(B\mid y) = \frac{\int_B \exp\{-Q(\theta)/\sigma - \lambda\norm{\Dk\theta}_1\}\,d\theta}{\int_{\R^n}\exp\{-Q(\theta)/\sigma - \lambda\norm{\Dk\theta}_1\}\,d\theta}$.\\
+This is proper for every data vector (proved for $k=2$, $n\ge4$), and its mode is quantile trend filtering with penalty $\lambda\sigma$.
+\item \emph{$\sigma$ learned, $\lambda$ fixed:} \ $\pi(\theta\mid y)\propto \{b_\sigma+Q(\theta)\}^{-(n+a_\sigma)}\,e^{-\lambda\norm{\Dk\theta}_1}$.
+\item \emph{$\lambda$ learned, $\sigma$ fixed:} \ $\pi(\theta\mid y)\propto e^{-Q(\theta)/\sigma}\,\{b_0+\norm{\Dk\theta}_1\}^{-(a_0+m)}$. Here $b_0>0$ is needed: with $b_0=0$ the marginal prior on $\Dk\theta$ is not integrable at $0$.
+\item \emph{both learned (the method as run):} \ $\pi(\theta\mid y)\propto \{b_\sigma+Q(\theta)\}^{-(n+a_\sigma)}\{b_0+\norm{\Dk\theta}_1\}^{-(a_0+m)}$.
+\end{enumerate}
+For a general hyperprior density $\pi_n$ on $\lambda$ (Target~2), replace the last factor in (iii) by
+\[
+\int_0^\infty\lambda^m e^{-\lambda\norm{\Dk\theta}_1}\pi_n(\lambda)\,d\lambda .
+\]
+
+\begin{table}[h]
+\centering\small
+\caption{What is fixed and what is learned in each result.}
+\label{tab:fixed}
+\begin{tabular}{@{}lllll@{}}
+\toprule
+Result & order $k$ & $\lambda$ & $\sigma$ & posterior regime \\
+\midrule
+Theorem B & 2 & fixed, oracle (deterministic) & fixed, any & (i) \\
+Theorem A & 2 & fixed, oracle or window & fixed, $\sigma\ge\sbar/(1-\eta)$ & (i) \\
+Target 1 (A$^+$) & 2 & fixed, oracle or window & fixed, any & (i) \\
+Target 2 & 2 & learned (hyperprior) & fixed & (iii) \\
+Target 3 & 2 & fixed (3a) or learned (3b) & learned, IG & (ii) or (iv) \\
+Target 6 & general & fixed, oracle $\lambda_{k,n}$ & fixed & (i) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%=====================================================================
+\section{Loss and target of contraction}
+\label{sec:loss}
+
+For $\theta\in\R^n$ write $\delta = \theta-\theta^*$ and define
+\[
+\Delta_n^2(\theta,\theta^*) := \frac1n\sum_{i=1}^n \min\{|\delta_i|,\ \delta_i^2\}, \qquad \norm{\delta}_n^2 := \frac1n\sum_{i=1}^n\delta_i^2 .
+\]
+$\Delta_n^2$ is a Huber-type loss: it equals $\norm{\delta}_n^2$ when $\norm{\delta}_\infty\le1$, and it grows only linearly in large deviations. That linear growth is what lets the theory avoid moment conditions. It is also the natural loss for the check risk: under the margin condition (A2) below, the expected excess check loss $n^{-1}\sum_i\E[\rho_\tau(y_i-\theta_i)-\rho_\tau(y_i-\theta^*_i)]$ is at least $c_0\Delta_n^2(\theta,\theta^*)$, with $c_0=\min(f/2, fL/4)$.
+
+\begin{definition}[Contraction]
+Let $\Pn$ be a class of laws of $y$, let $\theta^*=\theta^*(P)$, and let $\Post(\cdot\mid y)$ be the posterior $\theta$-marginal. The posterior \emph{contracts at rate $\varepsilon_n$ in $\Delta_n$, uniformly over $\Pn$}, if for some constant $M$
+\[
+\sup_{P\in\Pn}\ \E_P\,\Post\big(\theta:\ \Delta_n^2(\theta,\theta^*) > M\varepsilon_n^2 \,\big|\, y\big)\ \longrightarrow\ 0 \qquad (n\to\infty).
+\]
+\end{definition}
+\noindent The law of $\theta-\theta^*$ under $\Post$ does not change if a polynomial of degree $\le k$ is added to $\theta^*$, because the prior is flat in those directions. So no bound on $\norm{\theta^*}_\infty$ is ever needed.
+
+%=====================================================================
+\section{Assumptions}
+\label{sec:assumptions}
+
+Constants $\tau$, $L$, $f$, $\bar f$, $V$, $\eta$, $b$ below are fixed (they do not depend on $n$ or $i$). Write $X_i(\delta) := \rho_\tau(\varepsilon_i-\delta)-\rho_\tau(\varepsilon_i)$ for the check-loss increment at displacement $\delta\in\R$; it satisfies $|X_i(\delta)|\le|\delta|$, so it has all moments whatever the noise.
+
+\begin{description}[leftmargin=0pt, itemsep=5pt]
+\item[(A1) Independence.] $y_1,\dots,y_n$ are independent, not necessarily identically distributed, on the grid $x_i=i/n$.\\
+\textit{Meaning:} the paper's setting; heteroscedastic noise is allowed.
+
+\item[(A2) Two-sided margin.] There are $L>0$ and $0<f\le\bar f<\infty$ such that, for all $n$, $i$ and $|\delta|\le L$,
+\[
+f|\delta| \le |F_i(\theta^*_i+\delta)-F_i(\theta^*_i)| \le \bar f|\delta| .
+\]
+We write (A2$^{\uparrow}$) for the upper inequality alone.\\
+\textit{Meaning:} near its $\tau$-quantile each $y_i$ has probability mass spread at a rate between $f$ and $\bar f$ (a density bounded above and below there). No moments are assumed. $f$ is a \emph{secant} constant over $[-L,L]$, so it is at most the point density at the quantile. The upper half forces $F_i(\theta^*_i)=\tau$; the lower half is Padilla and Chatterjee's Assumption~A.
+
+\item[(A3) Bounded variation of the second derivative ($k=2$).] $\TV_2(\theta^*) = n^2\norm{\Dthree\theta^*}_1\le V$.\\
+\textit{Meaning:} the discrete analogue of $\TV(g'')\le V$, i.e.\ Tibshirani's class $\mathcal F_2(V)$ and Padilla--Chatterjee's slow-rate class. It contains smooth curves and piecewise quadratics with kinks. For general $k$ (Target~6) it becomes (A3$_k$): $\TV_k(\theta^*)\le V$.
+
+\item[(A4) Strict $\sigma$ slack.] With $\sbar := \tau(1-\tau)/f$ and a fixed $\eta\in(0,1)$,
+\[
+\sigma \ \ge\ \sbar/(1-\eta).
+\]
+\textit{Meaning:} the working likelihood must not be more confident than the true check risk is curved: the posterior spread $\sigma/f$ must exceed the sandwich variance $\tau(1-\tau)/f^2$ of the centre, with room to spare. The equality case $\sigma=\sbar$ is false (counterexample: uniform errors, $\tau=\tfrac12$). The paper's learned $\sigma$ sits near $\sigma_0:=n^{-1}\sum_i\E\rho_\tau(\varepsilon_i)$, which violates (A4) for all common laws (Table~\ref{tab:noise}).
+
+\item[(EM) Light tails.] There is $b>0$ such that, for all $n$, $i$ and \emph{every} $\delta\in\R$,
+\[
+\E\exp\{-X_i(\delta)/\sigma\} \ \le\ \exp\{-(b/\sigma)\min(\delta^2,|\delta|)\}.
+\]
+\textit{Meaning:} at the working scale $\sigma$, the expected likelihood ratio of every displaced location decays with the displacement, globally. It has two necessary consequences. If $F_i$ is differentiable at the quantile, it forces $F_i'(\theta^*_i)\ge\tau(1-\tau)/\sigma+2b$, a strict point-density form of $\sigma>\sbar$. It also forces exponential tails, $P(\varepsilon_i>d)\le e^{-(\tau+b)d/\sigma}$ for $d\ge1$ (and the mirror bound), so polynomial tails are excluded.
+\end{description}
+
+\noindent Two checkable sufficient conditions for (EM) are proved.
+
+\begin{proposition}[Exponential envelope]
+If, for all $i$ and $t\ge0$, $P(\varepsilon_i>t)\le(1-\tau)e^{-\beta_+t}$ and $P(\varepsilon_i<-t)\le\tau e^{-\beta_-t}$, with $\beta_+>\tau/\sigma$ and $\beta_->(1-\tau)/\sigma$, then (EM) holds with some $b=b(\sigma,\tau,\beta_+,\beta_-)>0$. Heteroscedastic laws are allowed; the prefactors $1-\tau$ and $\tau$ are essential.
+\end{proposition}
+
+\begin{proposition}[Exponential moment plus a scale threshold]
+Assume (A2) and $\sup_{i,n}\E e^{c_\psi|\varepsilon_i|}\le K$. Put $c_0=\min(f/2,fL/4)$ and $C_V=\max\{e^{c_\psi/2},\,16K/(c_\psi e)^2\}$. If $1/\sigma\le\min\{c_\psi/2,\ c_0/C_V\}$, then (EM) holds with $b=c_0/2$.
+\end{proposition}
+
+\paragraph{Proposed assumption for learned $\sigma$ (Target 3 only).}
+\begin{description}[leftmargin=0pt]
+\item[(M) First moment.] For some $\gamma>0$, $\sup_{i,n}\E|\varepsilon_i|^{1+\gamma}<\infty$, and $\sigma_{0,n}:=n^{-1}\sum_i\E\rho_\tau(\varepsilon_i)$ stays in a fixed interval $[\sigma_{\mathrm{lo}},\sigma_{\mathrm{hi}}]\subset(0,\infty)$.\\
+\textit{Meaning:} the learned $\sigma$ tracks $\sigma_{0,n}$, the average check loss at the truth (the KL projection of the ALD scale). This needs $\E|\varepsilon_i|<\infty$. Under Cauchy noise $\sigma_0=\infty$, the learned $\sigma$ diverges and the likelihood flattens, so Cauchy is excluded.
+\end{description}
+
+\begin{table}[h]
+\centering\small
+\caption{Which result uses which assumption. ``$\uparrow$'' means the upper half of (A2) only.}
+\label{tab:uses}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+ & (A1) & (A2) & (A3) & (A4) & (EM) & (M) \\
+\midrule
+Theorem B & \checkmark & $\uparrow$ & \checkmark & -- & \checkmark & -- \\
+Theorem A & \checkmark & \checkmark & \checkmark & \checkmark & -- & -- \\
+Target 1 (A$^+$) & \checkmark & \checkmark & \checkmark & -- & -- & -- \\
+Target 2 (learned $\lambda$) & \multicolumn{5}{c}{as Theorem B (version 2B) or as Theorem A (version 2A)} & -- \\
+Target 3 (learned $\sigma$) & \checkmark & \checkmark & \checkmark & -- & -- & \checkmark \\
+Target 6 (order $k$) & \checkmark & \checkmark & (A3$_k$) & \multicolumn{2}{c}{(A4) or (EM)} & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Common noise laws.} Table~\ref{tab:noise} applies the assumptions to i.i.d.\ noise. (A1) holds throughout, and (A2) holds for all five laws (each has a continuous density, positive at the quantile). The column $R:=\sbar/\sigma_0$ uses the point density at the quantile, so it is the \emph{best case} for (A4); (A4) at the paper's scale $\sigma_0$ needs $R<1-\eta$. $R$ does not depend on the noise scale.
+
+\begin{table}[h]
+\centering\small
+\caption{Assumptions satisfied by common noise laws. ``Fixed $\sigma$ large'' means: for every fixed $\sigma$ above a law-dependent threshold. A and A$^+$ are listed by assumption, i.e.\ as they would apply once proved.}
+\label{tab:noise}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+Noise & $\tau$ & (A4) at & (EM) at & $R=\sbar/\sigma_0$ & covered at the & (M): & A$^+$ at \\
+ & & fixed $\sigma$ large & fixed $\sigma$ large & & paper's $\sigma_0$ by A or B? & learned $\sigma$ & any $\sigma$ \\
+\midrule
+Gaussian & 0.5 & yes & yes & 1.571 ($\pi/2$) & no & yes & yes \\
+         & 0.9 & yes & yes & 2.922 & no & yes & yes \\
+Laplace  & 0.5 & yes & yes & 1.000 & no (strict slack) & yes & yes \\
+         & 0.9 & yes & yes & 3.449$^\dagger$ & no & yes & yes \\
+$t_3$    & 0.5 & yes & no  & 1.234 & no & yes & yes \\
+         & 0.9 & yes & no  & 3.018$^\dagger$ & no & yes & yes \\
+$t_2$    & 0.5 & yes & no  & 1.000 & no (strict slack) & yes & yes \\
+         & 0.9 & yes & no  & 2.778$^\dagger$ & no & yes & yes \\
+Cauchy   & 0.5, 0.9 & yes & no & $\sigma_0=\infty$ & no ($\sigma_0=\infty$) & no & yes \\
+\bottomrule
+\end{tabular}
+\par\smallskip\raggedright\footnotesize
+$^\dagger$ Computed for this note (\texttt{writing/W01\_Statements/gap\_ratios.R}); the other $R$ values reproduce Theory's table. (EM) holds for Gaussian and Laplace noise at large $\sigma$ by Proposition~2, and fails for $t_\nu$ and Cauchy noise at every $\sigma$ (polynomial tails). At Laplace noise, $\tau=\frac12$, $\sigma=\sigma_0$ the ALD is correctly specified, yet it is not covered because (A4) needs strict slack.
+\end{table}
+
+\noindent\textbf{Scope, stated plainly.} Neither Theorem A nor Theorem B covers any of these laws at the paper's learned scale $\sigma_0$. For Gaussian noise the gap is the factor $\pi/2$ at $\tau=\tfrac12$, and it grows toward the tails (2.92 at $\tau=0.9$). Closing this gap is the purpose of Target~1 (A$^+$).
+
+%=====================================================================
+\section{Theorems and targets}
+\label{sec:theorems}
+
+Throughout this section $k=2$ (third differences), except in Target~6, and $\Post$ is the posterior $\theta$-marginal of the stated regime.
+
+%---------------------------------------------------------------------
+\subsection{\texorpdfstring{Theorem B: light tails, fixed $\lambda$ and $\sigma$ \quad \stPROVED}{Theorem B: light tails, fixed lambda and sigma [PROVED]}}
+
+Fix $\sigma>0$, $b>0$, $\tau\in(0,1)$, $(L,\bar f)$, $V>0$, constants $0<a_1\le a_2$ and $C>0$. Let $\Pn^{B}$ be the class of laws satisfying (A1), (A2$^{\uparrow}$) with $(L,\bar f)$, (A3) with $V$, and (EM) with this common $b$. Let $\lambda=\lambda_n$ be deterministic with $a_1\lambda_{\mathrm{or}}\le\lambda_n\le a_2\lambda_{\mathrm{or}}$, where either
+\begin{align*}
+\text{(B-i, oracle)}\quad &\lambda_{\mathrm{or}} = n^{5/2}/V, && \varepsilon_n^2 = C(\log n)^{1/6}\,V^{1/3}\,n^{-5/6};\\
+\text{(B-ii, fallback)}\quad &\lambda_{\mathrm{or}} = (n^3/V)^{3/4}, && \varepsilon_n^2 = C(\log n)^{1/6}\,V^{1/4}\,n^{-3/4}.
+\end{align*}
+
+\begin{named}{Theorem B}
+Let $C_1:=\max(\bar f/2,\,1/L)$ and $C_{\mathrm{pr}} := 39.6\,a_1^{-2/5}C^{-6/5}+1$. For every $M > (2/b)\,(1.44\,C_1 + 1 + \sigma C_{\mathrm{pr}})$,
+\[
+\sup_{P\in\Pn^{B}}\ \E_P\,\Post\big(\Delta_n^2(\theta,\theta^*) > M\varepsilon_n^2 \,\big|\, y\big)\ \longrightarrow\ 0 .
+\]
+\end{named}
+
+\noindent\textit{Constants.} $C_{\mathrm{pr}}$ (the prior-mass constant) is free of $V$ and of $P$; $V$ enters only through the sample size $n_0(V,a_1,a_2,C)$ beyond which the bounds hold. The factor $(\log n)^{1/6}$ may be replaced by $(\log n)^c$ for any $c\ge1/6$, and for $c>1/6$ any $C_{\mathrm{pr}}>0$ works. No bound is uniform as $b\to0$. The radii carry no margin constant $f$, because B does not use the lower half of (A2).
+
+\noindent\textit{Scope.} The result is in $\Delta_n$ only. A squared-loss version is not claimed (its sketch needs $\lambda/n^{9/5}\to\infty$, which both tunings satisfy, plus posterior control of $\TV_2(\theta-\theta^*)$). By the necessary consequences of (EM), B excludes polynomial tails and excludes Gaussian noise at $\sigma_0$; it covers none of the paper's runs as executed. B can cover laws that A excludes for every margin interval only when $F_i$ is not differentiable at the quantile (verified example: a dyadic staircase law at $\tau=\tfrac12$).
+
+\plainly{With exponentially light noise and a working scale that is not overconfident, the posterior of the trend concentrates around the true quantile curve at the linear-smoother rate $n^{-5/6}$ (up to a $(\log n)^{1/6}$ factor) when $\lambda$ is tuned to $n^{5/2}/V$. This is the first complete contraction result for the BQTF posterior, and it fixes the rate, the tuning and every constant that Theorem A must match.}
+
+\source{\texttt{theory/T05\_Proofs/THEOREM\_B\_COMPLETE.md} \S1 (exact statement); proof complete, every lemma reviewer-checked, and audited end to end by two independent reviewers (both ``complete with fixes''; every finding was re-derived by Theory, held, and was resolved in wording or scope; no mathematical gap).}
+
+%---------------------------------------------------------------------
+\subsection{\texorpdfstring{Theorem A: moment-free, fixed $\lambda$ and $\sigma$ \quad \stPROGRESS}{Theorem A: moment-free, fixed lambda and sigma [IN PROGRESS]}}
+
+Fix $(\tau,L,f,\bar f,\eta,V)$. Let $\Pn$ be the class of laws satisfying (A1)--(A3), and let $\sigma$ be fixed with (A4). Define
+\[
+\varepsilon^2(\lambda) := (\log n)^c\,(\sigma/f)^{5/6}\,\big[\lambda^{-1/3} + V^2\lambda^{5/3}n^{-5}\big],
+\]
+the sum of a spread term and a bias term. The $\lambda$-window is
+\[
+\Lambda_n := \big[\,n^2,\ n^3/\{V^{3/2}(\log n)^{C_0}\}\,\big], \qquad C_0>3c/5 .
+\]
+
+\begin{named}{Theorem A}
+There are constants $c$ and $M$, depending only on $(\tau,L,f,\bar f,\eta)$ (in particular, $M$ is free of $\sigma$), such that, for deterministic $\lambda$,
+\begin{align*}
+&\sup_{P\in\Pn}\ \sup_{\lambda\in\Lambda_n}\ \E_P\,\Post\big(\Delta_n^2(\theta,\theta^*) > M\varepsilon^2(\lambda)\,\big|\,y\big)\to0, \\
+&\sup_{P\in\Pn}\ \sup_{\lambda\in\Lambda_n}\ \E_P\,\Post\big(\norm{\theta-\theta^*}_n^2 > M\varepsilon^2(\lambda)\,\big|\,y\big)\to0 .
+\end{align*}
+\end{named}
+
+\begin{itemize}
+\item \emph{Primary version (to be proved first):} the single oracle tuning $\lambda_n = n^{5/2}/V$, uniformly over $\Pn$, which gives
+$\varepsilon_n^2 = (\log n)^c(\sigma/f)^{5/6}V^{1/3}n^{-5/6}$. At the fallback tuning $\lambda_n=(n^3/V)^{3/4}$ the same formula gives $(\log n)^c(\sigma/f)^{5/6}V^{1/4}n^{-3/4}$.
+\item \emph{Both losses:} once the posterior is localized in sup-norm ($\norm{\theta-\theta^*}_\infty\le1$), $\Delta_n^2=\norm{\cdot}_n^2$, so the second display follows from the proof of the first.
+\item \emph{Positioning:} $n^{-5/6}$ is the minimax rate over \emph{linear} smoothers for this class; the minimax rate is $n^{-6/7}$, attained by the posterior mode (Padilla--Chatterjee). At Padilla--Chatterjee's tuning $\lambda\sigma\asymp n^{15/7}(\log n)^{1/7}$ the formula gives $n^{-5/7}$ up to logs. The posterior's spread term does not depend on the truth, so knots give no gain under this prior.
+\item \emph{Uniformity over $\Lambda_n$ does not by itself cover a data-dependent $\lambda$;} that needs its own argument (Target~2).
+\end{itemize}
+
+\noindent\textit{Status: one step open.} Every other step is proved and reviewer-checked: the evidence lower bound, the prior small-ball and shift bounds that produce the $n^{-5/6}$ bias law, and the numerator bound on the region where $\norm{\theta-\theta^*}_\infty\le\Delta$. The open step is \textbf{sup-norm localization}: show, without moment conditions, that $\E_P\Post(\norm{\theta-\theta^*}_\infty>\Delta\mid y)\to0$ for a fixed small $\Delta$. Its deterministic half is proved: $\norm{\delta}_\infty\le6\norm{\delta}_n+7.06\,\norm{\delta}_n^{4/5}\TV_2(\delta)^{1/5}$. The missing half is posterior control of $\TV_2(\theta-\theta^*)$ together with the far region; the planned route needs $\lambda/n^{21/11}\to\infty$, which is why the window starts at $n^2$.
+
+\plainly{The same $n^{-5/6}$ rate as Theorem B, but with no moment or tail condition at all, so Cauchy noise is allowed. The price is the scale condition (A4): $\sigma$ must exceed $\sbar=\tau(1-\tau)/f$ with slack. This is the main theorem if the open step closes; if it does not, Theorem B is the main theorem and moment-free contraction is stated as a conjecture supported by the $t_2$ and Cauchy simulations.}
+
+\source{\texttt{theory/T03\_Feasibility/STATEMENT\_DRAFT.md} v3.1 (Theorem A, (A4)); \texttt{theory/T05\_Proofs/SKELETON.md} (status board; the open step is ``L10, Stage 1'').}
+
+%---------------------------------------------------------------------
+\subsection{\texorpdfstring{Target 1 (Theorem A$^+$): any fixed $\sigma$ \quad \stTARGET}{Target 1 (Theorem A+): any fixed sigma [TARGET]}}
+
+\begin{named}{Target 1 (Theorem A$^+$)}
+Theorem A holds for \emph{every} fixed $\sigma>0$, i.e.\ without (A4), with $\varepsilon^2(\lambda)$ replaced by
+\[
+\varepsilon_+^2(\lambda) := (\log n)^c\,(\sigma/f)^{5/6}\Big[\Big(1\vee\frac{\sbar}{\sigma}\Big)\lambda^{-1/3} + V^2\lambda^{5/3}n^{-5}\Big],
+\]
+and with $c$, $M$ allowed to depend also on $\sigma$.
+\end{named}
+
+\noindent Below $\sbar$ the spread term becomes $\tau(1-\tau)f^{-2}(f/\sigma)^{1/6}\lambda^{-1/3}$: the sampling error of the posterior centre, not the posterior spread. The factor $1\vee\sbar/\sigma$ is likely conservative. In simulations with Gaussian noise, $\tau=\tfrac12$ and $\sigma=\sigma_0$, the replicate variance of the posterior mean divided by the posterior spread is $1.49\approx\pi/2$ only in the 3-dimensional quadratic null space, and $1.08$ in the penalized directions.
+
+\noindent\textit{Status.} It needs Theorem A's open step plus one new step: on the localized set, bound the \emph{realized} likelihood ratio rather than its expectation, because the expectation argument fails above $1/\sbar$. A plan exists (a Knight decomposition with a Cauchy--Schwarz split); it is not started.
+
+\plainly{This is the theorem that covers the method's practice: it allows the scale the paper actually learns, including Gaussian noise at $\sigma_0$ and extreme quantiles, where the gap to (A4) is largest.}
+
+\source{\texttt{STATEMENT\_DRAFT.md} v3.1, Theorem A$^+$ and ``Plan for Theorem A$^+$''.}
+
+%---------------------------------------------------------------------
+\subsection{\texorpdfstring{Target 2: learned $\lambda$ \quad \stPROPOSED}{Target 2: learned lambda [PROPOSED]}}
+
+$\sigma$ is fixed, $\lambda$ has a hyperprior $\pi_n$, and $\Post$ is the $\theta$-marginal of regime (iii). The hyperprior is an open choice (Decision~1):
+\begin{description}[leftmargin=0pt]
+\item[(H1) $n$-scaled Gamma.] $\lambda\sim\mathrm{Gamma}(a_0,b_{0,n})$ with $b_{0,n} = s_y\,n^{-\beta}$, where $s_y$ is a data scale (since $b_0$ carries the units of $\norm{\Dk\theta}_1$) and $\beta\ge2$. Engineering's E-02 tested $\beta=2$ and $\beta=5/2$. This keeps the paper's conjugate update.
+\item[(H2) Polynomial-tailed prior.] A prior with polynomial upper tail and no $n$-dependent scale, for example the compound Gamma $\lambda\mid\beta\sim\mathrm{Gamma}(a_0,\beta)$, $\beta\sim\mathrm{Gamma}(c_1,d_1)$, with marginal density $\propto\lambda^{a_0-1}(d_1+\lambda)^{-(a_0+c_1)}$. It keeps conjugate Gibbs updates through $\beta\mid\lambda\sim\mathrm{Gamma}(c_1+a_0,d_1+\lambda)$.
+\end{description}
+
+\begin{named}{Target 2 (proposed)}
+Under the assumptions of Theorem B (version 2B), or of Theorem A (version 2A), with $\sigma$ fixed and $\lambda\sim\pi_n$ satisfying (H1) or (H2) (exact conditions on $\beta$ or on the tail index to be fixed by the proof),
+\[
+\sup_{P}\ \E_P\,\Post\big(\Delta_n^2(\theta,\theta^*)>M\varepsilon_n^2\,\big|\,y\big)\to0, \qquad \varepsilon_n^2 = C(\log n)^{c}\,V^{1/4}\,n^{-3/4},
+\]
+uniformly over the class, with $V$ unknown to the prior.
+\end{named}
+
+\noindent\textit{Why $n^{-3/4}$ and not $n^{-5/6}$.} The $\lambda$-update responds to the $\ell_1$ norm of the posterior draws, not to the bias. On kinked truths the learned $\lambda$ settles at the fallback tuning $(n^3/V)^{3/4}\asymp n^{9/4}$, where the rate is $n^{-3/4}$ (E-02, $b_0=n^{-5/2}$: slope of $\bar\lambda$ in $n$ is $2.14$ on a kinked truth and $2.54$ on a smooth one). So $n^{-3/4}$ is the honest uniform target, and $n^{-5/6}$ stays an oracle-tuning statement. The rate $n^{-3/4}$ does not require knowing $V$, which answers the referee point that the oracle $\lambda$ depends on $V$.
+
+\noindent\textit{Why not the paper's current fixed $b_0$.} With $b_0$ fixed in $n$, the learned $\lambda$ settles at
+\[
+\lambda\approx\{0.27\,n\,(f/\sigma)^{1/6}/b_0\}^{3/4}\asymp n^{3/4}
+\]
+(confirmed in E-02, slope $0.745$; it also matches the paper's own $\lambda\approx50$--$75$ at $n=500$ under Gamma(1,1)). That predicts a rate of only about $n^{-1/4}$. This is a heuristic, not a theorem.
+
+\noindent\textit{Proof needs.} Contraction of the hyperposterior of $\lambda$ onto a window where the fixed-$\lambda$ bound holds. Uniform bounds for deterministic $\lambda$ cannot simply be plugged in. Version 2B is the natural first step, since B is proved.
+
+\plainly{The method chooses its own smoothing level and still attains $n^{-3/4}$ over the whole bounded-variation class, without knowing $V$, provided the hyperprior on $\lambda$ is chosen as in (H1) or (H2).}
+
+%---------------------------------------------------------------------
+\subsection{\texorpdfstring{Target 3: learned $\sigma$ \quad \stPROPOSED}{Target 3: learned sigma [PROPOSED]}}
+
+$\sigma\sim\mathrm{IG}(a_\sigma,b_\sigma)$ with fixed hyperparameters. In version 3a $\lambda$ is fixed at the oracle $n^{5/2}/V$ (regime (ii)); in version 3b $\lambda$ is learned as in Target~2 (regime (iv), the method as run).
+
+\begin{named}{Target 3 (proposed)}
+Assume (A1)--(A3) and (M). Then the posterior of $\sigma$ concentrates around $\sigma_{0,n}$, and
+\[
+\sup_{P}\ \E_P\,\Post\big(\Delta_n^2(\theta,\theta^*)>M\varepsilon_n^2\,\big|\,y\big)\to0,
+\]
+with, in version 3a, the A$^+$ rate at $\sigma=\sigma_{0,n}$:
+\[
+\varepsilon_n^2 = (\log n)^c\,(\sigma_{0,n}/f)^{5/6}\,\big(1\vee\sbar/\sigma_{0,n}\big)\,V^{1/3}\,n^{-5/6},
+\]
+and, in version 3b, the Target~2 rate $C(\log n)^cV^{1/4}n^{-3/4}$.
+\end{named}
+
+\noindent\textit{Remarks.} (a) Since $\sigma_0<\sbar$ for every law in Table~\ref{tab:noise} ($R\ge1$), Target~3 builds on Target~1 (A$^+$), not on Theorem A. Through Theorem A it could reach only laws with $R<1-\eta$ (noise sharply peaked at the quantile). (b) Cauchy noise is excluded by (M). (c) In E-02 the posterior mean of $\sigma$ was within 3\% of $\sigma_0$.
+
+\plainly{Learning the ALD scale, as the paper does, costs nothing in rate as long as the noise has a finite mean; the learned scale converges to the average check loss at the truth.}
+
+%---------------------------------------------------------------------
+\subsection{\texorpdfstring{Target 6: general order $k$ \quad \stPROPOSED}{Target 6: general order k [PROPOSED]}}
+
+The penalty is $\Dk$ with $m=n-k-1$, the prior is flat on polynomials of degree $\le k$, and $\lambda$, $\sigma$ are fixed (regime (i)).
+
+\begin{named}{Target 6 (proposed)}
+Fix $k\ge0$. Under (A1), (A2), (A3$_k$): $\TV_k(\theta^*)\le V$, and either (A4) (moment-free version) or (EM) (light-tail version), there is a deterministic oracle tuning $\lambda_{k,n}$, depending on $(n,V)$, such that
+\[
+\sup_{P}\ \E_P\,\Post\big(\Delta_n^2(\theta,\theta^*)>M\varepsilon_{n,k}^2\,\big|\,y\big)\to0, \qquad \varepsilon_{n,k}^2 = (\log n)^{c_k}\,C(V,\sigma,f)\,n^{-r_k}.
+\]
+The exponent $r_k$ and the tuning $\lambda_{k,n}$ will be derived by Theory (Tuesday 24 November). Known case, $k=2$: $r_2=5/6$ at $\lambda\asymp n^{5/2}/V$, and $n^{-3/4}$ at the fallback $\lambda\asymp(n^3/V)^{3/4}$.
+\end{named}
+
+\noindent\textit{Proof needs.} Every $k$-dependent ingredient must be re-derived: the prior small-ball exponent, the signed bias kernel, the interpolation inequality behind sup-norm localization, and the window for $\lambda$.
+
+\plainly{The paper allows any order $k$ (e.g.\ $k=0$, the fused lasso, and $k=1$, piecewise linear trends); this target extends the guarantee from the default $k=2$ to all orders.}
+
+%=====================================================================
+\section{Summary}
+\label{sec:summary}
+
+\begin{center}\small
+\captionof{table}{Summary. Rates are $\varepsilon_n^2$ in $\Delta_n^2$, up to the stated log factors; $V$ is the bound in (A3).}
+\label{tab:summary}
+\begin{tabular}{@{}p{2.3cm}p{3.6cm}p{4.6cm}p{3.6cm}@{}}
+\toprule
+Result & Assumptions & Rate (tuning) & Status \\
+\midrule
+Theorem B & (A1), (A2$^\uparrow$), (A3), (EM); $\lambda,\sigma$ fixed & $(\log n)^{1/6}V^{1/3}n^{-5/6}$ ($\lambda\asymp n^{5/2}/V$); $(\log n)^{1/6}V^{1/4}n^{-3/4}$ ($\lambda\asymp(n^3/V)^{3/4}$) & \textcolor{proved}{\textbf{Proved}}, audited end to end \\[2pt]
+Theorem A & (A1)--(A4); $\lambda,\sigma$ fixed & $(\log n)^c(\sigma/f)^{5/6}V^{1/3}n^{-5/6}$ (oracle); $\varepsilon^2(\lambda)$ on $\Lambda_n$; also in $\norm{\cdot}_n^2$ & \textcolor{progress}{\textbf{In progress}}: one step open (sup-norm localization) \\[2pt]
+Target 1 (A$^+$) & (A1)--(A3); any fixed $\sigma$ & as A, spread term $\times(1\vee\sbar/\sigma)$ & \textcolor{target}{\textbf{Target}}; plan only \\[2pt]
+Target 2 & as B or A; $\lambda\sim$ (H1) or (H2) & $(\log n)^cV^{1/4}n^{-3/4}$, $V$ unknown & \textcolor{proposed}{\textbf{Proposed}} \\[2pt]
+Target 3 & (A1)--(A3), (M); $\sigma\sim\mathrm{IG}$ & A$^+$ rate at $\sigma_0$ (3a); $n^{-3/4}$ (3b) & \textcolor{proposed}{\textbf{Proposed}}; needs Target 1 \\[2pt]
+Target 6 & (A1), (A2), (A3$_k$), (A4) or (EM) & $n^{-r_k}$, $r_k$ to be derived; $r_2=5/6$ & \textcolor{proposed}{\textbf{Proposed}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Not claimed anywhere:} frequentist coverage of credible sets (the posterior spread is set by $\sigma$ and the prior, not by the sampling variance), a Bernstein--von Mises theorem, adaptation to the fast-rate class, or a lower bound. A lower bound is a stated conjecture: $\Post(\Delta_n^2<c\lambda^{-1/3}\mid y)\to0$, which would make the posterior strictly slower than its mode at every $\lambda$.
+
+\noindent\textbf{Numerical support} (Engineering E-02, sampler certified by E-04): the posterior spread follows $\lambda^{-1/3}$ (slopes $-0.37$ and $-0.34$ against $-1/3$); the bias on kinked truths follows the $\lambda^{5/3}n^{-5}$ law and excludes the cruder $\ell_1$ law at every tuning tested; the spread law carries over to $\tau=0.9$ and to Cauchy noise.
+
+%=====================================================================
+\vspace{1em}
+\noindent\fbox{\begin{minipage}{0.97\textwidth}
+\textbf{Decisions for Felipe}
+\begin{enumerate}[leftmargin=*, label=\textbf{D\arabic*.}]
+\item \textbf{Hyperprior on $\lambda$ (Target 2).} (H1) Gamma$(a_0, s_y n^{-\beta})$ with $\beta=2$ or $5/2$ (tested in E-02; conjugate; needs a data scale $s_y$; P-MALA did not converge at $b_0\propto n^{-2}$ for $n\gtrsim2000$ in the paper's run length, the Gibbs sampler did) \emph{or} (H2) a polynomial-tailed prior such as the compound Gamma (no $n$-scaling, no units issue, untested). Linked: whether the paper's default should change, since the current fixed $b_0$ predicts only about $n^{-1/4}$.
+\item \textbf{Learned-$\lambda$ rate target.} Aim for $n^{-3/4}$ uniformly over the class (what kinked truths self-tune to; recommended in the Theory memo), or also try for $n^{-5/6}$ (which would need $b_0\lesssim n^{-7/3}$ heuristically and is unsupported for kinked truths).
+\item \textbf{Moment condition for learned $\sigma$ (Target 3).} Accept (M), $\E|\varepsilon|^{1+\gamma}<\infty$, which excludes Cauchy noise from the learned-$\sigma$ result (Cauchy stays covered at fixed $\sigma$ by A and A$^+$).
+\item \textbf{Order of the targets after Theorem A.} Target 3 needs Target 1 to cover Gaussian noise at $\sigma_0$. Possible orders: 1 $\to$ 3 $\to$ 2 (the method's practice first), or 2B first (it builds on the proved Theorem B and is the cheapest new result), then 1 $\to$ 3; Target 6 last.
+\item \textbf{General $k$ in the paper.} State Target 6 as a theorem for all $k$, or keep $k=2$ (the paper's default) as the theorem and general $k$ as a remark, depending on what $r_k$ Theory derives on Tuesday.
+\item \textbf{Headline if Theorem A's open step fails.} Already decided by HQ: Theorem B becomes the main theorem and moment-free contraction is a conjecture supported by the $t_2$ and Cauchy simulations. Confirm.
+\end{enumerate}
+\end{minipage}}
+
+\end{document}
