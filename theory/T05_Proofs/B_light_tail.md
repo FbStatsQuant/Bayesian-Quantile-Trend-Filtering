@@ -1,6 +1,6 @@
 # Theorem B (light-tail fallback, "A-LT"): oracle contraction in Δ²ₙ under a global MGF condition
 
-**Status:** draft (2026-11-22).
+**Status:** self-checked (2026-11-22). Every step was re-derived; two fixes were made (the 1/V₃ factor in step 4, and the n ≥ n₀(V) condition for the primary prior mass). Ready for the advisor check. The mixture-row numbers depend on `checks/global_threshold.py`, which Engineering has queued.
 - **Source.** Written after the two light-tail opinions, Astra (`../T03_Feasibility/reviews/LIGHT_TAIL_astra.md`) and Fable/VP (`../T03_Feasibility/reviews/LIGHT_TAIL_fable.md`). Both say ADOPT WITH CHANGES. Felipe approved it as the fallback theorem, and HQ has decided to prove **B first, before L10**.
 - **Structure (HQ decision).**
   - The hypothesis is the VP's (EM).
@@ -117,9 +117,13 @@ The supremum is over all laws satisfying the assumptions.
    N(ℝⁿ) ≥ V₃(ε√n/2)³ · Π_λ(u_h + B_{ε/2}) · e^{−ω(1.44C₁+1)nε²}.
 
    The prior-mass bound is −log Π_λ(u_h + B_{ε/2}) ≤ C_pr nε². This comes from L3 together with the half-radius L4q and L4q-M (primary), or from L3 and L4 with u_h = u\* (fallback).
+   - *Primary route, conditions:* δ_A ≤ λε/4 and K′ = K(λε/2) ≤ 1. Both hold for n ≥ n₀(V), because λε ≍ n^{25/12}V^{−5/6} at the oracle and R1 needs λε ≥ 102·n^{10/7}(log m)^{1/7}.
+   - *Uniformity:* the prior side does not depend on the law P, so uniformity over P is unaffected.
 4. *Combine.*
 
-   E₀Πₙ(E | y) ≤ C₃(bω)·(2/(ε√n))³ · exp{−[bM/2 − (1.44C₁+1) − C_pr/ω]·ωnε²} + 1.44/(nε²).
+   E₀Πₙ(E | y) ≤ (C₃(bω)/V₃)·(2/(ε√n))³ · exp{−[bM/2 − (1.44C₁+1) − C_pr/ω]·ωnε²} + 1.44/(nε²).
+
+   This uses Πₙ(E | y) ≤ N(E)·1_Ω/L + 1_{Ωᶜ}, where L is the deterministic lower bound of step 3 and Ω its event.
 
    Since nε² → ∞, the first term → 0 once M > (2/b)[1.44C₁ + 2 + C_pr/ω], and the second → 0. ∎
 

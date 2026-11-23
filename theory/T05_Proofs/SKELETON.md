@@ -80,4 +80,4 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 | L8-b realized numerator | Theorem A⁺ | plan only |
 | L9-a far region | both | to attempt |
 | L9-c, L10 sup-norm | both | open (crux) |
-| B: Props 1–2 + assembly | Theorem B (light tails) | **draft** (`B_light_tail.md`); self-check next, then the advisor check |
+| B: Props 1–2 + assembly | Theorem B (light tails) | **self-checked** (`B_light_tail.md`); awaiting the advisor check |
