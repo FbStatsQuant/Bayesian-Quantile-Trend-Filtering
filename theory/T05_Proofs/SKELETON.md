@@ -60,6 +60,10 @@ We need E₀ Πₙ(‖θ − θ\*‖∞ > Δ | y) → 0. Plan (STATEMENT v2.1, L
 
 Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight score term, coarse net, fine-part integration, chained remainder (L8-b). Steps 1 and 3 are unchanged.
 
+## Theorem B (light-tail fallback; HQ: prove first)
+
+`B_light_tail.md`. Under the global MGF condition (EM), Step 2 is done on **all of ℝⁿ** by Fubini, and the flat part is bounded by C₃(bω), free of n. So Steps 3–4 (L7, L9, L10) are not needed. Step 1 (L6) is unchanged. The result is in Δ²ₙ only.
+
 ## Lemma status board
 
 | Lemma | Role | Status |
@@ -76,3 +80,4 @@ Replace Step 2 by the realized-numerator argument of STATEMENT v2.1: Knight scor
 | L8-b realized numerator | Theorem A⁺ | plan only |
 | L9-a far region | both | to attempt |
 | L9-c, L10 sup-norm | both | open (crux) |
+| B: Props 1–2 + assembly | Theorem B (light tails) | **draft** (`B_light_tail.md`); self-check next, then the advisor check |
