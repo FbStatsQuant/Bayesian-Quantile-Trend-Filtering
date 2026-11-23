@@ -1,0 +1,17 @@
+# l8p_mgf.py after the Fable review (secant f, constant 0.0321); owls_run -j 1 on Owls, 2026-11-22. Verbatim stdout.
+sup|psi'''| = 0.09623  vs 1/(6 sqrt3) = 0.09623
+normal    tau=0.50 f=0.383 wbar=1.532  exact=0.99275 MC=0.99254 m(0.3)=0.01782/0.01802  bound holds: True
+normal    tau=0.90 f=0.125 wbar=1.391  exact=0.99621 MC=0.99621 m(0.3)=0.00693/0.00692  bound holds: True
+normal    tau=0.05 f=0.068 wbar=1.432  exact=0.99691 MC=0.99702 m(0.3)=0.00546/0.00534  bound holds: True
+cauchy    tau=0.50 f=0.295 wbar=1.181  exact=0.99552 MC=0.99542 m(0.3)=0.01412/0.01423  bound holds: True
+cauchy    tau=0.90 f=0.026 wbar=0.294  exact=0.99990 MC=0.99989 m(0.3)=0.00129/0.00135  bound holds: True
+cauchy    tau=0.05 f=0.007 wbar=0.152  exact=0.99999 MC=0.99998 m(0.3)=0.00036/0.00037  bound holds: True
+laplace   tau=0.50 f=0.393 wbar=1.574  exact=0.98992 MC=0.98992 m(0.3)=0.02041/0.02040  bound holds: True
+laplace   tau=0.90 f=0.079 wbar=0.874  exact=0.99882 MC=0.99878 m(0.3)=0.00408/0.00414  bound holds: True
+laplace   tau=0.05 f=0.039 wbar=0.828  exact=0.99930 MC=0.99931 m(0.3)=0.00249/0.00248  bound holds: True
+t2        tau=0.50 f=0.333 wbar=1.333  exact=0.99440 MC=0.99480 m(0.3)=0.01573/0.01531  bound holds: True
+t2        tau=0.90 f=0.060 wbar=0.669  exact=0.99934 MC=0.99936 m(0.3)=0.00312/0.00308  bound holds: True
+t2        tau=0.05 f=0.024 wbar=0.508  exact=0.99977 MC=0.99980 m(0.3)=0.00144/0.00133  bound holds: True
+lognormal tau=0.50 f=0.213 wbar=0.852  exact=0.99731 MC=0.99732 m(0.3)=0.01090/0.01088  bound holds: True
+lognormal tau=0.90 f=0.016 wbar=0.178  exact=0.99997 MC=0.99996 m(0.3)=0.00075/0.00083  bound holds: True
+lognormal tau=0.05 f=0.100 wbar=2.105  exact=0.95989 MC=0.95975 m(0.3)=0.03396/0.03407  bound holds: True

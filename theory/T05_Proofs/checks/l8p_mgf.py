@@ -1,6 +1,7 @@
 """L8' check: exact MGF identity and the bound
    log E exp(-w X(d)) <= -B(w,Delta) * w * m(d),  |d| <= Delta,
-   B = exp(-w*Delta - w^2 Delta^2/8) - w/wbar - 0.0322 w^2 Delta / f,  wbar = f/(tau(1-tau)).
+   B = exp(-w*Delta - w^2 Delta^2/8) - w/wbar - 0.0321 w^2 Delta / f,  wbar = f/(tau(1-tau)).
+   f = SECANT constant of (A2): inf_{0<|d|<=L} |F(q+d)-tau|/|d| (Fable review, finding 4).
 Also checks sup |psi'''| <= 1/(6 sqrt 3) for the two-point log-MGF."""
 import numpy as np
 from scipy import stats, integrate
@@ -42,21 +43,19 @@ for name, dist in dists.items():
         q = dist.ppf(tau)
         # local margin constants on [-L, L], L = 0.5: f = min density, fbar = max density
         L = 0.5; ss = np.linspace(-L, L, 2001)
-        f = dist.pdf(q+ss).min()
-        if f <= 1e-8:
-            print(f"{name:9s} tau={tau:4.2f}  f=0 on [q-L, q+L]: outside (A2), skipped"); continue
+        sec = ss[ss != 0]; f = np.min(np.abs(dist.cdf(q+sec) - tau)/np.abs(sec))   # secant constant of (A2)
         wbar = f/(tau*(1-tau))
         # MC agreement at one point
-        v, m = exact_mgf(dist, tau, 0.7*wbar, 0.3)
+        v, m03 = exact_mgf(dist, tau, 0.7*wbar, 0.3)
         mv, mm = mc_mgf(dist, tau, 0.7*wbar, 0.3, N=400_000)
         worstB = np.inf; ok = True
         for eta in (0.1, 0.3):
             w = (1-eta)*wbar
             for Delta in (0.02, 0.05, 0.1, 0.2, min(0.5, L)):
-                B = np.exp(-w*Delta - w**2*Delta**2/8) - w/wbar - 0.0322*w**2*Delta/f
+                B = np.exp(-w*Delta - w**2*Delta**2/8) - w/wbar - 0.0321*w**2*Delta/f
                 for d in np.linspace(-Delta, Delta, 41):
                     if d == 0: continue
                     val, m = exact_mgf(dist, tau, w, d)
                     lhs = np.log(val); rhs = -B*w*m
                     if lhs > rhs + 1e-10: ok = False
-        print(f"{name:9s} tau={tau:4.2f} f={f:.3f} wbar={wbar:.3f}  exact={v:.5f} MC={mv:.5f} m={m:.5f}/{mm:.5f}  bound holds: {ok}")
+        print(f"{name:9s} tau={tau:4.2f} f={f:.3f} wbar={wbar:.3f}  exact={v:.5f} MC={mv:.5f} m(0.3)={m03:.5f}/{mm:.5f}  bound holds: {ok}")

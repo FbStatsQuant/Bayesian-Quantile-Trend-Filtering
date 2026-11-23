@@ -1,8 +1,8 @@
 # Lemma L8′: exact-MGF inequality and the bounded-region numerator (Theorem A, Step 2)
 
-**Status:** self-checked (2026-11-22). The proof is complete and elementary. The numerical check `checks/l8p_mgf.py` **passed** on all 14 valid rows (Engineering, NOTS job 2857877); see "Numerical check". Ready for the advisor check. Consistent with v3.1: A4 now requires the strict slack ω ≤ (1−η)ω̄ assumed here.
+**Status:** advisor-checked (2026-11-22). Fable (`reviews/FABLE_L3_L8p.md`): ACCEPT WITH FIXES; fixes 4–8 are applied (secant-constant numerical check with **15 of 15 rows passing**, strict slack throughout, (c) in point-density form, B ≥ 0 in (d), log(1/ε) = O(log n) in (e)). No mathematical gap was found.
 **Depends on:** L2 (the increment identity and margin), L5 (normalization, finite c-sections), L6 (the evidence bound).
-**Used by:** SKELETON Step 2, i.e. Theorem A (σ ≥ σ̄). Theorem A⁺ replaces this lemma by L8-b.
+**Used by:** SKELETON Step 2, i.e. Theorem A (strict slack ω ≤ (1−η)ω̄, i.e. σ ≥ σ̄/(1−η)). Theorem A⁺ replaces this lemma by L8-b.
 
 ## Setting
 
@@ -32,9 +32,9 @@ In particular, if ω ≤ (1−η)ω̄ and Δ ≤ Δ₀, where Δ₀ is the large
 
 then B ≥ η/2.
 
-**(c) Sharpness.** If Fᵢ has density f at 0 and ω > ω̄, then log E e^{−ωXᵢ(δ)} > 0 for all small δ ≠ 0. So the threshold ω̄ cannot be improved on this route. (This is the σ̄ statement of STATEMENT v2.1.)
+**(c) Sharpness.** If Fᵢ has density fᵢ(0) at 0 and ω > fᵢ(0)/(τ(1−τ)), then log E e^{−ωXᵢ(δ)} > 0 for all small δ ≠ 0. Since the class 𝒫ₙ contains laws with fᵢ(0) = f (the secant constant), **ω̄ cannot be improved uniformly over 𝒫ₙ** on this route.
 
-**(d) Bounded-region numerator.** Let Δ ≤ min(1, L) and E₁ := {θ : ‖δ‖ₙ² > Mε², ‖δ‖∞ ≤ Δ}, with δ = θ − θ\*. (On E₁, Δ²ₙ(δ) = ‖δ‖ₙ², since Δ ≤ 1.) Then
+**(d) Bounded-region numerator.** Let Δ ≤ min(1, L) with **B = B(ω, Δ) ≥ 0**, and E₁ := {θ : ‖δ‖ₙ² > Mε², ‖δ‖∞ ≤ Δ}, with δ = θ − θ\*. (On E₁, Δ²ₙ(δ) = ‖δ‖ₙ², since Δ ≤ 1.) Then
 
   E₀ N(E₁) ≤ V₃(√n Δ)³ · exp{ −B ω (f/2) M nε² }.
 
@@ -42,7 +42,9 @@ then B ≥ η/2.
 
   E₀ Πₙ(E₁ | y) ≤ (2Δ/ε)³ · exp{ −[B f M/2 − (1.44C₁ + 1) − C_pr/ω] ω nε² } + 1.44/(nε²).
 
-This tends to 0 whenever nε² → ∞ faster than log n and M > (2/(Bf))·[1.44C₁ + 2 + C_pr/ω].
+This tends to 0 whenever nε² → ∞ faster than log n, **log(1/ε) = O(log n)**, and M > (2/(Bf))·[1.44C₁ + 2 + C_pr/ω]. Both conditions on ε hold at every tuning in the theorem.
+
+**Slack written in σ-form.** The lemma's hypothesis ω ≤ (1−η)ω̄ is σ ≥ σ̄/(1−η). If instead σ ≥ (1+η′)σ̄ is assumed, apply the lemma with η = η′/(1+η′). This gives **B ≥ η′/(2(1+η′))** (not η′/2), with Δ₀ computed from η′/(1+η′).
 
 ## Proof
 
@@ -78,11 +80,11 @@ Combining 2 and 4 gives (b).
 
 using ω̄/f = 1/(τ(1−τ)).
 
-**(c)** Suppose Fᵢ(s) − τ = fs + o(s). By (a), as δ → 0,
+**(c)** Suppose Fᵢ(s) − τ = fᵢ(0)s + o(s). By (a), as δ → 0,
 
-  log E e^{−ωX} = ψ(ωδ) − ω fδ²/2 + o(δ²) = (δ²/2)·ω·(ωτ(1−τ) − f) + o(δ²).
+  log E e^{−ωX} = ψ(ωδ) − ω fᵢ(0)δ²/2 + o(δ²) = (δ²/2)·ω·(ωτ(1−τ) − fᵢ(0)) + o(δ²).
 
-This is positive when ω > f/(τ(1−τ)) = ω̄.
+This is positive when ω > fᵢ(0)/(τ(1−τ)). Because 𝒫ₙ contains laws with fᵢ(0) = f, ω̄ cannot be improved uniformly over the class.
 
 **(d)** By L5, N(E₁) = ∫_{E₁} e^{−ωℛ(θ)} ν(dθ), with ℛ = Σᵢ Xᵢ(δᵢ) and ν = dc ⊗ Π_λ.
 - *Independence.* By Tonelli and independence (A1), E₀N(E₁) = ∫_{E₁} ∏ᵢ E e^{−ωXᵢ(δᵢ)} ν(dθ).
@@ -116,5 +118,15 @@ Insert (d), the volume ratio (√nΔ)³/(ε√n/2)³ = (2Δ/ε)³, and the prior
 - sup|ψ‴| = 0.09623 = 1/(6√3).
 - Inequality (b) holds on every grid point for Normal, Cauchy, Laplace, t₂ and lognormal noise at τ ∈ {0.05, 0.5, 0.9}.
 - The exact MGF matches Monte Carlo to within 1–2 MC standard errors (se ≈ 2×10⁻⁴ at N = 4×10⁵).
-- **Excluded row:** lognormal at τ = 0.05. The window [q ± 0.5] around q ≈ 0.085 extends below the support, so f = 0 and (A2) fails with L = 0.5. B is NaN there, and the script's comparison was vacuous. That row is outside the lemma's hypotheses and is **not** counted as a pass. The script now guards against f = 0.
+- *Superseded by the Fable review (finding 4):* the lognormal τ = 0.05 row is **inside** (A2). (A2) is a secant condition, with f = 0.1 at L = 0.5 there. The original script used the minimum density as f, which is zero for that row, so the script could not test it. The script now uses the secant constant and the lemma's constant 0.0321; see the rerun below.
 - *Print quirk (cosmetic):* the printed "m" column is the exact m at δ = 0.5, while the MC value is at δ = 0.3. Both were checked by hand (normal, τ = ½: m(0.3) ≈ 0.0179, m(0.5) ≈ 0.0487).
+
+**Rerun after the Fable review (secant f, constant 0.0321; owls_run -j 1; output in `checks/l8p_mgf.out`).** **15 of 15 rows pass**, including lognormal τ = 0.05 (secant f = 0.100, ω̄ = 2.105, as Fable found). Exact versus MC agree within about 2 MC standard errors. The "m(0.3)" column now compares the same δ.
+
+## Response to the advisor check (Fable, findings 4–8)
+
+4. **Script:** f is now the secant constant of (A2) and the constant is 0.0321. 15/15 rows pass; the output is committed.
+5. **Strict slack:** "σ ≥ σ̄" is replaced by ω ≤ (1−η)ω̄ here and in SKELETON. The σ-form σ ≥ (1+η′)σ̄ gives B ≥ η′/(2(1+η′)); this is stated after (e). The SKELETON citations of v2.1 and the "to be written" notes are updated.
+6. **(c):** now states the point-density threshold fᵢ(0)/(τ(1−τ)). ω̄ is unimprovable uniformly over 𝒫ₙ.
+7. **(d):** now assumes B ≥ 0.
+8. **(e):** now states log(1/ε) = O(log n).

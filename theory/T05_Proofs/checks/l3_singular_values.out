@@ -1,2 +1,8 @@
-owls_run: REFUSED: fb31 compute CPU 727% (measured 727%, reserved by running jobs 200%) + requested 100% would exceed the 8-core budget
-owls_run: wait for running jobs to finish, or move this work to NOTS (see /home/fb31/.config/bvs-hq/owls/POLICY.md).
+# Output of l3_singular_values.py, NOTS job 2857810 (Engineering), HEAD 97a04c2, sha256 d364e632..., GCC/13.2.0 SciPy-bundle/2023.11, single thread. Verbatim.
+N=5: max rel err sv(C) vs formula = 2.91e-16
+N=50: max rel err sv(C) vs formula = 8.21e-16
+N=400: max rel err sv(C) vs formula = 4.01e-15
+n=50: ||D S - I||_max = 0.0e+00; max_r sigma_r(A)/(n^2.5 r^-3) = 0.1040 (bound 91.1); at r=1: 0.0040
+n=300: ||D S - I||_max = 0.0e+00; max_r sigma_r(A)/(n^2.5 r^-3) = 0.1213 (bound 91.1); at r=1: 0.0040
+n=1200: ||D S - I||_max = 0.0e+00; max_r sigma_r(A)/(n^2.5 r^-3) = 0.1241 (bound 91.1); at r=1: 0.0040
+# (The script prints the pre-review constant 91.1; the lemma now states 91.2 = rounded-up 4.5^3. The conclusion is unaffected.)

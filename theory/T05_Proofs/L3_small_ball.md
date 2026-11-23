@@ -1,6 +1,6 @@
 # Lemma L3: centred small-ball bound for the Laplace difference prior
 
-**Status:** self-checked (2026-11-22). Second read done, with the fixes listed at the end; Astra's and the VP's L3 points from their final reviews of v3 are applied. The numerical check `checks/l3_singular_values.py` **passed** (Engineering, NOTS job 2857810, HEAD 97a04c2): see "Numerically checkable claims". Ready for the advisor check.
+**Status:** advisor-checked (2026-11-22). Fable (`reviews/FABLE_L3_L8p.md`): ACCEPT; the editorial fixes are applied (91.2 instead of 91.1, the real NOTS output committed in `checks/l3_singular_values.out`, the leftover clause deleted). Self-check and numerical check passed (Engineering, NOTS job 2857810), and Fable's own rerun reproduces the numbers.
 **Depends on:** standard facts only: the Gaussian scale-mixture representation of the Laplace law, Anderson's theorem, singular values of the cumulative-sum matrix, and Horn's (Ky Fan's) product inequality.
 **Used by:** L6 (prior mass) and L4q (condition (C)).
 
@@ -13,7 +13,7 @@ Notation as in L4q:
 
 ## Statement
 
-There is an absolute constant C such that, for all n ≥ 5 (so m ≥ 2), λ > 0, and ε > 0,
+For all n ≥ 5 (so m ≥ 2), λ > 0 and ε > 0,
 
   φ(ε) ≤ 30 · x^{2/5} · (log m)^{1/5}  +  6,  where x := n^{5/2}/(λε).
 
@@ -37,14 +37,14 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
 
   γ_{v₀}(B_ε) = P( Σ_r v₀σ_r² ξ_r² ≤ ε² ),  with ξ_r i.i.d. N(0, 1).
 
-**Step 4 (singular-value bound: σ_r(A) ≤ 91.1·n^{5/2}r^{−3}).**
+**Step 4 (singular-value bound: σ_r(A) ≤ 91.2·n^{5/2}r^{−3}).**
 1. The cumulative-sum matrix C_N (N×N) satisfies σ_k(C_N) = 1/(2 sin((2k−1)π/(4N+2))). This is standard: C⁻ᵀC⁻¹ is tridiag(−1, 2, −1) with last diagonal entry 1.
 2. Using sin x ≥ 2x/π on [0, π/2], σ_k(C_n) ≤ (2n+1)/(2(2k−1)) ≤ (2n+1)/(2k) ≤ 1.5n/k.
 3. **Horn / Ky Fan:** σ_{i+j+l−2}(XYZ) ≤ σᵢ(X)σⱼ(Y)σₗ(Z). With i = j = l = k this gives σ_{3k−2}(C³) ≤ σ_k(C)³. Take k := ⌊(r+2)/3⌋, so that 3k − 2 ≤ r and k ≥ r/3. By monotonicity, σ_r(C³) ≤ σ_{3k−2}(C³) ≤ σ_k(C)³ ≤ (1.5n·3/r)³ = (4.5n/r)³.
 4. S is a column-submatrix of C³, so σ_r(S) ≤ σ_r(C³) by Cauchy interlacing. P⊥ is a contraction.
-5. Therefore σ_r(A) ≤ n^{−1/2}(4.5n/r)³ = 91.1·n^{5/2}r^{−3}.
+5. Therefore σ_r(A) ≤ n^{−1/2}(4.5n/r)³ = 91.125·n^{5/2}r^{−3} ≤ 91.2·n^{5/2}r^{−3}.
 
-**Step 5 (comparison).** Increasing any weight decreases the probability, by pointwise monotonicity (Anderson is not needed). Appending extra terms r > m with positive weights decreases it too. So with b := v₀(91.1)²n⁵,
+**Step 5 (comparison).** Increasing any weight decreases the probability, by pointwise monotonicity (Anderson is not needed). Appending extra terms r > m with positive weights decreases it too. So with b := v₀(91.2)²n⁵,
 
   γ_{v₀}(B_ε) ≥ P( Σ_{r ≥ 1} b r^{−6} ξ_r² ≤ ε² ).
 
@@ -61,7 +61,7 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
   using K! ≥ (K/e)^K. **No log K factor appears.**
 - **Combining.** The head and tail are independent, so
 
-  −log γ_{v₀}(B_ε) ≤ log(4/3) + 3.85K,  with K ≤ 1 + (8b/(5ε²))^{1/5} = 1 + (1.6·91.1²·2 log m)^{1/5}·x^{2/5} ≤ 1 + 7.7(log m)^{1/5}x^{2/5}.
+  −log γ_{v₀}(B_ε) ≤ log(4/3) + 3.85K,  with K ≤ 1 + (8b/(5ε²))^{1/5} = 1 + (1.6·91.2²·2 log m)^{1/5}·x^{2/5} ≤ 1 + 7.7(log m)^{1/5}x^{2/5}.
 
 **Step 7 (assembly).** φ(ε) ≤ log 4 + log(4/3) + 3.85·(1 + 7.7(log m)^{1/5}x^{2/5}) ≤ 30·x^{2/5}(log m)^{1/5} + 6. (K ≥ 1 always, because of the ceiling.) ∎
 
@@ -76,12 +76,12 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
 `checks/l3_singular_values.py`:
 1. the exact singular values of C_N;
 2. DS = I;
-3. σ_r(A) ≤ 91.1·n^{5/2}r^{−3}.
+3. σ_r(A) ≤ 91.2·n^{5/2}r^{−3}.
 
 **Result (NOTS job 2857810, single thread):**
 - the singular values of C_N match the closed form to ≤ 4.0e-15 (N = 5, 50, 400);
 - ‖DS − I‖_max = 0 exactly (n = 50, 300, 1200);
-- max_r σ_r(A)/(n^{5/2}r^{−3}) = 0.104, 0.121 and 0.124 at n = 50, 300 and 1200, against the bound 91.1. The bound is loose by a factor of about 730, and the ratio at r = 1 is 0.0040.
+- max_r σ_r(A)/(n^{5/2}r^{−3}) = 0.104, 0.121 and 0.124 at n = 50, 300 and 1200, against the bound 91.2. The bound is loose by a factor of about 730, and the ratio at r = 1 is 0.0040.
 
 ## Second read (2026-11-22): fixes
 
@@ -91,3 +91,11 @@ B_ε is a centred symmetric convex set. **Anderson's theorem:** if Σ₁ ⪯ Σ�
 
 All other steps were re-verified: the scale-mixture rate λ²/2, Anderson's direction, (1 − 1/m)^m ≥ 1/4, the singular values of C_N (tridiagonal (C⁻¹)ᵀC⁻¹ with last diagonal entry 1), sin x ≥ 2x/π on the relevant range, interlacing for column deletion, the tail integral 1/(5K⁵), and Markov's inequality.
 4. **Head bound with the full product** (suggested independently by Astra and by the VP in their final reviews of v3). Keeping ∏(r/K)³ = (K!/K^K)³ ≥ e^{−3K} removes the log K factor. The bound becomes φ(ε) ≤ 30x^{2/5}(log m)^{1/5} + 6, with explicit constants and a loss of only (log m)^{1/5}. This supersedes fix 2's log(e + x log m).
+
+## Response to the advisor check (Fable, `reviews/FABLE_L3_L8p.md`)
+
+1. **Constant: fixed.** 4.5³ = 91.125, so the bound is now written as 91.2 throughout. Steps 6–7 are unchanged: (1.6·91.2²·2)^{1/5} = 7.68 ≤ 7.7.
+2. **Evidence trail: fixed.** `checks/l3_singular_values.out` now holds the verbatim output of NOTS job 2857810, replacing the Owls refusal.
+3. **Leftover clause: deleted.** The STATEMENT L3 row no longer says "numerical check pending".
+
+Fable also notes that L3 costs exactly (log n)^{1/6} in ε², so c ≥ 1/6, consistent with Theorem B. Fable's Monte Carlo at n = 6–40 shows the bound is valid but loose by about two orders of magnitude.
