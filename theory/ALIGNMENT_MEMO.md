@@ -20,7 +20,7 @@
 | (a) | σ > σ̄ is used ONLY in Theorem B's expected-numerator step (EM). It is a limit of that proof technique: not needed for contraction, and not used for coverage. | PROVED |
 | (b) | Contraction holds for fixed σ < σ̄ at the SAME rate n^{−5/6}: C1 (localization) + Lemma F + C2 (realized-numerator shells), uniformly on compact σ-intervals, moment-free. | PROVED, audited by both families |
 | (c) | Learned σ: **Theorem C\*** gives n^{−5/6} with σ ~ IG learned, at deterministic oracle λ (Lemma S: σ is contained in [l, H₀] and concentrates on σ₀,ₙ). MEASURED: σ/σ₀,ₙ = 0.95–1.02, with width ∝ n^{−1/2}. | PROVED; every part audited by both families (Lemma S: Opus + Fable) |
-| (d) | Constant b₀ alone (no floor) is **not** covered: λ ∝ n^{3/4} (MEASURED), outside every window. With the floor (V0T) it is covered at n^{−5/6} for constant OR scaled b₀. Under (EM), constant b₀ gives n^{−1/4} without a floor. | PROVED (floor); the no-floor case below σ̄ is OPEN (Fable A, in progress) |
+| (d) | Constant b₀ alone (no floor) is **not** covered: λ ∝ n^{3/4} (MEASURED), outside every window. With the floor (V0T) it is covered at n^{−5/6} for constant OR scaled b₀. Under (EM), constant b₀ gives n^{−1/4} without a floor. | PROVED (floor). **No floor: a general theorem is IMPOSSIBLE.** Astra's counterexample (Theory-verified; Fable audit pending) is a law in the class where the exact no-floor posterior is inconsistent. The necessary condition σ₀ ≤ 2τ(1−τ)R **holds for all paper designs with margin** (ratio 0.18–0.47, computed). Sufficiency is OPEN. **This justifies the floor.** |
 | (e) | Route B with Theorem B as it stood is impossible on data: every σ ≥ σ̄ arm fails Felipe's MSE bar. Route A succeeded; see the headline. | MEASURED + PROVED |
 
 **Variants:**

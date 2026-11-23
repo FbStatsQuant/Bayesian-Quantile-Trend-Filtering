@@ -1,0 +1,22 @@
+# noFloor_necessary.py, owls_run -j 1, 2026-11-23
+Gaussian tau=0.01 R=1.1894 sigma0=0.00888 2t(1-t)R=0.02355 ratio sigma0/bound=0.377 OK
+Gaussian tau=0.05 R=1.1894 sigma0=0.03438 2t(1-t)R=0.11299 ratio sigma0/bound=0.304 OK
+Gaussian tau=0.25 R=1.1894 sigma0=0.10593 2t(1-t)R=0.44603 ratio sigma0/bound=0.237 OK
+Gaussian tau=0.50 R=1.1894 sigma0=0.13298 2t(1-t)R=0.59471 ratio sigma0/bound=0.224 OK
+Gaussian tau=0.75 R=1.1894 sigma0=0.10593 2t(1-t)R=0.44603 ratio sigma0/bound=0.237 OK
+Gaussian tau=0.95 R=1.1894 sigma0=0.03438 2t(1-t)R=0.11299 ratio sigma0/bound=0.304 OK
+Gaussian tau=0.99 R=1.1894 sigma0=0.00888 2t(1-t)R=0.02355 ratio sigma0/bound=0.377 OK
+Beta     tau=0.01 R=0.4943 sigma0=0.00178 2t(1-t)R=0.00979 ratio sigma0/bound=0.182 OK
+Beta     tau=0.05 R=0.4943 sigma0=0.00866 2t(1-t)R=0.04696 ratio sigma0/bound=0.184 OK
+Beta     tau=0.25 R=0.4943 sigma0=0.03686 2t(1-t)R=0.18535 ratio sigma0/bound=0.199 OK
+Beta     tau=0.50 R=0.4943 sigma0=0.05557 2t(1-t)R=0.24714 ratio sigma0/bound=0.225 OK
+Beta     tau=0.75 R=0.4943 sigma0=0.05028 2t(1-t)R=0.18535 ratio sigma0/bound=0.271 OK
+Beta     tau=0.95 R=0.4943 sigma0=0.01779 2t(1-t)R=0.04696 ratio sigma0/bound=0.379 OK
+Beta     tau=0.99 R=0.4943 sigma0=0.00463 2t(1-t)R=0.00979 ratio sigma0/bound=0.473 OK
+Mixed    tau=0.01 R=2.5899 sigma0=0.01933 2t(1-t)R=0.05128 ratio sigma0/bound=0.377 OK
+Mixed    tau=0.05 R=2.5899 sigma0=0.07483 2t(1-t)R=0.24604 ratio sigma0/bound=0.304 OK
+Mixed    tau=0.25 R=2.5899 sigma0=0.23062 2t(1-t)R=0.97121 ratio sigma0/bound=0.237 OK
+Mixed    tau=0.50 R=2.5899 sigma0=0.28954 2t(1-t)R=1.29494 ratio sigma0/bound=0.224 OK
+Mixed    tau=0.75 R=2.5899 sigma0=0.23062 2t(1-t)R=0.97121 ratio sigma0/bound=0.237 OK
+Mixed    tau=0.95 R=2.5899 sigma0=0.07483 2t(1-t)R=0.24604 ratio sigma0/bound=0.304 OK
+Mixed    tau=0.99 R=2.5899 sigma0=0.01933 2t(1-t)R=0.05128 ratio sigma0/bound=0.377 OK
