@@ -1,6 +1,6 @@
 # Alignment memo: does the theorem's σ/λ match Felipe's method?
 
-*Theory Department, 2026-11-23 (final candidate, 14:30 CT; inputs still arriving are marked). INTERNAL, for HQ.*
+*Theory Department, 2026-11-23 (final, 18:00 CT; inputs still arriving at 17:05 are folded in). INTERNAL, for HQ.*
 
 **Status labels.** PROVED means proved by Theory, with the proof here or in the cited file; "not yet audited" when no advisor has checked it. SKETCH means the steps are written but unverified. OPEN means no proof. MEASURED means Engineering data, with the source cited.
 
@@ -18,6 +18,19 @@
   - **Joint smoke, n = 2000, VS, levels 0.90–0.99, 1 chain:**
     - At 0.90–0.98 the floor never binds and the two arms match (MSE ratios 0.89–1.14). No crossings.
     - **τ = 0.99 is unresolved:** neither arm converged at 6000 sweeps. It is NOT a floor effect: the floor did not bind.
+
+**Second track: the A-rule without a floor** (data-favoured prior λ ~ Gamma(1, 1/(5500(n/500)^{5/2})), σ learned). This is NOT yet a floor-free theorem. The chain to (LT) of Corollary P, and its status at 17:05:
+
+| Link | λ range / step | Status |
+|---|---|---|
+| L1 | tiny λ | PROVED, class-wide |
+| L2 | bounded λ (design condition DC) | OPEN; reductions proved; certificate specified |
+| L3 | interpolating fits, extreme scales | PROVED, class-wide |
+| L4a | [ℓ₀, n^{3/2}] | OPEN; named assumption with data check (`T06_Alignment/L4a_assumption.md`) |
+| L4b | [n^{3/2}, n^{2.30}] | OPEN; one new lemma needed (CT Fable A until 16:55) |
+| L5 | [n^{2.30}, c₋n^{5/2}(log n)^{−1/2}] | **PROVED, cross-family audited**: "the A-rule posterior excludes the middle band of λ", averaged β̄ < 6, all paper designs at τ ∈ [0.05, 0.95] |
+| L6 | L1–L5 ⇒ (LT) | assembly PROVED given its inputs |
+| L7 | (LT) ⇒ rate n^{−5/6}(log n)^{1/3} via V0T\* with an n-dependent floor | **PROVED, cross-family audited** |
 
 **Answers to HQ's questions:**
 
