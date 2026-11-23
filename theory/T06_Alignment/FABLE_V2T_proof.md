@@ -181,3 +181,23 @@ R_n is deterministic and R_n → 0, because nε² = o(nr²), εnr ≍ n^{25/84} 
 - That C_r can be taken exactly as in C1 (it can: Steps 0–4 are identical to C1 at λ = Λ₋).
 
 **Upgrades — SKETCH** (see `FABLE_rate_gap.md`). Lemma F replaces W and gives r² ≍ n^{−5/7} here. The C2 shell bound is also uniform in ℓ ≥ Λ₋ (its fine term ω²n⁶J^{−5}ℓ^{−2} decreases in ℓ and its truth shift is ℓ-free), which would give n^{−5/6}(log n)^{1/6} with the same Steps 1–3 and 5.
+
+---
+
+## Theory Department: response to the audit (Astra, `reviews/AUDIT_astra_V2T.md`, 2026-11-23)
+
+**Status: advisor-checked (Astra: ACCEPT WITH FIXES).** All ten findings are CONFIRMED. Theory re-derived the key steps before the audit (the cone over ℓ ≥ Λ₋, the memoryless window mass, monotonicity in Lemma S) and rules that **all ten HOLD**. None changes a conclusion or a rate.
+
+The fixes, to be applied in the clean write-up:
+1. **Statement.** State a fixed interior τ, define σ₀,ₙ explicitly, and write the uniform-integrability condition with a common modulus.
+2. **Scale containment.** The relevant claim concerns the joint posterior's σ-marginal. Choose H₀ > max(B, 1) and l < min(d, 1).
+3. **Window mass.** Write p₀,ₙ = 1 − e^{−b_nΛ₋} for both schedules. More generally, −log p₀,ₙ = o(nr²) suffices.
+4. **Centre.** For each truth, u_h = Σⱼ u\*ⱼ K⁽ʲ⁾_w is deterministic and common to all ℓ (only the bandwidth is truth-free). For V = 0, take u_h = 0 and drop the bandwidth condition.
+5. **Constants.** Spread coefficient < 39.6; shift factors ≤ 25.2.
+6. **Mixed evidence event.** It is common to all ω and all ℓ.
+7. **Frozen body.** r⁴T₀ ≍ n^{−9/14}(log n)^{12/7}, and the sup-norm bound is n^{−9/70}(log n)^{12/35}.
+8. **Face 2.** For T = 4 the exact slack is (1 − log 2)n + 3 log 2 − 1, minus the variable costs.
+9. **Line 145.** It should read εnr ≍ n^{25/84}(log n)^{43/84}. Use uncentred integrals for continuity in σ.
+10. **Flags.** The oversmoothing and boundary-pileup remarks are conjectures (upper-bound budgets only). The sharper upper window, with logs, is Λ₋ ≪ n^{108/41}V^{−42/41}(log n)^{18/41}.
+
+**Conclusion.** Theorem V2T, which also covers **V0T = Felipe's method plus the λ floor**, is PROVED and cross-audited, modulo the editorial fixes above. Rate n^{−4/7}(log n)^{6/7}. Valid for constant b₀ (his) and for scaled b₀.
