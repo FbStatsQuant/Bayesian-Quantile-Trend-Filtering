@@ -27,8 +27,8 @@
 | L2 | bounded λ (design condition DC) | **PROVED and cross-family audited for all three paper designs** at τ ∈ {0.05, 0.25, 0.5, 0.75, 0.95} (Fable B / Astra, `T06_Alignment/FABLE_B_L2_analysis.md` incl. Theorem DC-W). ℓ₀ at τ = ½: Gaussian 1223, Mixed 1194, Beta 49.75; tails: Gaussian 18.9, Mixed 10.08, Beta 0.05: 378, Beta 0.95: 4.1 (short range). Uses (A3). Not "every τ" |
 | L3 | interpolating fits, extreme scales | PROVED, class-wide |
 | L4a | [ℓ₀, n^{3/2}] | OPEN; named assumption with data check (`T06_Alignment/L4a_assumption.md`) |
-| L4b | [n^{3/2}, n^{2.30}] | **PROVED (unaudited) down to n^{9/5}** at fixed (σ, λ), via a new layer-cake remainder bound (Fable A, `T06_Alignment/FABLE_A_L4b.md`, 7335034; Lemma CA verified by Theory; Astra audit running). One hypothesis left on [n^{1.53}, n^{1.80}]; [n^{3/2}, n^{1.53}] SKETCH; uniform version SKETCH below n^{21/11} |
-| L5 | [n^{2.30}, c₋n^{5/2}(log n)^{−1/2}] | **PROVED, cross-family audited**: "the A-rule posterior excludes the middle band of λ", averaged β̄ < 6, all paper designs at τ ∈ [0.05, 0.95] |
+| L4b | [n^{3/2}, n^{2.30}] | **Partly closed, cross-family audited** (Fable A / Astra, `T06_Alignment/FABLE_A_L4b.md`, 1af9f8b). The posterior band exclusion now reaches **n^{21/11} ≈ n^{1.91}**. Fixed-(σ, λ) Occam bound to n^{9/5}; to n^{26/17} under one hypothesis. **Open:** the posterior statement on [n^{3/2}, n^{21/11}] (min-density version) |
+| L5 | [n^{2.30}, c₋n^{5/2}(log n)^{−1/2}] (extended to n^{21/11} by L4b's audited uniform step, min-density) | **PROVED, cross-family audited**: "the A-rule posterior excludes the middle band of λ", averaged β̄ < 6, all paper designs at τ ∈ [0.05, 0.95] |
 | L6 | L1–L5 ⇒ (LT) | assembly PROVED given its inputs |
 | L7 | (LT) ⇒ rate n^{−5/6}(log n)^{1/3} via V0T\* with an n-dependent floor | **PROVED, cross-family audited** |
 
