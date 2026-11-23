@@ -95,6 +95,14 @@ Here Π_σ is the θ-posterior at fixed σ (λ fixed, or learned and mixed over)
      This breaks the circularity Astra flagged in the W-01 review.
    - **§3, PROVED: transfer.** If Hypothesis U holds (uniform fixed-σ localization on the whole of [l, H₀], with the supremum inside the expectation), then (H) and hence Lemma S follow.
    - **Hypothesis U is exactly what C1 states** (`T06_Alignment/C1_any_sigma.md`: E sup_{ω∈[ω₁,ω₂]} Π_ω(‖δ‖ₙ > r | y) → 0, which gives |Q − Q\*|/n ≤ ‖δ‖ₙ ≤ r → 0).
+**MEASURED (Engineering R-A1/R-A2; exact Gibbs on Felipe's default posterior; 1bf027f; `engineering/E07_Tuning_Free/route_a/results/`).** 18 cells × n ∈ {500, 1000, 2000, 4000}, 5 seeds.
+- **σ concentrates on σ₀,ₙ, as Lemma S predicts.**
+  - The posterior median of σ/σ₀,ₙ is 0.95–1.02 for n ≥ 1000 in every cell (0.94–0.97 at τ = 0.05/0.95). The 90% interval width shrinks like n^{−0.50…−0.59}; at n = 4000 it is ≈ [0.93, 1.03].
+  - σ/σ̄ is flat in n, at 0.14–0.63: it never approaches σ̄.
+  - Cross-check at n = 500 against Felipe's P-MALA: σ agrees to 1.000 (range 0.94–1.07).
+- **Fixed (σ, λ) at the posterior medians reproduces the learned method (R-A2):** MSE ratio 0.94–1.02, rough-radius ratio 0.83–1.02. This is empirical support for the disintegration route of Theorem C.
+- **Caveat:** on S, Felipe's as-run P-MALA λ is under-converged (Gibbs/P-MALA λ 1.4–5.7×; ASIS is off at the paper's run length). λ statements on S therefore refer to the posterior, not to his chains.
+
 3. **Combined (C1 + Lemma S): learned σ under Felipe's IG(0.1, 0.1) prior, deterministic λ ≍ n^{5/2}/V (more generally n^{23/11}(log n)^{12/11} ≪ λ ≪ n^{108/41}V^{−42/41}; corrected per Fable's final read):**
    - Π(‖θ − θ\*‖²ₙ > r² | y) → 0 with r² ≍ n^{1/7}λ^{−2/7}(log n)^{6/7}, i.e. n^{−4/7} at the oracle;
    - ‖θ − θ\*‖∞ → 0;
@@ -122,6 +130,12 @@ Here Π_σ is the θ-posterior at fixed σ (λ fixed, or learned and mixed over)
 - The mismatch is PROVED in this sense: a constant b₀ is not of the form c·n^{−5/2} with c bounded.
 - The n^{3/4} growth and the n^{−1/4} rate are heuristic. They match the sprint λ̄ within a factor of 2–4 at n = 500, and R-A1-post will measure λ against n.
 - A theorem for constant b₀ is P3(ii) ("(b₀/n)^{1/4}-type"): **OPEN**.
+
+**MEASURED (R-A1): λ under constant b₀.** Median slope over n = 500–4000:
+- **S: 0.76–0.94, consistent with n^{3/4}** (τ = ½: 0.78–0.81).
+- VS: 1.09–1.69, plausibly pre-asymptotic, because of the bump.
+
+The default method contracts more slowly than the oracle schedules. Rough q95 slopes are S −0.18 to −0.49 and VS −0.50 to −0.63, consistent with λ^{−1/3} ∝ n^{−1/4} plus bias on S.
 
 **At the paper's n the learned λ is near the oracle (MEASURED against computed).** The oracle is n^{5/2}/V, with V from the statements note (Table simV): ≈ 3.6e4 (S, V ≈ 156) and ≈ 768 (VS, V ≈ 7276) at n = 500. The learned λ̄ in the σ sprint is 9e2–2.6e4 (S) and 1.1e3–3.1e3 (VS), i.e. 0.03–0.7× the oracle on S and 1.5–4× on VS. So the mismatch is asymptotic, not at the paper's n. The n^{3/4} growth with constant b₀ is MEASURED in E-02 (slope 0.745; statements note, line 485), and R-A1-post re-measures it under the default priors.
 
