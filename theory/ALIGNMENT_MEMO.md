@@ -11,6 +11,7 @@
 - **Result:** θ contracts at the **oracle rate n^{−5/6}(log n)^{1/6}**. No σ̄ condition, no exponential moments.
 - **At the paper's n:** the floor never binds at n = 500 (MEASURED), so V0T is his method there.
 - **Audit trail:** Fable proved it; Astra audited it (ACCEPT WITH FIXES, editorial).
+- **Matching lower bound (Theorem LB, audited; fixes in efc0a09):** the rate n^{−5/6} is exact. The lower bound holds under (A1) + upper (A2), at any σ, learned σ, and V0T's learned λ. The scope is detailed below.
 - **Data gate:** the paired data test against his method at n = 2000/4000, plus the joint smoke test, is running (≤ 15 core-h).
 
 **Answers to HQ's questions:**
@@ -60,10 +61,25 @@
     - **At the learned σ:** conditional on one explicit evidence inequality ("under-smoothed pairs cost code length").
     - **Proxy design condition:** β = τ(1−τ)/(f₀σ₀) < β_c ≈ 6 (CONJECTURE). It **predicts that the A-rule's λ drifts below its prior mean at Gaussian τ = 0.01/0.99 and Beta τ = 0.99**; a cheap data check has been requested from Engineering.
     - Three lemmas would close the gap for 1 < β < 6 on C1's window (SKETCH).
-  - **Lower bound, Theorem LB (referee point #1), Fable B** (`FABLE_B_lowerbound.md`; **PROVED and cross-family audited**, Astra: ACCEPT WITH FIXES).
-    - **Statement:** E₀Π(Δ²ₙ ≤ c₀λ^{−1/3} | y) → 0 under (A1) and upper (A2) only, at any fixed σ, for λ up to the oracle, with an explicit finite-n bound.
-    - **Consequence (audit-backed):** with C\*/V0T\*, **n^{−5/6} is the exact posterior rate at the oracle**, up to the upper-side (log n)^{1/6}. Above-oracle claims keep the β-dependent window.
-    - **Extensions:** learned σ and V0T. The 'spread around its own random centre' version needs a new lemma.
+  - **Lower bound, Theorem LB (referee point #1), Fable B** (`T06_Alignment/FABLE_B_lowerbound.md`). **PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES). **All eleven confirmed fixes, plus the plausible one, are applied in commit efc0a09.**
+    - **Statement:** E₀Π(Δ²ₙ(θ − θ\*) ≤ c₀λ^{−1/3} | y) → 0, with an explicit finite-n bound: 1.44/D + 8D^{3/2}e^{5−(Σ+1)D}, D = nλ^{−1/3}.
+    - **Exact scope of the lower bound:**
+      - **Noise:** (A1) and the **upper half of (A2) only**. No lower margin, no (EM), no moments, no σ ≥ σ̄.
+      - **σ:** any fixed σ > 0, with c₀ depending on σ. It holds uniformly on compact σ-intervals. It also holds for **σ learned under IG**, given Lemma S's hypotheses: row-average UI, σ₀,ₙ ≥ d, and (A3) or a bounded truth.
+      - **λ:** deterministic, with λ → ∞ and λ = o(n³), so D → ∞; precisely, (32Σ)³ ≤ λ ≤ (n/42)³. Σ depends on the truth through the shift budget β.
+        - Under (A3), TV⁽³⁾ ≤ V with fixed V > 0, this covers **every λ → ∞ with λ ≤ a₂n^{5/2}/V**, with β bounded.
+        - For quadratic truths it covers every λ = o(n³).
+        - **Above the oracle**, both tuning restrictions must be re-checked at the growing β, and they can fail; for example, λ = n^{59/20} is not certified.
+      - **λ learned:** his method plus the floor (V0T: constant b₀, fixed V and κ₋) gives Π(Δ²ₙ ≤ c·Λ₋^{−1/3} | y) → 0 with a constant c, **log-free** (this was closed by the audit). Not covered: unfloored scaled hyperpriors (A-rule, V2), because no upper containment of λ is available.
+      - **Centre:** a ball around the truth θ\*, not around a posterior-dependent centre. The "own spread" version needs a new lemma.
+    - **Matching (two-sided) statement at the oracle λ ≍ n^{5/2}/V:** c₀(V/a₂)^{1/3}n^{−5/6} ≤ Δ²ₙ ≤ M(log n)^{1/6}V^{1/3}n^{−5/6}, with posterior mass → 1. It holds in Δ²ₙ and in ‖·‖²ₙ.
+      - **The upper half needs more than LB:** full (A2), (A3), row-average UI and σ₀,ₙ ≥ d.
+        - learned σ, deterministic oracle λ: from C\*;
+        - his method + floor: from V0T\*;
+        - a fixed σ: from C\*-3/4;
+        - a fixed σ in the (EM) range: from Theorem B.
+      - **So under (A1) + upper (A2) alone, only the lower half is established.** The remaining gap is the factor (log n)^{1/6} on the upper side.
+    - **Headline (approved by HQ once the fixes were in):** "upper and matching lower bound": **n^{−5/6} is the exact posterior contraction rate** at the oracle, for his method + floor (V0T\*) and for learned σ at the oracle λ (C\*). This is up to (log n)^{1/6} on the upper side.
 - **Theorem H** (Fable A, `T06_Alignment/FABLE_A_theoremH.md`): Huber-body localization above any λ floor Λ₋ (n^{−3/14} at Λ₋ ≍ n^{3/4}), plus the plug-in identity Π(B | y) ≤ Π(B | y, λ ≥ Λ₋) + Π(λ < Λ₋ | y). **Status: PROVED and cross-family audited** (Astra: ACCEPT WITH FIXES; V2T Step 2 confirmed at a general floor; a fixed-M version is possible). Fixes applied in the commit that adds this note (see git log: 'Theorem H fixes applied'). It is the building block for a floor-free A-rule theorem; the missing input is lower-tail control of λ (Fable A, in progress).
 - **Exact-Gibbs hyperparameter screen (MEASURED, Engineering; prior effect only, both arms exact Gibbs):**
   - **PASSES:** **A-rule λ ~ Gamma(1, b_n), b_n = 1/(5500·(n/500)^{5/2})**. It is n-only, one rule for both signals, and V2-shaped. Median MSE ratio against his current prior: 0.95 / 0.90 / 0.53 at n = 500 / 1000 / 2000; max 1.13.
