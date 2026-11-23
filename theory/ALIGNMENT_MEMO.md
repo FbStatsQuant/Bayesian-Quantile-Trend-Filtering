@@ -24,7 +24,7 @@
 | Link | λ range / step | Status |
 |---|---|---|
 | L1 | tiny λ | PROVED, class-wide |
-| L2 | bounded λ (design condition DC) | OPEN; reductions proved; certificate specified |
+| L2 | bounded λ (design condition DC) | **PROVED for Gaussian noise at every τ, UNAUDITED** (Fable B, `T06_Alignment/FABLE_B_L2_analysis.md`, 23c6d54; Astra audit running). ℓ₀ = 790 at τ = ½, 12 at 0.05/0.95. Mixed and Beta: SKETCH (CP Fable B until 16:55). Beta at τ = 0.95 is not covered |
 | L3 | interpolating fits, extreme scales | PROVED, class-wide |
 | L4a | [ℓ₀, n^{3/2}] | OPEN; named assumption with data check (`T06_Alignment/L4a_assumption.md`) |
 | L4b | [n^{3/2}, n^{2.30}] | OPEN; one new lemma needed (CT Fable A until 16:55) |

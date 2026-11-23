@@ -22,7 +22,7 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 | Link | λ-range / step | Status | Prover | Auditor | Fallback |
 |---|---|---|---|---|---|
 | L1 | (I) tiny λ < 2t/(eσ₀) | PROVED, class-wide (lowertail §2) | — | Astra (with H1: RSB/LT-EM audit) | — |
-| L2 | (II) bounded λ ∈ [ℓ₁, ℓ₀]: the design condition (DC) = G5 | OPEN. The statement and the reductions to a compact grid are PROVED (`FABLE_B_DC.md`, 89cfec1, unaudited); there is no analytic proof at τ = ½. Certificate: **Tier 3 map first** (≈ 300 fixed-(σ, λ) chains, cheap); Tier 1 rigorous for ℓ ≲ 3 (< 1 core-h); Tier 2 rigorous (10–30 core-h), which may fail in a band | Fable B (spec), Engineering (runs) | Astra | (DC) as a named assumption, with the Tier 3 map as support (as for L4a) |
+| L2 | (II) bounded λ ∈ [ℓ₁, ℓ₀]: the design condition (DC) | **PROVED by analysis for Gaussian noise at every τ, unaudited** (`FABLE_B_L2_analysis.md`, 23c6d54; Astra auditing). Mixed and Beta: Fable B today; Beta at τ = 0.95 is not covered by this method | Fable B | Astra | Beta τ = 0.95: certificate Tier 3 → Tier 1/2 (`FABLE_B_DC.md`) |
 | L3 | (III-a/b) interpolating fits; extreme scales | PROVED, class-wide (lowertail §2; Lemma S) | — | Astra (H1) | — |
 | L4a | (III-c) λ ∈ [ℓ₀, n^{3/2}]: below the homogenization limit (`FABLE_A_gap4.md`, 9701f65) | OPEN; no theory, and β < 6 has no heuristic justification here | Fable (fresh look) | Astra | named assumption (sign of κ), with κ̂ data |
 | L4b | (III-c) λ ∈ [n^{3/2}, C·n^{2.30}]: LO extension via truncation (Fable A today) | OPEN; one new lemma (a posterior bound on high-amplitude energy) | Fable A | Astra | named assumption |
