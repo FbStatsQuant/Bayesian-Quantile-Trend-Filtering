@@ -6,13 +6,18 @@
 
 ## EXECUTIVE SUMMARY
 
-**Headline — Theorem V0T\* (PROVED, cross-family audited; data gate pending).**
+**Headline — Theorem V0T\* (PROVED, cross-family audited; individual data gate MET, joint 0.99 unresolved).**
 - **Method:** Felipe's method — σ ~ IG(0.1, 0.1) learned, λ ~ Gamma(1, b₀) learned at his constant b₀ — **plus one change: a λ floor λ ≥ 1.6e-5·n^{5/2}**.
 - **Result:** θ contracts at the **oracle rate n^{−5/6}(log n)^{1/6}**. No σ̄ condition, no exponential moments.
 - **At the paper's n:** the floor never binds at n = 500 (MEASURED), so V0T is his method there.
 - **Audit trail:** Fable proved it; Astra audited it (ACCEPT WITH FIXES, editorial).
 - **Matching lower bound (Theorem LB, audited; fixes in efc0a09):** the rate n^{−5/6} is exact. The lower bound holds under (A1) + upper (A2), at any σ, learned σ, and V0T's learned λ. The scope is detailed below.
-- **Data gate:** the paired data test against his method at n = 2000/4000, plus the joint smoke test, is running (≤ 15 core-h).
+- **Data gate (MEASURED, Engineering b872c87 + follow-up; internal):**
+  - **Individual, n = 4000, 7 cells, 2 chains per arm:** median MSE ratio V0T/his = **0.47** (0.38–0.99), so Felipe's bar (median ≤ 1.10, no cell > 1.25) is met.
+    - **Caveat:** at n = 4000 his default chain is stuck: λ = 372–1663, R̂ ≈ 2, and running twice as many sweeps does not fix it. The floor (≈ 1.6e4) rescues the chain; it does not reflect the posterior λ, which is ≈ 16–80k. In one cell (S-Mixed τ = 0.95) λ is pinned at the floor, with MSE ratio 0.99.
+  - **Joint smoke, n = 2000, VS, levels 0.90–0.99, 1 chain:**
+    - At 0.90–0.98 the floor never binds and the two arms match (MSE ratios 0.89–1.14). No crossings.
+    - **τ = 0.99 is unresolved:** neither arm converged at 6000 sweeps. It is NOT a floor effect: the floor did not bind.
 
 **Answers to HQ's questions:**
 
@@ -64,6 +69,12 @@
   - **Theorem LO, the local Occam bound** (Fable A, `T06_Alignment/FABLE_A_three_lemmas.md`; **PROVED at fixed σ and λ, cross-family audited** (Astra: ACCEPT WITH FIXES, 63849f0). **Uniformity in (σ, λ) is OPEN: the audit found a genuine gap in the sketch.** So there is no A-rule posterior statement yet). At the learned σ, the evidence of under-smoothed fits decays whenever **β < 6**, which is the conjectured constant itself. It holds for λ ≥ n^{2.30}, below the oracle n^{5/2}.
     - **Open:** uniformity in (σ, λ), a genuine gap with a repair route; the range of λ below n^{2.30}, which has no route; bounded λ, for which a numerical certificate is needed.
     - As proved it uses the worst-case density, so **Gaussian τ = 0.05/0.95 and Beta 0.95 are not covered yet**. The averaged-β version is a Tuesday piece.
+  - **Theorem U / U-σ: uniformity, closing the gap the LO audit found** (Fable A, `T06_Alignment/FABLE_A_uniformity.md`; **PROVED and cross-family audited**, Astra: ACCEPT WITH FIXES, f5f05de).
+    - **Result:** under the joint posterior with σ learned, **the A-rule puts vanishing mass on λ ∈ [C·n^{2.30}polylog, c₋n^{5/2}(log n)^{−1/2}]**, with no floor, for worst-case β < 6.
+    - **Still open:** λ below n^{2.30}. Astra's attempt today proved obstructions (`astra_gap4_sign.md`); Fable is working on it.
+  - **Averaged β** (Fable B, `T06_Alignment/FABLE_B_averaged_beta.md`). The condition is β̄ = ωt·Σfᵢ^{−5/6}/Σfᵢ^{1/6} < 6, and the key inequality is PROVED, unaudited. LO with β̄ is SKETCH.
+    - **Values:** Gaussian 0.05/0.95: 4.43; Beta 0.95: 5.12; Mixed 0.05/0.95: 4.46. So if the sketch closes, **the whole paper grid τ ∈ [0.05, 0.95] is covered**.
+    - **Crossing:** all designs cross 6 between τ = 0.96 and 0.97, consistent with the κ̂ pilot.
   - **Sign reduction** (Fable B, `T06_Alignment/FABLE_B_Arule_gauss.md`, 5fb5e67; identities verified by Theory). The λ lower tail reduces to the sign of a posterior mean, κ(ℓ) = m − ℓ·E_ℓ‖Dθ‖₁. At τ = ½ no diverging floor is proved; this is a negative result.
   - **MEASURED, internal (κ̂ pilot):** Engineering 75ad1a4, 0.29 core-h; Theory's reading is `T06_Alignment/kappa_pilot_reading.md`, 3c4562a.
     - On the Gaussian design, one seed, κ̂ > 0 at τ = 0.05, 0.25 and 0.5.
