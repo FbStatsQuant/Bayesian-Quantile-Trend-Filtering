@@ -24,10 +24,11 @@ Four pieces stand between Theorem LO, which is proved at fixed σ and λ and is 
 | L1 | (I) tiny λ < 2t/(eσ₀) | PROVED, class-wide (lowertail §2) | — | Astra (with H1: RSB/LT-EM audit) | — |
 | L2 | (II) bounded λ ∈ [ℓ₁, ℓ₀]: the design condition (DC) = G5 | OPEN; numerical certificate planned | Fable | Astra | (DC) as a named assumption, with an interval-arithmetic certificate |
 | L3 | (III-a/b) interpolating fits; extreme scales | PROVED, class-wide (lowertail §2; Lemma S) | — | Astra (H1) | — |
-| L4 | **(III-c) λ ∈ [ℓ₀, C·n^{2.30}]: gap 4** | OPEN; Astra's obstructions (b88fb9b); CT Fable A attempt today | Fable | Astra | the sign of κ on this range as a named assumption, with κ̂ data |
+| L4a | (III-c) λ ∈ [ℓ₀, n^{3/2}]: below the homogenization limit (`FABLE_A_gap4.md`, 9701f65) | OPEN; no theory, and β < 6 has no heuristic justification here | Fable (fresh look) | Astra | named assumption (sign of κ), with κ̂ data |
+| L4b | (III-c) λ ∈ [n^{3/2}, C·n^{2.30}]: LO extension via truncation (Fable A today) | OPEN; one new lemma (a posterior bound on high-amplitude energy) | Fable A | Astra | named assumption |
 | L5 | (III-c) λ ∈ [C·n^{2.30}, Λ₋] | **DONE: Theorem U-σ, audited** (f5f05de) | — | — | — |
 | L6 | L1–L5 ⇒ (LT) at Λ₋ = c₋n^{5/2}(log n)^{−1/2} | assembly (lowertail §5, PROVED given its inputs) | Fable | Astra | — |
-| L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | H6 is SKETCH (lowertail §5) | Astra | Fable | the rate keeps an extra log |
+| L7 | (LT) ⇒ rate: Corollary P's identity Π(B \| y) ≤ Π(B \| y, λ ≥ Λ₋) + Π(λ < Λ₋ \| y), then the conditioned posterior. **Since Λ₋ > n², the conditioned model is V0T\* with an n-dependent floor κ₋,ₙ = c₋(log n)^{−1/2}** (Corollary P remark; Theorem H is used only if Λ₋ ≤ n²) = H6 | H6: CT Fable A writing it today (`FABLE_A_V0Tstar_nfloor.md`) | Fable A | Astra | the rate keeps an extra log |
 | L8 | Rate n^{−5/6}(log n)^{1/3}, with LB matching up to logs | follows from L7 + Theorem LB | — | — | — |
 
 **Coverage upgrade (gap 2, in parallel).** Every link that uses β (L4, L5) is currently min-density. The averaged β̄ (H3) upgrades coverage to the whole grid τ ∈ [0.05, 0.95].
