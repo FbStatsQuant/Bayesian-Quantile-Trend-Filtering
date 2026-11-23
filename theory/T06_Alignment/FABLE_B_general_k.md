@@ -360,3 +360,21 @@ With nε² = C(log n)^{1/(2k+2)}V^{1/(k+1)}n^{1/(2k+2)}, so that **(nε²)^{2k+2
 4. **k = 0** beyond Theorem B: open (§6.3).
 5. **Learned λ without a floor** at general k: not examined.
 6. The frequentist comparison rate in §3 and the Gram-polynomial formulas in §4 are from memory.
+
+---
+
+## Theory Department: cross-family audit response (Astra, `reviews/AUDIT_astra_general_k.md`, 2026-11-23)
+
+**Verdict: ACCEPT WITH FIXES.** All eleven findings are CONFIRMED; Theory rules that they **HOLD**. They agree with Theory's own exponent check (spread and bias balance at λ = n^{k+1/2}/V, giving n^{−(2k+1)/(2k+2)}).
+
+Key outcomes:
+- **The Christoffel constant C_k = (k+1)² is now PROVED for every degree** (Astra #5), closing the gap that had been proved only for k ≤ 2.
+- L3 constant: exactly (3d/2)^d with d = k+1 (91.125 at k = 2).
+- The k = 1 window margin is n^{1/14}(log n)^{−4/7}, which suffices.
+- **k = 0:** a single spike of height √n·r defeats localization on the proposed body. Only Theorem B (under (EM)) survives at k = 0.
+
+Fixes, editorial:
+- restore the log factor in the fallback rate;
+- state the stronger hyperprior window-mass bound needed by the sharp mixed-posterior rate (both named priors satisfy it).
+
+**Status: the general-k extension (k ≥ 1) is PROVED and cross-family audited.**

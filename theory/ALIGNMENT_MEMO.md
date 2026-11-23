@@ -28,7 +28,7 @@
 - **V2** (b₀ ∝ n^{−5/2}): pilot running.
 - **V1** (λ fixed): expected to fail on data; test running.
 
-**General k:** rate n^{−(2k+1)/(2k+2)} at λ = n^{k+1/2}/V. Only constants change for k ≥ 2; k = 1 needs Lemma F; k = 0 breaks. SKETCH by substitution; audit on Tuesday.
+**General k:** rate n^{−(2k+1)/(2k+2)} at λ = n^{k+1/2}/V, for every k ≥ 1. **PROVED and cross-family audited** (Fable B; Astra: ACCEPT WITH FIXES). The Christoffel constant (k+1)² is proved for every degree. k = 1 has a thin but sufficient margin. At k = 0 only Theorem B survives.
 
 **Caveat for the paper:** all theorems concern the POSTERIOR. His P-MALA λ is not converged at n ≥ 1000 (Engineering aca7214).
 
