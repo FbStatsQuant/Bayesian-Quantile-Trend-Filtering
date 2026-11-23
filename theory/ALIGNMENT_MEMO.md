@@ -120,6 +120,19 @@ Here Π_σ is the θ-posterior at fixed σ (λ fixed, or learned and mixed over)
 
 **At the paper's n the learned λ is near the oracle (MEASURED against computed).** The oracle is n^{5/2}/V, with V from the statements note (Table simV): ≈ 3.6e4 (S, V ≈ 156) and ≈ 768 (VS, V ≈ 7276) at n = 500. The learned λ̄ in the σ sprint is 9e2–2.6e4 (S) and 1.1e3–3.1e3 (VS), i.e. 0.03–0.7× the oracle on S and 1.5–4× on VS. So the mismatch is asymptotic, not at the paper's n. The n^{3/4} growth with constant b₀ is MEASURED in E-02 (slope 0.745; statements note, line 485), and R-A1-post re-measures it under the default priors.
 
+**New results on learned λ** (temporary Astra assistant, `T06_Alignment/astra_learned_lambda.md`; key steps re-derived by Theory; Opus audit pending):
+- **Under (EM), i.e. σ in Theorem B's range, learned λ is covered for both schedules (P3 essentially resolved):**
+  - b₀ = c·n^{−5/2}: Δ²ₙ ≲ n^{−5/6}(log n)^{1/6}, and squared loss n^{−2/3}(log n)^{1/3};
+  - **constant b₀ (Felipe's schedule): Δ²ₙ ≲ n^{−1/4}(log n)^{1/8}**, with posterior λ ≲ n^{3/4}(log n)^{1/8}. The matching lower bound on λ is open.
+  - The proof mixes over λ inside Fubini. Constant b₀ is therefore covered as run, but only at the slow rate, and only where (EM) holds, i.e. not at the learned σ.
+- **Counterexample (PROVED, verified by Theory).** With learned λ (either schedule) and a fixed σ that is very small, the posterior is inconsistent: λ stays bounded and the fit interpolates the data. The example uses uniform noise with σ ≲ 6·10⁻⁵, against σ₀ = 0.25.
+  - So "learned λ, any fixed σ" is **false**, and a learned-λ result below σ̄ must use where the joint posterior puts σ.
+  - Felipe's learned σ is ≈ σ₀, about 4000× larger than the counterexample's σ. **It is not a flagrant conflict with the method**, but it means the both-learned case needs a genuinely joint argument.
+- **Both learned (σ and λ): OPEN.**
+  - The exact decomposition is PROVED (d3): sup over σ ∈ I, λ ∈ J of Π_{σ,λ}(bad), plus the joint tails of λ and σ.
+  - Missing: joint containment of λ in a window where C1 works (λ ≫ n^{23/11}). Under constant b₀ the posterior λ ≲ n^{3/4}, so C1 cannot apply.
+  - **For Felipe's exact method (constant b₀, σ learned) there is currently no contraction theorem at any rate.**
+
 **What would align λ.**
 - **(i)** State the default as **b₀ = c·n^{−5/2} with c fixed** at its n = 500 value. This is identical at the paper's n and differs elsewhere. It needs P3 plus Engineering's paired check at other n, under Felipe's rules. Proposal: UNTESTED.
 - **(ii)** A theorem for constant b₀ at the slower rate (P3 ii, OPEN).
