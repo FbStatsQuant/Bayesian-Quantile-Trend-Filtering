@@ -154,7 +154,12 @@
 
 **Caveat for the paper:** all theorems concern the POSTERIOR. His P-MALA λ is not converged at n ≥ 1000 (Engineering aca7214).
 
-**Still arriving:** Fable A and an independent Astra co-prover (the no-floor method), the Astra audit of general k, the VP's reply, the V1/V2/V0T data.
+**Still arriving at 18:00:**
+- the Astra audit of Fable A's L4b §9–10 sketch;
+- the VP's reply, if any;
+- the V2 pilot and the H-V2 screen re-runs (Engineering).
+
+Everything else listed this morning has landed and is folded in above.
 
 ---
 
@@ -362,10 +367,15 @@ Neither σ nor λ may be user-set, and they may not both be fixed. Every variant
 
 ---
 
-## Pending inputs
+## Pending inputs (as of 18:00)
 
-- Self-check of C1 (`T06_Alignment/C1_any_sigma.md`), then a cross-model audit of C1, W and S (Fable on CP from 15:15 CT).
+The morning's items are closed:
+- C1, W and S are cross-audited.
+- R-A1/R-A2 were measured.
+- The P2 uniformity question is subsumed by C1/C2 on compacts.
 
-- VP consultation on C1, C2 and (c)(2): due 16:30 CT.
-- Engineering R-A1-post + R-A2 (≈ 5.5 core-h; awaiting HQ's compute OK): σ and λ concentration against n, and fixed σ ≈ σ₀.
-- Audit of the P2 uniformity proof in (c)(1): to be requested from HQ (low priority: it only covers the (EM) range).
+**Open for Tuesday:** see `TUESDAY_PLAN.md`.
+- **Gaps:** L4a, and L4b below n^{21/11}.
+- **Shared missing input:** the posterior sup-norm lemma, with its entry points in `T06_Alignment/FABLE_B_supnorm.md` §§10–16.
+- **Clean rewrites** of LO, U, L2 and L4b with every audit fix written in full.
+- **The draws check for L4a** (Engineering, to be priced).
