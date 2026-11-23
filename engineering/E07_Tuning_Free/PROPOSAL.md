@@ -118,7 +118,7 @@ Arms on the same data and seeds:
 | **S4** | SPod (n = 8640, 3 levels; O at the paper's settings with 2 chains, the new sampler with 4) and Dutch boys (5 levels) | Mixing and runtime on real data | **7** |
 | **S5** | Scalability: n = 500…16k, 3 replications; ms/sweep and s/ESS for O vs the adopted sampler | n-scaling claim | **4** |
 | **S6** | **Joint gate (§3), after S1:** prototype the box-restricted moves; pilot against the original joint sampler on the joint design; J-scaling | Whether the individual gains have a working joint extension | **≈ 5** |
-| **Total S0–S5** | | | **≈ 51** (59 with S2b) |
+| **Total S0–S6** | | | **≈ 56** (64 with S2b; cap 60. Already spent: G0 1.3, σ sprint 8.0) |
 
 - **Already spent on E-07:** 1.3 core-h (G0, cancelled).
 - **Gates:**
