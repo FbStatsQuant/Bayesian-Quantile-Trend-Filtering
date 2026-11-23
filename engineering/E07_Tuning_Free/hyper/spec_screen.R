@@ -21,7 +21,7 @@ SPECS <- list(
 )
 EXTRA <- Sys.getenv("SPEC_EXTRA")                                    # optional: R code defining more entries, e.g. 'SPECS$T1 <- function(bl,n,tau) ...'
 if (nzchar(EXTRA)) eval(parse(text = EXTRA))
-NAMES <- strsplit(Sys.getenv("SPEC_NAMES", paste(names(SPECS), collapse = ",")), ",")[[1]]
+NAMES <- strsplit(Sys.getenv("SPEC_NAMES", paste(names(SPECS), collapse = ";")), "[;,]")[[1]]   # use ";" in sbatch --export (it splits on commas)
 g <- function(n, bl, noise, tau, seeds) expand.grid(n = n, bl = bl, noise = noise, tau = tau, seed = seeds, stringsAsFactors = FALSE)
 base <- rbind(g(500, c("VS", "S"), c("Normal", "Beta", "Mixed"), c(0.05, 0.5, 0.95), 1:5), g(1000, c("VS", "S"), "Normal", c(0.05, 0.5, 0.95), 1), g(2000, c("VS", "S"), "Normal", 0.5, 1))
 tasks <- do.call(rbind, lapply(NAMES, function(s) cbind(spec = s, base, stringsAsFactors = FALSE)))
