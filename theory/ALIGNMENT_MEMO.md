@@ -27,6 +27,12 @@
 - **V0T** (his method + floor): identical at n = 500; theorem at n^{−5/6}; data test running.
 - **V2** (b₀ ∝ n^{−5/2}): pilot running.
 - **V1** (λ fixed): **FAILED on data** (MEASURED, Engineering: S cells 1.37–1.92× worse; the posterior λ differs about 10× between S and VS). λ must stay data-driven.
+- **Soft floor via Gamma hyperparameters** (temporary Astra assistant, `T06_Alignment/astra_softfloor.md`; Fable cross-check in progress; NOT yet audited):
+  - **(i)** Shape a_n = Kn/log n with mean κn^{5/2} gives the V0T\* rate n^{−5/6} with no truncation. But it **pins λ** at its prior mean, which is V1's failure mode on data.
+  - **Impossibility:** no deterministic Gamma schedule gives class-wide contraction AND tracks oracle windows 46× apart.
+  - **(ii)** V2 (constant shape, scaled rate) **fails class-wide**, even on a bounded design satisfying the strict margin. So the margin condition is NOT sufficient.
+  - **(iii)** Felipe's Gamma(n, 1) gives no RMS contraction at any radius o(n^{−1/3}).
+  - **Consequence:** for an adaptive λ prior (data-passing), any theorem must be **design-specific** (the paper's smooth noise families). That is OPEN, and it is Tuesday's target.
 - **New freedom (Felipe):** Gamma/IG hyperparameters may be deterministic functions of n (τ for σ), but no truncation. Candidates for the exact-Gibbs screen: H-V2 (Gamma(1, b₀(500/n)^{5/2})), H-V2-common, H-V2-shape2. The theorem for these without the floor needs the 'no-interpolation' evidence lemma (Fable B and Astra, in progress).
 
 **Joint non-crossing (Theorem J, Fable B; PROVED and cross-family audited, Astra: ACCEPT WITH FIXES).** For a fixed number of levels, V0T\* and C\* transfer to the paper's joint non-crossing posterior at n^{−5/6}, with no extra separation condition: upper (A2) forces separated true quantiles, and the sup-norm conclusion makes the constraint asymptotically inactive. Caveat: at the paper's n the ordering is likely still active, so the theorem says the constraint does no harm asymptotically, not that it helps.
