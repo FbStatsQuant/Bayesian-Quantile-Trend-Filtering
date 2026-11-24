@@ -69,7 +69,7 @@ Posterior draws lie within $M\,n^{-(2k+1)/(2k+2)}$ of $\thetas$ in the loss $\De
 The proof, in Appendix~\ref{app:proofs}, writes the posterior as a ratio and treats its two terms separately. The denominator is bounded below through the prior mass of a ball centered at a locally smoothed version of $\thetas$. The numerator is bounded above on shells around $\thetas$, after a localization step that confines the posterior to a set on which $\|\theta-\thetas\|_\infty\to0$, so that Assumptions~\ref{ass:A} and~\ref{ass:B} apply to every coordinate. The localization step is where $k\ge1$ is needed.
 
 \begin{remark}[Comparison with the rate of the estimator]
-\citet{madrid2022risk} obtain the rate $n^{-(2k+2)/(2k+3)}$, up to a logarithmic factor, for the quantile trend filtering estimator. The whole posterior is slower. It averages over windows of order $\lambda^{1/(k+1)}$ points, so its own spread is $\Delta_n^2\asymp\lambda^{-1/(k+1)}$, while its smoothing bias is of order
+\citet{madrid2022risk} obtain the rate $n^{-(2k+2)/(2k+3)}$, up to a logarithmic factor, for the quantile trend filtering estimator. The rate of Theorem~\ref{thm:main} is slower. Heuristically, the posterior averages over windows of order $\lambda^{1/(k+1)}$ points, so its spread in the loss $\Delta_n^2$ is of order $\lambda^{-1/(k+1)}$, while its smoothing bias is of order
 \[
 V^{*2}\lambda^{(2k+1)/(k+1)}n^{-(2k+1)}.
 \]
