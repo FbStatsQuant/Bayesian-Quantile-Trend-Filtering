@@ -1,5 +1,5 @@
 % !TeX root = ../main.tex
-\subsection{Simulation}
+\subsection{Simulations on two benchmark signals}
 \label{sec:simulations}
 
 We compare Bayesian-PMALA with Bayesian and optimization-based quantile trend filtering on two benchmark signals: the varying-smoothness signal (VS) of \citet{onizuka2024fast}, which adds a localized bump to gradual variation, and the smooth sinusoid (S) of \citet{brantley2020baseline}. Section~\ref{sec:sim:individual} considers interior quantile levels, and Section~\ref{sec:sim:extreme} the joint estimation of extreme upper quantiles. Additional tables are in Appendix~\ref{app:simulation_results}.
@@ -16,7 +16,7 @@ The errors follow the three noise families of \citet{onizuka2024fast}. The first
 \subsubsection{Interior quantiles}
 \label{sec:sim:individual}
 
-We compare Bayesian-PMALA with the Laplace and horseshoe Gibbs samplers of \citet{onizuka2024fast} and with the ADMM estimator of \citet{brantley2020baseline}. The levels are $\tau=0.05$, $0.25$, $0.50$, $0.75$, and $0.95$, and all methods are fitted to the same data in each replication. Bayesian-PMALA uses $\sigma\sim\mathrm{IG}(0.1,0.1)$. For the VS signal, $\lambda\sim\mathrm{Gamma}(1,10^{-3})$, the interweaving step is used, and the chain has $30000$ sweeps of which the first $10000$ are discarded; for the S signal, $\lambda\sim\mathrm{Gamma}(1,5\times10^{-4})$, no interweaving step is used, and the chain has $20000$ sweeps of which the first $5000$ are discarded. The Onizuka samplers use $8000$ sweeps with $2000$ burn-in and an $\mathrm{IG}(1,1)$ prior on $\sigma^2$. The Bayesian point estimates are posterior means. ADMM selects $\lambda$ by extended BIC over a $25$-point logarithmic grid, and a replication is discarded when any candidate on the grid fails to converge.
+The competitors are the Laplace and horseshoe Gibbs samplers of \citet{onizuka2024fast} and the ADMM estimator of \citet{brantley2020baseline}. The levels are $\tau=0.05$, $0.25$, $0.50$, $0.75$, and $0.95$, and all methods are fitted to the same data in each replication. Bayesian-PMALA uses $\sigma\sim\mathrm{IG}(0.1,0.1)$. For the VS signal, $\lambda\sim\mathrm{Gamma}(1,10^{-3})$, the interweaving step is used, and the chain has $30000$ sweeps of which the first $10000$ are discarded; for the S signal, $\lambda\sim\mathrm{Gamma}(1,5\times10^{-4})$, no interweaving step is used, and the chain has $20000$ sweeps of which the first $5000$ are discarded. The Onizuka samplers use $8000$ sweeps with $2000$ burn-in and an $\mathrm{IG}(1,1)$ prior on $\sigma^2$. The Bayesian point estimates are posterior means. ADMM selects $\lambda$ by extended BIC over a $25$-point logarithmic grid, and a replication is discarded when any candidate on the grid fails to converge.
 
 For each fit we compute $\mathrm{MSE}=n^{-1}\sum_i(\widehat\theta_{\tau,i}-Q_\tau(u_i))^2$, $\mathrm{MAD}=n^{-1}\sum_i|\widehat\theta_{\tau,i}-Q_\tau(u_i)|$, and, for the samplers, the mean width MCIW of the pointwise $95\%$ intervals. All three are averaged over valid replications.
 
