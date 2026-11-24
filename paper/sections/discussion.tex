@@ -1,6 +1,6 @@
 % !TeX root = ../main.tex
 
-\section{Discussion}
+\section{Conclusions}
 \label{sec:discussion}
 
 Bayesian-PMALA brings exact posterior sampling to quantile trend filtering while keeping the proximal structure of the optimization problem. Under the normal--exponential representation, the proximal map of the whole conditional posterior of the trend is a weighted trend filtering problem, so no part of the check loss is smoothed and the Metropolis--Hastings correction is exact. In the simulation study each competitor is most accurate on the benchmark that suits it, and Bayesian-PMALA is competitive with both on both signals. It matches the locally adaptive horseshoe sampler with a single global penalty per quantile, and it matches ADMM while learning the penalty and the likelihood scale from the posterior instead of selecting a penalty by an information criterion.

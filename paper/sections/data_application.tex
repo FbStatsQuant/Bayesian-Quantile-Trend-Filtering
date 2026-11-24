@@ -1,8 +1,8 @@
 % !TeX root = ../main.tex
-\section{Data Applications}
+\subsection{Data Applications}
 \label{sec:applications}
 
-\subsection{Air Quality Sensor Data}
+\subsubsection{Air Quality Sensor Data}
 \label{sec:app:spod}
 
 \paragraph{Data.} Our first application revisits the fenceline air-quality monitoring problem that motivated quantile trend filtering in \citet{brantley2020baseline}. The U.S.\ Environmental Protection Agency deploys low-cost SPod sensors on the perimeter of industrial facilities to detect fugitive emissions of volatile organic compounds (VOCs). Each SPod records, once per second, the raw signal of a photoionization detector (PID): a UV lamp ionizes VOC molecules in the sampled air and the resulting current, reported in uncalibrated counts, is proportional to the total concentration of ionizable compounds. The series has three components with sharply different time scales. Emission plumes crossing the sensor produce large one-sided spikes lasting seconds to a few minutes; the electronic baseline drifts slowly over hours with temperature, humidity, and lamp condition; and high-frequency instrument noise rides on top of both. The scientific interest lies exclusively in the spikes, but because each unit's baseline drifts idiosyncratically and the counts are not calibrated across units, the drifting baseline must be estimated and removed before events can be flagged or compared across sensors. Since the plumes are strictly one-sided excursions above the baseline, the baseline is identified by a \emph{low} conditional quantile of the series, making this a natural quantile trend filtering problem in which, in contrast to the usual convention, the trend is the nuisance and the residual carries the signal. We analyze one day of data, June 15, 2018, from sensor \texttt{d} of the two collocated SPods in the EPA Rubbertown dataset accompanying \citet{brantley2020baseline}, aggregating the 86{,}400 raw 1-Hz observations into 10-second block means, which yields $n = 8{,}640$ observations and attenuates the strong serial correlation of the 1-Hz noise that the ALD working likelihood does not model.
@@ -25,7 +25,7 @@
 \label{fig:spod_detrended_pmala}
 \end{figure}
 
-\subsection{Growth Centiles for Dutch Children}
+\subsubsection{Growth Centiles for Dutch Children}
 \label{sec:app:growth}
 
 Growth charts are the canonical use of quantile curves: a child's height is read against the population centiles at the same age, so the chart itself is a family of quantile curves indexed by age. We use the Fifth Dutch Growth Study \citep{schonbeck2013tallest}, a nationwide cross-sectional sample collected in 2009 and distributed with the \texttt{mice} package \citep{vanbuuren2011mice}. After removing records without a height measurement the data contain 4{,}817 boys and 5{,}190 girls aged 0 to 22 years, each measured once. Boys and girls are analysed separately.

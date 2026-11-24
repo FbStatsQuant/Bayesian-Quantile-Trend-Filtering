@@ -39,6 +39,10 @@
 % ============================================================
 \newtheorem{proposition}{Proposition}
 \newtheorem{remark}{Remark}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
 % ============================================================
 % TITLE
 % ============================================================
@@ -70,14 +74,13 @@ Gibbs sampling, extreme quantiles.
 % ============================================================
 \input{sections/introduction}
 \input{sections/methodology}
-\input{sections/simulations}
-\newpage
-\input{sections/scalability}
-\input{sections/air_simulation}
-\input{sections/data_application}
+\input{sections/theory}
+\input{sections/numerical}
 \input{sections/discussion}
 \clearpage
 \appendix
+\input{sections/appendix_theory}
+\input{sections/appendix_assumptions}
 \input{sections/appendix_pmala}
 \input{sections/appendix_simulations}
 \input{sections/appendix_data_application_plots}

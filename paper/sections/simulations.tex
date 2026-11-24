@@ -1,5 +1,5 @@
 % !TeX root = ../main.tex
-\section{Simulation}
+\subsection{Simulation}
 \label{sec:simulations}
 
 We compare Bayesian-PMALA with Bayesian and optimization-based quantile trend filtering on two benchmark signals: the varying-smoothness signal (VS) of \citet{onizuka2024fast}, which adds a localized bump to gradual variation, and the smooth sinusoid (S) of \citet{brantley2020baseline}. Section~\ref{sec:sim:individual} considers interior quantile levels and Section~\ref{sec:sim:extreme} the joint estimation of extreme upper quantiles. Additional tables are in Appendix~\ref{app:simulation_results}.
@@ -19,14 +19,14 @@ and the three noise families of \citet{onizuka2024fast}:
 \end{itemize}
 The target is the true conditional quantile $Q_\tau(u)=f(u)+F_u^{-1}(\tau)$, where $F_u$ is the error distribution at $u$.
 
-\subsection{Interior quantiles}
+\subsubsection{Interior quantiles}
 \label{sec:sim:individual}
 
 \paragraph{Methods.} We compare Bayesian-PMALA with the Laplace and horseshoe Gibbs samplers of \citet{onizuka2024fast} and the ADMM estimator of \citet{brantley2020baseline} at $\tau\in\{0.05,0.25,0.50,0.75,0.95\}$, all fitted to the identical response in each replication. Bayesian-PMALA uses $\sigma\sim\mathrm{IG}(0.1,0.1)$; for the VS signal $\lambda\sim\mathrm{Gamma}(1,10^{-3})$, the interweaving step and $30000$ sweeps of which the first $10000$ are discarded, and for the S signal $\lambda\sim\mathrm{Gamma}(1,5\times10^{-4})$, no interweaving step and $20000$ sweeps of which the first $5000$ are discarded. The Onizuka samplers use $8000$ iterations with $2000$ burn-in and their supplied $\mathrm{IG}(1,1)$ prior on $\sigma^2$. The Bayesian point estimates are posterior means. ADMM selects $\lambda$ by extended BIC over a $25$-point logarithmic grid, and a replication is discarded when any candidate on the grid fails to converge.
 
 \paragraph{Performance measures.} For each fit we compute $\mathrm{MSE}=n^{-1}\sum_i(\widehat\theta_{\tau,i}-Q_\tau(u_i))^2$, $\mathrm{MAD}=n^{-1}\sum_i|\widehat\theta_{\tau,i}-Q_\tau(u_i)|$ and, for the samplers, the mean width MCIW of the pointwise $95\%$ intervals, and average them over valid replications.
 
-\subsubsection{Varying smoothness}
+\paragraph{Varying smoothness}
 \label{sec:sim:ind:vs}
 
 Table~\ref{tab:vs_int_mse} reports the MSE; MAD and MCIW are in Appendix~\ref{app:sim:individual:vs}. The three Bayesian samplers perform similarly in every configuration, with the horseshoe slightly ahead under Beta noise, so a single global penalty matches local shrinkage on this signal. ADMM is markedly less accurate in almost every configuration: extended BIC selects a penalty too heavy for the localized bump, whereas the samplers learn a lighter one from the data.
@@ -62,7 +62,7 @@ ADMM & 0.088108 & 0.025091 & 0.020181 & 0.014800 & 0.022334 \\
 \end{tabular}
 \end{table}
 
-\subsubsection{Smooth signal}
+\paragraph{Smooth signal}
 \label{sec:sim:ind:smooth}
 
 Table~\ref{tab:s_int_mse} reports the MSE; MAD and MCIW are in Appendix~\ref{app:sim:individual:smooth}. On the S signal ADMM is the most accurate method everywhere, as expected for the smooth-baseline setting it was designed for. Bayesian-PMALA is more accurate than both Onizuka samplers at the central levels under every noise family and slightly behind them at most outer levels: without a localized feature the local shrinkage scales have little to exploit.
@@ -98,7 +98,7 @@ ADMM & 0.006561 & 0.003129 & 0.002456 & 0.002843 & 0.005929 \\
 \end{tabular}
 \end{table}
 
-\subsection{Joint estimation of extreme upper quantiles}
+\subsubsection{Joint estimation of extreme upper quantiles}
 \label{sec:sim:extreme}
 
 The joint sampler of Section~\ref{subsec:joint} fits $\tau\in\{0.90,0.93,0.96,0.97,0.98,0.99\}$ together. The competitors, Bayesian-PMALA, the two Onizuka samplers and ADMM, are fitted one level at a time to the same data. Tables~\ref{tab:vs_ext_upper_mse} and \ref{tab:s_ext_upper_mse} report the MSE at all six levels, and Appendix~\ref{app:sim:joint_extreme} counts crossings among the four levels from $0.96$ to $0.99$.
