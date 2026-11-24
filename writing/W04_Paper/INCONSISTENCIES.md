@@ -32,3 +32,7 @@ Format: file:line — what. Append only.
 - paper/sections/introduction.tex (eq:intro_model) vs methodology.tex (eq:datamodel) — the data model is displayed twice.
 - paper/main.tex (title, keywords, \tableofcontents) — title and keywords predate the theory section (no "posterior contraction"; "Sequential Gibbs Sampling"); SBSS has no table of contents.
 - paper/sections/abstract.tex — about 230 words; SBSS abstract is about 170.
+- paper/sections/appendix_data_application_plots.tex — one remaining bold `\btheta`; data_application.tex now writes plain $\theta$, as Section 2 does (lead restyle pass). Unify the appendix caption.
+- paper/sections/data_application.tex:26 — "the smoothed check-loss gradient is nearly flat" explains the low effective sample size at $\tau = 0.01$ through a smoothed check loss; the sampler of Section 2 does not smooth the check loss (same origin as the $\gamma = 0.1$, $\epsilon = 0.01$ item above).
+- paper/sections/data_application.tex (SPod) vs methodology.tex (Section 2.4) — the SPod curves are posterior medians; Section 2.4 and the growth application report the posterior mean as the point estimate.
+- paper/sections/data_application.tex vs simulations.tex, scalability.tex — number formats differ: $8{,}640$ and $6{,}000$ here, $30000$ and $4000$ in the simulations, $7\,035$ in the cost table and its prose; "Gibbs iterations" here versus "sweeps" elsewhere.

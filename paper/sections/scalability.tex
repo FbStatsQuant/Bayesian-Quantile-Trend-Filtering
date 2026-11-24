@@ -15,7 +15,7 @@
 
 We compare the time per Gibbs sweep of Bayesian-PMALA with that of the Laplace and horseshoe samplers of \citet{onizuka2024fast}. All three use the same augmentation and differ in the trend update. Bayesian-PMALA computes two proximal maps by ADMM with a fixed iteration budget and banded factorizations (Section~\ref{subsec:pmala}), so its sweep costs $O(n)$. The code of \citet{onizuka2024fast} draws the trend from its Gaussian full conditional by forming the dense inverse of the precision matrix and an eigendecomposition (\texttt{MASS::mvrnorm}), whose cost grows cubically in $n$.
 
-The experiment uses the VS signal \eqref{eq:sim_vs} with Gaussian noise, $\tau = 0.5$, $k = 2$ and $n$ from $250$ to $4000$, with the same data for all samplers. The Onizuka code is used unmodified, with \texttt{sparse = TRUE}, and both samplers are timed by clock reads around their updates. All runs use one laptop core (Intel Core Ultra 7 155U, R~4.4.1, reference BLAS). Warm-up and setup are excluded, and each entry is the median over up to three replicates with distinct data.
+The experiment uses the VS signal \eqref{eq:sim_vs} with Gaussian noise, $\tau = 0.5$, $k = 2$, and $n$ from $250$ to $4000$, with the same data for all samplers. The Onizuka code is used unmodified, with \texttt{sparse = TRUE}, and both samplers are timed by clock reads around their updates. All runs use one laptop core (Intel Core Ultra 7 155U, R~4.4.1, reference BLAS). Warm-up and setup are excluded, and each entry is the median over up to three replicates with distinct data.
 
 \begin{table}[!htbp]
 \centering
@@ -53,7 +53,7 @@ $n$ & PMALA & Laplace & Horseshoe & Laplace & Horseshoe \\
 \label{fig:cost_scaling}
 \end{figure}
 
-Table~\ref{tab:cost_scaling} and Figure~\ref{fig:cost_scaling} show the time per sweep. For Bayesian-PMALA it grows linearly with $n$, at an essentially constant cost per observation of about $0.008$ to $0.009$ ms. An Onizuka sweep grows roughly cubically, so the ratio to Bayesian-PMALA increases with every doubling of $n$: from $25$ (Laplace) and $24$ (horseshoe) at $n=250$ to $7\,035$ and $6\,593$ at $n=4000$. The two Onizuka priors cost about the same. Almost all of a Bayesian-PMALA sweep is the P-MALA move, and almost all of an Onizuka sweep is the dense inverse and eigendecomposition of the trend draw (Figure~\ref{fig:cost_breakdown}).
+Table~\ref{tab:cost_scaling} and Figure~\ref{fig:cost_scaling} show the time per sweep. For Bayesian-PMALA it grows linearly with $n$, at a cost per observation of about $0.008$ to $0.009$ ms. An Onizuka sweep grows roughly cubically, so the ratio to Bayesian-PMALA increases with every doubling of $n$: from $25$ (Laplace) and $24$ (horseshoe) at $n=250$ to $7\,035$ and $6\,593$ at $n=4000$. The two Onizuka priors cost about the same. Almost all of a Bayesian-PMALA sweep is the P-MALA move, and almost all of an Onizuka sweep is the dense inverse and eigendecomposition of the trend draw (Figure~\ref{fig:cost_breakdown}).
 
 The gap is a property of the implementation: the precision matrix of the horseshoe hierarchy is banded and admits a banded Cholesky draw. The experiment times single sweeps; the autocorrelation of the chains is not measured, and the cost per effective draw also depends on it.
 

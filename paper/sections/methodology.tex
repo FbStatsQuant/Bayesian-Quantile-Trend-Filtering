@@ -1,7 +1,8 @@
 % !TeX root = ../main.tex
 \section{The model and the algorithm}
 \label{sec:methodology}
-%% LEAD: section opening
+
+This section presents the model and the two samplers. Section~\ref{subsec:model} states the data model and the priors. Section~\ref{subsec:likelihood} introduces the working likelihood and its normal--exponential mixture representation, and Section~\ref{subsec:posterior} gives the posterior and relates it to quantile trend filtering. Section~\ref{subsec:individual} lists the steps of the sampler for a single quantile level, and Section~\ref{subsec:pmala} describes its trend update by P-MALA. Section~\ref{subsec:joint} extends the sampler to several quantile levels with ordered trends, and Section~\ref{subsec:joint_trend} gives its constrained trend and interweaving updates.
 
 \subsection{Model and priors}
 \label{subsec:model}
@@ -11,7 +12,7 @@ We observe $\by = (y_1, \ldots, y_n)^\top \in \R^n$ and model
     y_i = \theta_i + \varepsilon_i, \qquad i = 1, \ldots, n,
     \label{eq:datamodel}
 \end{equation}
-with independent errors, where for a level $\tau \in (0,1)$ the trend entry $\theta_i$ is the conditional $\tau$-quantile of $y_i$. Until Section~\ref{subsec:joint}, $\theta$, $z$, $\lambda$ and $\sigma$ refer to a single level $\tau$; Section~\ref{subsec:joint} attaches the level index.
+with independent errors, where for a level $\tau \in (0,1)$ the trend entry $\theta_i$ is the conditional $\tau$-quantile of $y_i$. Until Section~\ref{subsec:joint}, $\theta$, $z$, $\lambda$, and $\sigma$ refer to a single level $\tau$; Section~\ref{subsec:joint} attaches the level index.
 
 Let $D = D^{(k+1)} \in \R^{m \times n}$ be the difference operator of order $k+1$, with $m = n - k - 1$ rows. Independent Laplace priors with common rate $\lambda$ on the differences give
 \begin{equation}
@@ -72,14 +73,14 @@ This is the quantile trend filtering problem of \citet{brantley2020baseline} wit
 \subsection{The individual quantile sampler}
 \label{subsec:individual}
 
-We sample \eqref{eq:posterior} by a four-block Gibbs sampler, Bayesian-PMALA. A sweep updates the blocks $\theta$, $z$, $\lambda$ and $\sigma$ in this order, each conditional on the most recent values of the others; the three conjugate conditionals are derived in Appendix~\ref{app:pmala:conditionals}. The steps of one sweep are the following.
+We sample \eqref{eq:posterior} by a four-block Gibbs sampler, Bayesian-PMALA. A sweep updates the blocks $\theta$, $z$, $\lambda$, and $\sigma$ in this order, each conditional on the most recent values of the others; the three conjugate conditionals are derived in Appendix~\ref{app:pmala:conditionals}. The steps of one sweep are the following.
 \begin{enumerate}
     \item \emph{Trend $\theta$.} Given $(z, \lambda, \sigma)$, the conditional density of $\theta$ is proportional to $\exp\{-U(\theta)\}$ with
     \begin{equation}
         U(\theta) = \frac{1}{2}\sum_{i=1}^n w_i (\theta_i - r_i)^2 + \lambda \norm{D\theta}_1 .
         \label{eq:Utheta}
     \end{equation}
-    This is a weighted Gaussian term plus an $\ell_1$ penalty, which has no standard form. $U$ is convex but not differentiable wherever a difference $(D\theta)_j$ vanishes, so we draw $\theta$ by P-MALA, a Metropolis--Hastings move built on the proximal map of $U$ (Section~\ref{subsec:pmala}).
+    This conditional is not a standard distribution: $U$ is a weighted quadratic plus the $\ell_1$ penalty, convex but not differentiable wherever a difference $(D\theta)_j$ vanishes. We draw $\theta$ by P-MALA, a Metropolis--Hastings move built on the proximal map of $U$ (Section~\ref{subsec:pmala}).
     \item \emph{Latent variables $z$.} Given $(\theta, \sigma)$, the $z_i$ are independent with
     \begin{equation}
         z_i^{-1} \mid \theta, \sigma, \by \sim \mathrm{InvGauss}\!\left(\frac{1}{\tau(1-\tau)\,|y_i - \theta_i|},\ \frac{1}{2\tau(1-\tau)\,\sigma}\right),
@@ -100,7 +101,7 @@ We sample \eqref{eq:posterior} by a four-block Gibbs sampler, Bayesian-PMALA. A 
     The scale enters the weights and the penalty $\lambda\sigma$ of \eqref{eq:map_qtf}, so it is drawn with the other parameters rather than fixed.
     \item \emph{Step size $\delta$.} The P-MALA step size is updated by a Robbins--Monro recursion toward acceptance rate $0.5$ (Appendix~\ref{app:pmala:adapt}).
 \end{enumerate}
-Algorithm~\ref{alg:pmala} states one run. The point estimate is the posterior mean of $\theta$, and the $2.5\%$ and $97.5\%$ quantiles of the retained draws give pointwise $95\%$ intervals. Initialization, warm-up and numerical safeguards are given in Appendices~\ref{app:pmala:init}--\ref{app:pmala:safeguards}.
+Algorithm~\ref{alg:pmala} states one run. The point estimate is the posterior mean of $\theta$, and the $2.5\%$ and $97.5\%$ quantiles of the retained draws give pointwise $95\%$ intervals. Initialization, warm-up, and numerical safeguards are given in Appendices~\ref{app:pmala:init}--\ref{app:pmala:safeguards}.
 
 \begin{algorithm}[h!]
 \caption{Bayesian-PMALA for a single quantile level $\tau$}
@@ -124,7 +125,7 @@ Algorithm~\ref{alg:pmala} states one run. The point estimate is the posterior me
 \subsection{Sampling the trend by P-MALA}
 \label{subsec:pmala}
 
-The trend step needs an exact draw from $\exp\{-U(\theta)\}$. P-MALA \citep{pereyra2016proximal} replaces $U$ by its Moreau--Yosida envelope, draws a Langevin proposal from the envelope's gradient, and accepts or rejects it against the exact density. We apply it to the whole conditional \eqref{eq:Utheta}, likelihood and penalty together.
+The trend step requires a move that leaves the conditional of $\theta$ in \eqref{eq:Utheta} invariant. P-MALA \citep{pereyra2016proximal} replaces $U$ by its Moreau--Yosida envelope, draws a Langevin proposal from the envelope's gradient, and accepts or rejects it against the exact density. We apply it to the whole conditional \eqref{eq:Utheta}, likelihood and penalty together.
 
 The proposal is built from the proximal map of $U$. For a symmetric positive definite $M$ and $\gamma > 0$, the proximal map of $U$ in the $M$-norm and the envelope are
 \begin{equation}
@@ -159,7 +160,7 @@ The metric $M$ is chosen to match the curvature of $U$. We use
     M = W + \kappa\, \frac{\lambda^2}{2}\, D^\top D, \qquad W = \mathrm{diag}(w_1, \ldots, w_n), \qquad \kappa = 3,
     \label{eq:metric}
 \end{equation}
-which combines the precision of the augmented likelihood with a difference precision on the scale of the prior. $M$ depends on $(z, \lambda, \sigma)$ but not on $\theta$, so the move is a valid Metropolis--Hastings kernel.
+which combines the precision of the augmented likelihood with a difference precision on the scale of the prior. The metric depends on $(z, \lambda, \sigma)$ but not on $\theta$, so the move is a valid Metropolis--Hastings kernel.
 
 Problem \eqref{eq:prox} is a weighted trend filtering problem, solved by ADMM with a fixed number of iterations and a cold start, so $T$ is deterministic (Appendix~\ref{app:pmala:admm}). Every linear system is banded with half-bandwidth $k+1$, and one factorization serves the forward and reverse maps, so the work per sweep is linear in $n$. The step size $\delta$ is adapted toward acceptance $0.5$ (Appendix~\ref{app:pmala:adapt}).
 
@@ -168,7 +169,7 @@ Problem \eqref{eq:prox} is a weighted trend filtering problem, solved by ADMM wi
 
 Quantile curves fitted one level at a time can cross. The joint sampler fits several levels with ordered trends. It is the sampler of Section~\ref{subsec:individual} applied level by level, except that each trend is drawn from its conditional restricted to lie between its neighbors, so its proximal map becomes a box-constrained problem. We first define the joint target and the bounds, then list the steps that differ from the individual sampler; Section~\ref{subsec:joint_trend} gives the constrained trend and interweaving updates.
 
-Let $0 < \tau_1 < \cdots < \tau_J < 1$, and write $\theta_j$, $z_j$, $\lambda_j$ and $\sigma_j$ for the quantities of Sections~\ref{subsec:model}--\ref{subsec:individual} at level $\tau_j$. The levels are coupled only through the ordering
+Let $0 < \tau_1 < \cdots < \tau_J < 1$, and write $\theta_j$, $z_j$, $\lambda_j$, and $\sigma_j$ for the quantities of Sections~\ref{subsec:model}--\ref{subsec:individual} at level $\tau_j$. The levels are coupled only through the ordering
 \begin{equation}
     \mathcal C = \left\{(\theta_1,\ldots,\theta_J):\
     \theta_{i1} \leq \cdots \leq \theta_{iJ},\quad i=1,\ldots,n\right\}.
@@ -181,7 +182,7 @@ With $\pi_j$ the augmented posterior \eqref{eq:posterior} at $\tau=\tau_j$, the 
     \prod_{j=1}^J \pi_j(\theta_j,z_j,\lambda_j,\sigma_j\mid\by),
     \label{eq:joint_target}
 \end{equation}
-where $\Theta=(\theta_1,\ldots,\theta_J)$ and $Z=(z_1,\ldots,z_J)$. Because the indicator depends only on $\Theta$, the conditionals of $z_j$, $\lambda_j$ and $\sigma_j$ are \eqref{eq:zupdate}--\eqref{eq:sigmaupdate} at $\tau = \tau_j$.
+where $\Theta=(\theta_1,\ldots,\theta_J)$ and $Z=(z_1,\ldots,z_J)$. Because the indicator depends only on $\Theta$, the conditionals of $z_j$, $\lambda_j$, and $\sigma_j$ are \eqref{eq:zupdate}--\eqref{eq:sigmaupdate} at $\tau = \tau_j$.
 
 A sweep visits the levels in increasing order. At sweep $t$ the bounds of level $j$ are
 \begin{equation}
