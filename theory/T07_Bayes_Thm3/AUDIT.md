@@ -49,3 +49,38 @@ Notation: p = 2r−1, s = n^{−p/(2r)}(log n)^{1/(2r)}, H = ns.
 | SEVERE MISALIGNMENT: learned λ (Gamma) and the joint non-crossing sampler are not covered | Correct. This is the agreed scope (Felipe: deterministic λ, single level, σ fixed) | HOLDS as a scope statement; reported to HQ |
 | Misspecification paragraph | Checked the KL claim: KL(p₀ ‖ ALD_θ) = const + E ρ_τ(y−θ)/σ, minimized at the τ-quantile | HOLDS. Adopted into T07a Remark 3 (the clause "densities bounded away from 0 and ∞" was dropped as imprecise) |
 | Koenker (2005) Cond. A1 precedent for B | The reviewer quoted it from memory | NOT VERIFIED. Must be checked against the book before any citation |
+
+### Theory head's own check of the proof draft `T07c_proof.tex` (prover's first draft), 2026-11-24
+
+I read every lemma and redid the arithmetic. No errors were found. The items checked:
+
+| Item | What I redid | Ruling |
+|---|---|---|
+| Lemma 4 (small ball, no log) | Laplace = √V·g mixture; Eckart–Young with rank(P_J − P) = J′ ≤ J; Σ_{q>J}μ_q ≤ b₀J^{−(2r−1)}; μ_q ≤ 2·3^{2r−1}b₀q^{−2r} = 8·6^{2r−1}c_F²n^{2r−1}/λ²·q^{−2r}; tail ≤ ϱ²/8 then Markov; head t_q ≥ (2/√(2r−1))(q/K)^r; P(\|γ\|≤t) ≥ 0.48 min(t,1); K!/K^K ≥ e^{−K}; final C_sb | HOLDS |
+| Lemma 5 (quadratic shift) | AM–GM step and max(\|w\|,\|h\|) identity; Prékopa marginals; neighbour shift v = −te_{j′}+v′; concavity of Λ via K(s) = sK(1); chord-slope bound for a ≤ ϱ/2; f_j(0) ≤ λ(1+K/2)/(1−e^{−2}) | HOLDS |
+| Lemma 6 + Prop 1 (smoothed truth, prior mass) | Polynomial-reproducing kernel, \|K\| ≤ r/(g_r w); d_j supported on w−1 rows; δ_A ≤ n^{r−2}; condition 4 ≤ c n^{3/2}ε_n; K → 0 so c_K ≤ 2; ε_n^{−2/(2r−1)} = nε_n²; C_pr | HOLDS |
+| Lemma 7 (denominator) | Jensen; mean via global upper margin C₁ = max{f̄/2, 1/L}; Var(ℓ̄) ≤ (5/4)nε²; Chebyshev | HOLDS |
+| Lemmas 8–10 (width, interpolation, concentration) | Sub-Gaussian max with h ≤ 2n/J gives 2^r c_F; window bound and the three cases of w; symmetrization (vdV–W 2.3.6) and contraction (L–T 4.12) constants 2 and 2 match the published statements as I know them; Efron–Stein bounded change \|δ̂_i\| | HOLDS (exact citation wording still to be checked by the formal auditor) |
+| Prop 2 (localization) | ρ_n^{2r−2}T_n exponent −(4r²−8r+1)/(2(2r+1)), −1/10 at r=2; J_n ≍ n^{2/(2r+1)}, so E sup ≍ n^{2/(2r+1)}√log n = o(nρ_n²); Chebyshev 64/(f²nρ²); rays; Gamma(m,1) tail exp{−(1−log 2)n + (3/2)(α+1)}; ratio to denominator | HOLDS |
+| Lemma 11 (score events) | Var(ψᵀQψ) ≤ ‖Q‖_F²/4; coarse Chebyshev 4/(9(J+r)); Hoeffding 1/(2n); ℓ₂ part: ‖WWᵀ‖_F ≤ ‖W‖_op‖W‖_F, c_op²/c_F² = 3r, h/m ≤ 2/J | HOLDS |
+| Prop 3 (shells) | Cauchy–Schwarz split; coarse term ≤ (f/8)a nε²; Laplace MGF; 8ω²‖t‖²/λ² = 2C_fine ω²/(c²M^{2r−1})·nε² using n = (nε²)^{2r}; truth term √log n · (nε²)^{1/2} = o(nε²); exponents combine to −(ωf/8)a nε² + (1 + C_fine ω²/(c²M^{2r−1}))nε² | HOLDS |
+| Assembly | Volume ratio (8a)^{r/2}; M = M₁ + M₂ gives bracket ≤ (ωf/16)M; dyadic sum ≤ 2 for r ≥ 2; 4/9 + 8r/3 ≤ 3r; C = 2 + 768r/(f²M); M formula matches Theorem 2 | HOLDS |
+| Lemmas 12–13, Prop 4 (lower bound, general r) | Log-concave variance bound p(0) ≤ 1/√(2v); block functionals (z−1)^rσ_ℓ^{r+1} = (z^ℓ−1)^rσ_ℓ, disjoint supports, ‖g_b‖² = ℓ·C(2r,r); p₀ bound; union bound (4p₀)^{B/2}; range x₀ ≤ x ≤ C_ℓn^{r−1/2}; Hoeffding-lemma numerator; Anderson; c₀ choice | HOLDS |
+
+Naturality: the log-free Theorem 2 (radius M n^{−(2r−1)/(2r)}, bound C n^{−1/(2r)}) together with Prop 4 is the cleaner statement. Recommendation to HQ: after the formal audit, make it the headline and keep the log version as a remark. Not changed yet.
+
+Not checked by me in this pass: Lemmas 1–3 proofs line by line (statements checked; Lemma 3 numerics reported by the prover). These go to Astra-1 and the formal audit.
+
+## Padilla items: status in our proof
+
+Felipe's ruling (2026-11-24): Padilla is a template, not a law. Any borrowed item is re-checked; known or suspected wrong items are never cited.
+
+| Padilla item | What it says | Our status |
+|---|---|---|
+| Assumption A | lower CDF chord growth | Used as is, plus our Assumption B (upper chord growth, which also forces F(θ*) = τ) |
+| Lemma 10 | symmetrization | Used, but cited to the source (van der Vaart–Wellner 1996, Lemma 2.3.6) |
+| Lemma 11 | contraction | Used, but cited to the source (Ledoux–Talagrand 1991, Thm 4.12) |
+| Lemma 13 | lower margin | Corrected: our Lemma 2(d) under A + B; his version breaks with an atom at the quantile (Astra-2 #1) |
+| Lemma 16 | ker D^{(r)} = polynomials | Used as is (elementary; re-proved in Lemma 1) |
+| Prop 3, Lemmas 17–25 | localization, incl. Δ vs ℓ₂ comparison | Avoided. Lemma 24/19 is false for entries ≫ 1 (Astra-2 #2). Our localization (Lemmas 8–10, Prop 2) is self-contained and compares Δ and ℓ₂ only where ‖δ‖_∞ ≤ 1 |
+| Theorem 3 | mode rate | Not used by the main theorem. Mode corollary: to be re-proved self-contained under A + B (Felipe, 2026-11-24) |
