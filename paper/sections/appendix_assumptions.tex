@@ -1,2 +1,81 @@
 \section{Analysis of the assumptions}\label{app:assumptions}
-[TODO W-04 phase 2.]
+
+This appendix states what Assumptions~\ref{ass:A} and \ref{ass:B} and the bound $V^*\le\bar V$ require, shows where each enters the proof of Theorem~\ref{thm:main}, and verifies them for the simulation settings of Section~\ref{sec:simulations}. Throughout, $F_{y_i}$ is the distribution function of $y_i$, $\theta^*_i$ is its $\tau$-quantile, $r=k+1$, $D=D^{(r)}$, $\mathrm{TV}(\theta)=n^k\|D\theta\|_1$, $V^*=\mathrm{TV}(\theta^*)$, and $\Delta_n^2(v)=n^{-1}\sum_{i=1}^n\min\{|v_i|,v_i^2\}$.
+
+\paragraph{What the assumptions say.}
+Assumption~\ref{ass:A} is a lower margin: the distribution function of $y_i$ grows at least linearly in a fixed neighborhood of the quantile, uniformly in $i$ and $n$. It holds when the density is bounded below near $\theta^*_i$, but it is weaker, since it constrains only increments of $F_{y_i}$. It is the condition of \citet{madrid2022risk}, and a lower density bound of this kind is also used for Bayesian linear quantile regression by \citet{sriram2013posterior}. Assumption~\ref{ass:B} is the matching upper margin. It excludes an atom at the quantile, so that $F_{y_i}(\theta^*_i)=\tau$, and it excludes densities that are unbounded near the quantile. Both conditions concern $F_{y_i}$ only near $\theta^*_i$, and neither requires a moment of $y_i$; Cauchy noise is allowed. They do not involve the signal. If $y_i=f(u_i)+\varepsilon_i$ with $\varepsilon_i\sim F_{u_i}$ and $q_\tau(u)=F_u^{-1}(\tau)$, then $F_{y_i}(\theta^*_i+\delta)-F_{y_i}(\theta^*_i)=F_{u_i}(q_\tau(u_i)+\delta)-F_{u_i}(q_\tau(u_i))$, which does not depend on $f$.
+
+The assumptions exclude discrete or rounded data, a flat stretch of $F_{y_i}$ at the quantile, a noise scale that vanishes or grows without bound in $i$, and a level $\tau$ that depends on $n$. For every distribution $\underline f L\le\min\{\tau,1-\tau\}$, because the increment of $F_{y_i}$ is at most $1-\tau$ for $\delta>0$ and at most $\tau$ for $\delta<0$; the constant $\underline f$ therefore shrinks at extreme levels.
+
+The condition $V^*\le\bar V$ is the bounded-variation class of \citet{tibshirani2014adaptive}. For $\theta^*_i=Q(i/n)$ with $Q$ having $k$ derivatives, $\mathrm{TV}(\theta^*)$ is the discrete analogue of the total variation of $Q^{(k)}$, and it stays bounded when $Q^{(k+1)}$ is integrable. Here $Q=f+q_\tau$ includes the noise quantile curve.
+
+\paragraph{Where they enter the proof.}
+Write $\delta=\theta-\theta^*$. The posterior depends on the data only through the check loss, and every probability in Theorem~\ref{thm:main} is under the true law of $y$. The expected excess check loss is
+\[
+\mathcal{L}(\delta)=\mathbb{E}\sum_{i=1}^n\bigl\{\rho_\tau(y_i-\theta^*_i-\delta_i)-\rho_\tau(y_i-\theta^*_i)\bigr\}=\sum_{i=1}^n\int_0^{\delta_i}\bigl\{F_{y_i}(\theta^*_i+z)-\tau\bigr\}\,dz .
+\]
+Assumption~\ref{ass:B} gives $F_{y_i}(\theta^*_i)=\tau$, so the integrand has the sign of $z$ and $\mathcal{L}(\delta)\ge0$, with equality only at $\delta=0$ when $F_{y_i}$ is strictly increasing at $\theta^*_i$. This is why the posterior concentrates at the $\tau$-quantile whatever the distribution of the data.
+
+Assumption~\ref{ass:A} gives the curvature of $\mathcal{L}$. For $|z|\le L$ the integrand is at least $\underline f|z|$ in absolute value, and for $|z|>L$ it is at least $\underline f L$ by monotonicity of $F_{y_i}$. Integrating,
+\[
+\mathcal{L}(\delta)\ge\tfrac12\,\underline f\,\min\{1,L\}\;n\,\Delta_n^2(\delta).
+\]
+The excess loss is quadratic in $\delta_i$ near zero and linear far from it, which is the shape of $\Delta_n^2$; this is why the contraction is measured in that loss. A large $\mathcal{L}(\delta)$ makes the numerator of the posterior small on the shells away from $\theta^*$.
+
+Assumption~\ref{ass:B} gives the upper bound $\mathcal{L}(\delta)\le\tfrac12\bar f\|\delta\|_2^2$ for $\|\delta\|_\infty\le L$. Neighborhoods of $\theta^*$ defined by the excess loss therefore contain Euclidean balls, so the prior mass of a small ball bounds the denominator of the posterior from below. The proof first shows that the posterior puts all but exponentially small mass on a set where $\|\delta\|_\infty\le L$, so the two margins apply in every coordinate. The bound $\bar V$ enters the same step through the prior mass near a locally smoothed version of $\theta^*$. The constants $M$, $C$ and $c_0$ of Theorem~\ref{thm:main} depend on $L$, $\underline f$, $\bar f$ and $\bar V$ only.
+
+\paragraph{Verification for the simulation settings.}
+The settings are the signals~\eqref{eq:sim_vs} and \eqref{eq:sim_s}, the three noise families of Section~\ref{sec:simulations}, the eleven levels $\tau\in\{0.05,0.25,0.50,0.75,0.95\}$ and $\{0.90,0.93,0.96,0.97,0.98,0.99\}$, and $k=2$. Assumptions~\ref{ass:A} and \ref{ass:B} depend only on the noise family and $\tau$, and $V^*$ depends on all three. The noise law at $i$ depends on $i$ only through $u_i=i/n\in(0,1]$ and varies continuously with it, so all constants below are uniform in $n$.
+
+Table~\ref{tab:ass:margins} reports, for $L=0.1$, the smallest and largest value of $|F_u(q_\tau(u)+\delta)-F_u(q_\tau(u))|/|\delta|$ over $0<|\delta|\le L$ and $u\in(0,1]$, computed on a grid of 2000 values of $u$. These are admissible values of $\underline f$ and $\bar f$. Assumptions~\ref{ass:A} and \ref{ass:B} hold in all $33$ combinations of noise family and level. The smallest $\underline f$ is $0.031$, for mixed normal noise at $\tau=0.99$. The largest $\bar f$ is $10.74$, for Beta noise at $\tau=0.05$. The global density bounds are $1.596$, $11$ and $0.564$ for the Gaussian, Beta and mixed normal families, so $\bar f$ cannot exceed these values.
+
+\begin{table}[t]
+\centering
+\caption{Margin constants $\underline f$ (smallest) and $\bar f$ (largest) of Assumptions~\ref{ass:A} and \ref{ass:B} for $L=0.1$, by noise family and quantile level. Each entry is the infimum or supremum of $|F_u(q_\tau(u)+\delta)-F_u(q_\tau(u))|/|\delta|$ over $0<|\delta|\le L$ and $u\in(0,1]$.}
+\label{tab:ass:margins}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{2}{c}{Gaussian} & \multicolumn{2}{c}{Beta} & \multicolumn{2}{c}{Mixed normal}\\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+$\tau$ & $\underline f$ & $\bar f$ & $\underline f$ & $\bar f$ & $\underline f$ & $\bar f$\\
+\midrule
+$0.05$ & $0.175$ & $0.566$ & $0.500$ & $10.74$ & $0.125$ & $0.164$\\
+$0.25$ & $0.591$ & $1.419$ & $1.000$ & $9.68$ & $0.411$ & $0.470$\\
+$0.50$ & $0.793$ & $1.596$ & $1.000$ & $8.18$ & $0.540$ & $0.564$\\
+$0.75$ & $0.591$ & $1.419$ & $0.881$ & $5.65$ & $0.411$ & $0.470$\\
+$0.95$ & $0.175$ & $0.566$ & $0.305$ & $1.44$ & $0.125$ & $0.164$\\
+$0.90$ & $0.308$ & $0.890$ & $0.514$ & $2.59$ & $0.218$ & $0.271$\\
+$0.93$ & $0.231$ & $0.710$ & $0.396$ & $1.92$ & $0.165$ & $0.210$\\
+$0.96$ & $0.145$ & $0.484$ & $0.254$ & $1.19$ & $0.104$ & $0.138$\\
+$0.97$ & $0.113$ & $0.393$ & $0.200$ & $1.00$ & $0.081$ & $0.110$\\
+$0.98$ & $0.079$ & $0.291$ & $0.141$ & $1.00$ & $0.057$ & $0.079$\\
+$0.99$ & $0.042$ & $0.170$ & $0.076$ & $1.00$ & $0.031$ & $0.044$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+For Gaussian noise the density at the quantile is $\varphi(z_\tau)/s(u)$ with $s(u)\in[0.25,0.5]$, which ranges from $0.798$ to $1.596$ at $\tau=0.50$. For mixed normal noise it is a smooth mixture of two normal densities and stays between $0.036$ and $0.564$ at all levels. Under Beta noise $F_u(x)=1-(1-x)^{b}$ on $[0,1]$ with $b=11-10u\in[1,11)$, so the density is $b(1-x)^{b-1}$. Two features need a remark. First, the density jumps from zero to $b$ at the origin, and at small $\tau$ the quantile lies close to the jump: its distance from the origin is $0.0047$ at $\tau=0.05$ and $0.026$ and $0.061$ at $\tau=0.25$ and $0.50$, in each case as $u\to0$. A lower density bound would then hold only for $L<0.0047$. Assumption~\ref{ass:A} is stated for increments of $F_{y_i}$: once $\theta^*_i+\delta$ leaves the support, the increment equals $\tau$ and the ratio is $\tau/|\delta|\ge\tau/L$. This gives $\underline f=0.500$ at $\tau=0.05$, against a density of up to $10.5$ at the quantile. Second, $b\ge1$ on the whole design, so the density does not blow up at the upper endpoint, and the quantile stays at distance at least $1-\tau$ from it. Assumption~\ref{ass:B} would fail for a design that reaches $b<1$.
+
+Table~\ref{tab:ass:tv} reports $V^*=n^2\|D^{(3)}\theta^*\|_1$ with $\theta^*_i=f(u_i)+q_\tau(u_i)$, as a range over the eleven levels. The quantile curves $q_\tau$ are smooth on $[0,1]$ in all three families, so $V^*$ converges to $\int_0^1|(f+q_\tau)'''(u)|\,du$ as $n\to\infty$. The values at $n=500$ and $n=16000$ are close, which is consistent with this limit, so $V^*\le\bar V$ holds in all $66$ combinations of signal, noise family and level.
+
+\begin{table}[t]
+\centering
+\caption{Total variation $V^*=n^2\|D^{(3)}\theta^*\|_1$ of the true quantile curve for the signals~\eqref{eq:sim_vs} and \eqref{eq:sim_s}, as the minimum and maximum over the eleven quantile levels.}
+\label{tab:ass:tv}
+\begin{tabular}{llcc}
+\toprule
+Signal & Noise & $n=500$ & $n=16000$\\
+\midrule
+VS & Gaussian & $7275.6$ & $7282.8$\\
+VS & Beta & $7282.9$--$7310.8$ & $7290.6$--$7319.5$\\
+VS & Mixed normal & $7275.5$--$7275.9$ & $7282.7$--$7283.1$\\
+S & Gaussian & $156.4$ & $157.9$\\
+S & Beta & $141.8$--$177.1$ & $143.5$--$179.2$\\
+S & Mixed normal & $156.3$--$156.6$ & $157.8$--$158.1$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The noise quantile curve contributes little. For Gaussian noise $q_\tau(u)=s(u)z_\tau$ is a quadratic polynomial in $u$, which $D^{(3)}$ annihilates, so $V^*$ equals the total variation of $f$ and does not depend on $\tau$. For mixed normal noise the contribution is between $0.17$ and $1.22$. For Beta noise it is between $9.5$ and $45.1$, which moves $V^*$ by about $-10\%$ to $+13\%$ for S and is invisible for VS. For S the limit is $16\pi^2=157.9$, the integral of $|f'''|$ for $f(u)=\sin(2\pi u)$. The value $7.3\times10^3$ for VS comes from the localized bump; it is about $46$ times the value for S, so the constants of Theorem~\ref{thm:main} are larger for VS.
+
+The constants of the theorem also degrade where $\underline f$ is small, at $\tau\ge0.96$ and for Beta noise at $\tau=0.05$. The assumptions still hold there, so the rate is unchanged. The asymmetric Laplace likelihood is a working model and plays no role in the assumptions, which concern only the law of $y_i$; its consequences are discussed after Theorem~\ref{thm:main}.
