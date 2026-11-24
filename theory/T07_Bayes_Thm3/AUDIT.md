@@ -84,3 +84,33 @@ Felipe's ruling (2026-11-24): Padilla is a template, not a law. Any borrowed ite
 | Lemma 16 | ker D^{(r)} = polynomials | Used as is (elementary; re-proved in Lemma 1) |
 | Prop 3, Lemmas 17–25 | localization, incl. Δ vs ℓ₂ comparison | Avoided. Lemma 24/19 is false for entries ≫ 1 (Astra-2 #2). Our localization (Lemmas 8–10, Prop 2) is self-contained and compares Δ and ℓ₂ only where ‖δ‖_∞ ≤ 1 |
 | Theorem 3 | mode rate | Not used by the main theorem. Mode corollary: to be re-proved self-contained under A + B (Felipe, 2026-11-24) |
+
+**Pending style instruction (HQ, 2026-11-24).** If Felipe picks the log-free theorem plus lower bound as the headline, both theorem blocks are written like Padilla's: "there exist constants M, C depending only on …". The explicit formulas for M, C and c₀ move into the proof or a remark. This goes into the prover's fix-round brief.
+
+### Astra-1, feedback on the proof draft (`astra/ASTRA1_proof_feedback.md`), 2026-11-24
+
+The file was restored by me from Astra-1's thread, because its `owls_run tee` heredoc wrote an empty file.
+
+| # | Astra-1 severity | Theory head's check | Ruling and action |
+|---|---|---|---|
+| 1 | GAP: Prop 1 bandwidth divides by V̄ = 0 | True: w = ⌊n(ε/(2C_sV̄))^{2/(2r−1)}⌋ is undefined at V̄ = 0. With u° = 0, the approximation and shift terms vanish and Lemma 4 gives the first summand of C_pr | HOLDS (boundary case). Prover adds the branch |
+| 2 | ERROR (wording): Remark "same order" | These are upper bounds; for a polynomial truth they are 0 | HOLDS. Reword as "at most of order" |
+| 3 | ERROR (wording): Remark r=2, "any polynomial loss breaks it" | Redone: a loss n^γ gives ρ^{5/4} ≍ n^{γ−3/8}, so ρ² ≍ n^{−3/5+8γ/5} and ρ²T ≍ n^{−1/10+8γ/5} → 0 iff γ < 1/16 | HOLDS. Reword: a loss of n^{1/16} or more would break it |
+| 4 | IMPRECISION: Lemma 5 at a = 0 or δ_A = 0 | True. The fix (integrate over \|t\| ≤ 1/λ, which is inside the old range because λϱ/(2δ_A) ≥ 1) gives the same constant | HOLDS. Prover applies the fix |
+| 5 | IMPRECISION: ordered pairs in the quadratic-form variance | True; the formula is right, the sentence is not | HOLDS. Reword |
+| 6 | IMPRECISION: "realized numerator" | Prop 3 bounds E[N(E_a)1_Ω]; the point of Remark 6 (the score is never averaged) is unaffected | HOLDS. Reword Remark 6 and the status table |
+
+**Track record and switch to spot-checks.** All 24 Astra claims checked so far (Astra-1: 4 + 6 + 12 OK computations, which I had redone myself in my own pass; Astra-2: 14) held up. From now on, for IMPRECISION or OK items, I spot-check instead of redoing every one. ERROR and GAP items, and every finding of the formal audit, still get my full check. Reason: 24/24 correct, and the remaining risk is concentrated in ERROR/GAP claims.
+
+### Mode corollary plan (`T07d_mode_plan.md`), 2026-11-24
+
+The gate passed: about 1.5 pages, no new tool. Padilla's Theorem 3, Prop 3 and Lemmas 17–25 are not used. I checked the plan:
+- Basic inequality: L̂(sδ̂) + λ_TV·TV(sδ̂) ≤ 2λ_TV·V* along the ray (by convexity).
+- Norm face: (3f/8)nρ² > 2λ_TV·V̄ iff C_ρ > 16cV̄/(3f).
+- TV face: λ_TV·(T − 2V̄) = (f/4)nρ² > G.
+- The width gives J ≍ n^{1/(2r+1)}(log n)^{1/(2r+1)}, the same order as nρ², so a large C_ρ absorbs it.
+
+Rulings:
+- r ≥ 2 only, the same as the main theorem; r = 1 goes in as a remark sketch. Accepted.
+- Log power (log n)^{1/(2r+1)}, the same as Padilla's. Accepted.
+- Any c > 0; no threshold c_{1,ε} is needed. Accepted.
