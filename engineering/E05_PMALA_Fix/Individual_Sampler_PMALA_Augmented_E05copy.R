@@ -1,5 +1,6 @@
 # E-05 COPY of method/individual/Individual_Sampler_PMALA_Augmented.R (the original is never edited).
 # Only change: the curvature-metric cap 1e8 is read from getOption("bqtf.metric_cap", 1e8) (default = original behaviour).
+# Settings block below: UNUSED by e05_pmala_fix.R (the driver passes every setting explicitly, incl. order = 2L); synced to the master 2026-11-24.
 # =============================================================================
 # Bayesian quantile trend filtering: proper P-MALA (Pereyra 2016) on the
 # ALD posterior via the Kozumi-Kobayashi normal-exponential augmentation.
@@ -72,21 +73,21 @@ load_prox_cpp <- function(src) {
 # target efficiency metric): ASIS lambda step ON (lambda-ESS per hour 87 vs 50, half-chain lambda drift 0.10 vs 0.26, MSE geometric
 # mean ratio 0.96); early exit OFF (no wall-time gain at a 150-iteration budget); K = 1 (K = 3, 5 raise theta-ESS 3-4x but cost
 # 3.6-6x); joint lambda jump OFF (lambda-ESS per hour 28-39, below ASIS).  See variant_adoption_summary.csv.
-seed        <- 100
+seed        <- 1
 n           <- 500L
 tau         <- 0.5
 baseline_id <- "VS"
 noise_id    <- "Normal"
-order       <- 1L          # k: piecewise quadratic; D = 3rd differences
+order       <- 2L          # k: piecewise quadratic; D = 3rd differences
 prior_scale <- "none"      # "none": Laplace prior exp(-lambda ||D theta||_1) (the paper's prior) | "sigma": Park-Casella scale sigma/lambda.
                            # "sigma" gives the same MSE but has a runaway mode (lambda enters sigma's rate and sigma enters lambda's:
                            # sigma -> 1e5, lambda -> (a0+m)/b0, theta detaches from the data; seen in 1 of 60 cell-runs), so "none" is the default.
-a0 <- 1;  b0 <- 0.001      # Gamma prior on lambda: rate b0 << ||D theta||_1 of a smooth fit so lambda is data-driven (b0 >= 0.1 is clearly worse)
+a0 <- 1;  b0 <- 0.01      # Gamma prior on lambda: rate b0 << ||D theta||_1 of a smooth fit so lambda is data-driven (b0 >= 0.1 is clearly worse)
 a_sigma <- 0.1; b_sigma <- 0.1     # IG prior on sigma (paper value; 0.01/0.01 gives identical results at n = 500)
-gibbs_iter  <- 20000      # lambda equilibrates slowly for smooth truths (see notes); 30k/10k is the pilot setting
-gibbs_burn  <- 5000
+gibbs_iter  <- 30000      # lambda equilibrates slowly for smooth truths (see notes); 30k/10k is the pilot setting
+gibbs_burn  <- 10000
 delta_init  <- 0.2        # posterior-scale step under metric = "curv"
-adapt_target <- 0.55       # Robbins-Monro on log(delta) during burn-in
+adapt_target <- 0.50       # Robbins-Monro on log(delta) during burn-in
 adapt_gain   <- 1.0
 adapt_kappa  <- 0.6
 delta_bounds <- c(1e-8, 100)
@@ -110,7 +111,7 @@ lamjump      <- FALSE      # joint (lambda, theta) Metropolis move once per swee
                            # re-shrinks the roughness of theta to the lambda' scale, so lambda can jump while theta follows (the conjugate
                            # and ASIS draws only move lambda by a few % per sweep because ||D theta||_1 ~ m/lambda is locked to lambda).
 lamjump_s    <- 0.3        # initial log-scale step of the lambda jump; Robbins-Monro adapted to acceptance 0.25
-asis_lambda  <- FALSE       # ancillary-sufficient interweaving for lambda: after the conjugate draw, redraw lambda holding
+asis_lambda  <- TRUE       # ancillary-sufficient interweaving for lambda: after the conjugate draw, redraw lambda holding
                            # u~ = lambda * D theta and the polynomial part of theta fixed (theta rescales with lambda);
                            # 1-d slice sampler on log lambda, target p(lambda) * L(theta(lambda)).  Valid Gibbs variant (Yu & Meng 2011).
 admm_rho     <- NULL       # ADMM penalty; NULL -> 0.1 * (mean(d) + c) / gamma at call time
