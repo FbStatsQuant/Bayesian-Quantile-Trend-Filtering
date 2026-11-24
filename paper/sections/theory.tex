@@ -1,10 +1,92 @@
+% !TeX root = ../main.tex
+% Section 3. Mathematics from writing/W03_Theorem/theorem.tex (audited), in the paper's notation: r = k + 1.
+\providecommand{\TV}{\mathrm{TV}}
+\providecommand{\lamtv}{\lambda_{\TV}}
+\providecommand{\thetas}{\theta^{*}}
+\providecommand{\fl}{\underline f}
+\providecommand{\fu}{\bar f}
+\providecommand{\Vb}{\bar V}
+\renewcommand{\theassumption}{\Alph{assumption}}
+
 \section{Theory}\label{sec:theory}
 
-\subsection{Assumptions}\label{sec:assumptions}
-[TODO W-04 phase 2.]
+This section studies the posterior of Section~\ref{sec:methodology} when the penalty $\lambda$ and the scale $\sigma$ are held fixed. Section~\ref{sec:assumptions} describes the setting and states two assumptions on the distribution of the data. Section~\ref{sec:main-result} presents the posterior contraction theorem, which gives the exact rate at which the posterior concentrates around the true quantiles, and discusses the rate and the role of the working likelihood. Section~\ref{sec:theory-remarks} relates the fixed $\lambda$ and $\sigma$ of the theorem to the priors used by the sampler. All proofs are in Appendix~\ref{app:proofs}.
 
-\subsection{Main result}\label{sec:main-result}
-[TODO W-04 phase 2.]
+\subsection{Setting and assumptions}\label{sec:assumptions}
 
-\subsection{Remarks}\label{sec:theory-remarks}
-[TODO W-04 phase 2.]
+Fix a quantile level $\tau\in(0,1)$ and an order $k\ge1$. We observe independent $y_1,\dots,y_n$ with distribution functions $F_{y_1},\dots,F_{y_n}$, and $\thetas_i$ denotes the $\tau$-quantile of $y_i$; the vector $\thetas=(\thetas_1,\dots,\thetas_n)$ is the target. The observations need not be identically distributed, and the asymmetric Laplace density \eqref{eq:ald} is used as a working likelihood only: the data are not assumed to follow it. For $\theta,v\in\R^n$, let
+\[
+\TV(\theta)=n^{k}\norm{D\theta}_1,\qquad V^{*}=\TV(\thetas),\qquad
+\Delta_n^2(v)=\frac1n\sum_{i=1}^n\min\{|v_i|,v_i^2\}.
+\]
+The factor $n^k$ is the usual scaling of the differences of order $k+1$ on an equally spaced grid: if $\thetas_i=Q(i/n)$ for a function $Q$ on $[0,1]$ whose $k$th derivative has bounded variation, then $V^{*}$ remains bounded as $n$ grows. The loss $\Delta_n^2$ is that of \citet{madrid2022risk}; it is quadratic in the small errors and linear in the large ones.
+
+In the results of this section $\lambda$ is deterministic and $\sigma$ is fixed. We take $\sigma=1$ for simplicity; Theorem~\ref{thm:main} extends to any fixed $\sigma$. Under the working likelihood \eqref{eq:ald} and the prior \eqref{eq:prior_theta}, the posterior of $\theta$ is, for every Borel set $B\subset\R^n$,
+\begin{equation}\label{eq:post-fixed}
+\Pi_\lambda(B\mid \by)=\frac{\int_B\exp\{-\sum_{i=1}^n\rho_\tau(y_i-\theta_i)-\lambda\norm{D\theta}_1\}\,d\theta}
+{\int_{\R^n}\exp\{-\sum_{i=1}^n\rho_\tau(y_i-\theta_i)-\lambda\norm{D\theta}_1\}\,d\theta}.
+\end{equation}
+This is the conditional posterior of $\theta$ given $(\lambda,\sigma)$ in Section~\ref{sec:methodology}, at $\sigma=1$. It is proper, although the prior is flat on the polynomials of degree at most $k$ (Appendix~\ref{app:proofs}). Since $\lambda\norm{D\theta}_1=\lamtv\TV(\theta)$ with $\lamtv=\lambda/n^{k}$, we state the order of the penalty both for $\lambda$ and for $\lamtv$.
+
+We can now state the two assumptions, both on the distribution functions near the target quantiles. They are inspired by \citet{madrid2022risk}: Assumption~\ref{ass:A} is their condition, and Assumption~\ref{ass:B} is the corresponding upper bound.
+
+\begin{assumption}[Lower bound near the quantile]\label{ass:A}
+There exist constants $L>0$ and $\fl>0$ such that for any $n$, any $\delta\in\R^n$ with $\|\delta\|_\infty\le L$ and all $i$,
+\[
+\bigl|F_{y_i}(\thetas_i+\delta_i)-F_{y_i}(\thetas_i)\bigr|\ge\fl\,|\delta_i|.
+\]
+\end{assumption}
+
+Assumption~\ref{ass:A} requires each distribution function to grow at least linearly within distance $L$ of its $\tau$-quantile. It holds when $y_i$ has a density bounded below by $\fl$ on $[\thetas_i-L,\thetas_i+L]$, but no density is required.
+
+\begin{assumption}[Upper bound near the quantile]\label{ass:B}
+There exists a constant $\fu<\infty$ such that, for the same $L$, any $n$, any $\delta\in\R^n$ with $\|\delta\|_\infty\le L$ and all $i$,
+\[
+\bigl|F_{y_i}(\thetas_i+\delta_i)-F_{y_i}(\thetas_i)\bigr|\le\fu\,|\delta_i|.
+\]
+\end{assumption}
+
+Assumption~\ref{ass:B} is the matching upper bound, satisfied when the density of $y_i$ is bounded above by $\fu$ on the same interval. It excludes an atom at the quantile, so $F_{y_i}(\thetas_i)=\tau$. Neither assumption involves moments of $y_i$, so heavy-tailed noise such as Cauchy noise is allowed. The last requirement concerns the signal: there is a constant $\Vb$ such that $V^{*}\le\Vb$ for all $n$. A more complete analysis of the assumptions, including their verification for the noise distributions and signals of Section~\ref{sec:numerical}, is given in Appendix~\ref{app:assumptions}.
+
+\subsection{Posterior contraction}\label{sec:main-result}
+
+The main theorem states that, with $\lambda$ of order $n^{(2k+1)/2}$, the posterior concentrates around $\thetas$ at the rate $n^{-(2k+1)/(2k+2)}$ in the loss $\Delta_n^2$ and that, for this penalty, it does not concentrate faster. We write $\E_{\thetas}$ for expectation under the true distribution of $\by$.
+
+\begin{theorem}\label{thm:main}
+Let $y_1,\dots,y_n$ be independent and satisfy Assumptions~\ref{ass:A} and~\ref{ass:B}, and let $V^{*}\le\Vb$ for all $n$. Let $\sigma=1$ and
+\[
+\lambda=c\,n^{(2k+1)/2},\qquad\text{equivalently}\qquad\lamtv=c\,n^{1/2},
+\]
+with a constant $c>0$. Then there exist constants $M$, $C$, $c_0>0$ and $n_0$, depending only on $c$, $k$, $L$, $\fl$, $\fu$ and $\Vb$, such that for all $n\ge n_0$
+\begin{align*}
+&\text{\upshape(a)}\quad \E_{\thetas}\,\Pi_\lambda\bigl(\theta:\ \Delta_n^2(\theta-\thetas)>M\,n^{-(2k+1)/(2k+2)}\bigm|\by\bigr)\le C\,n^{-1/(2k+2)},\\
+&\text{\upshape(b)}\quad \E_{\thetas}\,\Pi_\lambda\bigl(\theta:\ \Delta_n^2(\theta-\thetas)\le c_0\,n^{-(2k+1)/(2k+2)}\bigm|\by\bigr)\le 2\,n^{-1/(2k+2)}.
+\end{align*}
+The bounds are uniform over all laws of $\by$ that satisfy Assumptions~\ref{ass:A} and~\ref{ass:B} with the given constants and $V^{*}\le\Vb$. The same holds for any fixed $\sigma=\sigma_0>0$, with constants depending also on $\sigma_0$.
+\end{theorem}
+
+Theorem~\ref{thm:main} makes two assertions. The first, (a), is an upper bound: apart from posterior mass that vanishes in expectation, posterior draws lie within $M\,n^{-(2k+1)/(2k+2)}$ of $\thetas$ in the loss $\Delta_n^2$. The second, (b), is a lower bound: the posterior mass of the ball of radius $c_0\,n^{-(2k+1)/(2k+2)}$ around $\thetas$ vanishes as well. The posterior therefore contracts at the rate $n^{-(2k+1)/(2k+2)}$, and this rate is exact, with no logarithmic factor and no smaller power. For the default $k=2$, $\lambda=c\,n^{5/2}$ and the rate is $n^{-5/6}$.
+
+The proof, in Appendix~\ref{app:proofs}, writes the posterior as a ratio and treats its two terms separately. The denominator is bounded below through the prior mass of a ball centered at a locally smoothed version of $\thetas$. The numerator is bounded above on shells around $\thetas$, after a localization step that confines the posterior to a set on which $\|\theta-\thetas\|_\infty\to0$, so that Assumptions~\ref{ass:A} and~\ref{ass:B} apply to every coordinate. The localization step is where $k\ge1$ is needed.
+
+\begin{remark}[Comparison with the rate of the estimator]
+\citet{madrid2022risk} obtain the rate $n^{-(2k+2)/(2k+3)}$, up to a logarithmic factor, for the quantile trend filtering estimator. The whole posterior is slower. It averages over windows of order $\lambda^{1/(k+1)}$ points, so its own spread is $\Delta_n^2\asymp\lambda^{-1/(k+1)}$, while its smoothing bias is of order
+\[
+V^{*2}\lambda^{(2k+1)/(k+1)}n^{-(2k+1)}.
+\]
+The two balance at $\lambda\asymp n^{(2k+1)/2}$, which gives $n^{-(2k+1)/(2k+2)}$, the exponent of the lower bound for linear estimators over this class (\citealp{donoho1998minimax}; \citealp[Section~5.1]{tibshirani2014adaptive}). The posterior mode is the quantile trend filtering estimator with tuning $\sigma_0\lamtv$, and at $\lamtv=c\,(n\log n)^{1/(2k+3)}$ every mode attains $\Delta_n^2\le C\,n^{-(2k+2)/(2k+3)}(\log n)^{1/(2k+3)}$ with probability at least $1-C(n\log n)^{-1/(2k+3)}$, by the localization argument of Appendix~\ref{app:proofs}.
+\end{remark}
+
+\begin{remark}[Misspecification]
+The asymmetric Laplace density is a working likelihood: we do not assume that the data follow it, and every probability statement in Theorem~\ref{thm:main} is under the true distribution of the data. The posterior is therefore a Gibbs posterior, or quasi-posterior, built on the check loss, in which $1/\sigma$ acts as a learning rate \citep{syring2023gibbs,atchade2017contraction}. It concentrates on the true $\tau$-quantile because, whatever the distribution of $y_i$, the $\tau$-quantile minimizes the expected check loss and hence the Kullback--Leibler divergence from the truth to the asymmetric Laplace family \citep{sriram2013posterior}. Misspecification changes the spread of the posterior and not its center, so the theorem describes where the posterior concentrates and how fast, not the frequentist coverage of its credible sets \citep{yang2016posterior}.
+\end{remark}
+
+\subsection{The penalty and the scale in practice}\label{sec:theory-remarks}
+
+Theorem~\ref{thm:main} fixes $\lambda$ at a given order and fixes $\sigma$. The sampler of Section~\ref{sec:methodology} fixes neither: both have the priors \eqref{eq:hyperpriors} and are updated with the trend. We describe how the two settings relate.
+
+For the penalty, the full conditional \eqref{eq:lambdaupdate} is $\lambda\mid\theta,\by\sim\mathrm{Gamma}(a_0+m,\ b_0+\norm{D\theta}_1)$, with mean $(a_0+m)/(b_0+\norm{D\theta}_1)$. Under a weak prior, the roughness $\norm{D\theta}_1$ of the current trend sets the penalty: $\lambda$ is large when the trend is smooth and small when it is rough. The rate $b_0$ enters only through the sum $b_0+\norm{D\theta}_1$, so it matters only when $\norm{D\theta}_1$ is of the order of $b_0$ or smaller, that is, for trends that are nearly polynomials of degree $k$. Its role is to guard this unrealistically smooth case, in which the conditional mean of $\lambda$ would otherwise be unbounded.
+
+For the scale, once the latent variables are integrated out, $\sigma\mid\theta,\by\sim\mathrm{IG}(n+a_\sigma,\ S(\theta)+b_\sigma)$ with $S(\theta)=\sum_{i=1}^n\rho_\tau(y_i-\theta_i)$. Hence $\sigma$ concentrates near $S(\theta)/n$, which is close to the average check loss $\bar\sigma_n=n^{-1}\sum_{i=1}^n\E\,\rho_\tau(y_i-\thetas_i)$ when this average is finite and bounded away from zero; this excludes Cauchy noise. The scale is thus data driven, and Theorem~\ref{thm:main} with $\sigma_0=\bar\sigma_n$ describes the posterior at that scale.
+
+A posterior with random $\lambda$ and $\sigma$ differs from the posterior \eqref{eq:post-fixed} of the proof, and we do not claim a contraction result for it. The choice is pragmatic: it keeps the method free of tuning, since no penalty is selected by cross-validation or by an information criterion.
