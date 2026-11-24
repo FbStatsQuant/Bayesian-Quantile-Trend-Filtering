@@ -1,0 +1,4 @@
+source=/home/fb31/projects/Quant_Reg
+mode=dir
+archived_by=BQTF Engineering E-01, 2026-11-22T16:09:54-06:00
+note=symlinks are not archived (listed in SYMLINKS.txt; all point into /scratch/fb31/qr_data, which is empty)
