@@ -19,7 +19,7 @@ Let $D = D^{(k+1)} \in \R^{m \times n}$ be the difference operator of order $k+1
     p(\theta \mid \lambda) \propto \lambda^{m} \exp\!\left\{-\lambda \norm{D\theta}_1\right\}.
     \label{eq:prior_theta}
 \end{equation}
-The prior is flat on the null space of $D$, the polynomials of degree at most $k$, and the single global rate $\lambda$ controls the overall smoothing. The rate and the likelihood scale $\sigma$ receive conjugate priors, in the shape and rate parameterizations,
+The prior is flat on the null space of $D$, the polynomials of degree at most $k$, and the single global rate $\lambda$ controls the overall smoothing; we refer to $\lambda$ as the penalty. The rate and the likelihood scale $\sigma$ receive conjugate priors, in the shape and rate parameterizations,
 \begin{equation}
     \lambda \sim \mathrm{Gamma}(a_0, b_0), \qquad \sigma \sim \mathrm{IG}(a_\sigma, b_\sigma).
     \label{eq:hyperpriors}
@@ -87,7 +87,7 @@ We sample \eqref{eq:posterior} by a four-block Gibbs sampler, Bayesian-PMALA. A 
         \label{eq:zupdate}
     \end{equation}
     where $\mathrm{InvGauss}(\mu, \nu)$ is the inverse Gaussian distribution with mean $\mu$ and shape $\nu$. The draw is exact, and it refreshes the weights $w_i$ and pseudo-responses $r_i$ that define $U$ in the next sweep.
-    \item \emph{Regularization parameter $\lambda$.} Given $\theta$,
+    \item \emph{Penalty $\lambda$.} Given $\theta$,
     \begin{equation}
         \lambda \mid \theta, \by \sim \mathrm{Gamma}\!\left(a_0 + m,\ b_0 + \norm{D\theta}_1\right).
         \label{eq:lambdaupdate}
@@ -205,7 +205,7 @@ Within a sweep, level $j$ is updated by the five steps of Section~\ref{subsec:in
 \begin{enumerate}
     \item \emph{Trend $\theta_j$.} The draw is the individual P-MALA move restricted to $B_j$: the proximal map is solved over the box, the metric $M_j$ and the step size $\delta_j$ belong to level $j$, and a proposal outside $B_j$ is rejected. This step and the interweaving redraw of step 3 are the only ones that involve the other levels.
     \item \emph{Latent variables $z_j$.} Unchanged: \eqref{eq:zupdate} at $\tau=\tau_j$.
-    \item \emph{Regularization parameter $\lambda_j$.} The conjugate draw \eqref{eq:lambdaupdate} is unchanged. The interweaving redraw of $(\lambda_j,\theta_j)$ is restricted to the values for which $\theta_j$ stays in $B_j$.
+    \item \emph{Penalty $\lambda_j$.} The conjugate draw \eqref{eq:lambdaupdate} is unchanged. The interweaving redraw of $(\lambda_j,\theta_j)$ is restricted to the values for which $\theta_j$ stays in $B_j$.
     \item \emph{Likelihood scale $\sigma_j$.} Unchanged: \eqref{eq:sigmaupdate} at $\tau=\tau_j$.
     \item \emph{Step size $\delta_j$.} Each level has its own step size, updated toward acceptance $0.5$.
 \end{enumerate}

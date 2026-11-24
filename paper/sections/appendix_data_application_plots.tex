@@ -1,8 +1,8 @@
 % !TeX root = ../main.tex
-\section{Additional Real-Data Figures}
+\section{Additional real-data figures}
 \label{app:data_plots}
 
-\subsection{Air Quality Data: ADMM Benchmark Fits}
+\subsection{Air-quality data: ADMM benchmark fits}
 \label{app:spod_admm}
 
 This appendix reports the ADMM benchmark fits of Section~\ref{sec:app:spod} and the detrended series they produce, laid out as Figures~\ref{fig:spod_quantiles_pmala} and~\ref{fig:spod_detrended_pmala}.
@@ -12,17 +12,17 @@ This appendix reports the ADMM benchmark fits of Section~\ref{sec:app:spod} and 
 	\begin{subfigure}{0.72\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/spod_quantiles_admm}
-		\caption{Baseline trends at $\tau \in \{0.01, 0.05, 0.1\}$, with $\lambda = 54.6$ at $\tau = 0.01$ and $\lambda = 1096.6$ at $\tau \in \{0.05, 0.1\}$ selected by eBIC.}
+		\caption{Baseline trends at $\tau \in \{0.01, 0.05, 0.1\}$, with $\lambda = 54.6$ at $\tau = 0.01$ and $\lambda = 1096.6$ at $\tau \in \{0.05, 0.1\}$ selected by extended BIC.}
 		\label{fig:spod_quantiles_admm}
 	\end{subfigure}
 	\par\medskip
 	\begin{subfigure}{0.72\textwidth}
 		\centering
 		\includegraphics[width=\textwidth]{figures/spod_detrended_admm}
-		\caption{Detrended series $\by - \widehat{\btheta}$ for the baselines in (a), one panel per quantile level. Horizontal lines mark the 90th (dashed), 95th (solid), and 99th (dotted) empirical percentiles of the detrended data.}
+		\caption{Detrended series $\by - \widehat{\theta}$ for the baselines in (a), one panel per quantile level. Horizontal lines mark the 90th (dashed), 95th (solid), and 99th (dotted) empirical percentiles of the detrended data.}
 		\label{fig:spod_detrended_admm}
 	\end{subfigure}
-	\caption{Air quality data: ADMM benchmark fits \citep{brantley2020baseline} on the 10-second means ($n = 8{,}640$) of SPod \texttt{d}, June 15, 2018, with $\lambda$ selected by eBIC. The layout is that of Figures~\ref{fig:spod_quantiles_pmala} and~\ref{fig:spod_detrended_pmala}.}
+	\caption{Air-quality data: ADMM benchmark fits \citep{brantley2020baseline} on the 10-second means ($n = 8{,}640$) of SPod \texttt{d}, June 15, 2018, with $\lambda$ selected by extended BIC. The layout is that of Figures~\ref{fig:spod_quantiles_pmala} and~\ref{fig:spod_detrended_pmala}.}
 	\label{fig:spod_admm}
 \end{figure}
 
@@ -72,15 +72,15 @@ This appendix reports the ADMM benchmark fits of Section~\ref{sec:app:spod} and 
 
 \fi
 
-\subsection{Growth Centiles}
+\subsection{Growth centiles}
 \label{app:growth}
 
-This appendix reports the growth-chart fits of Section~\ref{sec:app:growth} that are not shown there: the individual sampler for girls and the LMS centiles \citep{cole1992smoothing} for boys and girls. The P-MALA settings are those of Section~\ref{sec:app:growth}: $k = 2$, $\lambda \sim \mathrm{Gamma}(1,\sqrt{G})$, 6{,}000 iterations with 1{,}000 burn-in, and one independent run per level. The LMS curves are the 10th, 30th, 50th, 70th, and 90th centiles of the fitted Box--Cox Cole--Green distribution, evaluated on the same 0.1-year age grid.
+This appendix reports the growth-chart fits of Section~\ref{sec:app:growth} that are not shown there: the individual sampler for girls and the LMS centiles \citep{cole1992smoothing} for boys and girls. The settings of Bayesian-PMALA are those of Section~\ref{sec:app:growth}: $k = 2$, $\lambda \sim \mathrm{Gamma}(1,\sqrt{G})$, 6{,}000 sweeps with 1{,}000 burn-in, and one independent run per level. The LMS curves are the 10th, 30th, 50th, 70th, and 90th centiles of the fitted Box--Cox Cole--Green distribution, evaluated on the same 0.1-year age grid.
 
 \begin{figure}[htbp]
 	\centering
 	\includegraphics[width=0.75\textwidth]{figures/growth_pmala_girls}
-	\caption{Individual P-MALA/Gibbs fits for the height of 5{,}190 Dutch girls (Fifth Dutch Growth Study, 2009) at $\tau \in \{0.1, 0.3, 0.5, 0.7, 0.9\}$, $k = 2$. Curves are posterior means on the 0.1-year age grid; grey circles are the individual measurements. Each level is fitted independently.}
+	\caption{Bayesian-PMALA fits for the height of 5{,}190 Dutch girls (Fifth Dutch Growth Study, 2009) at $\tau \in \{0.1, 0.3, 0.5, 0.7, 0.9\}$, $k = 2$. Curves are posterior means on the 0.1-year age grid; gray circles are the individual measurements. Each level is fitted independently.}
 	\label{fig:growth_girls}
 \end{figure}
 

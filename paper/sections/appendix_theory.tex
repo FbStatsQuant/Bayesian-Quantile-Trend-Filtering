@@ -221,7 +221,11 @@ $s\le\sqrt{C_0}\,a\sqrt{n/w}+C'T(w/n)^{r-1}$ with $C'=(1+\sqrt{C_0})/(r-1)!$. If
 \end{proof}
 
 \begin{lemma}[concentration]\label{pf:lem:conc}
-Let $K\subset\R^n$ be compact and symmetric and $G_K=\sup_{\delta\in K}|\Lh(\delta)-\Lm(\delta)|$. Then
+Let $K\subset\R^n$ be compact and symmetric, and let
+\[
+G_K=\sup_{\delta\in K}|\Lh(\delta)-\Lm(\delta)|.
+\]
+Then
 $\E G_K\le4\E\sup_K\langle\xi,\delta\rangle$ and $\mathrm{Var}(G_K)\le\sup_K\|\delta\|_2^2$.
 \end{lemma}
 
@@ -260,7 +264,11 @@ because $4r^2-8r+1\ge1$ for $r\ge2$. This is the substantive use of $r\ge2$: at 
 \emph{Mass of $A_2$.} $\Gamma=\lambda\|u\|_1\sim\mathrm{Gamma}(m,1)$ under $\Ql$, and $t(\delta)\le\bar t:=\Gamma/(4n)+c\Vb/(4\sqrt n)\le\Gamma/(4n)+1/2$, so $A_2\subset\{\Gamma>2n\}$. By \eqref{pf:eq:vol}, $x^r\le r!e^x$, $\ind\{\Gamma>2n\}\le e^{(\Gamma-2n)/2}$ and $\E e^{\vartheta\Gamma}=(1-\vartheta)^{-m}$,
 $N(A_2)\le r!V_r(\sqrt n\rho_n)^r\E_{\Ql}[e^{(\alpha_n+1)\bar t}\ind\{\Gamma>2n\}]\le r!V_r(\sqrt n\rho_n)^re^{-n/4}$ for $n\ge n_2$.
 
-(b) Divide by Lemma~\ref{pf:lem:evid}: $\Pi_\lambda(K_n^c\mid y)\le r!(16/(\fl n\rho_n\en))^re^{-\alpha_n/2+C_En\en^2}+r!(2\rho_n/\en)^re^{-n/4+C_En\en^2}$. Since $n\en^2=o(n\rho_n^2)$ and $\rho_n/\en$ grows polynomially, this is at most $r!\{e^{-\alpha_n/4}+e^{-n/8}\}$ for $n\ge n_2$.
+(b) Divide by Lemma~\ref{pf:lem:evid}:
+\[
+\Pi_\lambda(K_n^c\mid y)\le r!(16/(\fl n\rho_n\en))^re^{-\alpha_n/2+C_En\en^2}+r!(2\rho_n/\en)^re^{-n/4+C_En\en^2}.
+\]
+Since $n\en^2=o(n\rho_n^2)$ and $\rho_n/\en$ grows polynomially, this is at most $r!\{e^{-\alpha_n/4}+e^{-n/8}\}$ for $n\ge n_2$.
 \end{proof}
 
 %----------------------------------------------------------------------
@@ -282,7 +290,11 @@ The $\zeta_i$ are i.i.d., centred, $|\zeta_i|\le1$, variance $v\le1/4$, so for s
 For $a>0$ let $E_a=\{\theta:\ \|\delta\|_\infty\le s_0,\ an\en^2<\|\delta\|_2^2\le2an\en^2\}$.
 
 \begin{proposition}[shells]\label{pf:prop:shell}
-Let $M>0$, $J=\lfloor(\fl^2/128)Mn\en^2\rfloor-r$ and $C_{\rm fine}=2^{2r+1}c_F^2(256/\fl^2)^{2r-1}$. There is $n_3$, depending only on $(M,c,r,\fl,\Vb)$, such that for $n\ge n_3$: $1\le J\le m$, $J\ge(\fl^2/256)Mn\en^2$, and for every $a\ge M$
+Let $M>0$,
+\[
+J=\lfloor(\fl^2/128)Mn\en^2\rfloor-r\qquad\text{and}\qquad C_{\rm fine}=2^{2r+1}c_F^2(256/\fl^2)^{2r-1}.
+\]
+There is $n_3$, depending only on $(M,c,r,\fl,\Vb)$, such that for $n\ge n_3$: $1\le J\le m$, $J\ge(\fl^2/256)Mn\en^2$, and for every $a\ge M$
 \[
 \E\bigl[N(E_a)\ind_{\Omega_\zeta(J)}\bigr]\le V_r(2an\en^2)^{r/2}\exp\Bigl\{-\frac{\fl}8an\en^2+\Bigl(1+\frac{C_{\rm fine}}{c^2M^{2r-1}}\Bigr)n\en^2\Bigr\}.
 \]
@@ -290,7 +302,10 @@ Let $M>0$, $J=\lfloor(\fl^2/128)Mn\en^2\rfloor-r$ and $C_{\rm fine}=2^{2r+1}c_F^
 
 \begin{proof}
 By Lemma~\ref{pf:lem:check}(c) and Cauchy--Schwarz in $L^2(\nu)$,
-$N(E_a)\le I_1^{1/2}I_2^{1/2}$ with $I_1=\int_{E_a}e^{2\langle\zeta,\delta\rangle}d\nu$ and $I_2=\int_{E_a}e^{-2\Rh(\delta)}d\nu$, $\Rh=\sum_iR_i(\delta_i)$.
+$N(E_a)\le I_1^{1/2}I_2^{1/2}$ with
+\[
+I_1=\int_{E_a}e^{2\langle\zeta,\delta\rangle}d\nu,\qquad I_2=\int_{E_a}e^{-2\Rh(\delta)}d\nu,\qquad \Rh=\sum_iR_i(\delta_i).
+\]
 
 \emph{Remainder.} On $E_a$, $\|\delta\|_\infty\le s_0$, so Lemma~\ref{pf:lem:check}(e), (d) and independence give $\E e^{-2\Rh(\delta)}\le e^{-\Lm(\delta)}\le e^{-(\fl/2)an\en^2}$; by Tonelli and \eqref{pf:eq:vol}, $\E I_2\le V_r(2an\en^2)^{r/2}e^{-(\fl/2)an\en^2}$.
 
