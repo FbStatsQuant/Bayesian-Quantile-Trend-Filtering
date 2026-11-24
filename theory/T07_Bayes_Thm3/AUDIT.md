@@ -143,3 +143,16 @@ Report: `astra/ASTRA_FORMAL_AUDIT.md`. Verdict: **PASS WITH FIXES**. Theorems 1�
 | 487, 591, 717, 739, 773, 939 | IMPRECISION: assumptions in some lemmas stronger than their proofs need | True but optional | NOTED, no change. Naturality: keep A + B uniform across all results |
 
 Track record: 8/8 formal-audit findings hold on my own check (all ERROR/GAP fully redone, IMPRECISIONs spot-checked). Overall Astra track record: 38/38.
+
+**Fixes applied (2026-11-24).** The prover applied all seven Part II fixes: remarks, outline and parentheticals only; no theorem or proof logic changed. Spot-checked lines 897 (λ → ∞ restored) and 938–939 (Padilla Lemmas 10–11 → "Replaced"). Status of T-07: CLOSED. Headline (HQ/Felipe, 2026-11-24): Thm 2 log-free + Prop 5 lower bound; log version as a remark; mode result secondary.
+
+### Padilla items: final status (supersedes the earlier table)
+
+| Padilla item | Final status |
+|---|---|
+| Assumption A | Used as is, plus our Assumption B |
+| Lemma 10 (symmetrization), Lemma 11 (contraction) | Replaced by the textbook absolute-value versions (van der Vaart–Wellner 2.3.6, Ledoux–Talagrand 4.12); his are one-sided |
+| Lemma 13 (lower margin), eq. (19) | Corrected under A + B (Lemma 2(d)) |
+| Lemma 16 (ker D^{(r)} = polynomials) | Used as is; re-proved in Lemma 1 |
+| Prop 3, Lemmas 17–25 | Avoided (Lemma 24/19 false) |
+| Theorem 3 | Not used; the mode result is proved self-contained (Prop 4, Corollary 1) |
