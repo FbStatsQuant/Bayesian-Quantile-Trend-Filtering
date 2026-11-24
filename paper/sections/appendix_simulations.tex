@@ -7,11 +7,11 @@ This appendix supplements the interior-quantile comparisons of Section~\ref{sec:
 \subsection{Interior quantiles}
 \label{app:sim:individual}
 
-This appendix reports the measures omitted from Section~\ref{sec:sim:individual}: MAD and MCIW for the varying-smoothness and smooth signals. All entries use the default order $k=2$ and $n=500$, and are averages over valid replications. MCIW is the average width of the $95\%$ pointwise posterior intervals and is not available for the ADMM point estimator.
+This subsection reports the measures omitted from Section~\ref{sec:sim:individual}: MAD and MCIW for the varying-smoothness and smooth signals. All entries are averages over valid replications. MCIW is the average width of the $95\%$ pointwise posterior intervals, and it is not available for the ADMM point estimator.
 
 \subsubsection{Varying smoothness}
 \label{app:sim:individual:vs}
-The MAD comparison (Table~\ref{tab:vs_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:vs}. Bayesian-PMALA's intervals are narrower than those of both Onizuka variants (Table~\ref{tab:vs_int_mciw}); the widths describe different posterior constructions and are not by themselves a measure of calibration.
+The MAD comparison (Table~\ref{tab:vs_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:vs}. Bayesian-PMALA's intervals are narrower than those of both Onizuka variants at every level and under every noise family (Table~\ref{tab:vs_int_mciw}).
 
 \begin{table}[!htbp]
 \centering
@@ -141,12 +141,12 @@ Bayesian-PMALA & 0.258425 & 0.230489 & 0.226939 & 0.229488 & 0.255030 \\
 \subsection{Joint estimation of extreme upper quantiles}
 \label{app:sim:joint_extreme}
 
-Tables~\ref{tab:vs_ext_upper_cross_nb}--\ref{tab:s_ext_upper_cross_all} count the crossings among the fitted curves of Section~\ref{sec:sim:extreme}. For two reported levels $\tau_a<\tau_b$, a crossing is an index $i$ at which $\widehat{\theta}_{\tau_a,i}>\widehat{\theta}_{\tau_b,i}$. The neighbouring count of a level adds its crossings with the adjacent reported levels, so the count at $\tau=0.97$ involves $0.96$ and $0.98$; the total count adds its crossings with all three other reported levels in $\{0.96,0.97,0.98,0.99\}$. Each pair of levels contributes at most $n$ crossings, so a count can exceed $n$. Entries average the counts over replications. The levels $0.90$ and $0.93$ of the joint fit are excluded. Every retained draw of the joint sampler is ordered at every index, so its posterior means do not cross and its entries are zero.
+Tables~\ref{tab:vs_ext_upper_cross_nb}--\ref{tab:s_ext_upper_cross_all} count the crossings among the fitted curves of Section~\ref{sec:sim:extreme}. For two reported levels $\tau_a<\tau_b$, a crossing is an index $i$ at which $\widehat{\theta}_{\tau_a,i}>\widehat{\theta}_{\tau_b,i}$. The neighboring count of a level adds its crossings with the adjacent reported levels, so the count at $\tau=0.97$ involves $0.96$ and $0.98$; the total count adds its crossings with all three other reported levels in $\{0.96,0.97,0.98,0.99\}$. Each pair of levels contributes at most $n$ crossings, so a count can exceed $n$. Entries average the counts over replications. The levels $0.90$ and $0.93$ of the joint fit are excluded. Every retained draw of the joint sampler is ordered at every index, so its posterior means do not cross and its entries are zero.
 
 \begin{table}[!htbp]
 \centering
 \small
-\caption{Average number of crossings with the neighbouring reported levels at extreme upper quantiles for the VS signal, $n=500$ and $k=2$.}
+\caption{Average number of crossings with the neighboring reported levels at extreme upper quantiles for the VS signal, $n=500$ and $k=2$.}
 \label{tab:vs_ext_upper_cross_nb}
 \begin{tabular}{lrrrr}
 \toprule
@@ -180,7 +180,7 @@ Joint sampler (non-crossing) & 0.00 & 0.00 & 0.00 & 0.00 \\
 \begin{table}[!htbp]
 \centering
 \small
-\caption{Average number of crossings with the neighbouring reported levels at extreme upper quantiles for the S signal, $n=500$ and $k=2$.}
+\caption{Average number of crossings with the neighboring reported levels at extreme upper quantiles for the S signal, $n=500$ and $k=2$.}
 \label{tab:s_ext_upper_cross_nb}
 \begin{tabular}{lrrrr}
 \toprule

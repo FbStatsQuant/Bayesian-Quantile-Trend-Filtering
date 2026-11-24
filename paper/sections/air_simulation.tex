@@ -5,22 +5,15 @@
 
 We follow the peak-detection design of \citet[Section~4.2]{brantley2020baseline}, in which a slowly drifting baseline is contaminated by short-lived peaks. The goal is to estimate a low-quantile baseline and to detect the peaks in the detrended series. We compare Bayesian-PMALA with the horseshoe and Laplace samplers of \citet{onizuka2024fast}, Onizuka (HS) and Onizuka (Laplace), and with ADMM \citep{brantley2020baseline}.
 
-\paragraph{Data generation.} Each of $100$ replications has $n=500$ equally spaced observations, generated as follows.
-\begin{enumerate}
- \item \emph{Baseline.} $b_i$ is a natural cubic spline with a random number of basis functions and independent $\operatorname{Exp}(1)$ coefficients.
- \item \emph{Peaks.} A $\operatorname{Binomial}(500,0.005)$ number of Gaussian-shaped peaks is placed at uniformly random locations, with widths drawn from $\operatorname{Unif}(2,12)$ and areas from $\mathcal{N}(20,4^2)$; $s_i$ is their sum.
- \item \emph{Observations.} $y_i=b_i+s_i+e_i$, with $e_i\stackrel{\mathrm{iid}}{\sim}\mathcal{N}(0,0.25^2)$.
- \item \emph{Target.} At each level $\tau\in\{0.01,0.05,0.10\}$, the estimand is the $\tau$-quantile of the peak-free series, $q_{\tau,i}=b_i+0.25\,\Phi^{-1}(\tau)$.
-\end{enumerate}
-Each method fits every level separately to the same $y$; $b$ and $s$ are used only for evaluation.
+Each of $100$ replications has $n=500$ equally spaced observations. The baseline $b_i$ is a natural cubic spline with a random number of basis functions and independent $\operatorname{Exp}(1)$ coefficients. A $\operatorname{Binomial}(500,0.005)$ number of Gaussian-shaped peaks is placed at uniformly random locations, with widths drawn from $\operatorname{Unif}(2,12)$ and areas from $\mathcal{N}(20,4^2)$, and $s_i$ is their sum. The observations are $y_i=b_i+s_i+e_i$ with $e_i\stackrel{\mathrm{iid}}{\sim}\mathcal{N}(0,0.25^2)$. At each level $\tau\in\{0.01,0.05,0.10\}$, the estimand is the $\tau$-quantile of the peak-free series, $q_{\tau,i}=b_i+0.25\,\Phi^{-1}(\tau)$. Each method fits every level separately to the same $y$; $b$ and $s$ are used only for evaluation.
 
-\paragraph{Evaluation.} For a fitted curve $\widehat\theta_\tau$ we report the MSE against $q_\tau$ and the mean check loss (CL) on $y$. Peaks are detected as the points with $y_i-\widehat\theta_{\tau,i}>h$, for $h\in\{0.5,0.75,1,1.2\}$, and compared with the true signal points $s_i>0.5$ by the class-averaged accuracy (CAA), the mean of sensitivity and specificity. Each metric is averaged over replications; CAA uses the replications that contain signal points.
+For a fitted curve $\widehat\theta_\tau$ we report the MSE against $q_\tau$ and the mean check loss (CL) on $y$. Peaks are detected as the points with $y_i-\widehat\theta_{\tau,i}>h$, for $h\in\{0.5,0.75,1,1.2\}$, and compared with the true signal points $s_i>0.5$ by the class-averaged accuracy (CAA), the mean of sensitivity and specificity. Each metric is averaged over replications; CAA uses the replications that contain signal points.
 
 \begin{table}[H]
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
-\caption{Simulated air-quality results. Means across replications. $^{\dagger}$Average over $99$ replications.}
+\caption{Simulated air-quality data, $n=500$ and $100$ replications. MSE is measured against the quantile of the peak-free series, CL is the mean check loss, and CAA is the class-averaged accuracy of peak detection at threshold $h$. Entries are means across replications. $^{\dagger}$Average over $99$ replications.}
 \label{tab:air_n500}
 \begin{tabular}{@{}rlrrrrrr@{}}
 \toprule
@@ -46,4 +39,4 @@ $\tau$ & Method & MSE & CL & $0.5$ & $0.75$ & $1$ & $1.2$ \\
 \end{tabular}
 \end{table}
 
-Bayesian-PMALA performs very close to ADMM, the method designed for this problem: the two recover the baseline with similar accuracy at $\tau=0.05$ and $0.10$ and detect the peaks almost equally well at every level, with ADMM clearly ahead in baseline recovery only at the most extreme level. Bayesian-PMALA clearly outperforms both Onizuka fits, which have the smallest check losses but by far the largest MSE and the weakest detection in nearly every case, consistent with fits that follow the peaks instead of the baseline beneath them. The Laplace prior improves on the horseshoe at $\tau=0.05$ and $0.10$, but not at $\tau=0.01$, and remains well behind Bayesian-PMALA and ADMM at every level.
+Table~\ref{tab:air_n500} reports the results. At $\tau=0.05$ and $0.10$ the MSE of Bayesian-PMALA is $0.0138$ and $0.0131$, against $0.0127$ and $0.0114$ for ADMM, the method designed for this problem; at $\tau=0.01$ the values are $0.0461$ and $0.0302$. The CAA values of the two methods are close at $\tau=0.05$ and $0.10$ for every threshold, and at $\tau=0.01$ ADMM is higher by about $0.07$ at $h=0.5$ and $0.75$. The Onizuka fits have the smallest check losses but the largest MSE, between $0.065$ and $0.107$ at $\tau=0.05$ and $0.10$ against at most $0.0138$ for Bayesian-PMALA and ADMM, and their CAA is lower than that of Bayesian-PMALA in all cases except $h=0.5$ at $\tau=0.01$. This is consistent with fits that follow the peaks rather than the baseline beneath them. Between the two Onizuka priors, the Laplace prior has the smaller MSE at $\tau=0.05$ and $0.10$ and the horseshoe at $\tau=0.01$.
