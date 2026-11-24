@@ -1,0 +1,259 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\emergencystretch=2em
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem*{assumptionA}{Assumption A}
+\newtheorem*{assumptionB}{Assumption B}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\pr}{\mathrm{pr}}
+\newcommand{\TV}{\mathrm{TV}}
+\newcommand{\Dr}{D^{(r)}}
+\newcommand{\lamtv}{\lambda_{\TV}}
+\newcommand{\thetas}{\theta^{*}}
+
+\title{T07a: a Bayesian counterpart of Padilla--Chatterjee Theorem 3\\[2pt]
+\large Statement and roadmap. No proof.}
+\author{Theory Department, BQTF project (research sub-agent)}
+\date{24 November 2026}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Status.} Statement accepted by the Theory head on 24 November 2026, with the fixed-$\sigma_0$ form of Theorem~\ref{thm:main} and Remark~\ref{rem:sampler} added at the owner's request.\par\smallskip
+\noindent\textbf{What this note contains.} The setup, the assumptions, one theorem, one corollary, five remarks and a roadmap for the prover. Nothing here is proved. Numbers in the form ``eq.~(44)'' or ``Lemma~13'' refer to Madrid Padilla and Chatterjee, \emph{Risk bounds for quantile trend filtering}. The breakdown of their Theorem~3 is in the companion file \texttt{PADILLA\_THM3\_BREAKDOWN.md}.
+
+\medskip
+\noindent\textbf{The outcome in three lines.}
+\begin{itemize}[itemsep=1pt,topsep=2pt]
+\item Theorem~\ref{thm:main}: at a fixed scale $\sigma=\sigma_0$ (for instance $\sigma_0=1$) and prior rate $\lambda=c\,n^{(2r-1)/2}$, the posterior contracts at the rate $n^{-(2r-1)/(2r)}(\log n)^{1/(2r)}$. For $r=3$ this is $n^{-5/6}(\log n)^{1/6}$.
+\item Corollary~\ref{cor:mode}: at Padilla's $\lambda$ the posterior mode attains Padilla's rate $n^{-2r/(2r+1)}(\log n)^{1/(2r+1)}$.
+\item Remark~\ref{rem:lower}: the full posterior cannot attain Padilla's rate at a fixed $\sigma$, because it is wider than its mode.
+\end{itemize}
+
+\section{Setup}
+
+\paragraph{Data.} Fix a quantile level $\tau\in(0,1)$ and an integer $r\ge 1$. We observe independent random variables $y_1,\dots,y_n$, and $\thetas_i$ denotes the $\tau$-quantile of $y_i$. Write $F_{y_i}$ for the distribution function of $y_i$ and $\E_{\thetas}$ for expectation under the true law of $y=(y_1,\dots,y_n)$.
+
+\paragraph{Differences and total variation.} Let $D^{(1)}\theta=(\theta_2-\theta_1,\dots,\theta_n-\theta_{n-1})$ and $\Dr=D^{(1)}D^{(r-1)}\in\R^{(n-r)\times n}$. As in Padilla's eq.~(1),
+\begin{equation}\label{eq:tv}
+\TV^{(r)}(\theta)=n^{r-1}\,\|\Dr\theta\|_1,\qquad V^{*}=\TV^{(r)}(\thetas).
+\end{equation}
+
+\paragraph{Loss.} As in Padilla's eq.~(4),
+\begin{equation}\label{eq:loss}
+\Delta_n^2(v)=\frac1n\sum_{i=1}^n\min\{|v_i|,\,v_i^2\},\qquad v\in\R^n .
+\end{equation}
+
+\paragraph{Working likelihood.} With $\rho_\tau(u)=u\{\tau-\mathbf 1(u<0)\}$, the working likelihood is the asymmetric Laplace density with scale $\sigma$,
+\begin{equation}\label{eq:ald}
+p(y_i\mid\theta_i)=\frac{\tau(1-\tau)}{\sigma}\exp\Bigl\{-\frac{\rho_\tau(y_i-\theta_i)}{\sigma}\Bigr\},\qquad i=1,\dots,n,
+\end{equation}
+applied independently over $i$. We assume $\sigma=1$ for simplicity; everything below holds verbatim for any fixed $\sigma=\sigma_0>0$, with constants depending on $\sigma_0$ (Theorem~\ref{thm:main} is stated in that form).
+
+\paragraph{Prior.} With $m=n-r$ and a deterministic rate $\lambda>0$,
+\begin{equation}\label{eq:prior}
+p(\theta\mid\lambda)\;\propto\;\lambda^{m}\exp\bigl\{-\lambda\,\|\Dr\theta\|_1\bigr\}
+=\lambda^{m}\exp\bigl\{-\lamtv\,\TV^{(r)}(\theta)\bigr\},\qquad \lamtv=\frac{\lambda}{n^{r-1}} .
+\end{equation}
+Here $\lambda$ is the rate of the paper (the raw scale) and $\lamtv$ is the same rate in Padilla's normalization. The prior is flat on the null space of $\Dr$, the polynomials of degree at most $r-1$, so it is improper.
+
+\paragraph{Posterior.} For a Borel set $B\subset\R^n$,
+\begin{equation}\label{eq:post}
+\Pi_\lambda(B\mid y)=\frac{\displaystyle\int_B\exp\Bigl\{-\frac{1}{\sigma}\sum_{i=1}^n\rho_\tau(y_i-\theta_i)-\lambda\|\Dr\theta\|_1\Bigr\}d\theta}
+{\displaystyle\int_{\R^n}\exp\Bigl\{-\frac{1}{\sigma}\sum_{i=1}^n\rho_\tau(y_i-\theta_i)-\lambda\|\Dr\theta\|_1\Bigr\}d\theta}.
+\end{equation}
+For every $n>r$, every $y$ and every $\lambda>0$ this is a proper probability distribution, although the prior is not: the likelihood \eqref{eq:ald} is itself integrable in $\theta$ over $\R^n$. At $\sigma=1$ its modes are exactly the solutions of
+\begin{equation}\label{eq:mode}
+\hat\theta_\lambda\in\arg\min_{\theta\in\R^n}\Bigl\{\sum_{i=1}^n\rho_\tau(y_i-\theta_i)+\lamtv\,\TV^{(r)}(\theta)\Bigr\},
+\end{equation}
+which is the penalized quantile trend filtering (PQTF) estimator of Padilla's eq.~(3) with tuning parameter $\lamtv$. At a general fixed $\sigma$ the modes are PQTF with tuning parameter $\sigma\lamtv$.
+
+\section{Assumptions}
+
+\begin{assumptionA}[Padilla, verbatim]
+There exist constants $L>0$ and $\underline f>0$ such that for any positive integer $n$ and any $\delta\in\R^n$ satisfying $\|\delta\|_\infty\le L$ we have, for all $i=1,\dots,n$,
+\[
+\bigl|F_{y_i}(\thetas_i+\delta_i)-F_{y_i}(\thetas_i)\bigr|\;\ge\;\underline f\,|\delta_i| .
+\]
+\end{assumptionA}
+
+\begin{assumptionB}[new]
+There exists a constant $\bar f<\infty$ such that, for the same $L$, any $n$, any $\|\delta\|_\infty\le L$ and all $i$,
+\[
+\bigl|F_{y_i}(\thetas_i+\delta_i)-F_{y_i}(\thetas_i)\bigr|\;\le\;\bar f\,|\delta_i| .
+\]
+\end{assumptionB}
+
+Assumption~B holds whenever the $y_i$ have densities bounded by $\bar f$ near their $\tau$-quantiles. Together, A and B say that these densities are bounded away from zero and from infinity there. Neither assumption involves moments, so heavy-tailed laws such as the Cauchy are allowed.
+
+\section{Main result}
+
+\begin{theorem}\label{thm:main}
+Fix an integer $r\ge 2$. Let $\{y_i\}_{i=1}^n$ be any sequence of independent random variables which satisfies Assumptions A and B, and let $\thetas_i$ be the sequence of $\tau$-quantiles of $y_i$. Suppose that $V^{*}=O(1)$. Let $\Pi_\lambda(\cdot\mid y)$ be the posterior \eqref{eq:post} with a fixed scale $\sigma=\sigma_0>0$. If $\lambda$ is chosen to be
+\[
+\lambda=c\,n^{(2r-1)/2},\qquad\text{equivalently}\qquad \lamtv=c\,n^{1/2},
+\]
+for a constant $c>0$, then there exists a constant $M>0$ such that
+\[
+\E_{\thetas}\,\Pi_\lambda\Bigl(\theta:\ \Delta_n^2(\theta-\thetas)>M\,n^{-(2r-1)/(2r)}(\log n)^{1/(2r)}\ \Bigm|\ y\Bigr)\;\longrightarrow\;0
+\qquad\text{as } n\to\infty .
+\]
+Here $M$ depends only on $c$, $\sigma_0$, $r$, $\tau$, $L$, $\underline f$, $\bar f$ and the bound on $V^{*}$; the $n$-exponents do not depend on $\sigma_0$.
+\end{theorem}
+
+For the paper's default $k=2$, that is $r=3$: $\lambda=c\,n^{5/2}$ and the rate is $n^{-5/6}(\log n)^{1/6}$.
+
+\begin{corollary}[posterior mode]\label{cor:mode}
+Fix an integer $r\ge 1$. Let $\{y_i\}_{i=1}^n$ be any sequence of independent random variables which satisfies Assumption A, and let $\thetas_i$ be the sequence of $\tau$-quantiles of $y_i$. Suppose that $V^{*}=\Theta(1)$. Given any $\epsilon\in(0,1)$ there exists a positive constant $c_{1,\epsilon}$, only depending on $\epsilon$ and $V^{*}$, such that if $\lambda$ is chosen to be
+\[
+\lambda=c\,n^{r(2r-1)/(2r+1)}(\log n)^{1/(2r+1)},\qquad\text{equivalently}\qquad \lamtv=c\,n^{1/(2r+1)}(\log n)^{1/(2r+1)},
+\]
+for a constant $c$ satisfying $c>c_{1,\epsilon}$, then every mode $\hat\theta_\lambda$ of the posterior \eqref{eq:post} with $\sigma=1$ satisfies
+\[
+\Delta_n^2(\hat\theta_\lambda-\thetas)\;\le\;c_{2,\epsilon}\,n^{-2r/(2r+1)}(\log n)^{1/(2r+1)}
+\]
+with probability at least $1-\epsilon$. Here $c_{2,\epsilon}>0$ is a constant that only depends on $c$, $\epsilon$ and $V^{*}$.
+\end{corollary}
+
+Corollary~\ref{cor:mode} is Padilla's Theorem~3 read through \eqref{eq:mode}. It needs no new argument. The contrast with Theorem~\ref{thm:main} is this: at Padilla's $\lambda$ the mode is at Padilla's rate, but the posterior around it is wider than that rate, so the width of the posterior is the limiting factor (Remark~\ref{rem:lower}).
+
+\section{Remarks}
+
+\begin{remark}[Scaling conventions]\label{rem:scale}
+Padilla's Theorem~3 is stated with the penalty $\lamtv\,\TV^{(r)}(\theta)$, but its proof (Appendix~C) works with $\lambda\|\Dr\theta\|_1$ and sets, in eq.~(44),
+\[
+\lambda=3c_\epsilon\,n^{(2r-1)/(2r+1)}(\log n)^{1/(2r+1)}\,\|\Dr\thetas\|_1^{-(2r-1)/(2r+1)} .
+\]
+Since $\|\Dr\thetas\|_1=V^{*}n^{1-r}$, the two agree through $\lambda=n^{r-1}\lamtv$. The loss $\Delta_n^2$ contains the factor $1/n$; the proof uses $\Delta^2=n\Delta_n^2$ and the radius $t^2\asymp n^{1/(2r+1)}(\log n)^{1/(2r+1)}$ of eq.~(46). The table lists the two tunings that appear in this note.
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+ & raw rate $\lambda$ & TV-scale rate $\lamtv$ & $r=3$, raw \\
+\midrule
+Padilla (Corollary~\ref{cor:mode}) & $n^{r(2r-1)/(2r+1)}(\log n)^{1/(2r+1)}$ & $n^{1/(2r+1)}(\log n)^{1/(2r+1)}$ & $n^{15/7}(\log n)^{1/7}$\\
+Theorem~\ref{thm:main} & $n^{(2r-1)/2}$ & $n^{1/2}$ & $n^{5/2}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{remark}
+
+\begin{remark}[Which fixed $\sigma$ is relevant for the sampler]\label{rem:sampler}
+The model of the paper has $\sigma\sim\mathrm{IG}(a,b)$, with $a=b=0.1$, and a $\sigma$-free prior on $\theta$. Then
+\[
+\sigma\mid\theta,y\;\sim\;\mathrm{IG}\bigl(n+a,\;S(\theta)+b\bigr),\qquad S(\theta)=\sum_{i=1}^n\rho_\tau(y_i-\theta_i),
+\]
+so $\sigma$ concentrates at $S(\theta)/n$ with relative spread of order $n^{-1/2}$. At the truth, $S(\thetas)/n$ is close to
+\[
+\bar\sigma_n=\frac1n\sum_{i=1}^n\E\,\rho_\tau(y_i-\thetas_i),
+\]
+the average check loss at the truth, which does not grow or vanish with $n$. Theorem~\ref{thm:main} with $\sigma_0=\bar\sigma_n$ (bounded above and away from zero) therefore describes the posterior at the scale where the sampler's $\sigma$ sits. For Gaussian noise with standard deviation $s$, $\bar\sigma_n=s\,\phi(\Phi^{-1}(\tau))$; Engineering experiment E-08 found the learned $\sigma$ at $0.136$ against $0.13$ for $\tau=0.5$, and $0.033$ against $0.034$ for $\tau=0.05$. The paper's $\lambda$ is also learned, under a Gamma prior; Theorem~\ref{thm:main} takes it deterministic.
+
+\emph{A learned-$\sigma$ version (not claimed).} It would need two inputs: (a) posterior containment of $\sigma$ in a fixed compact interval $[\sigma_-,\sigma_+]\subset(0,\infty)$ with probability tending to one, which requires $\bar\sigma_n$ bounded away from zero and a uniform integrability condition on the check losses (no Cauchy-type tails); and (b) the conclusion of Theorem~\ref{thm:main} uniformly in $\sigma_0\in[\sigma_-,\sigma_+]$, together with the fact that the prior on $\theta$ does not involve $\sigma$, so that the joint posterior mass of the bad set is an average of conditional masses. Both are expected to hold under the theorem's assumptions plus (a), but neither is in scope here.
+\end{remark}
+
+\begin{remark}[Misspecification]\label{rem:misspec}
+The asymmetric Laplace density is a working likelihood: the data are not assumed to follow it, $\E_{\thetas}$ is taken under the true law of $y$, and the posterior still targets $\thetas$ because the $\tau$-quantile minimizes the expected check loss.
+\end{remark}
+
+\begin{remark}[Why the rate is $n^{-(2r-1)/(2r)}$ and not $n^{-2r/(2r+1)}$]\label{rem:lower}
+The statement first asked for was Theorem~\ref{thm:main} with Padilla's $\lambda$ and Padilla's rate:
+\begin{equation}\label{eq:target}
+\begin{gathered}
+\E_{\thetas}\,\Pi_\lambda\Bigl(\Delta_n^2(\theta-\thetas)>M\,n^{-2r/(2r+1)}(\log n)^{1/(2r+1)}\Bigm| y\Bigr)\to 0,\\
+\text{with}\quad \lamtv=c\,n^{1/(2r+1)}(\log n)^{1/(2r+1)}\quad\text{and}\quad\sigma=1 .
+\end{gathered}
+\end{equation}
+This fails. The reasons are as follows.
+
+\smallskip\noindent\emph{(i) Spread.} In the bulk, a prior with rate $\lambda$ on $r$-th differences acts like an $(r-1)$-fold integrated random walk with step $1/\lambda$. Over a window of $w$ indices it moves by $w^{r-1/2}/\lambda$, while the data fix a window average to within $w^{-1/2}$. The two balance at $w\asymp\lambda^{1/r}$, so the posterior is a local smoother with $n/w$ effective parameters and its own spread in $\Delta_n^2$ is of order
+\[
+\lambda^{-1/r}.
+\]
+At Padilla's $\lambda$ this is $n^{-(2r-1)/(2r+1)}$ up to a logarithm, which exceeds his rate by the factor $n^{1/(2r+1)}$. For $r=3$: spread $n^{-5/7}$ against rate $n^{-6/7}$.
+
+\smallskip\noindent\emph{(ii) Bias at larger $\lambda$.} Raising $\lambda$ shrinks the spread but increases the smoothing bias, which is of order $V^{2}\lambda^{(2r-1)/r}n^{-(2r-1)}$. Spread and bias balance at $\lambda\asymp n^{(2r-1)/2}/V$, with rate $V^{1/r}n^{-(2r-1)/(2r)}$. This is the tuning and the rate of Theorem~\ref{thm:main}. Heuristically no deterministic $\lambda$ does better at a fixed $\sigma$; what is proved is the case $\lambda\lesssim n^{5/2}$ at $r=3$, see (iii). The rate $n^{-(2r-1)/(2r)}$ is the minimax rate of linear estimators over bounded-variation classes (Donoho and Johnstone, 1998; Tibshirani, 2014, Section~5.1 with $k=r-1$).
+
+\smallskip\noindent\emph{(iii) What is proved.} For $r=3$ the spread bound is a theorem of the project (Theorem~LB, audited; file \texttt{FABLE\_B\_lowerbound.md} in \texttt{theory/T06\_Alignment}). Its assumptions are: independence; Assumption~B only, with no lower margin and no moments; $\TV^{(3)}(\thetas)\le V$; any fixed $\sigma>0$; and a deterministic $\lambda\to\infty$ with $\lambda\le a_2n^{5/2}/V$, which includes $n^{15/7}(\log n)^{1/7}$. Its conclusion is
+\[
+\E_{\thetas}\,\Pi_\lambda\bigl(\Delta_n^2(\theta-\thetas)\le c_0\,\lambda^{-1/3}\bigm| y\bigr)\to 0 ,
+\]
+with $c_0>0$ depending on $\sigma$. So for $r=3$, \eqref{eq:target} is false, and the exponent $5/6$ in Theorem~\ref{thm:main} cannot be improved at $\lambda\asymp n^{5/2}$. All three noise families of the paper (Gaussian with scale in $[1/4,1/2]$, $\mathrm{Beta}(1,11-10u)$, and the mixed normal) have bounded densities, so Theorem~LB covers each of them. For general $r$ the spread law in (i) is a heuristic. The same phenomenon is proved for the Bayesian LASSO by Castillo, Schmidt-Hieber and van der Vaart (2015, Theorem~7).
+
+\smallskip\noindent\emph{(iv) What is observed.} Engineering experiment E-06 ran the exact Gibbs sampler at $r=3$ with $\sigma$ and $\lambda$ fixed, two truths, five noise laws, $n$ from $10^3$ to $3.2\times10^4$ and 20 seeds. The seed-median slope in $\log n$ of the posterior $95\%$ radius was as follows (10 configurations in the first row).
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+schedule & observed slope, rough part & spread law & Padilla's exponent\\
+\midrule
+$\lambda\sigma\propto n^{15/7}$ & $-0.736$ to $-0.775$ & $-5/7\approx-0.714$ & $-6/7\approx-0.857$\\
+$\lambda\sigma\propto n^{5/2}$ & median $-0.844$, range $-0.80$ to $-0.89$ & $-5/6\approx-0.833$ & \\
+\bottomrule
+\end{tabular}
+\end{center}
+For the full $\Delta_n^2$ radius at $n^{15/7}$ the slopes were $-0.77$ to $-0.81$. No configuration comes near $-6/7$. The E-06 notes attribute the excess steepness of $0.02$ to $0.06$ to pre-asymptotic curvature of the spread exponent.
+
+\smallskip\noindent\emph{(v) The rate at Padilla's $\lambda$.} The posterior at Padilla's $\lambda$ is expected to contract at the spread-limited rate $n^{-(2r-1)/(2r+1)}$. For $r=3$ the lower bound $n^{-5/7}$ is proved (Theorem~LB). A matching upper bound at this $\lambda$ was not found among the audited project results; the audited localization bound gives $n^{-23/49}(\log n)^{40/49}$ there. Theorem~\ref{thm:main} has the better exponent, $5/6$ against $5/7$.
+\end{remark}
+
+\begin{remark}[The case $r=1$]\label{rem:r1}
+Theorem~\ref{thm:main} is stated for $r\ge 2$ because the proof route of Section~\ref{sec:roadmap} uses a sup-norm localization step that degenerates at $r=1$. The statement is expected to hold at $r=1$, with rate $n^{-1/2}(\log n)^{1/2}$, but this is not claimed.
+\end{remark}
+
+\section{Roadmap for the prover}\label{sec:roadmap}
+
+Write $\varepsilon_n^2=n^{-(2r-1)/(2r)}(\log n)^{1/(2r)}$, $\delta=\theta-\thetas$, and, as in Padilla's Definition~2,
+$\hat M(\theta)=\sum_i\{\rho_\tau(y_i-\theta_i)-\rho_\tau(y_i-\thetas_i)\}$ and $M=\E_{\thetas}\hat M$. The posterior is the ratio
+$N(B)/N(\R^n)$ with $N(B)=\int_B e^{-\hat M(\theta)}e^{-\lambda\|\Dr\theta\|_1}d\theta$. Since $|\hat M_i(\theta_i)|\le|\delta_i|$ (Padilla's Remark~11), no moment of $y$ is needed anywhere.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{p{0.04\textwidth}p{0.40\textwidth}p{0.46\textwidth}}
+\toprule
+ & Step & What it reuses\\
+\midrule
+1 & \emph{Coordinates.} Write $\theta=Nc+Su$ with $u=\Dr\theta$ and $c\in\R^r$ the polynomial part. The prior is flat in $c$ and Laplace in $u$. & Padilla Lemma~16 (the null space is the polynomials). Project lemma L5.\\
+2 & \emph{Evidence lower bound.} With probability tending to one, $N(\R^n)\ge e^{-Cn\varepsilon_n^2}$ times the prior mass of a ball of radius $\varepsilon_n$ around a smoothed truth. & New Bayesian step. Assumption~B gives $M(\thetas+\delta)\le C\|\delta\|^2$ near $\thetas$. Project lemmas L6 (evidence bound, by Chebyshev), L3 (small-ball probability; this is where $(\log n)^{1/(2r)}$ enters) and L4q, L4q-M (shift to a smoothed truth), at order $k=r-1$.\\
+3 & \emph{Localization.} The posterior mass of $\{\TV^{(r)}(\delta)$ large or $\|\delta\|_\infty$ large$\}$ tends to zero. & Padilla Proposition~3 with Lemmas~23--25 (noise bound in the dual seminorm, null-space term), and Lemmas~17--22 (from $\Delta$ to $\ell_2$). Project result C1 with the width lemma W$'$ and the interpolation lemma L10-I. This step needs $r\ge 2$.\\
+4 & \emph{Shells.} On the localized set, the expected numerator over $\{2^jM\varepsilon_n^2<\Delta_n^2(\delta)\le 2^{j+1}M\varepsilon_n^2\}$ is at most $e^{-c2^jMn\varepsilon_n^2}$ times the bound of Step~2. & Padilla Lemma~13 (Assumption~A gives $M(\thetas+\delta)\ge c_0\Delta^2(\delta)$) and Knight's identity. Padilla's first-moment bound (Markov, Lemmas~10--11, Proposition~2) is replaced by an exponential-moment bound. Project Lemmas C2 and F.\\
+5 & \emph{Assembly.} Sum over $j$ and divide by the bound of Step~2. The volume factors of the flat part cancel. & Padilla Lemmas~18, 20, 21 for the polynomial part.\\
+6 & \emph{Sharpness (optional).} The exponent cannot be improved. & Project Theorem~LB, $r=3$.\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Where the proof departs from Padilla's.} There are three places.
+\begin{itemize}[itemsep=2pt,topsep=2pt]
+\item \emph{The denominator.} An estimator has none. Step~2 is the reason for Assumption~B.
+\item \emph{The bias term.} Padilla bounds the penalty at the truth by the rate: $\lamtv V^{*}\lesssim t^2$ (Step~5 of his outline). At $\lamtv=c\,n^{1/2}$ this fails for $r\ge2$, since $c\,V^{*}n^{1/2}$ is much larger than $n\varepsilon_n^2=n^{1/(2r)}(\log n)^{1/(2r)}$. The prior must instead be centred at a smoothed truth, at a quadratic cost.
+\item \emph{Moments of the supremum.} Padilla needs the expectation of a supremum (Markov's inequality). A ratio of integrals needs exponential bounds on each shell.
+\end{itemize}
+
+\paragraph{Prior project evidence.} For $r=3$ the rate $n^{-5/6}(\log n)^{1/6}$ at $\lambda\asymp n^{5/2}/V$ and fixed $\sigma$ is recorded as audited in \texttt{theory/THEOREM\_INDEX.md} (Lemmas F, W$'$, C2). For general $r=k+1\ge2$ the index records an audited rate $n^{-(2k+1)/(2k+2)}(\log n)^{1/(2k+2)}$ at $\lambda=n^{k+1/2}/V$ (\texttt{FABLE\_B\_general\_k.md}). Its hypotheses are independence, the two-sided margin with constants $(L,\underline f,\bar f)$, and $\TV^{(k+1)}(\thetas)\le V$. They differ from Padilla's Assumption~A only by the upper half of the margin, which is Assumption~B here.
+
+\paragraph{Assessment of the exponent.}
+\begin{itemize}[itemsep=2pt,topsep=2pt]
+\item \emph{Theorem~\ref{thm:main}: the $n$-exponent is safe.} It has an audited upper bound and, at $r=3$, an audited matching lower bound.
+\item \emph{The logarithm.} $(\log n)^{1/(2r)}$ is the power the existing upper-bound route needs. Theorem~LB has no logarithm, so the true rate lies between $n^{-(2r-1)/(2r)}$ and the stated one.
+\item \emph{Padilla's exponent.} It is not attainable by the full posterior at any fixed $\sigma$ with a deterministic $\lambda$. It is attained by the mode (Corollary~\ref{cor:mode}).
+\item \emph{A quantitative form.} The evidence event in Step~2 is controlled by Chebyshev's inequality, so a bound of the form $\E_{\thetas}\Pi_\lambda(\cdot\mid y)\le C/(n\varepsilon_n^2)$ is expected. It is not claimed.
+\end{itemize}
+
+\paragraph{Points I could not settle.}
+\begin{itemize}[itemsep=2pt,topsep=2pt]
+\item Whether ``any constant $c>0$'' is exactly what the audited proofs give, or a window $a_1\le cV\le a_2$. I read the statements, not the upper-bound proofs.
+\item Whether $r=1$ can be included at $\sigma=1$ (Remark~\ref{rem:r1}).
+\item Whether a fixed $c$ above a threshold free of $\epsilon$ suffices in Corollary~\ref{cor:mode}. Padilla's $c_{1,\epsilon}$ depends on $\epsilon$ because his proof uses one constant for both $\lambda$ and the radius, eqs.~(44) and (46). The corollary keeps his form.
+\end{itemize}
+
+\end{document}
