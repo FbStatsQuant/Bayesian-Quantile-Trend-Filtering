@@ -145,3 +145,12 @@ At Padilla's λ this is `n^{−(2r−1)/(2r+1)}(log n)^{−1/(r(2r+1))}`, larger
 - **Log power.** I state (log n)^{1/(2r)}, the project's upper-side power. Theorem LB is log-free, so the true rate lies between.
 - **Constant c.** I state "any c > 0". Corollary 8.4 of the LB file uses a_1n^{5/2}/V ≤ λ ≤ a_2n^{5/2}/V, which supports this, but I did not read the upper proofs.
 - **Upper bound at Padilla's λ.** Not located as an audited result. If the owner wants the n^{−5/7} line as a theorem, it needs its own check.
+
+## 8. Corrections after the internal check (Astra-2, verified by the Theory head, 2026-11-24)
+
+- **Assumption A alone does not give F(θ*_i) = τ.** An atom at the quantile is compatible with A. Example: median 0, F(−t) = 1/2 − t²/2 on (0,1], an atom of mass 1/4 at 0, and mass 1/4 uniform on (0,1). Then E u_i ≠ 0 in (35), and the excess loss on the left is t³/6, so Lemma 13 fails. Padilla's proof silently uses F(θ*_i) = τ, in (19) and (35). Assumption B implies it. The corollary now assumes A and B.
+- **Lemma 24 (and Lemma 19) do not hold as stated.** The comparison Δ(x) ≳ ‖x‖₂ on {x ∈ row(D^{(r)}): ‖D^{(r)}x‖₁ ≤ 1} fails when entries are ≫ 1, because Δ² then behaves like ‖x‖₁. Counterexample at r = 2: x_i ∝ |i| − mean, which gives ‖x‖₂ ≍ n^{3/2} but Δ(x) ≍ n. This is consistent with the project's earlier finding that Lemma 19 is off by n^{r−1}. So Proposition 3 has a gap. The main theorem does not use these lemmas; its localization is its own. The mode corollary rests on the published theorem.
+- **Bookkeeping in §3.**
+  - Lemma 25's statement and (43) print Δ²/n, while its proof (36) gives Δ²/√n. The latter is still enough at (46).
+  - The Step 5 width ratio is an upper bound ≲ c_ε^{−1−1/(2r)}(log n)^{−1/(4r)}, not a ≍.
+  - In (47), for V* < 1 the smaller power of V* matters, so constants need both an upper and a positive lower bound on V*.
