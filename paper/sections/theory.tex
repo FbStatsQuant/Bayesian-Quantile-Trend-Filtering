@@ -37,7 +37,7 @@ There exist constants $L>0$ and $\fl>0$ such that for any $n$, any $\delta\in\R^
 \]
 \end{assumption}
 
-Assumption~\ref{ass:A} requires each distribution function to grow at least linearly within distance $L$ of its $\tau$-quantile. It holds when $y_i$ has a density bounded below by $\fl$ on $[\thetas_i-L,\thetas_i+L]$, but no density is required.
+This condition requires each distribution function to grow at least linearly within distance $L$ of its $\tau$-quantile. It holds when $y_i$ has a density bounded below by $\fl$ on $[\thetas_i-L,\thetas_i+L]$, but no density is required.
 
 \begin{assumption}[Upper bound near the quantile]\label{ass:B}
 There exists a constant $\fu<\infty$ such that, for the same $L$, any $n$, any $\delta\in\R^n$ with $\|\delta\|_\infty\le L$ and all $i$,
@@ -46,7 +46,7 @@ There exists a constant $\fu<\infty$ such that, for the same $L$, any $n$, any $
 \]
 \end{assumption}
 
-Assumption~\ref{ass:B} is the matching upper bound, satisfied when the density of $y_i$ is bounded above by $\fu$ on the same interval. It excludes an atom at the quantile, so $F_{y_i}(\thetas_i)=\tau$. Neither assumption involves moments of $y_i$, so heavy-tailed noise such as Cauchy noise is allowed. The last requirement concerns the signal: there is a constant $\Vb$ such that $V^{*}\le\Vb$ for all $n$. A more complete analysis of the assumptions, including their verification for the noise distributions and signals of Section~\ref{sec:numerical}, is given in Appendix~\ref{app:assumptions}.
+This second condition is the matching upper bound, satisfied when the density of $y_i$ is bounded above by $\fu$ on the same interval. It excludes an atom at the quantile, so $F_{y_i}(\thetas_i)=\tau$. Neither assumption involves moments of $y_i$, so heavy-tailed noise such as Cauchy noise is allowed. The last requirement concerns the signal: there is a constant $\Vb$ such that $V^{*}\le\Vb$ for all $n$. A more complete analysis of the assumptions, including their verification for the noise distributions and signals of Section~\ref{sec:numerical}, is given in Appendix~\ref{app:assumptions}.
 
 \subsection{Main result}\label{sec:main-result}
 
