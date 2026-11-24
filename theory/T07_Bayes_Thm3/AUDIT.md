@@ -126,3 +126,20 @@ Rulings:
 | Ray, TV face | λ_TV(T_m − 2V̄) = (f/4)nβ² > G | HOLDS |
 
 Verdict: the mode result is proved for r ≥ 2, any c > 0 and n ≥ n_ε, at Padilla's rate n^{−2r/(2r+1)}(log n)^{1/(2r+1)}, without Padilla's Thm 3, Prop 3 or Lemmas 17–25. Statement to be restated in this proved form (r ≥ 2, any c > 0, n ≥ n_ε); this was put to HQ. r = 1 stays a SKETCH remark.
+
+## Part II. Formal audit of T07c (Astra-2, fresh context, commit 3c96e05), 2026-11-24
+
+Report: `astra/ASTRA_FORMAL_AUDIT.md`. Verdict: **PASS WITH FIXES**. Theorems 1–2, Props 1–5 and Corollary 1 hold as stated. All findings are in remarks, side comments or wording; none changes a theorem.
+
+| Line(s) | Astra severity | Theory head's check | Ruling and action |
+|---|---|---|---|
+| 897 | ERROR: Remark close(ii) quotes Theorem LB without "λ → ∞" | True. Theorem LB assumes λ → ∞ (T06 FABLE_B_lowerbound). Without it the claim fails trivially: at λ = n^{−3}, λ^{−1/3} = n while the posterior has Δ² = O(1) | HOLDS. Add "λ → ∞" and the upper window |
+| 876, 897 | GAP: the other-λ sketch names only the evidence bound as missing | True. The lower bound also uses localization (Prop 2(a)) to identify Δ² with ‖·‖²_n, and at smaller λ, ρ²T_n diverges (r = 2, mode tuning: n^{1/5}) | HOLDS. Confined to a labelled SKETCH. Reword: it needs a new localization or a small-ball bound for Δ directly |
+| 417, 711, 818, 821, 946 | ERROR: the large/small-c orders of C_pr and C_m, and "no smaller log power", assume V̄ > 0 | True: at V̄ = 0, C_pr → C_sb and only the third entry of C_m survives | HOLDS. Qualify by "for V̄ > 0" |
+| 136, 142, 361 | IMPRECISION: worst-case orders stated as two-sided | Spot-checked: true (V* = 0 possible; t = 0 possible) | HOLDS. Say "at most" |
+| 292 | IMPRECISION: Eckart–Young error is the squared Frobenius norm | True; the display is right | HOLDS. Fix wording |
+| 494, 938 | IMPRECISION: Padilla's Lemmas 10–11 "used as is" | True: his are one-sided; we need absolute-value versions, which the textbook results give | HOLDS. Status: "replaced by textbook versions (vdV–W 2.3.6, L–T 4.12)" |
+| 527, 948 | IMPRECISION: "r ≥ 2 used only in localization" | True: Lemma 3 Case I and δ_A ≤ n^{r−2} also use it (both have elementary r = 1 replacements) | HOLDS. Reword: localization is the substantive obstruction |
+| 487, 591, 717, 739, 773, 939 | IMPRECISION: assumptions in some lemmas stronger than their proofs need | True but optional | NOTED, no change. Naturality: keep A + B uniform across all results |
+
+Track record: 8/8 formal-audit findings hold on my own check (all ERROR/GAP fully redone, IMPRECISIONs spot-checked). Overall Astra track record: 38/38.
