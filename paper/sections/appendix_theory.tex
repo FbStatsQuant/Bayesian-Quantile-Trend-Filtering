@@ -1,2 +1,366 @@
+\providecommand{\pr}{\mathrm{pr}}
+\providecommand{\TV}{\mathrm{TV}}
+\providecommand{\Dr}{D^{(r)}}
+\providecommand{\lamtv}{\lambda_{\TV}}
+\providecommand{\thetas}{\theta^{*}}
+\providecommand{\en}{\varepsilon_n}
+\providecommand{\Lh}{\widehat{\mathcal L}}
+\providecommand{\Lm}{\mathcal L}
+\providecommand{\Rh}{\widehat{\mathcal R}}
+\providecommand{\Ql}{Q_\lambda}
+\providecommand{\Pp}{P^{\perp}}
+\providecommand{\cP}{\mathcal P}
+\providecommand{\fl}{\underline f}
+\providecommand{\fu}{\bar f}
+\providecommand{\Vb}{\bar V}
+\providecommand{\nn}[1]{\|#1\|_n}
+\providecommand{\ind}{\mathbf 1}
+\providecommand{\op}{\mathrm{op}}
+
 \section{Proofs of the theoretical results}\label{app:proofs}
-[TODO W-04 phase 2.]
+
+Throughout the proofs we write $r=k+1$, so that $D=D^{(r)}$ and the rate exponent is $(2r-1)/(2r)=(2k+1)/(2k+2)$. We write $\thetas_i$ for the $\tau$-quantile of $y_i$, $\TV^{(r)}(\theta)=n^{r-1}\|\Dr\theta\|_1$, $V^{*}=\TV^{(r)}(\thetas)$, $\Delta_n^2(v)=n^{-1}\sum_{i=1}^n\min\{|v_i|,v_i^2\}$ and $\rho_\tau(u)=u\{\tau-\ind(u<0)\}$. With $\sigma=1$, the posterior is, for Borel $B\subset\R^n$,
+\begin{equation}\label{pf:eq:post}
+\Pi_\lambda(B\mid y)=\frac{\int_B\exp\{-\sum_{i}\rho_\tau(y_i-\theta_i)-\lambda\|\Dr\theta\|_1\}\,d\theta}
+{\int_{\R^n}\exp\{-\sum_{i}\rho_\tau(y_i-\theta_i)-\lambda\|\Dr\theta\|_1\}\,d\theta}.
+\end{equation}
+It is proper by Lemma~\ref{pf:lem:coord}.
+
+\subsection{Outline of the proof}
+
+Write $\delta=\theta-\thetas$, $Z_i=y_i-\thetas_i$, $\nn{v}=n^{-1/2}\|v\|_2$, and
+\[
+\Lh(\delta)=\sum_{i=1}^n\{\rho_\tau(Z_i-\delta_i)-\rho_\tau(Z_i)\},\qquad \Lm(\delta)=\E_{\thetas}\Lh(\delta),\qquad \en^2=n^{-(2r-1)/(2r)}.
+\]
+Then $n\en^2=n^{1/(2r)}$ and $(n\en^2)^{2r}=n$. The posterior is a ratio $\Pi_\lambda(B\mid y)=N(B)/N(\R^n)$, $N(B)=\int_Be^{-\Lh(\theta-\thetas)}d\nu(\theta)$, with $\nu$ the prior. Five steps:
+\begin{enumerate}
+\renewcommand{\labelenumi}{\textbf{\arabic{enumi}.}}
+\item \emph{Coordinates.} $\theta=Nc+Su$ with $u=\Dr\theta$: under the prior $c\in\R^r$ is flat and the $u_j$ are independent Laplace$(\lambda)$.
+\item \emph{Denominator.} With high probability $N(\R^n)\ge(\text{volume})\cdot e^{-Cn\en^2}$. This needs prior mass $e^{-Cn\en^2}$ near the truth. Centring at $\thetas$ costs $\lambda\|\Dr\thetas\|_1=cV^{*}\sqrt n$, in general far above $n\en^2$, so the ball is centred at a locally smoothed truth, at a quadratic cost $\lambda^2\|u^\circ\|_2^2\lesssim n\en^2$; the centred small-ball probability is bounded without a logarithm.
+\item \emph{Localization.} The posterior puts exponentially small mass outside a set $K_n$ on which $\|\delta\|_\infty\to0$. This is where $r\ge2$ is needed. On $K_n$, $\Delta_n^2(\delta)=\nn{\delta}^2$ and Assumptions A and B apply to every coordinate.
+\item \emph{Shells.} On a shell $\{a\en^2<\nn{\delta}^2\le2a\en^2\}$ write $\Lh(\delta)=-\langle\zeta,\delta\rangle+\Rh(\delta)$ with the score $\zeta_i=\tau-\ind(Z_i<0)$ and a nonnegative remainder. A spline projector with $J\asymp Mn\en^2$ knots splits the score: the coarse part is handled by Cauchy--Schwarz, the fine part by the exact Laplace moment generating function. The numerator is of order $e^{-(\fl/8)an\en^2}$.
+\item \emph{Assembly.} $\E\,\Pi\le\pr(\text{bad events})+\E[\Pi\,\ind_{\rm good}]$; the volume factors cancel. The bad events have probability $O(1/(n\en^2))=O(n^{-1/(2r)})$.
+\end{enumerate}
+\emph{Where the rate comes from.} The prior mass of an $\en$-ball is $\exp\{-C(c\en)^{-2/(2r-1)}\}$, which must be at least $e^{-Cn\en^2}$; and the fine score costs $n/(c^2(Mn\en^2)^{2r-1})$ in the exponent, which must be at most of order $Mn\en^2$. Both hold, up to constants, exactly at $\en^2=n^{-(2r-1)/(2r)}$. For (b), the prior mass of a ball of radius $\sqrt{c_0}\,\en$ is too small for small $c_0$.
+
+%======================================================================
+\section{Proof}
+
+\subsection{Reduction to $\sigma=1$}
+
+For $\sigma_0>0$, the substitution $\theta=\sigma_0\theta'$ and positive homogeneity of $\rho_\tau$ show that the law of $\theta/\sigma_0$ under the $\sigma_0$-posterior is the $\sigma=1$ posterior based on $y/\sigma_0$ with $c$ replaced by $\sigma_0c$. The data $y/\sigma_0$ satisfy A and B with $(L/\sigma_0,\sigma_0\fl,\sigma_0\fu)$, and $V^{*}\le\Vb/\sigma_0$. Since $\min\{\sigma_0,\sigma_0^2\}\Delta_n^2(v)\le\Delta_n^2(\sigma_0v)\le\max\{\sigma_0,\sigma_0^2\}\Delta_n^2(v)$, (a) and (b) for $\sigma_0$ follow from the case $\sigma=1$ applied to the rescaled problem, with its $M$ multiplied by $\max\{\sigma_0,\sigma_0^2\}$ and its $c_0$ by $\min\{\sigma_0,\sigma_0^2\}$. From now on $\sigma=1$ and $\lambda=c\,n^{r-1/2}$.
+
+%----------------------------------------------------------------------
+\subsection{Coordinates and the check loss}
+
+For integers $t$ and $p\ge0$ let $b_p(t)=\binom tp\ind(t\ge0)$, with $\binom tp=t(t-1)\cdots(t-p+1)/p!$. Pascal's rule gives
+\begin{equation}\label{pf:eq:pascal}
+b_p(t+1)-b_p(t)=b_{p-1}(t)\quad(p\ge1),\qquad b_0(t+1)-b_0(t)=\ind(t=-1).
+\end{equation}
+Let $S\in\R^{n\times m}$ have columns $s_j(i)=b_{r-1}(i-j-1)$ (so $s_j(i)=0$ for $i<j+r$ and $0\le s_j(i)\le n^{r-1}/(r-1)!$). Let $\cP\subset\R^n$ be the vectors $(p(i))_{i\le n}$ with $p$ a polynomial of degree at most $r-1$, $N\in\R^{n\times r}$ an orthonormal basis of $\cP$, $P=NN^\top$, $\Pp=I-P$. Let $\Ql$ be the law on $\R^m$ of $m$ independent Laplace variables with density $(\lambda/2)e^{-\lambda|x|}$, and $V_r$ the volume of the unit ball of $\R^r$.
+
+\begin{lemma}[coordinates]\label{pf:lem:coord}
+Let $n>r$ and $D=\Dr$.
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\item $DS=I_m$ and $\ker D=\cP$.
+\item $(c,u)\mapsto Nc+Su$ is a linear bijection $\R^r\times\R^m\to\R^n$, with $u=D\theta$. Let $\nu$ be the image of $\mathrm{Leb}_r\otimes\Ql$. Then
+\begin{equation}\label{pf:eq:ratio}
+\Pi_\lambda(B\mid y)=\frac{N(B)}{N(\R^n)},\qquad N(B)=\int_Be^{-\Lh(\theta-\thetas)}\,d\nu(\theta),\qquad 0<N(\R^n)<\infty .
+\end{equation}
+\item Let $u^{*}=D\thetas$ and $c^{*}=N^\top(\thetas-Su^{*})$. For $\theta=Nc+Su$ and $\delta=\theta-\thetas$,
+\begin{equation}\label{pf:eq:pyth}
+\|\delta\|_2^2=\|c-\bar c(u)\|_2^2+\|\Pp S(u-u^{*})\|_2^2,\qquad \bar c(u)=c^{*}-N^\top S(u-u^{*}),
+\end{equation}
+and for measurable $H\ge0$ and $\varrho\ge0$ on $\R^m$,
+\begin{equation}\label{pf:eq:vol}
+\int\ind\{\|c-\bar c(u)\|_2\le\varrho(u)\}H(u)\,d\nu=V_r\int\varrho(u)^rH(u)\,d\Ql(u);
+\end{equation}
+in particular $\nu\{\|\delta\|_2\le\varrho\}\le V_r\varrho^r$ for every constant $\varrho\ge0$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(a) $D$ is the $r$-th forward difference. Applying \eqref{pf:eq:pascal} $r$ times to $i\mapsto b_{r-1}(i-j-1)$ gives $\ind(i=j)$, so $DS=I_m$ and $\operatorname{rank}D=m$. $D$ annihilates $\cP$ and $\dim\cP=r=n-m$, so $\ker D=\cP$.
+(b) If $Nc+Su=0$, applying $D$ gives $u=0$, then $c=0$; so the map is bijective, with constant Jacobian, and $e^{-\lambda\|u\|_1}du=(2/\lambda)^md\Ql(u)$. Substitute in \eqref{pf:eq:post} and divide both integrals by $\exp\{-\sum_i\rho_\tau(Z_i)\}$. For finiteness: $\rho_\tau(x)\ge\min\{\tau,1-\tau\}|x|$ and $\|y-Nc-Su\|_1\ge\|c-N^\top(y-Su)\|_2$, so the $c$-integral is finite and free of $u$.
+(c) $\thetas-Su^{*}\in\ker D=\cP$, so $\thetas=Nc^{*}+Su^{*}$, $P\delta=N\{c-\bar c(u)\}$ and $\Pp\delta=\Pp S(u-u^{*})$; \eqref{pf:eq:pyth} is Pythagoras and \eqref{pf:eq:vol} is Fubini.
+\end{proof}
+
+Let $F_i(t)=\pr(Z_i\le t)$, $\ell_i(t)=\rho_\tau(Z_i-t)-\rho_\tau(Z_i)$, $m_i(t)=\E\ell_i(t)$, $\zeta_i=\tau-\ind(Z_i<0)$, so $\Lh(\delta)=\sum_i\ell_i(\delta_i)$, $\Lm(\delta)=\sum_im_i(\delta_i)$. Put $C_1=\max\{\fu/2,1/L\}$.
+
+\begin{lemma}[check loss]\label{pf:lem:check}
+Under Assumptions A and B, for every $i$ and all real $t,t'$:
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\item $\ell_i$ is convex, $\ell_i(0)=0$, $|\ell_i(t)-\ell_i(t')|\le|t-t'|$, and $\ell_i(t)$ takes values in a fixed interval of length $|t|$.
+\item $F_i(0)=\tau$; the $\zeta_i$ are i.i.d., with values in $\{\tau-1,\tau\}$, mean $0$ and variance $\tau(1-\tau)\le1/4$.
+\item (Knight's identity) $\ell_i(t)=-t\zeta_i+R_i(t)$, where $R_i(t)=(t-Z_i)\ind(0\le Z_i<t)$ for $t>0$, $R_i(t)=(Z_i-t)\ind(t<Z_i<0)$ for $t<0$, $R_i(0)=0$; so $0\le R_i(t)\le|t|$.
+\item $m_i(t)=\E R_i(t)=\int_0^t\{F_i(s)-\tau\}ds\ge0$, with $\tfrac12\fl t^2\le m_i(t)\le\tfrac12\fu t^2$ for $|t|\le L$ and $m_i(t)\le C_1t^2$ for all $t$.
+\item $\E R_i(t)^2\le\fu|t|^3/3$ for $|t|\le L$, and $\E e^{-2R_i(t)}\le e^{-m_i(t)}$ for $|t|\le\min\{L,3\fl/(4\fu)\}$.
+\item $\E e^{-\ell_i(t)}\le e^{t^2/8}$ for all $t$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(a), (c). $\rho_\tau$ is convex and $1$-Lipschitz. For $t>0$ the cases $Z_i<0$, $0\le Z_i<t$, $Z_i\ge t$ give $\ell_i(t)=(1-\tau)t$, $(1-\tau)t-Z_i$, $-\tau t$ and $\zeta_i=\tau-1,\tau,\tau$, so $\ell_i(t)+t\zeta_i=0,\ t-Z_i,\ 0$, and $\ell_i(t)\in[-\tau t,(1-\tau)t]$; $t<0$ is symmetric \citep{knight1998limiting}.
+(b) By B, $F_i$ is continuous at $0$; since $\thetas_i$ is a $\tau$-quantile, $F_i(0)\ge\tau\ge F_i(0-)$, so $F_i(0)=\tau$ and $\pr(\zeta_i=\tau-1)=\tau$ for all $i$.
+(d) $\E\zeta_i=0$, so $m_i=\E R_i$; for $t>0$, $R_i(t)=\int_0^t\ind(0\le Z_i<s)ds$ gives the integral \citep{belloni2011l1}, and similarly for $t<0$. Under A and B, $\fl|s|\le|F_i(s)-\tau|\le\fu|s|$ for $|s|\le L$, with the sign of $s$. For $|t|>L$, (a) gives $m_i(t)\le|t|\le t^2/L$.
+(e) $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$. With $e^{-x}\le1-x+x^2/2$ ($x\ge0$),
+$\E e^{-2R_i}\le1-2m_i+\tfrac23\fu|t|^3\le1-m_i\le e^{-m_i}$, using $\tfrac23\fu|t|^3\le\tfrac12\fl t^2\le m_i$.
+(f) Hoeffding's lemma with (a) and $m_i\ge0$.
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{Spline approximation}
+
+For an integer $1\le J\le m$ let $h=\lceil m/J\rceil$, $J'=\lfloor m/h\rfloor$, $V_J=\cP+\mathrm{span}\{s_{lh}:l=1,\dots,J'\}$ (discrete splines with $J'$ equally spaced knots), and $P_J$ the orthogonal projector onto $V_J$. Then $h\le2n/J$ and $\dim V_J\le J+r$.
+
+\begin{lemma}[spline approximation]\label{pf:lem:F}
+Let $1\le J\le m$. For every $j$ there is $e_j$ with $s_j-e_j\in V_J$, supported on at most $rh$ consecutive indices in $[j-rh,j+rh]$, with $\|e_j\|_\infty\le c_\infty h^{r-1}$, $c_\infty=(1+2^{r-1})(2r)^{r-1}/(r-1)!$. Consequently $(I-P_J)N=0$ and, with $c_F=\sqrt r\,c_\infty$, $c_{\op}=\sqrt3\,r\,c_\infty$,
+\begin{equation}\label{pf:eq:F}
+\max_{j}\|(I-P_J)s_j\|_2\le c_F\,h^{r-1/2},\qquad \|(I-P_J)S\|_{\op}\le c_{\op}\,h^{r}.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For fixed $i$, $p_i(x)=\binom{i-x-1}{r-1}$ is a polynomial of degree $r-1$ with $s_l(i)=p_i(l)$ for $l\le i-1$ and $s_l(i)=0$ for $l\ge i$. For fixed $j$, $q_j=(\binom{i-j-1}{r-1})_i\in\cP$, $s_j(i)=q_j(i)\ind(i\ge j+1)$ and $|q_j(i)|\le(j-i+r-1)^{r-1}/(r-1)!$ for $i\le j$.
+
+\emph{Case $J'\ge r$, $h\le j\le J'h$.} Let $a=\min\{\lfloor j/h\rfloor,J'-r+1\}$, knots $\kappa_l=(a+l)h$, $l=0,\dots,r-1$, $x=j/h-a\in[0,r-1]$, and $a_l$ the Lagrange weights for the nodes $0,\dots,r-1$ at $x$. Put $e_j=s_j-\sum_la_ls_{\kappa_l}$. For $i\le\kappa_0$ all terms vanish; for $i>\kappa_{r-1}$ all are values of $p_i$ and $e_j(i)=p_i(j)-\sum_la_lp_i(\kappa_l)=0$. So $e_j$ lives on $(r-1)h$ consecutive indices, where all entries are at most $((r-1)h)^{r-1}/(r-1)!$. Since $\prod_{k\ne l}|x-k|\le(r-1)!$, $|a_l|\le\binom{r-1}{l}$ and $\sum_l|a_l|\le2^{r-1}$.
+\emph{Case $j<h$, or $J'<r$ and $h\le j\le J'h$.} Put $e_j=s_j-q_j=-q_j\ind(i\le j)$, supported on at most $(r-1)h$ indices with entries at most $(2rh)^{r-1}/(r-1)!$.
+\emph{Case $j>J'h$.} Put $e_j=s_j$, supported on $\{j+r,\dots,n\}$, at most $h-1$ indices, entries at most $(h+r-3)^{r-1}/(r-1)!$.
+
+Since $\cP\subset V_J$, $(I-P_J)N=0$, and $\|(I-P_J)s_j\|_2\le\|e_j\|_2\le\sqrt{rh}\,c_\infty h^{r-1}$. For $E=(e_1,\dots,e_m)$, $(I-P_J)S=(I-P_J)E$; column sums of $|E|$ are at most $rh\,c_\infty h^{r-1}$ and row sums at most $3rh\,c_\infty h^{r-1}$, so the Schur test gives $\|E\|_{\op}\le\sqrt3\,r\,c_\infty h^r$.
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{Prior mass}
+
+Let $A=n^{-1/2}\Pp S$, $B_\varrho=\{u\in\R^m:\|Au\|_2\le\varrho\}$ and $\varphi(\varrho)=-\log\Ql(B_\varrho)$.
+
+\begin{lemma}[small ball]\label{pf:lem:sb}
+There is $C_{\rm sb}$ depending only on $r$ such that for all $n>r$, $\lambda>0$, $\varrho>0$,
+$\varphi(\varrho)\le C_{\rm sb}\{1+(n^{r-1/2}/(\lambda\varrho))^{2/(2r-1)}\}$.
+\end{lemma}
+
+\begin{proof}
+A Laplace$(\lambda)$ variable is $\sqrt Vg$ with $V$ exponential of mean $2/\lambda^2$ and $g\sim N(0,1)$ \citep{andrews1974scale}. Given $V=(V_j)$, $\|Au\|_2^2\sim\sum_q\mu_q\gamma_q^2$ with $\gamma_q$ i.i.d.\ $N(0,1)$ and $\mu_1\ge\mu_2\ge\dots$ the squared singular values of $G=A\,\mathrm{diag}(V_j^{1/2})$. On $\mathcal V=\{\sum_jV_j\le4m/\lambda^2\}$, which has probability at least $1/2$ by Markov's inequality:
+
+\emph{Eigenvalues.} By Eckart--Young (the squared Frobenius error of the best approximation of $G$ of rank at most $J$ is $\sum_{q>J}\mu_q$) and \eqref{pf:eq:F}, since $\Pp-(P_J-P)=I-P_J$ and $P_J-P$ has rank at most $J$,
+$\sum_{q>J}\mu_q\le n^{-1}\sum_jV_j\|(I-P_J)s_j\|_2^2\le b_0J^{-(2r-1)}$ with $b_0=2^{2r+1}c_F^2n^{2r-1}/\lambda^2$; also $\sum_q\mu_q\le b_0$. Taking $J=\lfloor q/2\rfloor$ and using monotonicity, $\mu_q\le b\,q^{-2r}$ with $b=8\cdot6^{2r-1}c_F^2n^{2r-1}/\lambda^2$.
+
+\emph{Gaussian small ball.} Let $K=\lceil(8b/\{(2r-1)\varrho^2\})^{1/(2r-1)}\rceil$. Then $\E\sum_{q>K}\mu_q\gamma_q^2\le\varrho^2/8$, so the tail is at most $\varrho^2/2$ with probability at least $3/4$. With $t_q^2=\varrho^2q^{2r}/(2bK)$, $\{|\gamma_q|\le t_q,\ q\le K\}$ forces the head to be at most $\varrho^2/2$, and $t_q\ge\vartheta_r(q/K)^r$ with $\vartheta_r=2/\sqrt{2r-1}$. Since $\pr(|\gamma|\le t)\ge0.48\min\{t,1\}$ and $K!\ge(K/e)^K$, the head has probability at least $e^{-\beta_rK}$, $\beta_r=r+\log(\max\{1,\sqrt{2r-1}/2\}/0.48)$. Hence $\Ql(B_\varrho)\ge\tfrac38e^{-\beta_rK}$. With $x=n^{r-1/2}/(\lambda\varrho)$, $K\le1+6(64c_F^2/(2r-1))^{1/(2r-1)}x^{2/(2r-1)}$.
+\end{proof}
+
+\begin{lemma}[quadratic shift]\label{pf:lem:qshift}
+Let $m\ge2$, $A$ any real matrix with columns $a_1,\dots,a_m$, $B_\varrho$ and $\varphi$ as above for this $A$, and $\delta_A=\max_{j<m}\|a_{j+1}-a_j\|_2$. If $\delta_A\le\lambda\varrho/2$, then for every $h\in\R^m$
+\[
+\Ql(h+B_\varrho)\ge\Ql(B_\varrho)\exp\{-c_K\lambda^2\|h\|_2^2\},\qquad c_K=\frac{1+K/2}{1-e^{-2}},\quad K=\frac{4\delta_A\varphi(\varrho/4)}{\lambda\varrho}.
+\]
+\end{lemma}
+
+\begin{proof}
+Let $B=B_\varrho$ and $\pi$ the density of $\Ql$. By symmetry, $\Ql(h+B)$ is the average of $\int_B\pi(w\pm h)dw$; the AM--GM inequality, $|w_j+h_j|+|w_j-h_j|=2\max\{|w_j|,|h_j|\}$ and Jensen give $\Ql(h+B)\ge\Ql(B)\exp\{-\lambda\sum_j\E_B(|h_j|-|w_j|)_+\}$, with $\E_B$ under $\Ql(\cdot\mid B)$. The marginal density $f_j$ of $w_j$ under $\Ql(\cdot\mid B)$ is symmetric and log-concave \citep{prekopa1973logarithmic}, so $\E_B(|h_j|-|w_j|)_+\le f_j(0)h_j^2$ and
+$\Ql(h+B)\ge\Ql(B)\exp\{-\lambda\|h\|_2^2\max_jf_j(0)\}$.
+It remains to show $f_j(0)\le c_K\lambda$. Let $j'$ be a neighbour of $j$, $A_{-j}$ the matrix without column $j$, $Q_{-j}$ the law of the other coordinates, $g(t)=Q_{-j}\{\|A_{-j}v+ta_j\|_2\le\varrho\}$ and $\Lambda(s)=\log Q_{-j}\{\|A_{-j}v\|_2\le s\}$. Shifting $v$ by $-te_{j'}$ gives $g(t)\ge e^{-\lambda|t|}e^{\Lambda(\varrho-|t|\delta_A)}$. $\Lambda$ is nondecreasing, nonpositive and concave \citep{prekopa1973logarithmic,borell1975convex}, and $-\Lambda(\varrho/4)\le\varphi(\varrho/4)$ (sections of $B_{\varrho/4}$ have largest measure at $w_j=0$). Concavity gives $\Lambda(\varrho)-\Lambda(\varrho-a)\le4\varphi(\varrho/4)a/\varrho$ for $0\le a\le\varrho/2$. For $|t|\le1/\lambda$, $a=|t|\delta_A\le\varrho/2$, so $g(t)\ge g(0)e^{-\lambda|t|(1+K)}$ and
+$\Ql(B)=\int(\lambda/2)e^{-\lambda|t|}g(t)dt\ge g(0)(1-e^{-2})/(2+K)$. Hence $f_j(0)=(\lambda/2)g(0)/\Ql(B)\le c_K\lambda$.
+\end{proof}
+
+For $w\ge r$ let $G_w=w^{-1}\sum_{k=0}^{w-1}\mathbf b(k/w)\mathbf b(k/w)^\top$, $\mathbf b(x)=(1,x,\dots,x^{r-1})^\top$, and $g_r=\inf_{w\ge r}\lambda_{\min}(G_w)\in(0,1]$ (a constant depending only on $r$), and $C_s=1+r/g_r$.
+
+\begin{lemma}[smoothed truth]\label{pf:lem:smooth}
+For every integer $r\le w\le m$ there is $u_w\in\R^m$ with $\|u_w\|_2\le C_sV^{*}/(n^{r-1}\sqrt w)$ and $\nn{S(u^{*}-u_w)}\le C_sV^{*}(w/n)^{r-1/2}$.
+\end{lemma}
+
+\begin{proof}
+For each $j$ take a window $W_j=\{a_j+1,\dots,a_j+w\}\ni j$, $x_l=(l-a_j-1)/w$ and the kernel $K^{(j)}(l)=w^{-1}\mathbf b(x_j)^\top G_w^{-1}\mathbf b(x_l)$ on $W_j$. It reproduces polynomials of degree at most $r-1$ at $j$ and $\|K^{(j)}\|_2\le r/(g_r\sqrt w)$. The vector $d_j=s_j-\sum_lK^{(j)}(l)s_l$ vanishes for $i\le a_j+1$ and, by reproduction of $p_i$, for $i\ge a_j+w+1$; so $\|d_j\|_2\le C_sw^{r-1/2}$. Let $u_w=\sum_ju^{*}_jK^{(j)}$ and use $\|u^{*}\|_1=V^{*}n^{-(r-1)}$.
+\end{proof}
+
+\begin{proposition}[prior mass]\label{pf:prop:prior}
+Let $V^{*}\le\Vb$. There is $n_1$ depending only on $(c,\Vb,r)$ such that for $n\ge n_1$ there is $u^\circ$ with
+$\nn{\Pp S(u^{*}-u^\circ)}\le\en/2$ and $-\log\Ql(u^\circ+B_{\en/2})\le C_{\rm pr}\,n\en^2$, where
+$C_{\rm pr}=C_{\rm sb}\{1+(2/c)^{2/(2r-1)}\}+4c^2C_s^2\Vb^2(2C_s\Vb)^{2/(2r-1)}$.
+\end{proposition}
+
+\begin{proof}
+Note $\en^{-2/(2r-1)}=n\en^2$. If $\Vb=0$ take $u^\circ=0$ and use Lemma~\ref{pf:lem:sb}. Otherwise let $w=\lfloor n(\en/(2C_s\Vb))^{2/(2r-1)}\rfloor$ and $u^\circ=u_w$ (Lemma~\ref{pf:lem:smooth}); for $n\ge n_1$, $r\le w\le m$ and the approximation error is at most $\en/2$, while
+$\lambda^2\|u^\circ\|_2^2\le c^2C_s^2\Vb^2n/w\le2c^2C_s^2\Vb^2(2C_s\Vb)^{2/(2r-1)}n\en^2$.
+Apply Lemma~\ref{pf:lem:qshift} with $A=n^{-1/2}\Pp S$, $\varrho=\en/2$: by \eqref{pf:eq:pascal}, $\delta_A\le n^{r-2}$, so $\delta_A\le\lambda\varrho/2$ and, by Lemma~\ref{pf:lem:sb}, $K\to0$ and $c_K\le2$ for $n\ge n_1$. Hence $-\log\Ql(u^\circ+B_{\en/2})\le\varphi(\en/2)+2\lambda^2\|u^\circ\|_2^2\le C_{\rm pr}n\en^2$.
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{Denominator}
+
+\begin{lemma}[denominator]\label{pf:lem:evid}
+Let $n\ge n_1$ and $C_E=\tfrac54C_1+1+C_{\rm pr}$. There is an event $\Omega_E$ with $\pr(\Omega_E^c)\le\tfrac54(n\en^2)^{-1}$ on which $N(\R^n)\ge V_r(\sqrt n\,\en/2)^re^{-C_En\en^2}$.
+\end{lemma}
+
+\begin{proof}
+We adapt \citet[Lemma~8.1]{ghosal2000convergence}. Let $\mathcal G=\{Nc+Su:\ u\in u^\circ+B_{\en/2},\ \|c-\bar c(u)\|_2\le\sqrt n\en/2\}$. By \eqref{pf:eq:pyth}, $\nn{\delta}^2\le\tfrac54\en^2$ on $\mathcal G$, and by \eqref{pf:eq:vol}, $\nu(\mathcal G)=V_r(\sqrt n\en/2)^r\Ql(u^\circ+B_{\en/2})$. Let $\bar\nu=\nu(\cdot\cap\mathcal G)/\nu(\mathcal G)$ and $\bar{\mathcal L}=\int\Lh\,d\bar\nu$. Jensen gives $N(\R^n)\ge\nu(\mathcal G)e^{-\bar{\mathcal L}}$. By Lemma~\ref{pf:lem:check}(d), $\E\bar{\mathcal L}\le\tfrac54C_1n\en^2$; by Lemma~\ref{pf:lem:check}(a) and independence, $\mathrm{Var}(\bar{\mathcal L})\le\int\|\delta\|_2^2d\bar\nu\le\tfrac54n\en^2$. Chebyshev's inequality gives $\pr\{\bar{\mathcal L}\ge(\tfrac54C_1+1)n\en^2\}\le\tfrac54(n\en^2)^{-1}$. Use Proposition~\ref{pf:prop:prior}.
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{Localization}
+
+For $\rho,T>0$ let $K(\rho,T)=\{\delta:\ \nn{\delta}\le\rho,\ \TV^{(r)}(\delta)\le T\}$, a compact convex symmetric set.
+
+\begin{lemma}[width]\label{pf:lem:width}
+For independent Rademacher signs $\xi_i$, all $\rho,T>0$ and $1\le J\le m$,
+$\E\sup_{K(\rho,T)}\langle\xi,\delta\rangle\le\sqrt n\{\rho\sqrt{J+r}+2^rc_F\sqrt{\log(2n)}\,T\,J^{-(r-1/2)}\}$.
+\end{lemma}
+
+\begin{proof}
+For $\delta=Nc+Su$, $\|u\|_1\le Tn^{-(r-1)}$ and $\langle\xi,\delta\rangle=\langle P_J\xi,\delta\rangle+\langle S^\top(I-P_J)\xi,u\rangle$. Bound the first term by $\|P_J\xi\|_2\sqrt n\rho$ with $\E\|P_J\xi\|_2\le\sqrt{J+r}$, and the second by $\max_j|\langle(I-P_J)s_j,\xi\rangle|\,Tn^{-(r-1)}$, a maximum of $2m$ sub-Gaussian variables with variance proxy $c_F^2h^{2r-1}$ by \eqref{pf:eq:F}. Use $h\le2n/J$.
+\end{proof}
+
+\begin{lemma}[interpolation]\label{pf:lem:interp}
+There is $C_I$ depending only on $r$ such that for $n>r$ and $\delta\in\R^n$,
+$\|\delta\|_\infty\le C_I\{\nn{\delta}+\nn{\delta}^{(2r-2)/(2r-1)}\TV^{(r)}(\delta)^{1/(2r-1)}\}$.
+\end{lemma}
+
+\begin{proof}
+Let $a=\nn{\delta}$, $T=\TV^{(r)}(\delta)$, $s=|\delta_{i_0}|=\|\delta\|_\infty$, $C_0=r/g_r$. On a window $W\ni i_0$ of $w\ge r$ consecutive indices, Lemma~\ref{pf:lem:coord} applied to $\delta_W$ gives $\delta_W=p+S_wu_W$ with $p$ a polynomial and $\|\delta_W-p\|_\infty\le\varrho_w=w^{r-1}T/\{(r-1)!n^{r-1}\}$. Since $\max_W|p|\le(C_0/w)^{1/2}\|p\|_{\ell_2(W)}$ and $\|p\|_{\ell_2(W)}\le\sqrt na+\sqrt w\varrho_w$,
+$s\le\sqrt{C_0}\,a\sqrt{n/w}+C'T(w/n)^{r-1}$ with $C'=(1+\sqrt{C_0})/(r-1)!$. If $T\le a$ take $w=n$. Otherwise let $x^{*}=(a/T)^{2/(2r-1)}$; if $nx^{*}\ge r$ take $w=\lceil nx^{*}\rceil$, and if $nx^{*}<r$ use $s\le\sqrt na$. The claim holds with $C_I=\sqrt{C_0}+2^{r-1}C'$.
+\end{proof}
+
+\begin{lemma}[concentration]\label{pf:lem:conc}
+Let $K\subset\R^n$ be compact and symmetric and $G_K=\sup_{\delta\in K}|\Lh(\delta)-\Lm(\delta)|$. Then
+$\E G_K\le4\E\sup_K\langle\xi,\delta\rangle$ and $\mathrm{Var}(G_K)\le\sup_K\|\delta\|_2^2$.
+\end{lemma}
+
+\begin{proof}
+Symmetrization for independent processes, in absolute-value form \citep[Lemma~2.3.6]{vandervaart1996weak}, gives $\E G_K\le2\E\sup_K|\sum_i\xi_i\ell_i(\delta_i)|$; the $\ell_i$ are contractions vanishing at $0$, so the contraction principle in absolute-value form \citep[Theorem~4.12]{ledoux1991probability} and the symmetry of $K$ give the factor $4$. For the variance, replacing $Z_i$ by an independent copy changes $G_K$ by at most $|\hat\delta_i|$, with $\hat\delta$ a maximizer (Lemma~\ref{pf:lem:check}(a)); the Efron--Stein inequality \citep{efron1981jackknife}; \citealp[Theorem~3.1]{boucheron2013concentration} gives $\mathrm{Var}(G_K)\le\|\hat\delta\|_2^2$.
+\end{proof}
+
+Let
+\[
+\rho_n^2=n^{-(2r-1)/(2r+1)}\log n,\qquad T_n=\frac{4n^r}{\lambda}=\frac4c\sqrt n,\qquad K_n=K(\rho_n,T_n),\qquad \alpha_n=\frac{\fl}4n\rho_n^2,
+\]
+and $s_0=\min\{1,L,3\fl/(4\fu)\}$.
+
+\begin{proposition}[localization]\label{pf:prop:local}
+There is $n_2\ge n_1$, depending only on $(c,r,L,\fl,\fu,\Vb)$, and for $n\ge n_2$ an event $\Omega_G$ with $\pr(\Omega_G^c)\le64/(\fl^2n\rho_n^2)$, such that
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\alph{enumi})}
+\item $\sup_{\delta\in K_n}\|\delta\|_\infty\le s_0$; in particular $\Delta_n^2(\delta)=\nn{\delta}^2$ on $K_n$;
+\item on $\Omega_G\cap\Omega_E$, $\Pi_\lambda(\theta-\thetas\notin K_n\mid y)\le r!\{e^{-\fl n\rho_n^2/16}+e^{-n/8}\}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(a) By Lemma~\ref{pf:lem:interp}, $\sup_{K_n}\|\delta\|_\infty\le C_I\{\rho_n+(\rho_n^{2r-2}T_n)^{1/(2r-1)}\}$, and
+\[
+\rho_n^{2r-2}T_n=\frac4c\,n^{-(4r^2-8r+1)/(2(2r+1))}(\log n)^{r-1}\to0
+\]
+because $4r^2-8r+1\ge1$ for $r\ge2$. This is the substantive use of $r\ge2$: at $r=1$ the exponent is $+1/2$. (Case~I of Lemma~\ref{pf:lem:F} and the bound $\delta_A\le n^{r-2}$ in Proposition~\ref{pf:prop:prior} also use $r\ge2$, but have elementary replacements at $r=1$.)
+
+\emph{The event.} Let $G=G_{K_n}$ and $J_n=\lceil(T_n\sqrt{\log(2n)}/\rho_n)^{1/r}\rceil$. Lemma~\ref{pf:lem:width} gives $\E\sup_{K_n}\langle\xi,\delta\rangle\le(1+2^rc_F)\sqrt n\rho_n\sqrt{J_n+r}$, and $J_n+r=O(n^{2/(2r+1)})=o(n\rho_n^2)$, so $\E G\le(\fl/8)n\rho_n^2$ for $n\ge n_2$. Let $\Omega_G=\{G\le(\fl/4)n\rho_n^2\}$; Lemma~\ref{pf:lem:conc} and Chebyshev give the bound on $\pr(\Omega_G^c)$.
+
+\emph{Rays.} Let $t(\delta)=\max\{\nn{\delta}/\rho_n,\TV^{(r)}(\delta)/T_n\}$ and, for $\delta\notin K_n$, $\hat\delta=\delta/t(\delta)$; by convexity $\Lh(\delta)\ge t(\delta)\Lh(\hat\delta)$. On $\Omega_G$: if $\nn{\delta}/\rho_n\ge\TV^{(r)}(\delta)/T_n$ (set $A_1$), then $\|\hat\delta\|_\infty\le s_0$, Lemma~\ref{pf:lem:check}(d) gives $\Lm(\hat\delta)\ge(\fl/2)n\rho_n^2$, and $\Lh(\delta)\ge\alpha_n\nn{\delta}/\rho_n$; otherwise (set $A_2$), $\Lh(\delta)\ge-\alpha_nt(\delta)$.
+
+\emph{Mass of $A_1$.} On $A_1$, $\nn{\delta}\ge\rho_n/2+\|c-\bar c(u)\|_2/(2\sqrt n)$; with \eqref{pf:eq:vol} and $\int_{\R^r}e^{-\kappa\|c\|_2}dc=r!V_r\kappa^{-r}$, $N(A_1)\le r!V_r(2\sqrt n\rho_n/\alpha_n)^re^{-\alpha_n/2}$.
+
+\emph{Mass of $A_2$.} $\Gamma=\lambda\|u\|_1\sim\mathrm{Gamma}(m,1)$ under $\Ql$, and $t(\delta)\le\bar t:=\Gamma/(4n)+c\Vb/(4\sqrt n)\le\Gamma/(4n)+1/2$, so $A_2\subset\{\Gamma>2n\}$. By \eqref{pf:eq:vol}, $x^r\le r!e^x$, $\ind\{\Gamma>2n\}\le e^{(\Gamma-2n)/2}$ and $\E e^{\vartheta\Gamma}=(1-\vartheta)^{-m}$,
+$N(A_2)\le r!V_r(\sqrt n\rho_n)^r\E_{\Ql}[e^{(\alpha_n+1)\bar t}\ind\{\Gamma>2n\}]\le r!V_r(\sqrt n\rho_n)^re^{-n/4}$ for $n\ge n_2$.
+
+(b) Divide by Lemma~\ref{pf:lem:evid}: $\Pi_\lambda(K_n^c\mid y)\le r!(16/(\fl n\rho_n\en))^re^{-\alpha_n/2+C_En\en^2}+r!(2\rho_n/\en)^re^{-n/4+C_En\en^2}$. Since $n\en^2=o(n\rho_n^2)$ and $\rho_n/\en$ grows polynomially, this is at most $r!\{e^{-\alpha_n/4}+e^{-n/8}\}$ for $n\ge n_2$.
+\end{proof}
+
+%----------------------------------------------------------------------
+\subsection{Shells}
+
+For $1\le J\le m$ let $t=S^\top(I-P_J)\zeta$, i.e.\ $t_j=\langle(I-P_J)s_j,\zeta\rangle$, and
+\[
+\Omega_\zeta(J)=\Bigl\{\|P_J\zeta\|_2^2\le J+r,\ \ \|t\|_\infty\le c_Fh^{r-1/2}\sqrt{\log(2n)},\ \ \|t\|_2^2\le c_F^2mh^{2r-1}\Bigr\}.
+\]
+
+\begin{lemma}[score events]\label{pf:lem:score}
+For every $1\le J\le m$, $\pr(\Omega_\zeta(J)^c)\le\frac4{9(J+r)}+\frac1{2n}+\frac{8r}{3J}$.
+\end{lemma}
+
+\begin{proof}
+The $\zeta_i$ are i.i.d., centred, $|\zeta_i|\le1$, variance $v\le1/4$, so for symmetric $Q$: $\E\zeta^\top Q\zeta=v\,\mathrm{tr}Q$ and $\mathrm{Var}(\zeta^\top Q\zeta)\le\frac14\|Q\|_F^2$. With $Q=P_J$, Chebyshev gives the first term. Hoeffding's inequality and \eqref{pf:eq:F} give $\pr(|t_j|>c_Fh^{r-1/2}\sqrt{\log(2n)})\le1/(2n^2)$; sum over $j$. For $W=(I-P_J)S$, $\|W\|_F^2\le b:=c_F^2mh^{2r-1}$ and $\|WW^\top\|_F\le c_{\op}h^r\sqrt b$ by \eqref{pf:eq:F}, so $\pr(\|t\|_2^2>b)\le(c_{\op}^2h^{2r}b/4)/(3b/4)^2=\frac{4r}3\frac hm\le\frac{8r}{3J}$.
+\end{proof}
+
+For $a>0$ let $E_a=\{\theta:\ \|\delta\|_\infty\le s_0,\ an\en^2<\|\delta\|_2^2\le2an\en^2\}$.
+
+\begin{proposition}[shells]\label{pf:prop:shell}
+Let $M>0$, $J=\lfloor(\fl^2/128)Mn\en^2\rfloor-r$ and $C_{\rm fine}=2^{2r+1}c_F^2(256/\fl^2)^{2r-1}$. There is $n_3$, depending only on $(M,c,r,\fl,\Vb)$, such that for $n\ge n_3$: $1\le J\le m$, $J\ge(\fl^2/256)Mn\en^2$, and for every $a\ge M$
+\[
+\E\bigl[N(E_a)\ind_{\Omega_\zeta(J)}\bigr]\le V_r(2an\en^2)^{r/2}\exp\Bigl\{-\frac{\fl}8an\en^2+\Bigl(1+\frac{C_{\rm fine}}{c^2M^{2r-1}}\Bigr)n\en^2\Bigr\}.
+\]
+\end{proposition}
+
+\begin{proof}
+By Lemma~\ref{pf:lem:check}(c) and Cauchy--Schwarz in $L^2(\nu)$,
+$N(E_a)\le I_1^{1/2}I_2^{1/2}$ with $I_1=\int_{E_a}e^{2\langle\zeta,\delta\rangle}d\nu$ and $I_2=\int_{E_a}e^{-2\Rh(\delta)}d\nu$, $\Rh=\sum_iR_i(\delta_i)$.
+
+\emph{Remainder.} On $E_a$, $\|\delta\|_\infty\le s_0$, so Lemma~\ref{pf:lem:check}(e), (d) and independence give $\E e^{-2\Rh(\delta)}\le e^{-\Lm(\delta)}\le e^{-(\fl/2)an\en^2}$; by Tonelli and \eqref{pf:eq:vol}, $\E I_2\le V_r(2an\en^2)^{r/2}e^{-(\fl/2)an\en^2}$.
+
+\emph{Score, on $\Omega_\zeta=\Omega_\zeta(J)$.} Since $(I-P_J)N=0$, $\langle\zeta,\delta\rangle=\langle P_J\zeta,\delta\rangle+\langle t,u-u^{*}\rangle$. On $E_a$ with $a\ge M$, $|\langle P_J\zeta,\delta\rangle|\le\sqrt{J+r}(2an\en^2)^{1/2}\le(\fl/8)an\en^2$. By \eqref{pf:eq:vol} and $\int e^{sx}(\lambda/2)e^{-\lambda|x|}dx=(1-s^2/\lambda^2)^{-1}$,
+\[
+I_1\le e^{(\fl/4)an\en^2}e^{-2\langle t,u^{*}\rangle}V_r(2an\en^2)^{r/2}\prod_j(1-4t_j^2/\lambda^2)^{-1}.
+\]
+Using $h\le2n/J$, $J\ge(\fl^2/256)Mn\en^2$, $\lambda^2=c^2n^{2r-1}$, $(n\en^2)^{2r}=n$ and $\|u^{*}\|_1\le\Vb n^{-(r-1)}$: for $n\ge n_3$, $4\|t\|_\infty^2/\lambda^2\le2^{2r+1}c_F^2\log(2n)/(c^2J^{2r-1})\le\frac12$; $8\|t\|_2^2/\lambda^2\le2C_{\rm fine}c^{-2}M^{-(2r-1)}n\en^2$; and $2|\langle t,u^{*}\rangle|\le2c_F\Vb(512/(\fl^2M))^{r-1/2}\sqrt{\log(2n)}(n\en^2)^{1/2}\le2n\en^2$. With $-\log(1-x)\le2x$ on $[0,\frac12]$,
+$I_1\le\bar I_1:=V_r(2an\en^2)^{r/2}\exp\{(\fl/4)an\en^2+2n\en^2+2C_{\rm fine}c^{-2}M^{-(2r-1)}n\en^2\}$ on $\Omega_\zeta$.
+
+Since $\bar I_1$ is deterministic, $\E[N(E_a)\ind_{\Omega_\zeta}]\le\bar I_1^{1/2}(\E I_2)^{1/2}$ by Jensen.
+\end{proof}
+
+The score is never averaged over the data: only the nonnegative remainder is. This is why no lower bound on $\sigma_0$ is needed.
+
+%----------------------------------------------------------------------
+\subsection{Proof of Theorem~\ref{thm:main}(a)}
+
+Let
+\[
+M=\frac{32}{\fl}\bigl(C_E+1\bigr)+\Bigl(\frac{32C_{\rm fine}}{\fl c^2}\Bigr)^{1/(2r)},\qquad C=2+\frac{768r}{\fl^2M},
+\]
+$J$ as in Proposition~\ref{pf:prop:shell}, $n\ge n_0:=\max\{n_2,n_3\}$ (enlarged finitely often below) and $a_k=2^kM$. If $\delta\in K_n$ and $\Delta_n^2(\delta)>M\en^2$, then by Proposition~\ref{pf:prop:local}(a) $\nn{\delta}^2>M\en^2$ and $\theta\in E_{a_k}$ for some $k\ge0$. Hence, with $\Omega_\zeta=\Omega_\zeta(J)$,
+\begin{align*}
+\E\,\Pi_\lambda(\Delta_n^2>M\en^2\mid y)\le{}&\pr(\Omega_E^c)+\pr(\Omega_G^c)+\pr(\Omega_\zeta^c)\\
+&+\E[\Pi_\lambda(K_n^c\mid y)\ind_{\Omega_E\cap\Omega_G}]+\sum_{k\ge0}\E[\Pi_\lambda(E_{a_k}\mid y)\ind_{\Omega_E\cap\Omega_\zeta}].
+\end{align*}
+\emph{Shells.} On $\Omega_E$ the denominator is at least the deterministic bound of Lemma~\ref{pf:lem:evid}; the volume factors leave $(2an\en^2)^{r/2}(\sqrt n\en/2)^{-r}=(8a)^{r/2}$, and Proposition~\ref{pf:prop:shell} gives
+\[
+\E[\Pi_\lambda(E_a\mid y)\ind_{\Omega_E\cap\Omega_\zeta}]\le(8a)^{r/2}\exp\Bigl\{-\frac{\fl}8an\en^2+\Bigl(C_E+1+\frac{C_{\rm fine}}{c^2M^{2r-1}}\Bigr)n\en^2\Bigr\}.
+\]
+By the choice of $M$, $(\fl/32)M\ge C_E+1$ and $(\fl/32)M^{2r}\ge C_{\rm fine}/c^2$, so the bracket is at most $(\fl/16)M\le(\fl/16)a$. With $x_n=(\fl/16)Mn\en^2\ge r$ and $2^{kr/2}e^{-(2^k-1)x_n}\le e^{-0.65kr}$, the shell terms sum to at most $2(8M)^{r/2}e^{-x_n}$.
+
+\emph{Conclusion.} By Lemma~\ref{pf:lem:evid}, Proposition~\ref{pf:prop:local}, Lemma~\ref{pf:lem:score} with $J\ge(\fl^2/256)Mn\en^2$ and $4/9+8r/3\le3r$, the right side is at most
+\[
+\frac5{4n\en^2}+\frac{64}{\fl^2n\rho_n^2}+\frac{768r}{\fl^2Mn\en^2}+\frac1{2n}+r!\{e^{-\fl n\rho_n^2/16}+e^{-n/8}\}+2(8M)^{r/2}e^{-x_n}\le C\,n^{-1/(2r)},
+\]
+since $n\en^2=n^{1/(2r)}$ and every term other than the first and third is $o(1/(n\en^2))$. \qed
+
+%----------------------------------------------------------------------
+\subsection{Proof of Theorem~\ref{thm:main}(b)}
+
+\begin{lemma}[symmetric log-concave densities]\label{pf:lem:lc}
+A symmetric log-concave density $p$ on $\R$ with variance $v\in(0,\infty)$ has $\sup p=p(0)\le1/\sqrt{2v}$.
+\end{lemma}
+
+\begin{proof}
+Let $q(x)=(\beta/2)e^{-\beta|x|}$ with $\beta=2p(0)$. On $[0,\infty)$, $\log p-\log q$ is concave and vanishes at $0$, so $p\ge q$ exactly on some $[0,x_0]$. As $\int_0^\infty(p-q)=0$, $\int_0^\infty x^2(p-q)=\int_0^\infty(x^2-x_0^2)(p-q)\le0$, so $v\le2/\beta^2$.
+\end{proof}
+
+\begin{lemma}[small ball, upper bound]\label{pf:lem:sbu}
+Let $C_\ell=8e^2(r+1)\binom{2r}r^{1/2}$, $x_0=C_\ell(4(r+1))^{r-1/2}$, $c_{\rm lb}=C_\ell^{-2/(2r-1)}/(4(r+1))$. If $x=n^{r-1/2}/(\lambda\varrho)$ satisfies $x_0\le x\le C_\ell n^{r-1/2}$, then $\Ql(B_\varrho)\le\exp\{-c_{\rm lb}x^{2/(2r-1)}\}$.
+\end{lemma}
+
+\begin{proof}
+Let $\ell\ge1$ with $2(r+1)\ell\le n$ and $\mathsf B=\lfloor n/((r+1)\ell)\rfloor$. Let $\kappa$ be the coefficient vector of $(1+z+\dots+z^{\ell-1})^{r+1}$, so $\|\kappa\|_2^2\ge\ell^{2r+1}/(r+1)$; let $\kappa_b$ be $\kappa$ placed at offset $j_b=(b-1)(r+1)\ell$, and $g_b=D^\top\kappa_b$. The generating function of $g_b$ is $z^{j_b+1}(z^\ell-1)^r\sigma_\ell(z)$, $\sigma_\ell(z)=1+\dots+z^{\ell-1}$, so the $g_b$ have disjoint supports and $\|g_b\|_2^2=\ell\binom{2r}r$. By Lemma~\ref{pf:lem:coord}(a), $\langle g_b,\Pp Su\rangle=\langle\kappa_b,u\rangle=:Y_b$. For $u\in B_\varrho$, $\sum_bY_b^2/\|g_b\|_2^2\le n\varrho^2$, so at least $\lceil\mathsf B/2\rceil$ of the $Y_b$ satisfy $Y_b^2\le y_0^2=2n\varrho^2\ell\binom{2r}r/\mathsf B$. Under $\Ql$ the $Y_b$ are independent, symmetric and log-concave with variance $2\|\kappa\|_2^2/\lambda^2$, so by Lemma~\ref{pf:lem:lc}
+$p_0=\Ql(|Y_b|\le y_0)\le2(r+1)\binom{2r}r^{1/2}x^{-1}(n/\ell)^{r-1/2}$,
+and a union bound gives $\Ql(B_\varrho)\le(4p_0)^{\mathsf B/2}$. Take $\ell=\lceil n(C_\ell/x)^{2/(2r-1)}\rceil$: then $4p_0\le e^{-2}$, the range of $x$ gives $2(r+1)\ell\le n$, and $\mathsf B\ge(x/C_\ell)^{2/(2r-1)}/(4(r+1))$.
+\end{proof}
+
+\begin{proof}[Proof of (b)]
+Let $\eta=\sqrt{c_0}\,\en$, $c_0\le1$, and $H=\{\nn{\delta}\le\eta\}$. By Proposition~\ref{pf:prop:local}(a), $\{\Delta_n^2(\delta)\le c_0\en^2\}\subset K_n^c\cup H$. By Lemma~\ref{pf:lem:check}(f), Tonelli, \eqref{pf:eq:pyth}, \eqref{pf:eq:vol} and Anderson's inequality \citep{anderson1955integral}; $\Ql$ has a symmetric log-concave density,
+\[
+\E N(H)\le e^{n\eta^2/8}\nu(H)\le e^{n\eta^2/8}V_r(\sqrt n\eta)^r\Ql(u^{*}+B_\eta)\le e^{n\eta^2/8}V_r(\sqrt n\eta)^r\Ql(B_\eta).
+\]
+Here $x=1/(c\sqrt{c_0}\en)\in[x_0,C_\ell n^{r-1/2}]$ for large $n$ and $x^{2/(2r-1)}=(c^2c_0)^{-1/(2r-1)}n\en^2$, so Lemma~\ref{pf:lem:sbu} gives $\Ql(B_\eta)\le\exp\{-c_{\rm lb}(c^2c_0)^{-1/(2r-1)}n\en^2\}$. With Lemma~\ref{pf:lem:evid},
+\[
+\E[\Pi_\lambda(H\mid y)\ind_{\Omega_E}]\le2^r\exp\bigl\{\bigl(\tfrac18+C_E-c_{\rm lb}(c^2c_0)^{-1/(2r-1)}\bigr)n\en^2\bigr\}\le2^re^{-n\en^2}
+\]
+once $c_0$ is so small that $c_{\rm lb}(c^2c_0)^{-1/(2r-1)}\ge C_E+\frac98$. Adding $\pr(\Omega_E^c)+\pr(\Omega_G^c)+\E[\Pi_\lambda(K_n^c\mid y)\ind_{\Omega_E\cap\Omega_G}]$ (Lemma~\ref{pf:lem:evid}, Proposition~\ref{pf:prop:local}), the total is at most $2/(n\en^2)=2n^{-1/(2r)}$ for large $n$.
+\end{proof}
