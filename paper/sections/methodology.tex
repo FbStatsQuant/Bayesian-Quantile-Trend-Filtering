@@ -160,7 +160,7 @@ The metric $M$ is chosen to match the curvature of $U$. We use
     M = W + \kappa\, \frac{\lambda^2}{2}\, D^\top D, \qquad W = \mathrm{diag}(w_1, \ldots, w_n), \qquad \kappa = 3,
     \label{eq:metric}
 \end{equation}
-which combines the precision of the augmented likelihood with a difference precision on the scale of the prior. The metric depends on $(z, \lambda, \sigma)$ but not on $\theta$, so the move is a valid Metropolis--Hastings kernel.
+which combines the precision of the augmented likelihood with a difference precision on the scale of the prior. The metric depends on $(z, \lambda, \sigma)$ but not on $\theta$; the move is therefore a valid Metropolis--Hastings kernel.
 
 Problem \eqref{eq:prox} is a weighted trend filtering problem. We solve it by ADMM with a fixed number of iterations and a cold start, which makes $T$ a deterministic function of its input (Appendix~\ref{app:pmala:admm}). Every linear system is banded with half-bandwidth $k+1$, and one factorization serves the forward and reverse maps; the work per sweep is therefore linear in $n$. The step size $\delta$ is adapted toward acceptance $0.5$ (Appendix~\ref{app:pmala:adapt}).
 
@@ -209,7 +209,7 @@ Within a sweep, level $j$ is updated by the five steps of Section~\ref{subsec:in
     \item \emph{Likelihood scale $\sigma_j$.} Unchanged: \eqref{eq:sigmaupdate} at $\tau=\tau_j$.
     \item \emph{Step size $\delta_j$.} Each level has its own step size, updated toward acceptance $0.5$.
 \end{enumerate}
-During the first $H$ sweeps of the burn-in, the trend move is replaced by a constrained optimization step, and the interweaving step and the step-size update start afterwards (Appendix~\ref{app:pmala:init}). Algorithm~\ref{alg:joint_pmala} summarizes one run. Every retained draw satisfies \eqref{eq:joint_order}, so neither the draws nor the pointwise posterior means cross at the observed indices. For $J=1$ the joint sampler reduces to the individual sampler.
+During the first $H$ sweeps of the burn-in, the trend move is replaced by a constrained optimization step, and the interweaving step and the step-size update start afterwards (Appendix~\ref{app:pmala:init}). Algorithm~\ref{alg:joint_pmala} summarizes one run. Every retained draw satisfies \eqref{eq:joint_order}; consequently, neither the draws nor the pointwise posterior means cross at the observed indices. For $J=1$ the joint sampler reduces to the individual sampler.
 
 \begin{algorithm}[!htbp]
 \caption{Joint Bayesian-PMALA for ordered quantile levels}

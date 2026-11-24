@@ -12,7 +12,7 @@ with independent errors, where for a level $\tau \in (0,1)$ the trend $\theta_i$
     \sum_{i=1}^n \rho_\tau(y_i - \theta_i) + \lambda \norm{D^{(k+1)}\theta}_1,
     \label{eq:intro_qtf}
 \end{equation}
-where $\rho_\tau$ is the check loss of \citet{koenker1978regression} and $D^{(k+1)}$ is the difference operator of order $k+1$. The $\ell_1$ penalty on the differences adapts a piecewise polynomial fit of degree $k$ to local changes in the signal \citep{tibshirani2014adaptive,madrid2022risk}. Here $\lambda$ sets the smoothness of the fit and must be chosen; we refer to it as the penalty. Both optimization and posterior sampling have been proposed for this problem, and we describe them next.
+where $\rho_\tau$ is the check loss of \citet{koenker1978regression} and $D^{(k+1)}$ is the difference operator of order $k+1$. The $\ell_1$ penalty on the differences adapts a piecewise polynomial fit of degree $k$ to local changes in the signal \citep{tibshirani2014adaptive,madrid2022risk}. Here $\lambda$, which we call the penalty, sets the smoothness of the fit and must be chosen. Optimization and posterior sampling have both been proposed for this problem; we describe them next.
 
 Quantile trend filtering was developed by \citet{brantley2020baseline} for baseline drift estimation. They solve \eqref{eq:intro_qtf} by the alternating direction method of multipliers (ADMM), impose non-crossing constraints when several levels are fitted, and select $\lambda$ by an extended Bayesian information criterion. \citet{madrid2022risk} established risk bounds for the estimator. The method, however, returns a point estimate at the selected penalty.
 
