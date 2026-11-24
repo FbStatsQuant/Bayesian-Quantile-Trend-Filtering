@@ -30,14 +30,14 @@
 \begin{document}
 \maketitle
 
-\noindent\textbf{Status.} Statement accepted by the Theory head on 24 November 2026, with the fixed-$\sigma_0$ form of Theorem~\ref{thm:main} and Remark~\ref{rem:sampler} added at the owner's request. Revised the same day after internal checks (Astra-2 findings verified by the Theory head; see \texttt{AUDIT.md}).\par\smallskip
+\noindent\textbf{Status.} Statement accepted by the Theory head on 24 November 2026, with the fixed-$\sigma_0$ form of Theorem~\ref{thm:main} and Remark~\ref{rem:sampler} added at the owner's request. Revised the same day after internal checks (Astra-2 findings verified by the Theory head; see \texttt{AUDIT.md}). Corollary~\ref{cor:mode} was then restated in the form proved in \texttt{T07c\_proof.tex}.\par\smallskip
 \noindent\textbf{What this note contains.} The setup, the assumptions, one theorem, one corollary, five remarks and a roadmap for the prover. Nothing here is proved. Numbers in the form ``eq.~(44)'' or ``Lemma~13'' refer to Madrid Padilla and Chatterjee, \emph{Risk bounds for quantile trend filtering}. The breakdown of their Theorem~3 is in the companion file \texttt{PADILLA\_THM3\_BREAKDOWN.md}.
 
 \medskip
 \noindent\textbf{The outcome in three lines.}
 \begin{itemize}[itemsep=1pt,topsep=2pt]
 \item Theorem~\ref{thm:main}: at a fixed scale $\sigma=\sigma_0$ (for instance $\sigma_0=1$) and prior rate $\lambda=c\,n^{(2r-1)/2}$, the posterior contracts at the rate $n^{-(2r-1)/(2r)}(\log n)^{1/(2r)}$. For $r=3$ this is $n^{-5/6}(\log n)^{1/6}$.
-\item Corollary~\ref{cor:mode}: at Padilla's $\lambda$ the posterior mode attains Padilla's rate $n^{-2r/(2r+1)}(\log n)^{1/(2r+1)}$.
+\item Corollary~\ref{cor:mode}: at Padilla's $\lambda$ the posterior mode attains Padilla's rate $n^{-2r/(2r+1)}(\log n)^{1/(2r+1)}$, for $r\ge2$.
 \item Remark~\ref{rem:lower}: the full posterior cannot attain Padilla's rate at a fixed $\sigma$ and Padilla's $\lambda$, because it is wider than its mode (proved for $r=3$; heuristic for general $r$).
 \end{itemize}
 
@@ -115,18 +115,18 @@ Here $M$ depends only on $c$, $\sigma_0$, $r$, $\tau$, $L$, $\underline f$, $\ba
 For the paper's default $k=2$, that is $r=3$: $\lambda=c\,n^{5/2}$ and the rate is $n^{-5/6}(\log n)^{1/6}$.
 
 \begin{corollary}[posterior mode]\label{cor:mode}
-Fix an integer $r\ge 1$. Let $\{y_i\}_{i=1}^n$ be any sequence of independent random variables which satisfies Assumptions A and B, and let $\thetas_i$ be the sequence of $\tau$-quantiles of $y_i$. Suppose that $V^{*}=\Theta(1)$. Given any $\epsilon\in(0,1)$ there exists a positive constant $c_{1,\epsilon}$, only depending on $\epsilon$ and $V^{*}$, such that if $\lambda$ is chosen to be
+Fix an integer $r\ge 2$. Let $\{y_i\}_{i=1}^n$ be any sequence of independent random variables which satisfies Assumptions A and B, and let $\thetas_i$ be the sequence of $\tau$-quantiles of $y_i$. Suppose that $V^{*}\le\bar V$ for all $n$, for a constant $\bar V$. For every $c>0$ there exist constants $C$ and $n_0$, depending only on $(c,r,L,\underline f,\bar V)$, such that if $\lambda$ is chosen to be
 \[
 \lambda=c\,n^{r(2r-1)/(2r+1)}(\log n)^{1/(2r+1)},\qquad\text{equivalently}\qquad \lamtv=c\,n^{1/(2r+1)}(\log n)^{1/(2r+1)},
 \]
-for a constant $c$ satisfying $c>c_{1,\epsilon}$, then every mode $\hat\theta_\lambda$ of the posterior \eqref{eq:post} with $\sigma=1$ satisfies
+then for all $n\ge n_0$, with probability at least $1-C\,(n\log n)^{-1/(2r+1)}$, every mode $\hat\theta_\lambda$ of the posterior \eqref{eq:post} with $\sigma=1$ satisfies
 \[
-\Delta_n^2(\hat\theta_\lambda-\thetas)\;\le\;c_{2,\epsilon}\,n^{-2r/(2r+1)}(\log n)^{1/(2r+1)}
+\Delta_n^2(\hat\theta_\lambda-\thetas)\;\le\;C\,n^{-2r/(2r+1)}(\log n)^{1/(2r+1)} .
 \]
-with probability at least $1-\epsilon$. Here $c_{2,\epsilon}>0$ is a constant that only depends on $c$, $\epsilon$ and $V^{*}$.
+For a general fixed $\sigma=\sigma_0>0$ the modes are the same estimator with tuning parameter $\sigma_0\lamtv$, so the conclusion holds with $C$ and $n_0$ depending only on $(\sigma_0c,r,L,\underline f,\bar V)$.
 \end{corollary}
 
-Corollary~\ref{cor:mode} is Padilla's Theorem~3 read through \eqref{eq:mode}. It needs no new argument. Assumption~B is added only to guarantee $F_{y_i}(\thetas_i)=\tau$, which Padilla's proof uses (his eqs.~(19) and (35)) but Assumption~A alone does not imply: an atom at the quantile is compatible with A. \emph{Internal note, not for the paper:} the proof of Padilla's Proposition~3 relies on Lemma~24, whose comparison $\Delta(x)\gtrsim\|x\|_2$ on $\{x\in\mathrm{row}(\Dr):\|\Dr x\|_1\le1\}$ fails for vectors with entries much larger than one (Astra-2, finding 2, verified by the Theory head). The corollary rests on the published theorem; Theorem~\ref{thm:main} does not use Lemma~24. The contrast with Theorem~\ref{thm:main} is this: at Padilla's $\lambda$ the mode is at Padilla's rate, but the posterior around it is wider than that rate, so the width of the posterior is the limiting factor (Remark~\ref{rem:lower}).
+Corollary~\ref{cor:mode} is the counterpart of Padilla's Theorem~3 for the posterior mode, read through \eqref{eq:mode}: the tuning and the rate are his. It is proved in \texttt{T07c\_proof.tex} (Section~10) by a self-contained argument, for every $c>0$. Assumption~B is used only to guarantee $F_{y_i}(\thetas_i)=\tau$, which Assumption~A alone does not imply: an atom at the quantile is compatible with A. The case $r=1$ is not claimed. The contrast with Theorem~\ref{thm:main} is this: at Padilla's $\lambda$ the mode is at Padilla's rate, but the posterior around it is wider than that rate, so the width of the posterior is the limiting factor (Remark~\ref{rem:lower}).
 
 \section{Remarks}
 
@@ -224,10 +224,10 @@ $N(B)/N(\R^n)$ with $N(B)=\int_B e^{-\hat M(\theta)/\sigma_0}e^{-\lambda\|\Dr\th
 \midrule
 1 & \emph{Coordinates.} Write $\theta=Nc+Su$ with $u=\Dr\theta$ and $c\in\R^r$ the polynomial part. The prior is flat in $c$ and Laplace in $u$. & Padilla Lemma~16 (the null space is the polynomials). Project lemma L5.\\
 2 & \emph{Evidence lower bound.} With probability tending to one, $N(\R^n)\ge e^{-Cn\varepsilon_n^2}$ times the prior mass of a ball of radius $\varepsilon_n$ around a smoothed truth. & New Bayesian step. Assumption~B gives $M(\thetas+\delta)\le C\|\delta\|^2$ near $\thetas$. Project lemmas L6 (evidence bound, by Chebyshev), L3 (small-ball probability; this is where $(\log n)^{1/(2r)}$ enters) and L4q, L4q-M (shift to a smoothed truth), at order $k=r-1$.\\
-3 & \emph{Localization.} The posterior mass of $\{\TV^{(r)}(\delta)$ large or $\|\delta\|_\infty$ large$\}$ tends to zero. & Padilla Proposition~3 with Lemmas~23--25 (noise bound in the dual seminorm, null-space term), and Lemmas~17--22 (from $\Delta$ to $\ell_2$). Project result C1 with the width lemma W$'$ and the interpolation lemma L10-I. This step needs $r\ge 2$.\\
-4 & \emph{Shells.} On a score event of probability tending to one, the realized numerator over $\{2^jM\varepsilon_n^2<\Delta_n^2(\delta)\le 2^{j+1}M\varepsilon_n^2\}$ is at most $e^{-c2^jMn\varepsilon_n^2}$ times the bound of Step~2; then $\E\Pi\le\pr(\text{bad event})+\E[\Pi\,\mathbf 1_{\text{good}}]$. An unconditional bound on the expected numerator is not available, and $\E e^{-\hat M(\theta)/\sigma_0}<1$ fails for $\sigma_0<\tau(1-\tau)/\underline f$. & Padilla Lemma~13 (Assumption~A gives $M(\thetas+\delta)\ge c_0\Delta^2(\delta)$) and Knight's identity. Padilla's first-moment bound (Markov, Lemmas~10--11, Proposition~2) is replaced by an exponential-moment bound. Project Lemmas C2 and F.\\
-5 & \emph{Assembly.} Sum over $j$ and divide by the bound of Step~2. The volume factors of the flat part cancel. & Padilla Lemmas~18, 20, 21 for the polynomial part.\\
-6 & \emph{Sharpness (optional).} The exponent cannot be improved. & Project Theorem~LB, $r=3$.\\
+3 & \emph{Localization.} The posterior mass of $\{\TV^{(r)}(\delta)$ large or $\|\delta\|_\infty$ large$\}$ tends to zero. & Self-contained; Padilla's Proposition~3 and Lemmas~17--25 are not used. $\Delta_n$ and $\ell_2$ are compared only where $\|\delta\|_\infty\le1$. Symmetrization and contraction (his Lemmas~10--11, cited to van der Vaart--Wellner and Ledoux--Talagrand). Project result C1 with the width lemma W$'$ and the interpolation lemma L10-I. This step needs $r\ge 2$.\\
+4 & \emph{Shells.} On a score event of probability tending to one, the realized numerator over $\{2^jM\varepsilon_n^2<\Delta_n^2(\delta)\le 2^{j+1}M\varepsilon_n^2\}$ is at most $e^{-c2^jMn\varepsilon_n^2}$ times the bound of Step~2; then $\E\Pi\le\pr(\text{bad event})+\E[\Pi\,\mathbf 1_{\text{good}}]$. An unconditional bound on the expected numerator is not available, and $\E e^{-\hat M(\theta)/\sigma_0}<1$ fails for $\sigma_0<\tau(1-\tau)/\underline f$. & Padilla Lemma~13 under Assumptions A and B (A gives $M(\thetas+\delta)\ge c_0\Delta^2(\delta)$) and Knight's identity. Padilla's first-moment bound (Markov, Lemmas~10--11, Proposition~2) is replaced by an exponential-moment bound. Project Lemmas C2 and F.\\
+5 & \emph{Assembly.} Sum over $j$ and divide by the bound of Step~2. The volume factors of the flat part cancel. & Flat polynomial part integrated directly (T07c, eq.~(vol)); no Padilla lemma.\\
+6 & \emph{Sharpness (optional).} The exponent cannot be improved. & Project Theorem~LB ($r=3$); T07c Proposition~5 for every $r\ge2$ at $\lambda=c\,n^{r-1/2}$.\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -253,7 +253,7 @@ $N(B)/N(\R^n)$ with $N(B)=\int_B e^{-\hat M(\theta)/\sigma_0}e^{-\lambda\|\Dr\th
 \begin{itemize}[itemsep=2pt,topsep=2pt]
 \item Whether ``any constant $c>0$'' is exactly what the audited proofs give, or a window $a_1\le cV\le a_2$. I read the statements, not the upper-bound proofs.
 \item Whether $r=1$ can be included at $\sigma=1$ (Remark~\ref{rem:r1}).
-\item Whether a fixed $c$ above a threshold free of $\epsilon$ suffices in Corollary~\ref{cor:mode}. Padilla's $c_{1,\epsilon}$ depends on $\epsilon$ because his proof uses one constant for both $\lambda$ and the radius, eqs.~(44) and (46). The corollary keeps his form.
+\item Whether a fixed $c$ above a threshold free of $\epsilon$ suffices in Corollary~\ref{cor:mode}. \emph{Settled:} every $c>0$ suffices, with no threshold; the corollary is now stated in that form (proof in \texttt{T07c\_proof.tex}, Section~10).
 \end{itemize}
 
 \end{document}

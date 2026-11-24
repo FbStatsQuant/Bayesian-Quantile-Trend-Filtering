@@ -114,3 +114,15 @@ Rulings:
 - r ≥ 2 only, the same as the main theorem; r = 1 goes in as a remark sketch. Accepted.
 - Log power (log n)^{1/(2r+1)}, the same as Padilla's. Accepted.
 - Any c > 0; no threshold c_{1,ε} is needed. Accepted.
+
+### Mode proof (T07c §10, Proposition prop:mode), Theory head's check, 2026-11-24
+
+| Step | Check | Ruling |
+|---|---|---|
+| Basic inequality along the ray | Convexity of Q_n; TV(θ*+sδ̂) ≥ TV(sδ̂) − V* | HOLDS |
+| Sup-norm on K_m | Interpolation lemma with T_m constant, β_n → 0, r ≥ 2 | HOLDS |
+| Width and event | (T√log(2n)/β)^{1/r} = 2^{1/(2r)}T^{1/r}C_m^{−(2r+1)/(2r)}·nβ²; T_m² ≤ 8V̄² + f²C_m²/(8c²), covered by the max of the last two entries of C_m; E G ≤ 4(1+2^r c_F)√c_w·nβ² = (f/16)nβ²; Chebyshev 256/(f²nβ²) | HOLDS |
+| Ray, norm face | 3f/8 > 2cV̄/C_m ≥ … ≤ f/3, using C_m ≥ 6cV̄/f | HOLDS |
+| Ray, TV face | λ_TV(T_m − 2V̄) = (f/4)nβ² > G | HOLDS |
+
+Verdict: the mode result is proved for r ≥ 2, any c > 0 and n ≥ n_ε, at Padilla's rate n^{−2r/(2r+1)}(log n)^{1/(2r+1)}, without Padilla's Thm 3, Prop 3 or Lemmas 17–25. Statement to be restated in this proved form (r ≥ 2, any c > 0, n ≥ n_ε); this was put to HQ. r = 1 stays a SKETCH remark.
