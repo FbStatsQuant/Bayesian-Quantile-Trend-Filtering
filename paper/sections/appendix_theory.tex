@@ -41,12 +41,12 @@ Then $n\en^2=n^{1/(2r)}$ and $(n\en^2)^{2r}=n$. The posterior is a ratio $\Pi_\l
 \item \emph{Shells.} On a shell $\{a\en^2<\nn{\delta}^2\le2a\en^2\}$ write $\Lh(\delta)=-\langle\zeta,\delta\rangle+\Rh(\delta)$ with the score $\zeta_i=\tau-\ind(Z_i<0)$ and a nonnegative remainder. A spline projector with $J\asymp Mn\en^2$ knots splits the score: the coarse part is handled by Cauchy--Schwarz, the fine part by the exact Laplace moment generating function. The numerator is of order $e^{-(\fl/8)an\en^2}$.
 \item \emph{Assembly.} $\E\,\Pi\le\pr(\text{bad events})+\E[\Pi\,\ind_{\rm good}]$; the volume factors cancel. The bad events have probability $O(1/(n\en^2))=O(n^{-1/(2r)})$.
 \end{enumerate}
-\emph{Where the rate comes from.} The prior mass of an $\en$-ball is $\exp\{-C(c\en)^{-2/(2r-1)}\}$, which must be at least $e^{-Cn\en^2}$; and the fine score costs $n/(c^2(Mn\en^2)^{2r-1})$ in the exponent, which must be at most of order $Mn\en^2$. Both hold, up to constants, exactly at $\en^2=n^{-(2r-1)/(2r)}$. For (b), the prior mass of a ball of radius $\sqrt{c_0}\,\en$ is too small for small $c_0$.
+\emph{Where the rate comes from.} The prior mass of an $\en$-ball is $\exp\{-C(c\en)^{-2/(2r-1)}\}$, which must be at least $e^{-Cn\en^2}$; and the fine score costs $n/(c^2(Mn\en^2)^{2r-1})$ in the exponent, which must be at most of order $Mn\en^2$. Both hold, up to constants, exactly at $\en^2=n^{-(2r-1)/(2r)}$.
 
 %======================================================================
 \subsection{Reduction to $\sigma=1$}
 
-For $\sigma_0>0$, the substitution $\theta=\sigma_0\theta'$ and positive homogeneity of $\rho_\tau$ show that the law of $\theta/\sigma_0$ under the $\sigma_0$-posterior is the $\sigma=1$ posterior based on $y/\sigma_0$ with $c$ replaced by $\sigma_0c$. The data $y/\sigma_0$ satisfy A and B with $(L/\sigma_0,\sigma_0\fl,\sigma_0\fu)$, and $V^{*}\le\Vb/\sigma_0$. Since $\min\{\sigma_0,\sigma_0^2\}\Delta_n^2(v)\le\Delta_n^2(\sigma_0v)\le\max\{\sigma_0,\sigma_0^2\}\Delta_n^2(v)$, (a) and (b) for $\sigma_0$ follow from the case $\sigma=1$ applied to the rescaled problem, with its $M$ multiplied by $\max\{\sigma_0,\sigma_0^2\}$ and its $c_0$ by $\min\{\sigma_0,\sigma_0^2\}$. From now on $\sigma=1$ and $\lambda=c\,n^{r-1/2}$.
+For $\sigma_0>0$, the substitution $\theta=\sigma_0\theta'$ and positive homogeneity of $\rho_\tau$ show that the law of $\theta/\sigma_0$ under the $\sigma_0$-posterior is the $\sigma=1$ posterior based on $y/\sigma_0$ with $c$ replaced by $\sigma_0c$. The data $y/\sigma_0$ satisfy A and B with $(L/\sigma_0,\sigma_0\fl,\sigma_0\fu)$, and $V^{*}\le\Vb/\sigma_0$. Since $\Delta_n^2(\sigma_0v)\le\max\{\sigma_0,\sigma_0^2\}\Delta_n^2(v)$, the theorem for $\sigma_0$ follows from the case $\sigma=1$ applied to the rescaled problem, with its $M$ multiplied by $\max\{\sigma_0,\sigma_0^2\}$. From now on $\sigma=1$ and $\lambda=c\,n^{r-1/2}$.
 
 %----------------------------------------------------------------------
 \subsection{Coordinates and the check loss}
@@ -95,7 +95,6 @@ Under Assumptions A and B, for every $i$ and all real $t,t'$:
 \item (Knight's identity) $\ell_i(t)=-t\zeta_i+R_i(t)$, where $R_i(t)=(t-Z_i)\ind(0\le Z_i<t)$ for $t>0$, $R_i(t)=(Z_i-t)\ind(t<Z_i<0)$ for $t<0$, $R_i(0)=0$; so $0\le R_i(t)\le|t|$.
 \item $m_i(t)=\E R_i(t)=\int_0^t\{F_i(s)-\tau\}ds\ge0$, with $\tfrac12\fl t^2\le m_i(t)\le\tfrac12\fu t^2$ for $|t|\le L$ and $m_i(t)\le C_1t^2$ for all $t$.
 \item $\E R_i(t)^2\le\fu|t|^3/3$ for $|t|\le L$, and $\E e^{-2R_i(t)}\le e^{-m_i(t)}$ for $|t|\le\min\{L,3\fl/(4\fu)\}$.
-\item $\E e^{-\ell_i(t)}\le e^{t^2/8}$ for all $t$.
 \end{enumerate}
 \end{lemma}
 
@@ -105,7 +104,6 @@ Under Assumptions A and B, for every $i$ and all real $t,t'$:
 (d) $\E\zeta_i=0$, so $m_i=\E R_i$; for $t>0$, $R_i(t)=\int_0^t\ind(0\le Z_i<s)ds$ gives the integral \citep{belloni2011l1}, and similarly for $t<0$. Under A and B, $\fl|s|\le|F_i(s)-\tau|\le\fu|s|$ for $|s|\le L$, with the sign of $s$. For $|t|>L$, (a) gives $m_i(t)\le|t|\le t^2/L$.
 (e) $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$. With $e^{-x}\le1-x+x^2/2$ ($x\ge0$),
 $\E e^{-2R_i}\le1-2m_i+\tfrac23\fu|t|^3\le1-m_i\le e^{-m_i}$, using $\tfrac23\fu|t|^3\le\tfrac12\fl t^2\le m_i$.
-(f) Hoeffding's lemma with (a) and $m_i\ge0$.
 \end{proof}
 
 %----------------------------------------------------------------------
@@ -322,7 +320,7 @@ Since $\bar I_1$ is deterministic, $\E[N(E_a)\ind_{\Omega_\zeta}]\le\bar I_1^{1/
 The score is never averaged over the data: only the nonnegative remainder is. This is why no lower bound on $\sigma_0$ is needed.
 
 %----------------------------------------------------------------------
-\subsection{Proof of Theorem~\ref{thm:main}(a)}
+\subsection{Proof of Theorem~\ref{thm:main}}
 
 Let
 \[
@@ -344,36 +342,3 @@ By the choice of $M$, $(\fl/32)M\ge C_E+1$ and $(\fl/32)M^{2r}\ge C_{\rm fine}/c
 \frac5{4n\en^2}+\frac{64}{\fl^2n\rho_n^2}+\frac{768r}{\fl^2Mn\en^2}+\frac1{2n}+r!\{e^{-\fl n\rho_n^2/16}+e^{-n/8}\}+2(8M)^{r/2}e^{-x_n}\le C\,n^{-1/(2r)},
 \]
 since $n\en^2=n^{1/(2r)}$ and every term other than the first and third is $o(1/(n\en^2))$. \qed
-
-%----------------------------------------------------------------------
-\subsection{Proof of Theorem~\ref{thm:main}(b)}
-
-\begin{lemma}[symmetric log-concave densities]\label{pf:lem:lc}
-A symmetric log-concave density $p$ on $\R$ with variance $v\in(0,\infty)$ has $\sup p=p(0)\le1/\sqrt{2v}$.
-\end{lemma}
-
-\begin{proof}
-Let $q(x)=(\beta/2)e^{-\beta|x|}$ with $\beta=2p(0)$. On $[0,\infty)$, $\log p-\log q$ is concave and vanishes at $0$, so $p\ge q$ exactly on some $[0,x_0]$. As $\int_0^\infty(p-q)=0$, $\int_0^\infty x^2(p-q)=\int_0^\infty(x^2-x_0^2)(p-q)\le0$, so $v\le2/\beta^2$.
-\end{proof}
-
-\begin{lemma}[small ball, upper bound]\label{pf:lem:sbu}
-Let $C_\ell=8e^2(r+1)\binom{2r}r^{1/2}$, $x_0=C_\ell(4(r+1))^{r-1/2}$, $c_{\rm lb}=C_\ell^{-2/(2r-1)}/(4(r+1))$. If $x=n^{r-1/2}/(\lambda\varrho)$ satisfies $x_0\le x\le C_\ell n^{r-1/2}$, then $\Ql(B_\varrho)\le\exp\{-c_{\rm lb}x^{2/(2r-1)}\}$.
-\end{lemma}
-
-\begin{proof}
-Let $\ell\ge1$ with $2(r+1)\ell\le n$ and $\mathsf B=\lfloor n/((r+1)\ell)\rfloor$. Let $\kappa$ be the coefficient vector of $(1+z+\dots+z^{\ell-1})^{r+1}$, so $\|\kappa\|_2^2\ge\ell^{2r+1}/(r+1)$; let $\kappa_b$ be $\kappa$ placed at offset $j_b=(b-1)(r+1)\ell$, and $g_b=D^\top\kappa_b$. The generating function of $g_b$ is $z^{j_b+1}(z^\ell-1)^r\sigma_\ell(z)$, $\sigma_\ell(z)=1+\dots+z^{\ell-1}$, so the $g_b$ have disjoint supports and $\|g_b\|_2^2=\ell\binom{2r}r$. By Lemma~\ref{pf:lem:coord}(a), $\langle g_b,\Pp Su\rangle=\langle\kappa_b,u\rangle=:Y_b$. For $u\in B_\varrho$, $\sum_bY_b^2/\|g_b\|_2^2\le n\varrho^2$, so at least $\lceil\mathsf B/2\rceil$ of the $Y_b$ satisfy $Y_b^2\le y_0^2=2n\varrho^2\ell\binom{2r}r/\mathsf B$. Under $\Ql$ the $Y_b$ are independent, symmetric and log-concave with variance $2\|\kappa\|_2^2/\lambda^2$, so by Lemma~\ref{pf:lem:lc}
-$p_0=\Ql(|Y_b|\le y_0)\le2(r+1)\binom{2r}r^{1/2}x^{-1}(n/\ell)^{r-1/2}$,
-and a union bound gives $\Ql(B_\varrho)\le(4p_0)^{\mathsf B/2}$. Take $\ell=\lceil n(C_\ell/x)^{2/(2r-1)}\rceil$: then $4p_0\le e^{-2}$, the range of $x$ gives $2(r+1)\ell\le n$, and $\mathsf B\ge(x/C_\ell)^{2/(2r-1)}/(4(r+1))$.
-\end{proof}
-
-\begin{proof}[Proof of (b)]
-Let $\eta=\sqrt{c_0}\,\en$, $c_0\le1$, and $H=\{\nn{\delta}\le\eta\}$. By Proposition~\ref{pf:prop:local}(a), $\{\Delta_n^2(\delta)\le c_0\en^2\}\subset K_n^c\cup H$. By Lemma~\ref{pf:lem:check}(f), Tonelli, \eqref{pf:eq:pyth}, \eqref{pf:eq:vol} and Anderson's inequality \citep{anderson1955integral}; $\Ql$ has a symmetric log-concave density,
-\[
-\E N(H)\le e^{n\eta^2/8}\nu(H)\le e^{n\eta^2/8}V_r(\sqrt n\eta)^r\Ql(u^{*}+B_\eta)\le e^{n\eta^2/8}V_r(\sqrt n\eta)^r\Ql(B_\eta).
-\]
-Here $x=1/(c\sqrt{c_0}\en)\in[x_0,C_\ell n^{r-1/2}]$ for large $n$ and $x^{2/(2r-1)}=(c^2c_0)^{-1/(2r-1)}n\en^2$, so Lemma~\ref{pf:lem:sbu} gives $\Ql(B_\eta)\le\exp\{-c_{\rm lb}(c^2c_0)^{-1/(2r-1)}n\en^2\}$. With Lemma~\ref{pf:lem:evid},
-\[
-\E[\Pi_\lambda(H\mid y)\ind_{\Omega_E}]\le2^r\exp\bigl\{\bigl(\tfrac18+C_E-c_{\rm lb}(c^2c_0)^{-1/(2r-1)}\bigr)n\en^2\bigr\}\le2^re^{-n\en^2}
-\]
-once $c_0$ is so small that $c_{\rm lb}(c^2c_0)^{-1/(2r-1)}\ge C_E+\frac98$. Adding $\pr(\Omega_E^c)+\pr(\Omega_G^c)+\E[\Pi_\lambda(K_n^c\mid y)\ind_{\Omega_E\cap\Omega_G}]$ (Lemma~\ref{pf:lem:evid}, Proposition~\ref{pf:prop:local}), the total is at most $2/(n\en^2)=2n^{-1/(2r)}$ for large $n$.
-\end{proof}

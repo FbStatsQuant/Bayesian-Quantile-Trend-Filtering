@@ -10,7 +10,7 @@
 
 \section{Posterior contraction}\label{sec:theory}
 
-This section studies the posterior of Section~\ref{sec:methodology} when the penalty $\lambda$ and the scale $\sigma$ are held fixed. Section~\ref{sec:assumptions} describes the setting and states two assumptions on the distribution of the data. Section~\ref{sec:main-result} presents the posterior contraction theorem, which gives the exact rate at which the posterior concentrates around the true quantiles, and discusses the rate and the role of the working likelihood. Section~\ref{sec:theory-remarks} relates the fixed $\lambda$ and $\sigma$ of the theorem to the priors used by the sampler. All proofs are in Appendix~\ref{app:proofs}.
+This section studies the posterior of Section~\ref{sec:methodology} when the penalty $\lambda$ and the scale $\sigma$ are held fixed. Section~\ref{sec:assumptions} describes the setting and states two assumptions on the distribution of the data. Section~\ref{sec:main-result} presents the posterior contraction theorem, which gives the rate at which the posterior concentrates around the true quantiles, and discusses the rate and the role of the working likelihood. Section~\ref{sec:theory-remarks} relates the fixed $\lambda$ and $\sigma$ of the theorem to the priors used by the sampler. All proofs are in Appendix~\ref{app:proofs}.
 
 \subsection{Setting and assumptions}\label{sec:assumptions}
 
@@ -57,15 +57,14 @@ Let $y_1,\dots,y_n$ be independent and satisfy Assumptions~\ref{ass:A} and~\ref{
 \[
 \lambda=c\,n^{(2k+1)/2},\qquad\text{equivalently}\qquad\lamtv=c\,n^{1/2},
 \]
-with a constant $c>0$. Then there exist constants $M$, $C$, $c_0>0$ and $n_0$, depending only on $c$, $k$, $L$, $\fl$, $\fu$ and $\Vb$, such that for all $n\ge n_0$
-\begin{align*}
-&\text{\upshape(a)}\quad \E_{\thetas}\,\Pi_\lambda\bigl(\theta:\ \Delta_n^2(\theta-\thetas)>M\,n^{-(2k+1)/(2k+2)}\bigm|\by\bigr)\le C\,n^{-1/(2k+2)},\\
-&\text{\upshape(b)}\quad \E_{\thetas}\,\Pi_\lambda\bigl(\theta:\ \Delta_n^2(\theta-\thetas)\le c_0\,n^{-(2k+1)/(2k+2)}\bigm|\by\bigr)\le 2\,n^{-1/(2k+2)}.
-\end{align*}
-The bounds are uniform over all laws of $\by$ that satisfy Assumptions~\ref{ass:A} and~\ref{ass:B} with the given constants and $V^{*}\le\Vb$. The same holds for any fixed $\sigma=\sigma_0>0$, with constants depending also on $\sigma_0$.
+with a constant $c>0$. Then there exist constants $M$, $C>0$ and $n_0$, depending only on $c$, $k$, $L$, $\fl$, $\fu$ and $\Vb$, such that for all $n\ge n_0$
+\[
+\E_{\thetas}\,\Pi_\lambda\bigl(\theta:\ \Delta_n^2(\theta-\thetas)>M\,n^{-(2k+1)/(2k+2)}\bigm|\by\bigr)\le C\,n^{-1/(2k+2)}.
+\]
+The bound is uniform over all laws of $\by$ that satisfy Assumptions~\ref{ass:A} and~\ref{ass:B} with the given constants and $V^{*}\le\Vb$. The same holds for any fixed $\sigma=\sigma_0>0$, with constants depending also on $\sigma_0$.
 \end{theorem}
 
-Theorem~\ref{thm:main} makes two assertions. The first, (a), is an upper bound: apart from posterior mass that vanishes in expectation, posterior draws lie within $M\,n^{-(2k+1)/(2k+2)}$ of $\thetas$ in the loss $\Delta_n^2$. The second, (b), is a lower bound: the posterior mass of the ball of radius $c_0\,n^{-(2k+1)/(2k+2)}$ around $\thetas$ vanishes as well. The posterior therefore contracts at the rate $n^{-(2k+1)/(2k+2)}$, and this rate is exact, with no logarithmic factor and no smaller power. For the default $k=2$, $\lambda=c\,n^{5/2}$ and the rate is $n^{-5/6}$.
+Theorem~\ref{thm:main} says that, apart from posterior mass that vanishes in expectation, posterior draws lie within $M\,n^{-(2k+1)/(2k+2)}$ of $\thetas$ in the loss $\Delta_n^2$; the posterior therefore contracts at the rate $n^{-(2k+1)/(2k+2)}$, with no logarithmic factor. For the default $k=2$, $\lambda=c\,n^{5/2}$ and the rate is $n^{-5/6}$.
 
 The proof, in Appendix~\ref{app:proofs}, writes the posterior as a ratio and treats its two terms separately. The denominator is bounded below through the prior mass of a ball centered at a locally smoothed version of $\thetas$. The numerator is bounded above on shells around $\thetas$, after a localization step that confines the posterior to a set on which $\|\theta-\thetas\|_\infty\to0$, so that Assumptions~\ref{ass:A} and~\ref{ass:B} apply to every coordinate. The localization step is where $k\ge1$ is needed.
 
