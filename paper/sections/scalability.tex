@@ -15,12 +15,12 @@
 
 We compare the time per Gibbs sweep of Bayesian-PMALA with that of the Laplace and horseshoe samplers of \citet{onizuka2024fast}. All three use the same augmentation and differ in the trend update. Bayesian-PMALA computes two proximal maps by ADMM with a fixed iteration budget and banded factorizations (Section~\ref{subsec:pmala}), so its sweep costs $O(n)$. The code of \citet{onizuka2024fast} draws the trend from its Gaussian full conditional by forming the dense inverse of the precision matrix and an eigendecomposition (\texttt{MASS::mvrnorm}), whose cost grows cubically in $n$.
 
-The experiment uses the VS signal \eqref{eq:sim_vs} with Gaussian noise, $\tau = 0.5$, $k = 2$, and $n$ from $250$ to $4000$, with the same data for all samplers. The Onizuka code is used unmodified, with \texttt{sparse = TRUE}, and both samplers are timed by clock reads around their updates. All runs use one laptop core (Intel Core Ultra 7 155U, R~4.4.1, reference BLAS). Warm-up and setup are excluded, and each entry is the median over up to three replicates with distinct data.
+The experiment uses the VS signal \eqref{eq:sim_vs} with Gaussian noise, $\tau = 0.5$, $k = 2$, and $n$ from $250$ to $4000$, with the same data for all samplers. The code of \citet{onizuka2024fast} is used unmodified, with \texttt{sparse = TRUE}, and each update of each sampler is timed separately. All runs use one laptop core (Intel Core Ultra 7 155U, R~4.4.1, reference BLAS). Warm-up and setup are excluded, and each entry is the median over up to three replicates with distinct data.
 
 \begin{table}[!htbp]
 \centering
 \footnotesize
-\caption{Time per Gibbs sweep in milliseconds: median over replicates, with the range below ($\dagger$: single replicate). Ratios divide the median Onizuka time by the median Bayesian-PMALA time.}
+\caption{Time per Gibbs sweep in milliseconds: median over replicates, with the range below ($\dagger$: single replicate). Ratios divide the median time of each sampler of \citet{onizuka2024fast} by the median time of Bayesian-PMALA.}
 \label{tab:cost_scaling}
 \begin{tabular}{rrrrrr}
 \toprule
@@ -53,13 +53,13 @@ $n$ & PMALA & Laplace & Horseshoe & Laplace & Horseshoe \\
 \label{fig:cost_scaling}
 \end{figure}
 
-Table~\ref{tab:cost_scaling} and Figure~\ref{fig:cost_scaling} show the time per sweep. For Bayesian-PMALA it grows linearly with $n$, at a cost per observation of about $0.008$ to $0.009$ ms. An Onizuka sweep grows roughly cubically, so the ratio to Bayesian-PMALA increases with every doubling of $n$: from $25$ (Laplace) and $24$ (horseshoe) at $n=250$ to $7\,035$ and $6\,593$ at $n=4000$. The two Onizuka priors cost about the same. Almost all of a Bayesian-PMALA sweep is the P-MALA move, and almost all of an Onizuka sweep is the dense inverse and eigendecomposition of the trend draw (Figure~\ref{fig:cost_breakdown}).
+Table~\ref{tab:cost_scaling} and Figure~\ref{fig:cost_scaling} show the time per sweep. For Bayesian-PMALA it grows linearly with $n$, at a cost per observation of about $0.008$ to $0.009$ ms. For the two samplers of \citet{onizuka2024fast} it grows roughly cubically, so the ratio to Bayesian-PMALA increases with every doubling of $n$: from $25$ (Laplace) and $24$ (horseshoe) at $n=250$ to $7\,035$ and $6\,593$ at $n=4000$. Their two priors cost about the same. Almost all of a Bayesian-PMALA sweep is the P-MALA move, and almost all of a sweep of the other two samplers is the dense inverse and eigendecomposition of the trend draw (Figure~\ref{fig:cost_breakdown}).
 
-The gap is a property of the implementation: the precision matrix of the horseshoe hierarchy is banded and admits a banded Cholesky draw. The experiment times single sweeps; the autocorrelation of the chains is not measured, and the cost per effective draw also depends on it.
+Two points qualify this comparison. First, the cubic cost belongs to the implementation rather than to the model: the precision matrix of the horseshoe hierarchy is banded and admits a banded Cholesky draw. Second, the times are per sweep, and the cost per effective draw depends also on the autocorrelation of the chains, which we do not measure.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figures/scal_breakdown.pdf}
-\caption{Share of the time per sweep spent in each update (median over replicates). Left: Bayesian-PMALA. Right: the Onizuka Laplace sampler; the horseshoe sampler's shares agree to within three percentage points.}
+\caption{Share of the time per sweep spent in each update (median over replicates). Left: Bayesian-PMALA. Right: the Laplace sampler of \citet{onizuka2024fast}; the shares of the horseshoe sampler agree to within three percentage points.}
 \label{fig:cost_breakdown}
 \end{figure}

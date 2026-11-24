@@ -11,7 +11,7 @@ This subsection reports the measures omitted from Section~\ref{sec:sim:individua
 
 \subsubsection{Varying smoothness}
 \label{app:sim:individual:vs}
-The MAD comparison (Table~\ref{tab:vs_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:vs}. The intervals of Bayesian-PMALA are narrower than those of both Onizuka samplers at every level and under every noise family (Table~\ref{tab:vs_int_mciw}).
+The MAD comparison (Table~\ref{tab:vs_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:vs}. The intervals of Bayesian-PMALA are narrower than those of both samplers of \citet{onizuka2024fast} at every level and under every noise family (Table~\ref{tab:vs_int_mciw}).
 
 \begin{table}[!htbp]
 \centering
@@ -75,7 +75,7 @@ Bayesian-PMALA & 0.272470 & 0.274165 & 0.272616 & 0.275244 & 0.269605 \\
 \clearpage
 \subsubsection{Smooth signal}
 \label{app:sim:individual:smooth}
-For the smooth signal, Bayesian-PMALA uses $\lambda\sim\mathrm{Gamma}(1,5\times10^{-4})$, no interweaving step, and $20000$ sweeps of which the first $5000$ are discarded; all other settings are those of Section~\ref{sec:sim:individual}. The MAD comparison (Table~\ref{tab:s_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:smooth} (Table~\ref{tab:s_int_mse}): Bayesian-PMALA is more accurate than both Onizuka samplers at $\tau=0.25$, $0.50$, and $0.75$ under every noise family and under Beta noise at $\tau=0.05$, and less accurate than both at the other extreme levels. Its intervals are narrower than those of both Onizuka samplers at $\tau=0.25$, $0.50$, and $0.75$ and under Beta noise at $\tau=0.05$; at the other extreme levels they lie between the Laplace and horseshoe widths (Table~\ref{tab:s_int_mciw}).
+The settings for the smooth signal are those of Section~\ref{sec:sim:individual}. The MAD comparison (Table~\ref{tab:s_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:smooth} (Table~\ref{tab:s_int_mse}): Bayesian-PMALA is more accurate than both samplers of \citet{onizuka2024fast} at $\tau=0.25$, $0.50$, and $0.75$ under every noise family and under Beta noise at $\tau=0.05$, and less accurate than both in the other five configurations at $\tau=0.05$ and $0.95$. Its intervals are narrower than those of both samplers at $\tau=0.25$, $0.50$, and $0.75$ and under Beta noise at $\tau=0.05$; in the other five configurations they lie between the Laplace and horseshoe widths (Table~\ref{tab:s_int_mciw}).
 
 \begin{table}[!htbp]
 \centering

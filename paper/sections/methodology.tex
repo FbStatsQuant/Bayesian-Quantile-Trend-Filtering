@@ -14,17 +14,17 @@ We observe $\by = (y_1, \ldots, y_n)^\top \in \R^n$ and model
 \end{equation}
 with independent errors, where for a level $\tau \in (0,1)$ the trend entry $\theta_i$ is the conditional $\tau$-quantile of $y_i$. Until Section~\ref{subsec:joint}, $\theta$, $z$, $\lambda$, and $\sigma$ refer to a single level $\tau$; Section~\ref{subsec:joint} attaches the level index.
 
-Let $D = D^{(k+1)} \in \R^{m \times n}$ be the difference operator of order $k+1$, with $m = n - k - 1$ rows. Independent Laplace priors with common rate $\lambda$ on the differences give
+Let $D = D^{(k+1)} \in \R^{m \times n}$ be the difference operator of order $k+1$, with $m = n - k - 1$ rows. Independent Laplace priors with common parameter $\lambda$ on the differences give
 \begin{equation}
     p(\theta \mid \lambda) \propto \lambda^{m} \exp\!\left\{-\lambda \norm{D\theta}_1\right\}.
     \label{eq:prior_theta}
 \end{equation}
-The prior is flat on the null space of $D$, the polynomials of degree at most $k$, and the single global rate $\lambda$ controls the overall smoothing; we refer to $\lambda$ as the penalty. The rate and the likelihood scale $\sigma$ receive conjugate priors, in the shape and rate parameterizations,
+The prior is flat on the null space of $D$, the polynomials of degree at most $k$, and $\lambda$, the penalty, controls the smoothness of the trend. The penalty and the likelihood scale $\sigma$ receive the conjugate priors
 \begin{equation}
     \lambda \sim \mathrm{Gamma}(a_0, b_0), \qquad \sigma \sim \mathrm{IG}(a_\sigma, b_\sigma).
     \label{eq:hyperpriors}
 \end{equation}
-Following \citet{brantley2020baseline}, we use $k = 2$, so the fitted trends are piecewise quadratic.
+Following \citet{brantley2020baseline}, we use $k = 2$, so the prior favors piecewise quadratic trends.
 
 \subsection{The likelihood and its mixture representation}
 \label{subsec:likelihood}
@@ -40,7 +40,7 @@ where $\rho_\tau(u) = u\{\tau - \mathbbm{1}(u < 0)\}$ is the check function \cit
     \varepsilon_i = \psi_\tau z_i + \omega_\tau \sqrt{\sigma z_i}\, u_i, \qquad z_i \sim \mathrm{Exp}(\sigma), \qquad u_i \sim \mathcal{N}(0,1),
     \label{eq:ald_mixture}
 \end{equation}
-where $\mathrm{Exp}(\sigma)$ has mean $\sigma$, $z_i$ and $u_i$ are independent, $\psi_\tau = (1-2\tau)/\{\tau(1-\tau)\}$ and $\omega_\tau^2 = 2/\{\tau(1-\tau)\}$. Equivalently, $y_i \mid \theta_i, z_i, \sigma \sim \mathcal{N}(\theta_i + \psi_\tau z_i,\ \omega_\tau^2 \sigma z_i)$ with $z_i \mid \sigma \sim \mathrm{Exp}(\sigma)$. Integrating out $z_i$ returns \eqref{eq:ald} exactly, so the model is unchanged and the sampler gains the latent variables $z = (z_1,\ldots,z_n)^\top$. Given $z$ the likelihood is Gaussian in $\theta$, with weights and pseudo-responses
+where $\mathrm{Exp}(\sigma)$ has mean $\sigma$, $z_i$ and $u_i$ are independent, $\psi_\tau = (1-2\tau)/\{\tau(1-\tau)\}$ and $\omega_\tau^2 = 2/\{\tau(1-\tau)\}$. Equivalently, $y_i \mid \theta_i, z_i, \sigma \sim \mathcal{N}(\theta_i + \psi_\tau z_i,\ \omega_\tau^2 \sigma z_i)$ with $z_i \mid \sigma \sim \mathrm{Exp}(\sigma)$. Integrating out $z_i$ returns \eqref{eq:ald}, so the representation leaves the model unchanged; the latent variables $z = (z_1,\ldots,z_n)^\top$ are sampled with the other parameters. Given $z$ the likelihood is Gaussian in $\theta$, with weights and pseudo-responses
 \begin{equation}
     w_i = \frac{1}{\omega_\tau^2\, \sigma z_i}, \qquad r_i = y_i - \psi_\tau z_i, \qquad i = 1,\ldots,n.
     \label{eq:weights}
@@ -59,7 +59,7 @@ The joint posterior of $(\theta, z, \lambda, \sigma)$ is
 \end{equation}
 and its marginal in $(\theta, \lambda, \sigma)$ is the posterior under the ALD likelihood.
 
-Integrating out $z$, the conditional posterior of $\theta$ at fixed $(\lambda, \sigma)$ is proportional to
+With $z$ integrated out, the conditional posterior of $\theta$ at fixed $(\lambda, \sigma)$ is proportional to
 \[
     \exp\Big\{-\sigma^{-1}\sum_{i=1}^n \rho_\tau(y_i-\theta_i) - \lambda\norm{D\theta}_1\Big\},
 \]
@@ -68,12 +68,12 @@ with mode
     \hat{\theta}(\lambda, \sigma) \in \arg\min_{\theta \in \R^n} \left\{ \sum_{i=1}^n \rho_\tau(y_i-\theta_i) + \lambda\sigma \norm{D\theta}_1 \right\}.
     \label{eq:map_qtf}
 \end{equation}
-This is the quantile trend filtering problem of \citet{brantley2020baseline} with penalty $\lambda\sigma$. The sampler infers $\lambda$ and $\sigma$ together with $\theta$ and reports posterior means and pointwise intervals.
+This is the quantile trend filtering problem of \citet{brantley2020baseline} with effective penalty $\lambda\sigma$. We sample $\lambda$ and $\sigma$ together with $\theta$ and report posterior means and pointwise intervals.
 
 \subsection{The individual quantile sampler}
 \label{subsec:individual}
 
-We sample \eqref{eq:posterior} by a four-block Gibbs sampler, Bayesian-PMALA. A sweep updates the blocks $\theta$, $z$, $\lambda$, and $\sigma$ in this order, each conditional on the most recent values of the others; the three conjugate conditionals are derived in Appendix~\ref{app:pmala:conditionals}. The steps of one sweep are the following.
+We sample \eqref{eq:posterior} by a Gibbs sampler with four blocks, which we call Bayesian-PMALA. A sweep updates the blocks $\theta$, $z$, $\lambda$, and $\sigma$ in this order, each conditional on the most recent values of the others; the three conjugate conditionals are derived in Appendix~\ref{app:pmala:conditionals}. One sweep has five steps: the four block updates and an update of the P-MALA step size.
 \begin{enumerate}
     \item \emph{Trend $\theta$.} Given $(z, \lambda, \sigma)$, the conditional density of $\theta$ is proportional to $\exp\{-U(\theta)\}$ with
     \begin{equation}
@@ -92,16 +92,16 @@ We sample \eqref{eq:posterior} by a four-block Gibbs sampler, Bayesian-PMALA. A 
         \lambda \mid \theta, \by \sim \mathrm{Gamma}\!\left(a_0 + m,\ b_0 + \norm{D\theta}_1\right).
         \label{eq:lambdaupdate}
     \end{equation}
-    This step learns the amount of smoothing from the data. Because posterior draws satisfy $\norm{D\theta}_1 \approx m/\lambda$, the draw moves $\lambda$ slowly; it is therefore followed by an interweaving redraw \citep{yu2011center} that moves $\lambda$ and the rough part of $\theta$ together (Appendix~\ref{app:pmala:asis}).
+    Through this step the roughness $\norm{D\theta}_1$ of the current trend sets the amount of smoothing. Because posterior draws of the trend satisfy $\norm{D\theta}_1 \approx m/\lambda$, this update moves $\lambda$ slowly. It is therefore followed by an interweaving step \citep{yu2011center}, which rescales the component of $\theta$ outside the null space of $D$ together with $\lambda$ (Appendix~\ref{app:pmala:asis}).
     \item \emph{Likelihood scale $\sigma$.} Given $(\theta, z)$,
     \begin{equation}
         \sigma \mid \theta, z, \by \sim \mathrm{IG}\!\left(a_\sigma + \tfrac{3n}{2},\ b_\sigma + \sum_{i=1}^n \left\{ z_i + \frac{(y_i - \theta_i - \psi_\tau z_i)^2}{2\omega_\tau^2 z_i}\right\}\right).
         \label{eq:sigmaupdate}
     \end{equation}
-    The scale enters the weights and the penalty $\lambda\sigma$ of \eqref{eq:map_qtf}, so it is drawn with the other parameters rather than fixed.
+    The scale enters the weights and the effective penalty $\lambda\sigma$ of \eqref{eq:map_qtf}, so it is drawn with the other parameters rather than fixed.
     \item \emph{Step size $\delta$.} The P-MALA step size is updated by a Robbins--Monro recursion toward acceptance rate $0.5$ (Appendix~\ref{app:pmala:adapt}).
 \end{enumerate}
-Algorithm~\ref{alg:pmala} states one run. The point estimate is the posterior mean of $\theta$, and the $2.5\%$ and $97.5\%$ quantiles of the retained draws give pointwise $95\%$ intervals. Initialization, warm-up, and numerical safeguards are given in Appendices~\ref{app:pmala:init}--\ref{app:pmala:safeguards}.
+One run is stated in Algorithm~\ref{alg:pmala}. The point estimate is the posterior mean of $\theta$, and the $2.5\%$ and $97.5\%$ quantiles of the retained draws give pointwise $95\%$ intervals. Initialization, warm-up, and numerical safeguards are given in Appendices~\ref{app:pmala:init}--\ref{app:pmala:safeguards}.
 
 \begin{algorithm}[h!]
 \caption{Bayesian-PMALA for a single quantile level $\tau$}
@@ -125,7 +125,7 @@ Algorithm~\ref{alg:pmala} states one run. The point estimate is the posterior me
 \subsection{Sampling the trend by P-MALA}
 \label{subsec:pmala}
 
-The trend step requires a move that leaves the conditional of $\theta$ in \eqref{eq:Utheta} invariant. P-MALA \citep{pereyra2016proximal} replaces $U$ by its Moreau--Yosida envelope, draws a Langevin proposal from the envelope's gradient, and accepts or rejects it against the exact density. We apply it to the whole conditional \eqref{eq:Utheta}, likelihood and penalty together.
+The trend step requires a move that leaves the conditional of $\theta$ in \eqref{eq:Utheta} invariant. P-MALA \citep{pereyra2016proximal} replaces $U$ by its Moreau--Yosida envelope, draws a Langevin proposal from the envelope's gradient, and accepts or rejects it against the exact density. We apply it to the whole conditional \eqref{eq:Utheta}, which contains both the likelihood and the penalty.
 
 The proposal is built from the proximal map of $U$. For a symmetric positive definite $M$ and $\gamma > 0$, the proximal map of $U$ in the $M$-norm and the envelope are
 \begin{equation}
@@ -153,7 +153,7 @@ The proposal is accepted with probability $\min(1,\alpha)$, where
     \log \alpha = U(\theta) - U(\theta^\star) + \frac{1}{2\delta}\left\{ \norm{\theta^\star - T(\theta)}_M^2 - \norm{\theta - T(\theta^\star)}_M^2 \right\}.
     \label{eq:pmala_accept}
 \end{equation}
-The update is exact for the stated posterior: $U$ is the exact conditional, the proposal density is an explicit Gaussian, and $T$ enters only as a deterministic map of its input. An approximate proximal solve therefore changes the efficiency of the move and leaves its invariant distribution unchanged.
+The move leaves the conditional \eqref{eq:Utheta} invariant: the acceptance ratio \eqref{eq:pmala_accept} uses $U$ itself and the Gaussian proposal density \eqref{eq:pmala_proposal}, and $T$ enters both only as a deterministic function of its input. The accuracy of the proximal solve therefore affects only the efficiency of the move.
 
 The metric $M$ is chosen to match the curvature of $U$. We use
 \begin{equation}
@@ -162,7 +162,7 @@ The metric $M$ is chosen to match the curvature of $U$. We use
 \end{equation}
 which combines the precision of the augmented likelihood with a difference precision on the scale of the prior. The metric depends on $(z, \lambda, \sigma)$ but not on $\theta$, so the move is a valid Metropolis--Hastings kernel.
 
-Problem \eqref{eq:prox} is a weighted trend filtering problem, solved by ADMM with a fixed number of iterations and a cold start, so $T$ is deterministic (Appendix~\ref{app:pmala:admm}). Every linear system is banded with half-bandwidth $k+1$, and one factorization serves the forward and reverse maps, so the work per sweep is linear in $n$. The step size $\delta$ is adapted toward acceptance $0.5$ (Appendix~\ref{app:pmala:adapt}).
+Problem \eqref{eq:prox} is a weighted trend filtering problem. We solve it by ADMM with a fixed number of iterations and a cold start, which makes $T$ a deterministic function of its input (Appendix~\ref{app:pmala:admm}). Every linear system is banded with half-bandwidth $k+1$, and one factorization serves the forward and reverse maps; the work per sweep is therefore linear in $n$. The step size $\delta$ is adapted toward acceptance $0.5$ (Appendix~\ref{app:pmala:adapt}).
 
 \subsection{The joint quantile sampler}
 \label{subsec:joint}
@@ -203,13 +203,13 @@ the individual conditional \eqref{eq:Utheta} restricted to $B_j$.
 
 Within a sweep, level $j$ is updated by the five steps of Section~\ref{subsec:individual}, with the following changes.
 \begin{enumerate}
-    \item \emph{Trend $\theta_j$.} The draw is the individual P-MALA move restricted to $B_j$: the proximal map is solved over the box, the metric $M_j$ and the step size $\delta_j$ belong to level $j$, and a proposal outside $B_j$ is rejected. This step and the interweaving redraw of step 3 are the only ones that involve the other levels.
+    \item \emph{Trend $\theta_j$.} The draw is the individual P-MALA move restricted to $B_j$: the proximal map is solved over the box, the metric $M_j$ and the step size $\delta_j$ belong to level $j$, and a proposal outside $B_j$ is rejected. This step and the interweaving step for $\lambda_j$ are the only ones that involve the other levels.
     \item \emph{Latent variables $z_j$.} Unchanged: \eqref{eq:zupdate} at $\tau=\tau_j$.
-    \item \emph{Penalty $\lambda_j$.} The conjugate draw \eqref{eq:lambdaupdate} is unchanged. The interweaving redraw of $(\lambda_j,\theta_j)$ is restricted to the values for which $\theta_j$ stays in $B_j$.
+    \item \emph{Penalty $\lambda_j$.} The conjugate draw \eqref{eq:lambdaupdate} is unchanged. The interweaving step for $(\lambda_j,\theta_j)$ is restricted to the values for which $\theta_j$ stays in $B_j$.
     \item \emph{Likelihood scale $\sigma_j$.} Unchanged: \eqref{eq:sigmaupdate} at $\tau=\tau_j$.
     \item \emph{Step size $\delta_j$.} Each level has its own step size, updated toward acceptance $0.5$.
 \end{enumerate}
-During the first $H$ sweeps of the burn-in, the trend move is replaced by a constrained optimization step, and the interweaving redraw and the step-size update start afterwards (Appendix~\ref{app:pmala:init}). Algorithm~\ref{alg:joint_pmala} summarizes one run. Every retained draw satisfies \eqref{eq:joint_order}, so neither the draws nor the pointwise posterior means cross at the observed indices. For $J=1$ the joint sampler reproduces the individual sampler draw for draw (Appendix~\ref{app:pmala:tests}).
+During the first $H$ sweeps of the burn-in, the trend move is replaced by a constrained optimization step, and the interweaving step and the step-size update start afterwards (Appendix~\ref{app:pmala:init}). Algorithm~\ref{alg:joint_pmala} summarizes one run. Every retained draw satisfies \eqref{eq:joint_order}, so neither the draws nor the pointwise posterior means cross at the observed indices. For $J=1$ the joint sampler reduces to the individual sampler.
 
 \begin{algorithm}[!htbp]
 \caption{Joint Bayesian-PMALA for ordered quantile levels}
@@ -238,14 +238,14 @@ During the first $H$ sweeps of the burn-in, the trend move is replaced by a cons
 \subsection{Constrained trend and interweaving updates}
 \label{subsec:joint_trend}
 
-The negative log-density $U_j + \iota_{B_j}$, with $\iota_{B_j}$ the indicator function of $B_j$ in the convex-analysis sense, is convex, so P-MALA applies as in Section~\ref{subsec:pmala} with the box-constrained proximal map
+Let $\iota_{B_j}$ be the indicator function of $B_j$ in the convex-analysis sense. The negative log-density $U_j + \iota_{B_j}$ is convex, so P-MALA applies as in Section~\ref{subsec:pmala}, with the metric $M_j$ of \eqref{eq:metric} at level $j$, a step size $\delta_j$ per level, and the box-constrained proximal map
 \begin{equation}
     T_j(x) = \arg\min_{\vartheta\in B_j}
              \left\{U_j(\vartheta)+\frac{1}{2\gamma_j}\norm{\vartheta-x}_{M_j}^2\right\},
-             \qquad \gamma_j=\delta_j/2,
+             \qquad \gamma_j=\delta_j/2 .
     \label{eq:joint_prox}
 \end{equation}
-the metric $M_j$ of \eqref{eq:metric} at level $j$ and a step size $\delta_j$ per level. The proposal is
+The proposal is
 \begin{equation}
     \theta_j^\star \sim q_j(\,\cdot\mid\theta_j) = \mathcal N\!\left(T_j(\theta_j),\ \delta_jM_j^{-1}\right).
     \label{eq:joint_proposal}

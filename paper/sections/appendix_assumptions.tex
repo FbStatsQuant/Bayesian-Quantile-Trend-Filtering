@@ -2,14 +2,14 @@
 
 This appendix states what Assumptions~\ref{ass:A} and \ref{ass:B} and the bound $V^*\le\bar V$ require, shows where each enters the proof of Theorem~\ref{thm:main}, and verifies them for the simulation settings of Section~\ref{sec:simulations}. Throughout, $F_{y_i}$ is the distribution function of $y_i$, $\theta^*_i$ is its $\tau$-quantile, $r=k+1$, $D=D^{(r)}$, $\mathrm{TV}(\theta)=n^k\|D\theta\|_1$, $V^*=\mathrm{TV}(\theta^*)$, and $\Delta_n^2(v)=n^{-1}\sum_{i=1}^n\min\{|v_i|,v_i^2\}$.
 
-\paragraph{What the assumptions say.}
+\paragraph{Meaning of the assumptions.}
 Assumption~\ref{ass:A} is a lower margin: the distribution function of $y_i$ grows at least linearly in a fixed neighborhood of the quantile, uniformly in $i$ and $n$. It holds when the density is bounded below near $\theta^*_i$, but it is weaker, since it constrains only increments of $F_{y_i}$. It is the condition of \citet{madrid2022risk}, and a lower density bound of this kind is also used for Bayesian linear quantile regression by \citet{sriram2013posterior}. Assumption~\ref{ass:B} is the matching upper margin. It excludes an atom at the quantile, so that $F_{y_i}(\theta^*_i)=\tau$, and it excludes densities that are unbounded near the quantile. Both conditions concern $F_{y_i}$ only near $\theta^*_i$, and neither requires a moment of $y_i$; Cauchy noise is allowed. They do not involve the signal. If $y_i=f(u_i)+\varepsilon_i$ with $\varepsilon_i\sim F_{u_i}$ and $q_\tau(u)=F_u^{-1}(\tau)$, then $F_{y_i}(\theta^*_i+\delta)-F_{y_i}(\theta^*_i)=F_{u_i}(q_\tau(u_i)+\delta)-F_{u_i}(q_\tau(u_i))$, which does not depend on $f$.
 
 The assumptions exclude discrete or rounded data, a flat stretch of $F_{y_i}$ at the quantile, a noise scale that vanishes or grows without bound in $i$, and a level $\tau$ that depends on $n$. For every distribution $\underline f L\le\min\{\tau,1-\tau\}$, because the increment of $F_{y_i}$ is at most $1-\tau$ for $\delta>0$ and at most $\tau$ for $\delta<0$; the constant $\underline f$ therefore shrinks at extreme levels.
 
 The condition $V^*\le\bar V$ is the bounded-variation class of \citet{tibshirani2014adaptive}. For $\theta^*_i=Q(i/n)$ with $Q$ having $k$ derivatives, $\mathrm{TV}(\theta^*)$ is the discrete analogue of the total variation of $Q^{(k)}$, and it stays bounded when $Q^{(k+1)}$ is integrable. Here $Q=f+q_\tau$ includes the noise quantile curve.
 
-\paragraph{Where they enter the proof.}
+\paragraph{Role in the proof.}
 Write $\delta=\theta-\theta^*$. The posterior depends on the data only through the check loss, and every probability in Theorem~\ref{thm:main} is under the true law of $y$. The expected excess check loss is
 \[
 \mathcal{L}(\delta)=\mathbb{E}\sum_{i=1}^n\bigl\{\rho_\tau(y_i-\theta^*_i-\delta_i)-\rho_\tau(y_i-\theta^*_i)\bigr\}=\sum_{i=1}^n\int_0^{\delta_i}\bigl\{F_{y_i}(\theta^*_i+z)-\tau\bigr\}\,dz .
@@ -76,6 +76,6 @@ S & Mixed normal & $156.3$--$156.6$ & $157.8$--$158.1$\\
 \end{tabular}
 \end{table}
 
-The noise quantile curve contributes little. For Gaussian noise $q_\tau(u)=s(u)z_\tau$ is a quadratic polynomial in $u$, which $D^{(3)}$ annihilates, so $V^*$ equals the total variation of $f$ and does not depend on $\tau$. For mixed-normal noise the contribution is between $0.17$ and $1.22$. For Beta noise it is between $9.5$ and $45.1$, which moves $V^*$ by about $-10\%$ to $+13\%$ for S and is invisible for VS. For S the limit is $16\pi^2=157.9$, the integral of $|f'''|$ for $f(u)=\sin(2\pi u)$. The value $7.3\times10^3$ for VS comes from the localized bump; it is about $46$ times the value for S, so the constants of Theorem~\ref{thm:main} are larger for VS.
+The noise quantile curve contributes little. For Gaussian noise $q_\tau(u)=s(u)z_\tau$ is a quadratic polynomial in $u$, which $D^{(3)}$ annihilates, so $V^*$ equals the total variation of $f$ and does not depend on $\tau$. For mixed-normal noise the contribution is between $0.17$ and $1.22$. For Beta noise it is between $9.5$ and $45.1$, which moves $V^*$ by about $-10\%$ to $+13\%$ for S and is negligible for VS. For S the limit is $16\pi^2=157.9$, the integral of $|f'''|$ for $f(u)=\sin(2\pi u)$. The value $7.3\times10^3$ for VS comes from the localized bump; it is about $46$ times the value for S, so the constants of Theorem~\ref{thm:main} are larger for VS.
 
 The constants of the theorem also degrade where $\underline f$ is small, at $\tau\ge0.96$ and for Beta noise at $\tau=0.05$. The assumptions still hold there, so the rate is unchanged. The asymmetric Laplace likelihood is a working model and plays no role in the assumptions, which concern only the law of $y_i$; its consequences are discussed after Theorem~\ref{thm:main}.
