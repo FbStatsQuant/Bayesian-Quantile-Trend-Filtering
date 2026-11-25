@@ -54,15 +54,18 @@ curve_metrics <- function(est, lo, hi, truth) c(
 
 ## Snapshot and Slurm
 
-After the sampler commit and GO arrive, assemble a snapshot from the repo
-root. Set `SAMPLER_REF` to the approved sampler commit and
-`ENGINEERING_REF` to a commit containing the runner and E-14 data function.
-Set `SNAPSHOT` to an empty local staging directory under `tmp/E14/`.
+The approved sampler commit is `63f2a56205b8d2ec311565db8c98874cd96754b2`.
+Transfer the code by Git bundle between submissions. Verify the bundle in
+the source repo and on NOTS, then compare the resulting NOTS checkout's
+HEAD to the advertised Owls HEAD. Assemble the snapshot from the
+verified NOTS checkout. Set `SNAPSHOT` to an empty staging directory
+under `$HOME/BQTF`.
 
 ```bash
 set -euo pipefail
-sampler_commit=$(git rev-parse --verify "${SAMPLER_REF:?}^{commit}")
-engineering_commit=$(git rev-parse --verify "${ENGINEERING_REF:?}^{commit}")
+sampler_commit=63f2a56205b8d2ec311565db8c98874cd96754b2
+engineering_commit=$(git rev-parse --verify HEAD)
+git merge-base --is-ancestor "$sampler_commit" "$engineering_commit"
 e14=engineering/E14_Inner_Rerun
 original=experiments/interior_quantiles/individual_nots_20261003/source
 git archive "$sampler_commit" method/individual/Individual_Sampler_PMALA_Augmented.R \
@@ -76,8 +79,13 @@ printf 'Sampler-Commit: %s\nEngineering-Commit: %s\n' "$sampler_commit" "$engine
 ```
 
 Copy the snapshot contents into `$RUN/code` and create `$RUN/logs` before
-submission. Use a separate run directory for the pilot. Confirm memory and
-wall time on the approved sampler before submitting the full array.
+submission. The pilot uses the separate `E14-inner-rerun-20261125-pilot`
+run directory and task indices `0,700,1400,1900,2000,2700`, covering both
+signals and each noise with low, middle, and high quantiles. Submit the
+full array only if all six tasks finish, all have zero σ guards and
+acceptance between 0.4 and 0.6, and the mean per-task CPU time projects
+to at most 150 core-hours for 3,000 tasks. Size the final memory request
+from the pilot's largest MaxRSS with headroom.
 The script currently requests 3 GiB, one core, and three hours per task.
 With a 2,304 GiB commons QoS per-user memory cap, 600 tasks at 3 GiB use
 1,800 GiB of the quota. Other commons jobs can use part of that quota.
