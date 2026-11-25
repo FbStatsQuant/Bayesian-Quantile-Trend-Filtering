@@ -47,3 +47,12 @@ written atomically as one RDS per run. The RDS includes pointwise posterior
 means and 95% bands, MSE, acceptance, λ and σ traces, warm IPM fallback
 and burn-in σ guard counts, joint crossing totals, time, and sampler
 commit. The θ draw arrays are held only in worker memory.
+
+## Status
+
+Postponed 2026-11-25 by owner. Restart unchanged.
+
+The one-core Owls pilot started at 16:48:46 CST and was stopped at 16:53:30 CST
+during the first joint fit. The admitted service used 282.607 CPU seconds
+(0.0785 core-hours), with a cgroup peak of 674,738,176 bytes. The pilot
+produced no completed run, and the full run did not start.
