@@ -1,4 +1,4 @@
-# Usage: Rscript e14_tables.R RESULTS_DIR NEW_OUTPUT_DIR [VALID_REPS_CSV]
+# Usage: Rscript e14_tables.R RUN_OR_RESULTS_DIR [NEW_OUTPUT_DIR [VALID_REPS_CSV]]
 # The RDS schema uses posterior_mean, lo, hi and truth for the four curves.
 # An optional status="failed" and error string can record a failed keyed fit.
 
@@ -189,7 +189,8 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
   write.csv(do.call(rbind, health), file.path(output_dir, "health.csv"), row.names = FALSE)
 
   if (!all(comparison$complete) || length(unassigned)) {
-    message("LaTeX tables require a resolved ADMM mask and complete kept results. See ", output_dir)
+    message("LaTeX tables require known PMALA seed eligibility and complete kept results. See ",
+      output_dir)
     return(invisible(FALSE))
   }
   for (id in names(paper$tables)) {
@@ -209,11 +210,16 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
 
 if (sys.nframe() == 0L) {
   args <- commandArgs(trailingOnly = TRUE)
-  if (!length(args) %in% 2:3) stop("Usage: e14_tables.R RESULTS_DIR NEW_OUTPUT_DIR [VALID_REPS_CSV]")
+  if (!length(args) %in% 1:3) {
+    stop("Usage: e14_tables.R RUN_OR_RESULTS_DIR [NEW_OUTPUT_DIR [VALID_REPS_CSV]]")
+  }
   script <- sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))
   folder <- dirname(normalizePath(script, mustWork = TRUE))
   valid_csv <- if (length(args) == 3L) args[3L] else file.path(folder, "valid_reps.csv")
-  success <- e14_build_tables(args[1L], args[2L], valid_csv,
+  results_dir <- args[1L]
+  if (dir.exists(file.path(results_dir, "out"))) results_dir <- file.path(results_dir, "out")
+  output_dir <- if (length(args) >= 2L) args[2L] else file.path(folder, "out")
+  success <- e14_build_tables(results_dir, output_dir, valid_csv,
     file.path(folder, "published_values.csv"), file.path(folder, "..", ".."))
   quit(status = if (success) 0L else 1L)
 }

@@ -133,30 +133,41 @@ cat(length(pilot), "stored n=500 joint pilot curves and responses checked\n")
 RS
 ```
 
-## Replication mask
+## PMALA replication rule
 
-[valid_reps.csv](valid_reps.csv) lists all 3,000 candidate keys with `kept=NA`.
-The paper's exact kept set cannot be recovered from the repository records
-reviewed. The October PMALA packages process all 100 seeds per cell and their
-`task_status.csv` tracks PMALA artifact validity. The joint campaign's
-[paper reference](../../experiments/interior_quantiles/joint_nots/paper_reference/interior_tables_long.csv)
-only contains method averages. The earlier September
-[workbook extract](../../paper/history/simulation_revision_20260914/table_source.json)
-contains averages for a different table revision, and its
-[construction script](../../paper/history/simulation_revision_20260914/revise.py#L24)
-only gives historical ADMM count ranges (VS 98–100, S 55–88). Those ranges
-cannot identify the valid seeds for the current tables. The repository's
-[ADMM driver](../../method/admm_qtf/ADMM_QTF_Individual.R) identifies the 25-point
-grid but is a single-dataset driver with an LP default. A historical production
-solver configuration and per-candidate convergence records are needed.
+E-14 PMALA means over all 100 seeds, exactly as the current paper's PMALA
+entries. [valid_reps.csv](valid_reps.csv) marks all 3,000 keys `kept=TRUE`.
+ADMM convergence governs competitor eligibility. The table builder carries
+the published competitor values forward and aggregates the new Bayesian-PMALA
+results over the 100 required seeds in each cell.
 
-The closest reconstruction is to obtain the original ADMM logs or rerun all
-25 candidates with the archived production code, options, and software versions.
-Keep a seed in its cell only if every grid candidate converged. Check the
-reconstructed ADMM aggregates against the current paper before using the mask.
-If those inputs remain unavailable, report PMALA over all 100 planned seeds
-per cell as an explicitly unmatched sensitivity analysis and defer the
-replacement tables.
+The paper's PMALA settings match the October 12 VS and S campaign configs,
+including the two prior rates, sweep counts, and ASIS settings. Both configs
+set `seeds = 1:100`. Both production processors require
+`nrow(d) == length(cfg$seeds)` and `identical(sort(d$seed), cfg$seeds)`
+before averaging. The campaign READMEs likewise say the final averages
+use all 100 seeds. [Paper settings](../../paper/sections/simulations.tex#L19) ·
+[VS config](../../experiments/interior_quantiles/individual_nots_20261003/VS_b0001/config.R#L8) ·
+[VS processor](../../experiments/interior_quantiles/individual_nots_20261003/VS_b0001/process_results.R#L85) ·
+[VS run notes](../../experiments/interior_quantiles/individual_nots_20261003/VS_b0001/README.md#L26) ·
+[S config](../../experiments/interior_quantiles/individual_nots_20261003/S_b00005/config.R#L8) ·
+[S processor](../../experiments/interior_quantiles/individual_nots_20261003/S_b00005/process_results.R#L85) ·
+[S run notes](../../experiments/interior_quantiles/individual_nots_20261003/S_b00005/README.md#L25)
+
+The earlier October 3 MSE updater also enforces 100 seeds. Its inputs
+are the 15k/3k campaign with rate 0.01, and it corroborates the workflow.
+[Updater campaign](../../experiments/interior_quantiles/individual_nots_20261003/deployment/paper_mse_tables.py#L8) ·
+[Updater seed check](../../experiments/interior_quantiles/individual_nots_20261003/deployment/paper_mse_tables.py#L18)
+
+All 90 CSV values match the current six TeX tables, and the 30 MSE values
+also match the October 23 pre-edit manuscript snapshot. No production
+`average_metrics.csv`, per-seed results, or summary RDS for the October 12
+VS and S campaigns was found in the checkout, Git history, or the sealed
+NOTS archive file list. This verifies the aggregation rule at code level
+and the published transcription. Independently reproducing the 90 means
+would require the campaign outputs.
+[October TeX snapshot](../../paper/history/extreme_six_levels_20261023/before/sections/simulations.tex) ·
+[Sealed file list](../../engineering/E09_NOTS_Cleanup/quant_reg_archive/MANIFEST.sha256)
 
 ### Legacy campaign search on 2026-11-25
 
@@ -178,8 +189,8 @@ It offers several algorithms, defaults to LP, and does not pin the original
 production algorithm, backend, stopping tolerances, iteration cap, or
 warm-start policy. Those settings determine the recorded convergence flags.
 The archived `Extreme_admm` and `Air_sim` code belong to separate experiments.
-Neither reconstruction branch has the required inputs. The mask remains
-unresolved and there is no defensible timing estimate for the historical grid.
+Neither reconstruction branch had the required competitor inputs, so the
+search yielded no timing estimate for the historical grid.
 
 The next evidence source is the original per-seed files alongside the
 comparison workbooks in Felipe's PC OneDrive. The September
@@ -246,8 +257,8 @@ As a provenance check, the same inputs reproduce all 240 displayed
 competitor entries in the September
 [workbook extract](../../paper/history/simulation_revision_20260914/table_source.json)
 when each method uses its own valid seeds. The ADMM-valid rule reproduces
-115 of those 240 entries. The production mask still requires the inputs
-behind the current tables.
+115 of those 240 entries. This identifies the September competitor
+dataset. E-14 uses the October PMALA replication rule above.
 
 ## Published values
 
@@ -264,16 +275,18 @@ CSV and the table layout.
 
 ## Table builder
 
-Run from the repository root once a verified ADMM mask is available.
+Run from the repository root after the 3,000 production results have arrived.
 
 ```bash
-Rscript --vanilla engineering/E14_Inner_Rerun/e14_tables.R RESULTS_DIR NEW_OUTPUT_DIR VERIFIED_VALID_REPS.csv
+Rscript --vanilla engineering/E14_Inner_Rerun/e14_tables.R runs/E14-inner-rerun-20261125/
 ```
 
-The optional third argument defaults to the checked-in `valid_reps.csv`.
-Supply the worker's result folder, which contains the per-run RDS files.
+The builder reads the run's `out/` subdirectory and the checked-in
+`valid_reps.csv`. A direct result folder is also supported.
 The builder writes `pmala_old_vs_new.csv`, `health.csv`, and `run_issues.csv`
-in a new output directory. The ratio uses the unrounded new mean divided by
+in `engineering/E14_Inner_Rerun/out/` by default. An optional second
+argument selects a different new output directory, and an optional third
+argument selects a different replication manifest. The ratio uses the unrounded new mean divided by
 the displayed old mean. The comparison and health files identify kept and
 available runs and count unresolved seeds. Unreadable or unkeyed files appear
 in the issue report, along with keyed failures, duplicates, and missing runs.
@@ -307,3 +320,8 @@ all six LaTeX layouts, checked all three metrics, their SEs and ratios, and
 verified the diagnostic summaries. Further checks covered a missing result,
 a worker failure record, a duplicate, a wrong stored metric, an unreadable file,
 and the unresolved mask. The fixture files and generated output were removed.
+
+A second CLI test used 3,000 synthetic RDS files with the checked-in
+all-seeds manifest. Each of the 30 cells used 100 fits. All six LaTeX
+fragments preserved the original layout and competitor rows, and the
+old-vs-new ratios and health counts matched the fixture values.
