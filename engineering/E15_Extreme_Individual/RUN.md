@@ -22,8 +22,8 @@ hashes for both snapshots. The first two match the repository bytes and
 the sampler matches after restoring the archived CRLF line endings.
 The original `submit.sh` wrote `dput(cfg)` to `metadata/config.txt` and
 exported the task and batch grids. With the repository config the three
-recreated files match the Oct. 7 hashes. Changing only the two-level
-quantile vector to `c(0.90, 0.93)` also reproduces the Oct. 21 hashes
+recreated files match the Oct. 7 hashes. Changing only `cfg$taus` to
+`c(0.90, 0.93)` also reproduces the Oct. 21 hashes
 exactly. The Oct. 21 config hash is
 `7ab6eafabeeaf66e4cfae59e7132df0e43a7d0766c2d45af52ba3118d42c1749`,
 and its task manifest hash is
@@ -33,12 +33,16 @@ and its task manifest hash is
 SHA-256 hashes for all 3,600 tasks with the original individual and joint
 sampler generators. It hashes IEEE-754 numeric vectors as little-endian
 binary64 and verifies that each of the 600 signal/noise/seed groups has
-one response vector shared across all six quantiles.
+one response vector shared across all six quantiles. The verified hash
+CSV has SHA-256
+`642e6e94d5828999bfc394f4e84c880ecf32608b3b299bfb87945da0f957709c`.
 
 The original individual sampler uses an unscaled trend-filtering prior,
 σ ~ IG(0.1, 0.1), and λ ~ Gamma(1, b0) in shape/rate form. Both legacy
 configs override b0 to 0.01 for VS and 0.001 for S. E-14 used the same
 shape and σ parameters with rates 0.001 and 0.0005, respectively.
+E-15 applies the owner's common rate of 0.001 to both signals. The
+shape and σ parameters retain their legacy values.
 
 ## Sampler and outputs
 
@@ -69,16 +73,23 @@ from the pinned sampler commit. Archive the E-15 run scripts and
 from the verified engineering HEAD. Extract into `$RUN/code` and record
 `Sampler-Commit` and `Engineering-Commit` in `code/run_manifest.dcf`.
 
-The pilot uses indices `0,700,1400,2100,2800,3500` in a separate directory.
-Production requires six completions, a projection of at most 200
-core-hours from Slurm TotalCPU, zero σ guards, and all six acceptance
-rates in [0.4, 0.6]. Submit production as one `bqtf-e15` array.
+The common-rate pilot uses indices `0,500,1000,1700,1900,2600,3000,3500`
+in a separate directory. It tests 0.99 for both signals and covers all
+three noises. Together with the two E-14b pilot tasks, production
+requires ten completions, zero σ guards, and all acceptances in
+[0.4, 0.6]. The combined production projection from Slurm TotalCPU must
+be at most 260 core-hours. Submit production as one `bqtf-e15` array.
+
+Reference pilot `2894358` used the legacy VS/S rates. Its associated
+production array `2894375` was cancelled when the owner set the common
+rate. The reference runs are preserved separately from the common-rate
+results.
 
 ```bash
 RUN="$HOME/BQTF/runs/E15-extreme-indiv-20261125"
 code="$RUN/code/engineering/E15_Extreme_Individual"
 mkdir -p "$RUN/logs"
-sbatch --array=0-3599%600 --export="ALL,RUN=$RUN" \
+sbatch --array=0-3599%400 --export="ALL,RUN=$RUN" \
     --output="$RUN/logs/%x_%A_%a.out" "$code/e15.slurm"
 ```
 

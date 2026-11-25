@@ -37,7 +37,8 @@ e14_counter <- function(fit, name, trace) {
   NA_integer_
 }
 
-e14_fit <- function(task, code, smoke) {
+e14_fit <- function(task, code, smoke, b0 = c(VS = 1e-3, S = 5e-4)[[task$signal]],
+                    chain_seed = 10001L + task$index, save_posterior_means = FALSE) {
   e14_load_sampler(code)
 
   data_file <- file.path(code, "engineering", "E14_Inner_Rerun", "e14_data.R")
@@ -50,8 +51,6 @@ e14_fit <- function(task, code, smoke) {
 
   sweeps <- if (smoke) 300L else 30000L
   burn <- if (smoke) 220L else 10000L
-  b0 <- c(VS = 1e-3, S = 5e-4)[[task$signal]]
-  chain_seed <- 10001L + task$index
   RNGkind("Mersenne-Twister", "Inversion", "Rejection")
   set.seed(chain_seed)
   fit <- gibbs_pmala_aug(
@@ -79,7 +78,7 @@ e14_fit <- function(task, code, smoke) {
   stopifnot(all(is.finite(est)), all(is.finite(lo)), all(is.finite(hi)))
 
   trace_sweep <- seq.int(1L, sweeps, by = ceiling(sweeps / 1000L))
-  list(
+  result <- list(
     chain_seed = chain_seed, sweeps = sweeps, burn = burn,
     est = est, lo = lo, hi = hi, truth = dat$truth,
     mse = mean((est - dat$truth)^2), mad = mean(abs(est - dat$truth)), mciw = mean(hi - lo),
@@ -90,13 +89,19 @@ e14_fit <- function(task, code, smoke) {
     n_sigma_guard = e14_counter(fit, "n_sigma_guard", "sigma_guard"),
     seconds = fit$seconds
   )
+  if (save_posterior_means) {
+    result$b0 <- b0
+    result$coverage <- mean(dat$truth >= lo & dat$truth <= hi)
+    result$lambda_mean <- mean(fit$lambda[post])
+    result$sigma_mean <- mean(fit$sigma[post])
+  }
+  result
 }
 
-e14_main <- function(args) {
+e14_main <- function(args, tasks = e14_tasks(), fit_task = e14_fit) {
   if (!length(args) %in% c(2L, 3L) || (length(args) == 3L && args[3L] != "--smoke"))
     stop("Usage: Rscript e14_run.R RUN_DIR TASK_INDEX [--smoke]")
   smoke <- length(args) == 3L
-  tasks <- e14_tasks()
   index <- suppressWarnings(as.integer(args[2L]))
   if (!grepl("^[0-9]+$", args[2L]) || is.na(index) || index >= nrow(tasks))
     stop("Task index must be between 0 and ", nrow(tasks) - 1L)
@@ -122,7 +127,7 @@ e14_main <- function(args) {
               grepl("^[[:xdigit:]]{40}$", manifest[1L, 1L]))
     commit <- manifest[1L, 1L]
 
-    fit <- e14_fit(task, code, smoke)
+    fit <- fit_task(task, code, smoke)
     e14_atomic_rds(c(task, fit, list(commit = commit, hostname = hostname)), result_path)
     unlink(fail_path)
     cat(sprintf("%s | %.3f s | %.6f s/sweep | MSE %.6g | MAD %.6g | MCIW %.6g\n",

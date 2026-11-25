@@ -51,7 +51,7 @@ e15_fit <- function(task, code, smoke) {
 
   sweeps <- if (smoke) 300L else 30000L
   burn <- if (smoke) 220L else 10000L
-  b0 <- c(VS = 0.01, S = 0.001)[[task$signal]]
+  b0 <- 1e-3
   chain_seed <- 10001L + task$index
   RNGkind("Mersenne-Twister", "Inversion", "Rejection")
   set.seed(chain_seed)
@@ -81,7 +81,7 @@ e15_fit <- function(task, code, smoke) {
 
   trace_sweep <- seq.int(1L, sweeps, by = ceiling(sweeps / 1000L))
   list(
-    chain_seed = chain_seed, sweeps = sweeps, burn = burn,
+    chain_seed = chain_seed, b0 = b0, sweeps = sweeps, burn = burn,
     est = est, lo = lo, hi = hi, truth = dat$truth,
     mse = mean((est - dat$truth)^2), mad = mean(abs(est - dat$truth)), mciw = mean(hi - lo),
     coverage = mean(dat$truth >= lo & dat$truth <= hi),
