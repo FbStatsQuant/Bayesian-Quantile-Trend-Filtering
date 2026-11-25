@@ -90,10 +90,12 @@ The same code is in both samplers, and `e13b_zdraw_test.R` checks that it is ide
 | MSE | 0.00515 | 0.00533 | +0.00019 (0.00022) | 0.84 |
 | coverage | 0.965 | 0.955 | −0.011 (0.016) | −0.67 |
 | width | 0.2824 | 0.2816 | −0.0009 (0.0016) | −0.55 |
-| λ mean | 2,251 | 2,342 | **+91 (13)** | **6.8** |
+| λ mean | 2,251 | 2,342 | **+91 (13)*** | **6.8*** |
 | σ mean | 0.10996 | 0.11009 | +0.00012 (0.00004) | 2.8 |
 
-- **At the usual length, λ differed by 4%.** The cause is the **before** code: it had not finished its burn-in, not that the target changed.
+\* The SE of 13 understates the uncertainty, so z = 6.8 overstates the gap. In the long before-chains, the quarter means of λ vary by about ±100 between chains (2,120–2,381), whereas the within-run SE is about 10 (HQ review, 2026-11-25).
+
+- **λ differs by 4% at 30k. This is consistent with slow λ burn-in in the old code, and the two versions agree at 120k.**
   - The old start leaves λ ≈ 400–570 at the end of the warm start, and λ then climbs slowly from below.
   - In the long before-chains, the λ mean over the first 20k kept sweeps is 2,224–2,267 (the 30k-run window), and over the last 20k it is 2,297–2,372.
   - The after chains are flat from the start: 2,317–2,363 in the first 20k and 2,310–2,372 in the last 20k.
