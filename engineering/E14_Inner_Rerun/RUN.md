@@ -116,3 +116,24 @@ markers remain.
 ```bash
 Rscript --vanilla "$code/e14_check.R" "$RUN" 600
 ```
+
+## Production results
+
+Array `2890616` completed all 3,000 tasks. Slurm `sacct` reported
+510,754.292 seconds of `TotalCPU` summed over the array tasks, or
+141.876192 core-hours. Including the six-run pilot, the total was
+142.110826 core-hours. The completeness checker found zero missing IDs
+and zero failure files. No retries were submitted.
+
+The per-run `e14_summary.csv` includes pointwise coverage computed from
+the saved intervals and truth. The λ and σ means use the 666 retained
+post-burn-in draws per run. There were no σ guards and all acceptance
+rates fell between 0.48570 and 0.51975. All 3,000 runs recorded 200 IPM
+fallbacks during warm start.
+
+The 3,000 RDS files, `e14_summary.csv`, and `e14_health.csv` were copied
+to `runs/E14-inner-rerun-20261125/` on Owls. All 3,002 entries in
+`E14_RESULTS.sha256` verified on both hosts. The manifest's own SHA-256
+was `bb73840afc2e0691ef8a169cdf2cc87036ec9f71ac643d24f08cd34b56d67fe1`.
+The NOTS run was then sealed with `ops/seal_run.sh`. All 6,013 entries
+in its sealed manifest verified.
