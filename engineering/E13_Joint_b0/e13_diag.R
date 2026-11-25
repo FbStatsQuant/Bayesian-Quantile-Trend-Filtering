@@ -53,6 +53,22 @@ asis_box_step <- function(theta, lambda, a, r, a0, b0, P, order, lower, upper, .
   R$asis[[R$acalls]] <- c(lam_in = lambda, lam_out = out$lambda, moved = out$moved, q = attr(P, "q"))
   out
 }
+# warm-start trace: wrap prox_box (called only in the warm sweeps for J > 1); records only, no RNG use
+R$warm <- list(); R$wcalls <- 0L
+prox_box_orig <- prox_box
+prox_box <- function(x, a, r, lambda, gamma, d, c, order, lower, upper, rho = NULL, zeta_scale = 1, iters = 200L, tol = 0, ctrl = box_ctrl) {
+  out <- prox_box_orig(x, a, r, lambda, gamma, d, c, order, lower, upper, rho, zeta_scale, iters, tol, ctrl)
+  R$wcalls <- R$wcalls + 1L; th <- out$theta
+  ref <- if (Sys.getenv("E13_WARMREF", "0") == "1") {        # same problem solved with ctrl forcing the interior-point solver (no ADMM shortcut)
+    cr <- box_ctrl; cr[2] <- 0; prox_box_orig(x, a, r, lambda, gamma, d, c, order, lower, upper, rho, zeta_scale, iters, tol, cr)$theta } else rep(NA_real_, length(th))
+  obj <- function(t) sum(a * (t - r)^2) / 2 + lambda * sum(abs(diff(t, differences = order + 1L))) + sum(d * (t - x)^2) / (2 * gamma)
+  R$warm[[R$wcalls]] <- c(sweep = (R$wcalls - 1L) %/% J + 1L, level = (R$wcalls - 1L) %% J + 1L, lambda = lambda, a_med = median(a),
+                          r_mean = mean(r), x_mean = mean(x), th_mean = mean(th), y_mean = mean(y_glob), SD = sum(abs(diff(th, differences = order + 1L))),
+                          ref_mean = mean(ref), ref_maxdiff = max(abs(th - ref)), obj = obj(th), obj_ref = obj(ref), at_lo = sum(th <= lower + 1e-8), at_up = sum(th >= upper - 1e-8), lo_mean = mean(lower), up_mean = mean(upper))
+  out
+}
+y_glob <- dat$y
+WARM <- as.integer(Sys.getenv("E13_WARM", warm_sweeps)); warm_sweeps <- WARM
 set.seed(1001)
 t0 <- proc.time()[["elapsed"]]
 fit <- tryCatch(gibbs_joint_pmala(dat$y, TAUS, 2L, 1, b0, 0.1, 0.1, iters, max(warm_sweeps, iters - 1L), delta_init, NULL, adapt_target,
@@ -65,6 +81,6 @@ rec <- do.call(rbind, lapply(R$rec, function(x) { x <- x[nm]; names(x) <- nm; as
 asis <- if (length(R$asis)) as.data.frame(do.call(rbind, R$asis)) else NULL
 saveRDS(list(tag = tag, variant = variant, b0 = b0, taus = TAUS, cap = CAP, asis_on = ASIS, fit = if (inherits(fit, "error")) NULL else fit[setdiff(names(fit), "theta")],
              final_theta = if (inherits(fit, "error")) NULL else fit$final$theta, error = if (inherits(fit, "error")) conditionMessage(fit) else NULL,
-             rec = rec, asis = asis, y = dat$y, truth = dat$truth, seconds = proc.time()[["elapsed"]] - t0),
+             rec = rec, asis = asis, warm = if (length(R$warm)) as.data.frame(do.call(rbind, R$warm)) else NULL, warm_sweeps = WARM, y = dat$y, truth = dat$truth, seconds = proc.time()[["elapsed"]] - t0),
         file.path(OUT, "diag", paste0(tag, ".rds")))
 cat("done", tag, if (inherits(fit, "error")) conditionMessage(fit) else "", "\n")
