@@ -24,21 +24,21 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.012702 & 0.020517 & 0.030557 & 0.040591 & 0.066465 \\
 Onizuka (Horseshoe) & 0.011300 & 0.018849 & 0.028763 & 0.038443 & 0.062328 \\
-Bayesian-PMALA & 0.012738 & 0.020634 & 0.030695 & 0.040913 & 0.069349 \\
+Bayesian-PMALA & 0.012705 & 0.020700 & 0.030584 & 0.040697 & 0.069261 \\
 ADMM & 0.027314 & 0.029267 & 0.044214 & 0.052848 & 0.076817 \\
 \midrule
 Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.215556 & 0.139979 & 0.128822 & 0.138850 & 0.215747 \\
 Onizuka (Horseshoe) & 0.212371 & 0.140284 & 0.129614 & 0.141514 & 0.218726 \\
-Bayesian-PMALA & 0.223228 & 0.139281 & 0.127013 & 0.137967 & 0.212757 \\
+Bayesian-PMALA & 0.216900 & 0.139086 & 0.126371 & 0.137381 & 0.209422 \\
 ADMM & 0.218535 & 0.183889 & 0.169139 & 0.157936 & 0.201602 \\
 \midrule
 Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.109980 & 0.070160 & 0.063856 & 0.067192 & 0.103017 \\
 Onizuka (Horseshoe) & 0.106356 & 0.068189 & 0.061950 & 0.065668 & 0.101007 \\
-Bayesian-PMALA & 0.107777 & 0.069189 & 0.063468 & 0.067009 & 0.104810 \\
+Bayesian-PMALA & 0.106680 & 0.069284 & 0.063495 & 0.067010 & 0.104355 \\
 ADMM & 0.141630 & 0.087809 & 0.085612 & 0.081531 & 0.107235 \\
 \bottomrule
 \end{tabular}
@@ -55,19 +55,19 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.072159 & 0.100837 & 0.132473 & 0.158571 & 0.168685 \\
 Onizuka (Horseshoe) & 0.067523 & 0.100344 & 0.134284 & 0.161300 & 0.166118 \\
-Bayesian-PMALA & 0.063025 & 0.097430 & 0.129048 & 0.154243 & 0.157493 \\
+Bayesian-PMALA & 0.063096 & 0.097263 & 0.128918 & 0.154285 & 0.159541 \\
 \midrule
 Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.557248 & 0.564334 & 0.569489 & 0.565218 & 0.559566 \\
 Onizuka (Horseshoe) & 0.578243 & 0.613924 & 0.620905 & 0.624492 & 0.599896 \\
-Bayesian-PMALA & 0.539558 & 0.514693 & 0.509364 & 0.514597 & 0.538398 \\
+Bayesian-PMALA & 0.533499 & 0.515367 & 0.511419 & 0.516501 & 0.527685 \\
 \midrule
 Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.289501 & 0.286599 & 0.285566 & 0.284948 & 0.280193 \\
 Onizuka (Horseshoe) & 0.296111 & 0.301798 & 0.301683 & 0.301976 & 0.290053 \\
-Bayesian-PMALA & 0.272470 & 0.274165 & 0.272616 & 0.275244 & 0.269605 \\
+Bayesian-PMALA & 0.271823 & 0.273381 & 0.273393 & 0.275158 & 0.268848 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -75,7 +75,7 @@ Bayesian-PMALA & 0.272470 & 0.274165 & 0.272616 & 0.275244 & 0.269605 \\
 \clearpage
 \subsubsection{Smooth signal}
 \label{app:sim:individual:smooth}
-The settings for the smooth signal are those of Section~\ref{sec:sim:individual}. The MAD comparison (Table~\ref{tab:s_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:smooth} (Table~\ref{tab:s_int_mse}): Bayesian-PMALA is more accurate than both samplers of \citet{onizuka2024fast} at $\tau=0.25$, $0.50$, and $0.75$ under every noise family and under Beta noise at $\tau=0.05$, and less accurate than both in the other five configurations at $\tau=0.05$ and $0.95$. Its intervals are narrower than those of both samplers at $\tau=0.25$, $0.50$, and $0.75$ and under Beta noise at $\tau=0.05$; in the other five configurations they lie between the Laplace and horseshoe widths (Table~\ref{tab:s_int_mciw}).
+The settings for the smooth signal are those of Section~\ref{sec:sim:individual}. The MAD comparison (Table~\ref{tab:s_int_mad}) agrees with the MSE comparison of Section~\ref{sec:sim:ind:smooth} (Table~\ref{tab:s_int_mse}): Bayesian-PMALA is more accurate than both samplers of \citet{onizuka2024fast} in every configuration. Its intervals are also narrower than those of both samplers in every configuration (Table~\ref{tab:s_int_mciw}).
 
 \begin{table}[!htbp]
 \centering
@@ -88,21 +88,21 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.009000 & 0.017595 & 0.027191 & 0.035333 & 0.056189 \\
 Onizuka (Horseshoe) & 0.009166 & 0.016903 & 0.026235 & 0.034349 & 0.056422 \\
-Bayesian-PMALA & 0.008426 & 0.015465 & 0.023818 & 0.031182 & 0.061033 \\
+Bayesian-PMALA & 0.008059 & 0.014843 & 0.022516 & 0.028817 & 0.054178 \\
 ADMM & 0.007408 & 0.013056 & 0.019253 & 0.024246 & 0.039323 \\
 \midrule
 Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.209230 & 0.128588 & 0.117542 & 0.129947 & 0.200719 \\
 Onizuka (Horseshoe) & 0.212951 & 0.128772 & 0.116773 & 0.130281 & 0.208177 \\
-Bayesian-PMALA & 0.221367 & 0.116848 & 0.104087 & 0.116396 & 0.210121 \\
+Bayesian-PMALA & 0.175310 & 0.101395 & 0.087401 & 0.099587 & 0.165263 \\
 ADMM & 0.134511 & 0.082435 & 0.071963 & 0.081493 & 0.118870 \\
 \midrule
 Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.093516 & 0.062130 & 0.057391 & 0.060291 & 0.091704 \\
 Onizuka (Horseshoe) & 0.096546 & 0.061044 & 0.055676 & 0.059026 & 0.092177 \\
-Bayesian-PMALA & 0.097563 & 0.054812 & 0.049118 & 0.053120 & 0.095053 \\
+Bayesian-PMALA & 0.082926 & 0.049742 & 0.045036 & 0.048328 & 0.080376 \\
 ADMM & 0.060896 & 0.042695 & 0.037518 & 0.040551 & 0.057551 \\
 \bottomrule
 \end{tabular}
@@ -119,19 +119,19 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.051618 & 0.086614 & 0.118115 & 0.140828 & 0.144257 \\
 Onizuka (Horseshoe) & 0.055748 & 0.087738 & 0.119125 & 0.144581 & 0.152374 \\
-Bayesian-PMALA & 0.036528 & 0.067746 & 0.095498 & 0.120977 & 0.144979 \\
+Bayesian-PMALA & 0.035714 & 0.065104 & 0.089491 & 0.108993 & 0.124185 \\
 \midrule
 Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.530973 & 0.541054 & 0.546983 & 0.542001 & 0.528167 \\
 Onizuka (Horseshoe) & 0.572392 & 0.581571 & 0.576684 & 0.582025 & 0.573076 \\
-Bayesian-PMALA & 0.554772 & 0.499975 & 0.495835 & 0.502117 & 0.553304 \\
+Bayesian-PMALA & 0.436860 & 0.405506 & 0.400563 & 0.403851 & 0.429195 \\
 \midrule
 Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
 \midrule
 Onizuka (Laplace) & 0.250570 & 0.262358 & 0.265880 & 0.262720 & 0.248729 \\
 Onizuka (Horseshoe) & 0.274999 & 0.276615 & 0.274603 & 0.273819 & 0.269150 \\
-Bayesian-PMALA & 0.258425 & 0.230489 & 0.226939 & 0.229488 & 0.255030 \\
+Bayesian-PMALA & 0.214741 & 0.199880 & 0.198983 & 0.198874 & 0.210358 \\
 \bottomrule
 \end{tabular}
 \end{table}
