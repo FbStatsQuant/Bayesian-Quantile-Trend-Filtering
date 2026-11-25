@@ -82,8 +82,14 @@ be at most 260 core-hours. Submit production as one `bqtf-e15` array.
 
 Reference pilot `2894358` used the legacy VS/S rates. Its associated
 production array `2894375` was cancelled when the owner set the common
-rate. The reference runs are preserved separately from the common-rate
-results.
+rate. The cancelled array used 46.330329 Slurm core-hours and its
+outputs are preserved in `E15-extreme-indiv-20261125-cancelled-2894375`.
+
+Common-rate pilots `2895795` (E-15) and `2895796` (E-14b) passed. All ten
+tasks completed with zero σ guards and acceptance of 0.49490–0.50100.
+The combined production projection was 208.416 core-hours. The bundle
+verified on both hosts with identical engineering HEAD
+`20cc922927e2d68375f5a55bc91d13ec4bb68ffb`.
 
 ```bash
 RUN="$HOME/BQTF/runs/E15-extreme-indiv-20261125"
@@ -98,3 +104,20 @@ module versions, package library, and job-local compile cache follow
 E-14. After job completion, run `e15_check.R RUN_DIR 600` and
 `e15_summary.R RUN_DIR` from the snapshot. Verify the result and summary
 hashes on both systems before sealing the NOTS run.
+
+## Production results
+
+Array `2895854` completed all 3,600 runs at the common rate. The checker
+found zero missing IDs and zero failure files. Slurm TotalCPU summed
+to 583,504.383 seconds (162.084551 core-hours). Together with E-14b,
+production used 235.820396 core-hours, or 236.230656 including both
+common-rate pilots. Including the cancelled legacy-rate array and its
+reference pilot as well, all E-15 and E-14b Slurm work used 282.796798
+core-hours.
+
+Acceptance ranged from 0.48790 to 0.50990. No run triggered the σ guard,
+and all runs recorded 200 warm-start IPM fallbacks. The Owls copy is
+`runs/E15-extreme-indiv-20261125/`. All 3,602 result and summary hashes
+verified on both hosts. The transfer manifest SHA-256 is
+`1eb06ba314b5f4715c1d551896bbaa95d65eb4b45c6f7436a5cb92d8cefb0873`.
+The NOTS run was sealed after transfer. All 7,222 seal entries verified.
