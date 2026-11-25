@@ -10,7 +10,7 @@ The NOTS side was done by Opus-NOTS. This page covers Owls. Executed by Opus-Owl
 
 | Folder | Contents |
 |---|---|
-| `ops/` | The E-01 pipeline (was `~/BQTF_ops`). It holds `CLAUDE.md`, `README.md`, `bin/` (`bqtf_ops.sh`, `residue_remote.sh`, `verify_receipt.py`, `sshlock/`), `ledger/`, `logs/`, `nots/seal_run.sh`, `pc/bqtf_pull.ps1`, `backup/`, and `Rlib/`, the Owls R library that was `~/R/e02lib`. |
+| `ops/` | The E-01 pipeline (was `~/BQTF_ops`). It holds `CLAUDE.md`, `README.md`, `bin/` (`bqtf_ops.sh`, `residue_remote.sh`, `verify_receipt.py`, `sshlock/`), `ledger/`, `logs/`, `seal_run.sh` (the sealer, at the same path as on NOTS `~/BQTF/ops/seal_run.sh`), `pc/bqtf_pull.ps1`, `backup/`, and `Rlib/`, the Owls R library that was `~/R/e02lib`. |
 | `runs/` | `E02/` and `E04/` (were `~/BQTF_runs`), `E08-lambdaprior-20261123/` (was `~/BQTF_ops/runs`), `pilot-lambda_mixing-20261124/` (the 8 pilot `.rds` files), and `archive-owls-session-scratch-20261125/` (see below). |
 | `tmp/` | `e03/` (holds the E-03 rollback bundle), `e03_kit/`, `paper_smoke/`, `smoke/`, `s/`, `loose/` (19 BQTF files from `/tmp/claude-71711`), `theory_scratch/` (was `~/BQTF_ops/theory_scratch`), and the E-12 records `E12_*`. |
 
@@ -87,7 +87,7 @@ After the Owls delete these scripts will not run as they are. To rerun one, rest
 - `bqtf_ops.sh`:
   - The allowlist key `dir:/scratch/fb31/BQTF/e01_mirror_test` is kept, with a comment, so the old ledger entry `ledger/_tests/E01-mirrortest` still verifies. It creates nothing. (This was the manager's call on 11-25, after a brief removal at 12:02.)
   - `REMOTE_RUNS` and the verified-delete `R=` keep the physical path `/projects/ml75/fb31/BQTF/runs` on purpose. The checks there compare resolved paths, like the sealer, and the PC key is scoped to that path.
-- `ops/nots/seal_run.sh`: only the usage comment changed, to `bash ~/BQTF/ops/seal_run.sh ~/BQTF/runs/<RUN_ID>`. The code lines are identical to the NOTS copy.
+- `ops/seal_run.sh` (moved from `ops/nots/` so that Owls mirrors NOTS `~/BQTF/ops/seal_run.sh`; `ops/nots/` is removed): only the usage comment on line 4 changed, to `bash ~/BQTF/ops/seal_run.sh ~/BQTF/runs/<RUN_ID>`. The code lines are identical to the NOTS copy.
 - E-03:
   - In the frozen files, only the re-clone lines changed (commit 23ca11e).
   - The working kit `tmp/e03_kit/` got the tracked `CHECKLIST.md` and `05_history_rewrite.sh`. A diff showed no kit-only edits, and the old kit copies are in `tmp/e03_kit_backup_20261125/`.
