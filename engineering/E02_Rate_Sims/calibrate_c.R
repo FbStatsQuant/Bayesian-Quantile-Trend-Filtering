@@ -11,5 +11,5 @@ A <- c(1, 15/7, 9/4, 7/3, 3)
 cal <- data.frame(a = A, c = Lstar / n0^A, Lam_n0 = Lstar)
 for (n in c(250, 1000, 4000, 16000, 32000)) cal[[paste0("Lam_n", n)]] <- cal$c * n^cal$a
 print(signif(cal, 4))
-saveRDS(list(Lstar = Lstar, grid = grid, d2 = r, cal = cal), "/home/fb31/BQTF_runs/E02/calibration.rds")
+saveRDS(list(Lstar = Lstar, grid = grid, d2 = r, cal = cal), "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/calibration.rds")
 d <- make_data("sin", "gauss", 0.5, 500, 1); invisible(tryCatch(qtf_map(d$y, 0.5, Lstar), warning = function(w) cat("rq warning text:", conditionMessage(w), "\n")))

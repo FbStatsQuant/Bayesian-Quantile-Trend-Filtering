@@ -10,7 +10,7 @@ The paper's individual P-MALA (`method/individual/Individual_Sampler_PMALA_Augme
 **Scripts:** `e08_run.R` runs one fit, `e08_analyze.R` builds the table and figure, and `e08_job.slurm` is the NOTS array version (unused).
 
 **Run:** Owls, 2026-11-23, through `owls_run -j 3` (xargs -P 3), about 220 s per fit.
-- Fit files, which are heavy and kept out of git, are in `/home/fb31/BQTF_ops/runs/E08-lambdaprior-20261123/out/fits/`.
+- Fit files, which are heavy and kept out of git, are in `/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E08-lambdaprior-20261123/out/fits/`.
 - Repo HEAD at run time: d44464994599d7803b54f738463679574db1b360.
 
 Sampler SHA256 values:

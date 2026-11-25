@@ -1,5 +1,5 @@
 # head to head table. Args: felipe.rds chain1.rds chain2.rds
-.libPaths(c("/home/fb31/R/e02lib", .libPaths()))
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))
 a <- commandArgs(TRUE); fe <- readRDS(a[1]); c1 <- readRDS(a[2]); c2 <- readRDS(a[3])
 taus <- fe$taus; J <- length(taus); tr <- fe$truths
 postF <- (fe$burn + 1):fe$iter; post3 <- (c1$burn + 1):c1$sweeps

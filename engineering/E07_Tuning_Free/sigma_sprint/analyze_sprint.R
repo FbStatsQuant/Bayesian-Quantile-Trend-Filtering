@@ -1,5 +1,5 @@
 # sigma sprint analysis: tables and ggplot2 figures.  Usage: Rscript analyze_sprint.R <dir with the 180 fit .rds> <output dir>
-.libPaths(c("/home/fb31/R/e02lib", .libPaths()))
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))
 suppressPackageStartupMessages({ library(ggplot2); library(scales) })
 args <- commandArgs(TRUE); IN <- args[1]; OUT <- args[2]; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 fs <- list.files(IN, pattern = "\\.rds$", full.names = TRUE); obj <- setNames(lapply(fs, readRDS), basename(fs))

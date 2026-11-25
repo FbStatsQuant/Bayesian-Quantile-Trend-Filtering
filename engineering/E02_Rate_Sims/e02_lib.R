@@ -14,13 +14,13 @@
 #   Delta2(delta) = n^-1 sum_i min(|delta_i|, delta_i^2)   (Padilla & Chatterjee)
 #   mse(delta)    = n^-1 sum_i delta_i^2
 # =============================================================================
-if (dir.exists("/home/fb31/R/e02lib")) .libPaths(c("/home/fb31/R/e02lib", .libPaths()))   # Owls user library (quantreg); NOTS has it in the R module library
+if (dir.exists("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib")) .libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))   # Owls user library (quantreg); NOTS has it in the R module library
 suppressPackageStartupMessages({ library(SparseM); library(quantreg); library(coda) })
 
 # Paths are configurable so the same code runs on Owls and from a NOTS code snapshot (E02_DIR, E02_KERNEL, E02_CACHE).
 E02_DIR  <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
 KERNEL   <- Sys.getenv("E02_KERNEL", "/home/fb31/Bayesian-Quantile-Trend-Filtering/method/individual/prox_admm_metric.cpp")
-load_kernel <- function(cache = Sys.getenv("E02_CACHE", "/home/fb31/BQTF_runs/E02/.rcpp_cache")) {
+load_kernel <- function(cache = Sys.getenv("E02_CACHE", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/.rcpp_cache")) {
   dir.create(cache, recursive = TRUE, showWarnings = FALSE)
   Rcpp::sourceCpp(KERNEL, cacheDir = cache, env = globalenv())                       # paper's P-MALA kernel (validation only)
   Rcpp::sourceCpp(file.path(E02_DIR, "banded_ls.cpp"), cacheDir = cache, env = globalenv())   # perturb-and-solve Gaussian draw

@@ -1,7 +1,7 @@
 # E-02 free check: learned (lambda, sigma) BQTF, production config. Usage: Rscript run_free_check.R [time|full] [n8000seed1]
 args <- commandArgs(TRUE); mode <- if (length(args)) args[1] else "full"
 root <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/method/individual"
-outd <- "/home/fb31/BQTF_runs/E02/free_check"; dir.create(outd, recursive = TRUE, showWarnings = FALSE)
+outd <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/free_check"; dir.create(outd, recursive = TRUE, showWarnings = FALSE)
 setwd(root)
 L <- readLines("Individual_Sampler_PMALA_Augmented.R")
 L <- L[seq_len(grep("^# ---- Main", L)[1] - 1L)]

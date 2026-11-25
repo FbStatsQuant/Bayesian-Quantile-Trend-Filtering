@@ -1,6 +1,6 @@
 # Fit plots (INTERNAL until a win is confirmed): truth vs Felipe's P-MALA vs exact augmented Gibbs, same data, posterior means + 95% bands.
 # Usage: Rscript plots.R <gibbs_vs dir> <sigma_sprint dir> <variants dir> <out dir>
-.libPaths(c("/home/fb31/R/e02lib", .libPaths())); suppressPackageStartupMessages(library(ggplot2))
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths())); suppressPackageStartupMessages(library(ggplot2))
 a <- commandArgs(TRUE); GV <- a[1]; SP <- a[2]; VA <- a[3]; OUT <- a[4]; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 COL <- c(`Felipe's sampler (P-MALA)` = "#0072B2", `Exact augmented Gibbs` = "#D55E00")
 NL <- c(Normal = "Gaussian", Beta = "Beta", Mixed = "Mixed normal")

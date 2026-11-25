@@ -1,4 +1,4 @@
-source("/tmp/claude-71711/-home-fb31-Bayesian-Quantile-Trend-Filtering/5a5aaa0b-5c86-47ef-8fba-2096636ee464/scratchpad/common.R")
+source("/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/archive-owls-session-scratch-20261125/5a5aaa0b-5c86-47ef-8fba-2096636ee464/scratchpad/common.R")
 taus <- c(0.90, 0.93)
 dat <- e_new$simulate_data(1, 200L, taus, "VS", "Normal")
 iter <- 260L; burn <- 220L    # warm = 200, so 60 post-warm exact-kernel sweeps

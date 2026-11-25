@@ -1,6 +1,6 @@
 # E-04 analysis of parts A (exact n = 4), B (paper settings, P-MALA vs Gibbs, 4 chains each), C (R-hat of the E-02 functional).
 suppressPackageStartupMessages(library(coda))
-R <- Sys.getenv("E04_OUT", "/home/fb31/BQTF_runs/E04")
+R <- Sys.getenv("E04_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E04")
 cat("== A: exact posterior (4-d grid) vs samplers; z = (sampler - exact) / MC se (se from ESS) ==\n")
 for (r in readRDS(file.path(R, "A", "A_0.rds"))) {
   cl <- r$cell; se_g <- r$s_ex / sqrt(r$g$ess); se_p <- r$s_ex / sqrt(r$p$ess)

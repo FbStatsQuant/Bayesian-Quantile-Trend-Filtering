@@ -1,6 +1,6 @@
 # E-02 free check: where do learned lambda and sigma sit?
 
-Production sampler (order 2, a0=1, Normal noise s(u)=(1+u^2)/4, data seed s, MCMC seed s+1000). CAP=(a0+m)/b0, m=n-3. 15000 sweeps (burn 3000) for n<=2000, 12000 (burn 3000) for n=8000. Per-fit table: `free_check_table.csv`; raw traces: `/home/fb31/BQTF_runs/E02/free_check/*.rds`.
+Production sampler (order 2, a0=1, Normal noise s(u)=(1+u^2)/4, data seed s, MCMC seed s+1000). CAP=(a0+m)/b0, m=n-3. 15000 sweeps (burn 3000) for n<=2000, 12000 (burn 3000) for n=8000. Per-fit table: `free_check_table.csv`; raw traces: `/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/free_check/*.rds`.
 
 ## A. Existing records (BQTF sampler, not Onizuka/ADMM)
 | source | n | tau | a0, b0 | lambda-bar | lambda/CAP | sigma-bar | L0, sigma/L0 |

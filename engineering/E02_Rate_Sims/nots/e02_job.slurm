@@ -1,9 +1,9 @@
 #!/bin/bash
 # E-02 on NOTS.  Submit from the run directory's code snapshot, e.g.
-#   RUN=/projects/ml75/fb31/BQTF/runs/E02-rates-20261122
+#   RUN=$HOME/BQTF/runs/E02-rates-20261122
 #   sbatch --array=0-3 --job-name=bqtf-e02-T3 -o $RUN/logs/%x_%A_%a.out --export=ALL,RUN=$RUN,PHASE=T3 $RUN/code/nots/e02_job.slurm
 #   sbatch --job-name=bqtf-e02-validate -c 4 -t 04:00:00 -o $RUN/logs/%x_%j.out --export=ALL,RUN=$RUN,PHASE=validate $RUN/code/nots/e02_job.slurm
-# Writes only under $RUN (outputs) and /scratch/fb31/BQTF (compile cache, tmp).  Never writes to NOTS home.
+# Writes only under $RUN (outputs) and $HOME/BQTF/tmp (compile cache, tmp).  Never writes to NOTS home.
 #SBATCH --partition=commons
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=48G
@@ -17,7 +17,7 @@ export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 FLEXIBLAS_NUM_THREADS=1 MKL_NUM_
 CODE="${CODE:-$RUN/code}"                          # code snapshot dir (code, code_v2, ...)
 export E02_DIR="$CODE" E02_KERNEL="$CODE/prox_admm_metric.cpp" E02_OUT="$RUN" E02_CAL="$CODE/calibration.rds"
 tag="${SLURM_JOB_ID}_${SLURM_ARRAY_TASK_ID:-0}"
-export E02_CACHE="/scratch/fb31/BQTF/rcpp_cache_$tag" TMPDIR="/scratch/fb31/BQTF/tmp_$tag"
+export E02_CACHE="$HOME/BQTF/tmp/rcpp_cache_$tag" TMPDIR="$HOME/BQTF/tmp/tmp_$tag"
 mkdir -p "$E02_CACHE" "$TMPDIR" "$RUN/logs"
 echo "[$(date -Is)] host=$(hostname) phase=$PHASE array=${SLURM_ARRAY_TASK_ID:-none}/${SLURM_ARRAY_TASK_COUNT:-1} cpus=$SLURM_CPUS_PER_TASK"
 if [ "$PHASE" = lamsteps ]; then

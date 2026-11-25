@@ -1,7 +1,7 @@
 # E-02: learned-lambda arms (lamlearn, lamlearn2, lamlearn3): lambda-bar slopes in n (paired bootstrap over seeds), PQ/sin ratio,
 # mixing diagnostics.  Theory's discriminator: at b0 = n^-2.5 slope 2.5 (VP) vs 2.25 (l1); ratio PQ/sin ~6 (VP) vs ~3.8 (l1).
 suppressPackageStartupMessages(library(data.table))
-R <- Sys.getenv("E02_GRID", "/home/fb31/BQTF_runs/E02/nots/grid")
+R <- Sys.getenv("E02_GRID", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/nots/grid")
 D <- rbindlist(lapply(c("lamlearn", "lamlearn2", "lamlearn3"), function(ph) rbindlist(lapply(list.files(file.path(R, ph), full.names = TRUE),
        function(f) as.data.table(readRDS(f)$row)), fill = TRUE)[, phase := ph]), fill = TRUE)
 D[, b0lab := a]

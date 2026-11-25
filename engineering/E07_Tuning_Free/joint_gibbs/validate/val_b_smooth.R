@@ -13,4 +13,4 @@ tab <- data.frame(tau = taus,
 print(tab, digits = 4)
 cat(sprintf("total crossings over all sweeps/chains: %d; sec/sweep per chain: %s\n", sum(fj$crossings), paste(round(fj$sec_per_sweep, 4), collapse = " ")))
 cat("mean-curve ordering violations:", sum(sapply(1:(length(taus)-1), function(j) sum(fj$levels[[j]]$mean > fj$levels[[j+1]]$mean))), "\n")
-saveRDS(list(fj = fj, tab = tab), file.path("/tmp/claude-71711/-home-fb31-Bayesian-Quantile-Trend-Filtering/7aecef86-4e46-4d00-a632-302610e27229/scratchpad", "val_b_smooth.rds"))
+saveRDS(list(fj = fj, tab = tab), file.path("/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/archive-owls-session-scratch-20261125/7aecef86-4e46-4d00-a632-302610e27229/scratchpad", "val_b_smooth.rds"))

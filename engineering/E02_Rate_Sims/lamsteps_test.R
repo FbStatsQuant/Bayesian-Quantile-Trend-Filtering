@@ -1,7 +1,7 @@
 # E-02 (HQ question): is the lambda-mixing loss under b0 = n^-2 cheaply fixable?  Gibbs with lam_steps in {1, 5, 20}
 # (repeated conjugate + ASIS lambda moves per sweep), sin truth, N(0, 0.25^2), sigma = sigma0, n = 2000, b0 = n^-2, 3 seeds.
 source(file.path(Sys.getenv("E02_DIR", "."), "e02_lib.R")); load_kernel()
-OUT <- file.path(Sys.getenv("E02_OUT", "/home/fb31/BQTF_runs/E02"), "lamsteps"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
+OUT <- file.path(Sys.getenv("E02_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02"), "lamsteps"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
 jobs <- expand.grid(ls = c(1L, 5L, 20L), seed = 1:3)
 res <- parallel::mclapply(seq_len(nrow(jobs)), function(j) {
   jb <- jobs[j, ]; n <- 2000; d <- make_data("sin", "g25", 0.5, n, jb$seed); s0 <- sigma0("g25", 0.5)

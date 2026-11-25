@@ -1,7 +1,7 @@
 # sigma sprint, arm set 2: every fixed-sigma arm against L (learned sigma, Felipe's original), paired on common seeds.
 # Rule 1 (Felipe, permanent): an arm is REJECTED (data) if its median paired MSE ratio over cells > 1.10 or any cell > 1.25.
 # Usage: Rscript analyze_arms.R <dir with all fit .rds> <output dir>
-.libPaths(c("/home/fb31/R/e02lib", .libPaths())); suppressPackageStartupMessages({ library(ggplot2) })
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths())); suppressPackageStartupMessages({ library(ggplot2) })
 args <- commandArgs(TRUE); IN <- args[1]; OUT <- args[2]; dir.create(OUT, showWarnings = FALSE, recursive = TRUE)
 fs <- list.files(IN, pattern = "\\.rds$", full.names = TRUE); obj <- lapply(fs, readRDS)
 R <- do.call(rbind, lapply(obj, function(o) { r <- o$row; r$tv3 <- sum(abs(diff(o$mean, differences = 3L)))

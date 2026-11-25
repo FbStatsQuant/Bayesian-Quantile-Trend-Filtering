@@ -1,4 +1,4 @@
-d <- "/home/fb31/BQTF_runs/E02/free_check"
+d <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/free_check"
 fs <- list.files(d, "\\.rds$", full.names = TRUE)
 R <- lapply(fs, function(f) { r <- readRDS(f)
   if (is.null(r$a0)) { r$a0 <- 1; r$b0 <- 0.01  # file from first launch (before a0/b0/median/kappa were stored): recompute from traces

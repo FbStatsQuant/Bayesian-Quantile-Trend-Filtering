@@ -1,8 +1,8 @@
 # Felipe's joint sampler (E07lamjump copy, lamjump = FALSE == his), paper settings (experiments/joint_upper_levels/config.R) except iteration counts.
 # Args: iter burn out.rds
 a <- commandArgs(TRUE); iter <- as.integer(a[1]); burn <- as.integer(a[2]); outf <- a[3]
-.libPaths(c("/home/fb31/R/e02lib", .libPaths()))
-SCR <- "/tmp/claude-71711/-home-fb31-Bayesian-Quantile-Trend-Filtering/12592220-6c98-4d66-a1f5-aba8b81d5bdd/scratchpad"
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))
+SCR <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/archive-owls-session-scratch-20261125/12592220-6c98-4d66-a1f5-aba8b81d5bdd/scratchpad"
 options(rcpp.cache.dir = file.path(SCR, "rcpp_felipe"))
 ROOT <- "/home/fb31/Bayesian-Quantile-Trend-Filtering"; setwd(ROOT)
 L <- readLines("engineering/E07_Tuning_Free/joint/Joint_Sampler_PMALA_Augmented_E07lamjump.R"); k <- grep("^# ---- Main", L)[1]

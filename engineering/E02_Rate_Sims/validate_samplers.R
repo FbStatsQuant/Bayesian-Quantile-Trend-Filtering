@@ -1,7 +1,7 @@
 # E-02 validation: banded Gibbs (workhorse) vs exact P-MALA (paper kernel) on the same frozen posterior.
 # Long chains at small n; compare posterior mean, pointwise sd, mean Delta2 and spread with batch-means standard errors.
 source(file.path(Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims"), "e02_lib.R")); load_kernel()
-OUT_V <- file.path(Sys.getenv("E02_OUT", "/home/fb31/BQTF_runs/E02"), "validation"); dir.create(OUT_V, recursive = TRUE, showWarnings = FALSE)
+OUT_V <- file.path(Sys.getenv("E02_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02"), "validation"); dir.create(OUT_V, recursive = TRUE, showWarnings = FALSE)
 bm_se <- function(v, nb = 50) { b <- floor(length(v) / nb); sd(colMeans(matrix(v[1:(b * nb)], b, nb))) / sqrt(nb) }
 cells <- list(list(truth = "sin", noise = "gauss", tau = 0.5, n = 250, Lam = 20),
               list(truth = "sin", noise = "gauss", tau = 0.9, n = 250, Lam = 450),

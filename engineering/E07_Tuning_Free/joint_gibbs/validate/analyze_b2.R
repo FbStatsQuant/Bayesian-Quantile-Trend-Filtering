@@ -1,5 +1,5 @@
-.libPaths(c("/home/fb31/R/e02lib", .libPaths()))
-S <- "/tmp/claude-71711/-home-fb31-Bayesian-Quantile-Trend-Filtering/7aecef86-4e46-4d00-a632-302610e27229/scratchpad"
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))
+S <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/archive-owls-session-scratch-20261125/7aecef86-4e46-4d00-a632-302610e27229/scratchpad"
 taus <- c(0.90, 0.93, 0.96, 0.97, 0.98, 0.99); J <- 6
 c1 <- readRDS(file.path(S, "v2_c1.rds")); c2 <- readRDS(file.path(S, "v2_c2.rds")); fe <- readRDS(file.path(S, "felipe_full.rds"))
 sw <- c1$sweeps; post2 <- (c1$burn + 1):sw; truth <- c1$truth; cpu2 <- sum(c(c1$seconds, c2$seconds))

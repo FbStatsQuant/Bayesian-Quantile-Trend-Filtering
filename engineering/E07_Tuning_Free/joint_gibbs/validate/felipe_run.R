@@ -1,7 +1,7 @@
 # Felipe's joint sampler (worker copy, lamjump = FALSE) on the joint smoke design. Args: iter burn out.rds
 a <- commandArgs(TRUE); iter <- as.integer(a[1]); burn <- as.integer(a[2]); outf <- a[3]
-.libPaths(c("/home/fb31/R/e02lib", .libPaths()))
-SCR <- "/tmp/claude-71711/-home-fb31-Bayesian-Quantile-Trend-Filtering/7aecef86-4e46-4d00-a632-302610e27229/scratchpad"
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))
+SCR <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/archive-owls-session-scratch-20261125/7aecef86-4e46-4d00-a632-302610e27229/scratchpad"
 options(rcpp.cache.dir = file.path(SCR, "rcpp_felipe")); dir.create(file.path(SCR, "rcpp_felipe"), showWarnings = FALSE)
 ROOT <- "/home/fb31/Bayesian-Quantile-Trend-Filtering"; setwd(ROOT)
 L <- readLines("engineering/E07_Tuning_Free/joint/Joint_Sampler_PMALA_Augmented_E07lamjump.R"); k <- grep("^# ---- Main", L)[1]

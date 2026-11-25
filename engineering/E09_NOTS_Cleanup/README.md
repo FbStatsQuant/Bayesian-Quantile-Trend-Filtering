@@ -32,7 +32,7 @@ Nothing else qualified. Every other large item is the single version in use: the
 
 - **Archive:** run `legacy-quant-reg-20261122`, with 4,787 files and 81.8 MB.
 - **PC copy:** at `C:\Users\felip\Documents\BQTF_Data\runs\legacy-quant-reg-20261122`, PC-verified on 2026-11-22 at 16:38 CT.
-- **Receipt:** `/home/fb31/BQTF_ops/ledger/receipts/legacy-quant-reg-20261122.json`. Its signature was re-verified on 11-24 against `ledger/state/pc_receipt_pubkey.txt`.
+- **Receipt:** `/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/ledger/receipts/legacy-quant-reg-20261122.json`. Its signature was re-verified on 11-24 against `ledger/state/pc_receipt_pubkey.txt`.
 
 ## Heavy data (E-01 path)
 

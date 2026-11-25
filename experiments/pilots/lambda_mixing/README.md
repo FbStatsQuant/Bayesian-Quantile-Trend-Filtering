@@ -16,3 +16,5 @@ B-splines fixed and rescales only the remainder. q = k + 1 with the polynomial b
 
 Wall-time differences between the two chains of a variant come from Owls load. Read the efficiency columns within a lane.
 Run: `owls_run -j 1 -- ./lane.sh "<name> chain_seed=<s> [asis_q=<q>]" ...` from this folder.
+
+The per-chain draws (`results/<variant>.rds`, 9 MB, not in git) were moved on 2026-11-25 (E-12) to the git-ignored `runs/pilot-lambda_mixing-20261124/` on Owls. A re-run writes them to `results/` again; move them there too.

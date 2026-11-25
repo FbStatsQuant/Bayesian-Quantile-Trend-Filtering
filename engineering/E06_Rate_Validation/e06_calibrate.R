@@ -4,7 +4,7 @@
 # Writes $E06_OUT/calibration.rds (a data frame) and prints the table, with a flag if the minimum is on the grid edge.
 E06_DIR <- Sys.getenv("E06_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E06_Rate_Validation")
 E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
-OUT <- Sys.getenv("E06_OUT", "/home/fb31/BQTF_runs/E06")
+OUT <- Sys.getenv("E06_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E06")
 source(file.path(E02_DIR, "e02_lib.R")); source(file.path(E06_DIR, "e06_lib.R")); load_kernel()
 cores <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "2"))
 grid <- 10^seq(0, 6, by = 0.125); seeds <- 1:10

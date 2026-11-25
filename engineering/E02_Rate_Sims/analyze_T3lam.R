@@ -1,6 +1,6 @@
 # E-02: quick analysis of the T3lam phase (Theory P1: rough spread vs lambda at fixed n). Reads the synced NOTS outputs.
 suppressPackageStartupMessages(library(data.table))
-f <- list.files("/home/fb31/BQTF_runs/E02/nots/grid/T3lam", full.names = TRUE)
+f <- list.files("/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/nots/grid/T3lam", full.names = TRUE)
 D <- rbindlist(lapply(f, function(x) as.data.table(readRDS(x)$row)), fill = TRUE)
 D[, loglam := log10(lambda)]
 M <- D[, .(rough = mean(rough_spread), total = mean(total_spread), bias2 = mean(centre_mse), spread_d2 = mean(spread_d2), centre_d2 = mean(centre_d2),

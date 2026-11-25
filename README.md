@@ -25,6 +25,7 @@ In simulations with varying-smoothness and smooth signals under Gaussian, Beta, 
 | `writing/` | Writing Department task folders (W-01 ...: statement drafts, reviews). The Writing Department commits only here. |
 | `literature/` | Reading list with DOI/arXiv links. PDFs are local only (git-ignored), except our own `Large Prior.pdf`. |
 | `archive/` | Superseded material kept for the record (small files only) and `archived_campaigns.md`, the index of the NOTS campaigns archived to the PC. |
+| `ops/` `runs/` `tmp/` | **Not in git** (git-ignored, local to each machine). `ops/` = the E-01 operations pipeline (ops scripts, receipt ledger, PC puller, ssh lock shim, R library `ops/Rlib`); `runs/` = run outputs and sealed `archive-*` runs headed for the PC; `tmp/` = scratch. Same layout on NOTS at `~/BQTF` (= `/projects/ml75/fb31/BQTF`, the NOTS checkout). See `engineering/E12_Disk_Reorg/`. |
 
 **Committing (all departments share one working tree and git index):**
 - Commit with explicit paths, staging and committing in ONE command: `git add <your paths> && git commit -m "..."`.

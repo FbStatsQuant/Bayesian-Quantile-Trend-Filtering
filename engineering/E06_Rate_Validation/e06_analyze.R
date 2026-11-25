@@ -1,7 +1,7 @@
 # E-06 analysis: slopes of the Delta2 contraction radius against n, paired-bootstrap CIs, paper table + figure.
 # Reads $E06_OUT/grid/{main,supp}/*.rds; writes into $E06_RES (default: this folder) tables/ and figs/.
 #   E06_LOGC: exponent c of the log factor in eps_n^2 = (log n)^c ..., used only for the descriptive log-adjusted slope.
-E06_OUT <- Sys.getenv("E06_OUT", "/home/fb31/BQTF_runs/E06")
+E06_OUT <- Sys.getenv("E06_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E06")
 E06_RES <- Sys.getenv("E06_RES", Sys.getenv("E06_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E06_Rate_Validation"))
 PRED <- c(primary = -5/6, fallback = -3/4, padilla = -5/7)
 LOGC <- as.numeric(Sys.getenv("E06_LOGC", as.character(1/6)))   # Theory: headline c = 0 (plain slope); c = 1/6 sensitivity

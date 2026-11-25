@@ -7,7 +7,7 @@
 #   c  a + b
 # Reference: the banded Gibbs runs of the same datasets (pvg, seeds 1-3), read from $E02_GRID/pvg.
 E05 <- Sys.getenv("E05_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E05_PMALA_Fix")
-E02_DIR <- Sys.getenv("E02_DIR"); OUT <- Sys.getenv("E05_OUT", "/home/fb31/BQTF_runs/E05"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
+E02_DIR <- Sys.getenv("E02_DIR"); OUT <- Sys.getenv("E05_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E05"); dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
 source(file.path(E02_DIR, "e02_lib.R")); load_kernel()
 psrc <- file.path(E05, "Individual_Sampler_PMALA_Augmented_E05copy.R")
 pl <- readLines(psrc); pl <- pl[seq_len(grep("^# ---- Main", pl)[1] - 1L)]

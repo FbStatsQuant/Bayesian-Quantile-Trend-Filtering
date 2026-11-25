@@ -20,14 +20,14 @@
 #         twin  = Gaussian twin (scale-mixture variances frozen at 2/lambda^2), paired with T3/kink83/T3s83 Laplace runs (seeds 1-10)
 #         T3s83 = Laplace sin at lambda = n^(8/3) (the twin's missing Laplace pair)
 #         p1x   = default grid with the extra orders a in {1.5, 2, 2.5};  Qlam = quadratic-truth lambda sweep (P1, V = 0)
-# One .rds per task under /home/fb31/BQTF_runs/E02/grid/<phase>/; existing outputs are skipped, so a re-run resumes.
+# One .rds per task under /home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/grid/<phase>/; existing outputs are skipped, so a re-run resumes.
 args <- commandArgs(trailingOnly = TRUE)
 phase <- if (length(args)) args[1] else "p1"
 cores <- if (length(args) > 1) as.integer(args[2]) else as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "2"))
 E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
-OUT_BASE <- Sys.getenv("E02_OUT", "/home/fb31/BQTF_runs/E02")          # NOTS: /projects/ml75/fb31/BQTF/runs/E02-<phase>-<date>
+OUT_BASE <- Sys.getenv("E02_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02")          # NOTS: /projects/ml75/fb31/BQTF/runs/E02-<phase>-<date>
 source(file.path(E02_DIR, "e02_lib.R")); load_kernel()
-cal <- readRDS(Sys.getenv("E02_CAL", "/home/fb31/BQTF_runs/E02/calibration.rds"))
+cal <- readRDS(Sys.getenv("E02_CAL", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/calibration.rds"))
 A <- c(a1 = 1, a15_7 = 15/7, a9_4 = 9/4, a7_3 = 7/3, a3 = 3, a1.5 = 1.5, a2 = 2, a2.5 = 2.5, a8_3 = 8/3, a2.4 = 2.4, a2.6 = 2.6)
 A_MAIN <- c("a1", "a15_7", "a9_4", "a7_3", "a3"); A_EXTRA <- c("a1.5", "a2", "a2.5")   # extra orders requested by Theory
 NS <- c(250, 500, 1000, 2000, 4000, 8000, 16000, 32000)

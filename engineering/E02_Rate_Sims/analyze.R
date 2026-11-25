@@ -2,7 +2,7 @@
 #   Rscript analyze.R [phase ...]      (default: all phases present)
 suppressPackageStartupMessages({ library(ggplot2); library(data.table) })
 E02 <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims"
-ROOT <- "/home/fb31/BQTF_runs/E02/grid"
+ROOT <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02/grid"
 phases <- commandArgs(trailingOnly = TRUE); if (!length(phases)) phases <- list.files(ROOT)
 dir.create(file.path(E02, "figs"), showWarnings = FALSE); dir.create(file.path(E02, "tables"), showWarnings = FALSE)
 A_LAB <- c(a1 = "1", a15_7 = "15/7", a9_4 = "9/4", a7_3 = "7/3", a3 = "3")

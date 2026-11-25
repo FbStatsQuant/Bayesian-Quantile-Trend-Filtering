@@ -1,5 +1,5 @@
-.libPaths(c("/home/fb31/R/e02lib", .libPaths()))
-options(rcpp.cache.dir = "/tmp/claude-71711/-home-fb31-Bayesian-Quantile-Trend-Filtering/5a5aaa0b-5c86-47ef-8fba-2096636ee464/scratchpad/rcpp")
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))
+options(rcpp.cache.dir = "/home/fb31/Bayesian-Quantile-Trend-Filtering/tmp/rcpp_cache")
 setwd("/home/fb31/Bayesian-Quantile-Trend-Filtering")
 load_env <- function(path) {            # source everything before "# ---- Main" into a fresh env (no main run)
   L <- readLines(path); k <- grep("^# ---- Main", L)[1]

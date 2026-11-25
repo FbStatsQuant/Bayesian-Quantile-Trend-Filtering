@@ -1,7 +1,7 @@
 # Joint gate analysis: Felipe's original joint sampler (F; 30k/10k, 1 chain) vs joint v3 (exact reflective HMC; 2 chains x 30k/10k), same data,
 # priors and ordering constraint. Per config and level: paired MSE ratio V3/F, crossings, Rhat(log lambda) (V3, 2 chains), ESS(log lambda)/s, wall time.
 # Usage: Rscript joint_gate_analyze.R <joint_gate dir> <out dir> <Individual_Sampler_PMALA_Augmented.R (for simulate_data)>
-.libPaths(c("/home/fb31/R/e02lib", .libPaths())); suppressPackageStartupMessages({ library(ggplot2); library(posterior) })
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths())); suppressPackageStartupMessages({ library(ggplot2); library(posterior) })
 a <- commandArgs(TRUE); IN <- a[1]; OUT <- a[2]; dir.create(OUT, showWarnings = FALSE, recursive = TRUE); options(width = 220)
 src <- readLines(a[3]); i0 <- grep("^simulate_data <- function", src); i1 <- grep("^# ---- Model pieces", src) - 1; eval(parse(text = src[i0:i1]))
 fs <- list.files(IN, pattern = "\\.rds$", full.names = TRUE)

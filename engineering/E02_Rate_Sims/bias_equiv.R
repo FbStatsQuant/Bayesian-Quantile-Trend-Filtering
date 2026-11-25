@@ -27,5 +27,5 @@ res <- parallel::mclapply(seq_len(nrow(cells)), function(ci) {
              ratio_RB = mse(rb - ts) / sb, ratio_pm = mse(pm - ts) / sb, pen_ratio = mean(pen), w_over_n = (lam^2 / kappa)^(1/6) / n)
 }, mc.cores = as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "2")), mc.preschedule = FALSE)
 R <- do.call(rbind, res); R <- R[order(R$a, R$n), ]
-out <- file.path(Sys.getenv("E02_OUT", "/home/fb31/BQTF_runs/E02"), "analysis"); dir.create(out, recursive = TRUE, showWarnings = FALSE)
+out <- file.path(Sys.getenv("E02_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E02"), "analysis"); dir.create(out, recursive = TRUE, showWarnings = FALSE)
 saveRDS(R, file.path(out, "bias_equiv.rds")); print(signif(R, 4), row.names = FALSE)

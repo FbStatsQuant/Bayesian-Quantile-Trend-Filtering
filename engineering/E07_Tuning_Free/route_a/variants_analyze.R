@@ -1,5 +1,5 @@
 # V1 / V2 pilot analysis (INTERNAL). Usage: Rscript variants_analyze.R <variants dir> <sigma_sprint dir> <out dir>
-.libPaths(c("/home/fb31/R/e02lib", .libPaths())); suppressPackageStartupMessages({ library(ggplot2); library(posterior) })
+.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths())); suppressPackageStartupMessages({ library(ggplot2); library(posterior) })
 args <- commandArgs(TRUE); IN <- args[1]; SPR <- args[2]; OUT <- args[3]; dir.create(OUT, showWarnings = FALSE, recursive = TRUE); options(width = 230)
 fs <- list.files(IN, pattern = "\\.rds$", full.names = TRUE); O <- lapply(fs, readRDS); R <- do.call(rbind, lapply(O, `[[`, "row"))
 burn_of <- function(bl) if (bl == "VS") 10000L else 5000L

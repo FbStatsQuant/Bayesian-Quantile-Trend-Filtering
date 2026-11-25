@@ -7,7 +7,7 @@
 #  C  R-hat / ESS of the functional E-02 plots: 4 dispersed-start Gibbs chains (fixed lambda, sigma) at representative E-02 cells.
 # Outputs: $E04_OUT/<part>/*.rds
 E02_DIR <- Sys.getenv("E02_DIR", "/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E02_Rate_Sims")
-OUT <- Sys.getenv("E04_OUT", "/home/fb31/BQTF_runs/E04"); PART <- Sys.getenv("PART", "A")
+OUT <- Sys.getenv("E04_OUT", "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/E04"); PART <- Sys.getenv("PART", "A")
 cores <- as.integer(Sys.getenv("SLURM_CPUS_PER_TASK", "2"))
 source(file.path(E02_DIR, "e02_lib.R")); load_kernel()
 dir.create(file.path(OUT, PART), recursive = TRUE, showWarnings = FALSE)
