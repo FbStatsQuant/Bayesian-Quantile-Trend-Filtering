@@ -196,16 +196,48 @@ metric_dc <- function(metric, a, lambda, c_fixed, kappa = 1) {
     iso   = list(d = rep(1, length(a)), c = 0),
     stop("unknown metric"))
 }
+# Inverse Gaussian sampler (Michael, Schucany & Haas 1976); mean mu, shape lam.
+# E-13a: the smaller root is computed as x = mu / (1 + w + sqrt(w (w + 2))), w = mu y / (2 lam).  This equals the textbook
+# x = mu + mu^2 y/(2 lam) - (mu/(2 lam)) sqrt(4 mu lam y + mu^2 y^2) = mu (1 + w - sqrt(w^2 + 2w)) exactly (the two roots multiply to
+# mu^2), so the law is the same; the textbook form cancels catastrophically for large w (tiny residuals: mu ~ 1/|e|) and returned
+# x <= 0 (z at its 1e4 clamp) for 1% of draws at |e| = 1e-8 and 42% at 1e-10.  sqrt(w) sqrt(w + 2) avoids overflow of w^2.
 rinvgauss <- function(n, mu, lam) {
   nu <- rnorm(n); yv <- nu^2
-  xv <- mu + mu^2 * yv / (2 * lam) - (mu / (2 * lam)) * sqrt(4 * mu * lam * yv + mu^2 * yv^2)
+  w  <- mu * yv / (2 * lam)
+  xv <- mu / (1 + w + sqrt(w) * sqrt(w + 2))
   u  <- runif(n)
   ifelse(u <= mu / (mu + xv), xv, mu^2 / xv)
 }
+
+# Block 2: z_i | theta, sigma  via 1/z_i ~ InvGauss(1/(tau(1-tau)|e_i|), 1/(2 tau(1-tau) sigma))
 draw_z <- function(e, tau, sigma) {
-  ae <- pmax(abs(e), 1e-10)
+  ae <- pmax(abs(e), 1e-100)                            # |e| = 0 only: the law at |e| = 1e-100 is the |e| -> 0 limit to double precision
   v  <- rinvgauss(length(e), mu = 1 / (tau * (1 - tau) * ae), lam = 1 / (2 * tau * (1 - tau) * sigma))
-  pmin(pmax(1 / v, 1e-8), 1e4)
+  pmin(pmax(1 / v, 1e-8), 1e4)                          # floor/cap keep a_i = 1/(t2 sigma z_i) in [~4e-5, ~1e8]: P = diag(a) + c D'D stays factorisable
+                                                        # (z ~ Exp(sigma) with sigma < 1, so P(z > 1e4) is nil; the cap only removes degenerate draws)
+}
+
+# ---- Warm start helpers (E-13a phase 2; used in burn-in only, identical in the individual and joint scripts) ------------------
+# pilot_fit: a data-only starting fit for every level: s = running median of y (window ~ n/20), theta0_j = s + the tau_j-quantile of
+#   y - s (ordered in tau by construction), sigma0_j = mean check loss of theta0_j (the ALD maximum-likelihood scale given theta0_j:
+#   E rho_tau(eps) = sigma under ALD(0, sigma, tau)).  No RNG, no truth.
+pilot_fit <- function(y, tau_list) {
+  n <- length(y); k <- max(5L, 2L * (n %/% 40L) + 1L); if (k > n) k <- n - (1L - n %% 2L)
+  s <- as.numeric(stats::runmed(y, k, endrule = "median")); e <- y - s
+  th <- vapply(tau_list, function(t) s + stats::quantile(e, t, names = FALSE, type = 7), numeric(n))
+  if (!is.matrix(th)) th <- matrix(th, n, length(tau_list))
+  list(theta = th, sigma = vapply(seq_along(tau_list), function(j) mean(rho_tau(y - th[, j], tau_list[j])), 0), window = k)
+}
+warm_admm_tol  <- 1e-6                     # warm start: ADMM must meet this relative primal/dual residual tolerance ...
+warm_ipm_ctrl  <- c(1, 0, 200, 1e-8, 0)    # ... else the interior-point solver of prox_box_metric.cpp (IPM only, tol 1e-8) is used
+sigma_guard    <- 10                       # burn-in only: if sigma_j > sigma_guard * sigma0_j it is reset to sigma0_j (logged)
+warm_lambda    <- "hold"                   # "hold": lambda stays at its initial value during the warm sweeps | "draw": conjugate draw (pre-E-13a)
+# Conditional MAP for the warm start: argmin sum a/2 (theta - r)^2 + lambda ||D theta||_1 + ||theta - x||_a^2 / (2 gamma) on [lower, upper].
+warm_prox <- function(x, a, r, lambda, gamma, order, lower, upper, iters) {
+  w <- prox_admm_metric_conv(x, a, r, lambda, gamma, a, 0, order, median(a), iters, warm_admm_tol)
+  if (isTRUE(w$converged) && all(w$theta >= lower & w$theta <= upper)) return(list(theta = w$theta, fallback = FALSE, ipm_conv = NA))
+  ip <- prox_box_metric(x, a, r, lambda, gamma, a, 0, order, median(a), rep(0, length(x)), iters, 0, lower, upper, warm_ipm_ctrl)
+  list(theta = ip$theta, fallback = TRUE, ipm_conv = ip$diag$converged)
 }
 draw_sigma <- function(y, theta, z, cst, a_sigma, b_sigma, lambda_SD = 0, m = 0) {
   n <- length(y)
@@ -369,21 +401,25 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
                               metric = "curv", c_fixed = 0, rho = NULL, iters = 200L,
                               mh = TRUE, adapt = TRUE, warm = 0L, gamma_warm = 1e3,
                               kappa = 1, adapt_all = TRUE, K = 1L, asis = FALSE, tol = 0,
-                              zeta_scale = 1, ctrl = box_ctrl, asis_q = "auto", verbose = TRUE, keep_every = 1L) {
+                              zeta_scale = 1, ctrl = box_ctrl, asis_q = "auto", verbose = TRUE, keep_every = 1L,
+                              warm_lam = warm_lambda, guard = sigma_guard) {
   stopifnot(length(tau_list) >= 1, all(diff(tau_list) > 0), all(tau_list > 0 & tau_list < 1), warm <= gibbs_burn, gibbs_burn < gibbs_iter)
   n <- length(y); m <- n - order - 1L; J <- length(tau_list)
   q_grid <- asis_q_grid(n, order, asis_q)
   Ps <- if (asis) lapply(q_grid, function(q) asis_projector(n, q, order)) else NULL   # one per sweep, cycled (same at every level)
   cst <- lapply(tau_list, ald_const)
-  # init: theta_j = y + s_y (Phi^-1(tau_j) - median Phi^-1(tau)) for J > 1 (ordered, data-based, no RNG); exactly y for J = 1.
-  # Hyperparameters at the individual script's data-free defaults: sigma = 1, z = sigma, lambda = m (one unit of penalty per difference).
-  off <- if (J == 1) 0 else max(sd(y), 0.1) * (qnorm(tau_list) - median(qnorm(tau_list)))
-  theta <- sapply(off, function(o) y + o); if (!is.matrix(theta)) theta <- matrix(theta, n, J)
-  sigma <- rep(1, J); z <- matrix(1, n, J); lambda <- rep(if (is.null(lambda_init)) m else lambda_init, J); delta <- rep(delta_init, J)
+  # init (E-13a, as the individual script's "data" init): theta_j = the data-only pilot fit (running median + the tau_j-quantile of its
+  # residuals; ordered in j by construction), sigma_j = sigma0_j = its mean check loss, z_j ~ z | theta_j, sigma0_j; lambda = m.
+  # (Pre-E-13a: theta_j = y + offsets, sigma = 1, z = 1 -- far from the data scale, the trigger of the warm-start runaway.)
+  pf <- pilot_fit(y, tau_list); sigma0 <- pf$sigma
+  theta <- pf$theta; sigma <- sigma0
+  z <- vapply(seq_len(J), function(j) draw_z(y - theta[, j], tau_list[j], sigma[j]), numeric(n)); if (!is.matrix(z)) z <- matrix(z, n, J)
+  lambda <- rep(if (is.null(lambda_init)) m else lambda_init, J); delta <- rep(delta_init, J)
   keep <- length(seq(gibbs_burn + 1L, gibbs_iter, by = keep_every))
   theta_s <- array(NA_real_, c(keep, n, J)); kept <- 0L
   lambda_s <- sigma_s <- delta_s <- acc_s <- SD_s <- out_s <- ipm_s <- asis_s <- matrix(NA_real_, gibbs_iter, J)
   n_acc <- numeric(J)
+  warm_fb <- warm_ipm_bad <- guard_s <- matrix(0L, gibbs_iter, J)              # E-13a logs: warm IPM fallback, IPM not converged, sigma guard
   t0 <- proc.time()[["elapsed"]]
   for (it in seq_len(gibbs_iter)) {
     for (j in seq_len(J)) {
@@ -393,8 +429,8 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
       th <- theta[, j]; zj <- z[, j]; sg <- sigma[j]; lam <- lambda[j]; dl <- delta[j]; cs <- cst[[j]]
       if (it <= warm) {                                                        # warm start: optimisation step only (conditional MAP in the box)
         a <- 1 / (cs$t2 * sg * zj); r <- y - cs$psi * zj
-        th <- if (free) prox_T(th, a, r, lam, gamma_warm, a, 0, order, rho = median(a), iters = 2L * iters)
-              else prox_box(th, a, r, lam, gamma_warm, a, 0, order, lower, upper, rho = median(a), zeta_scale = zeta_scale, iters = 2L * iters, ctrl = ctrl)$theta
+        wp <- warm_prox(th, a, r, lam, gamma_warm, order, lower, upper, 2L * iters)   # E-13a: ADMM to tolerance and in the box, else IPM
+        th <- wp$theta; warm_fb[it, j] <- wp$fallback; warm_ipm_bad[it, j] <- isTRUE(wp$ipm_conv == 0)
         st <- list(theta = th, accept = NA, log_alpha = NA, outside = NA, ipm = NA)
       } else {                                                                 # Block 1: K P-MALA moves at fixed (z, lambda, sigma, box)
         acc_k <- la_k <- out_k <- ipm_k <- numeric(K)
@@ -408,7 +444,8 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
       n_acc[j] <- n_acc[j] + if (is.na(st$accept)) 0 else st$accept
       zj  <- draw_z(y - th, tau_list[j], sg)                                   # Block 2
       SD  <- sum(abs(Dtheta(th, order)))
-      lam <- rgamma(1, shape = a0 + m, rate = b0 + SD)                         # Block 3 (sufficient parameterisation)
+      if (!(it <= warm && identical(warm_lam, "hold")))                       # E-13a: lambda held at its start during the warm sweeps
+        lam <- rgamma(1, shape = a0 + m, rate = b0 + SD)                       # Block 3 (sufficient parameterisation)
       moved <- NA
       if (asis && it > warm) {                                                 # Block 3b: ancillary redraw (restricted to the box), theta rescales
         a_ <- 1 / (cs$t2 * sg * zj); r_ <- y - cs$psi * zj
@@ -418,6 +455,8 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
         lam <- as_$lambda; th <- as_$theta; SD <- sum(abs(Dtheta(th, order)))
       }
       sg <- draw_sigma(y, th, zj, cs, a_sigma, b_sigma, lambda_SD = 0, m = 0)   # Block 4
+      if (it <= gibbs_burn && is.finite(guard) && is.finite(sg) && sg > guard * sigma0[j]) {   # E-13a: burn-in sigma-runaway guard
+        sg <- sigma0[j]; guard_s[it, j] <- 1L }
       if (adapt && it > warm && (adapt_all || it <= gibbs_burn)) {              # adapt delta_j (diminishing gain)
         dl <- exp(log(dl) + adapt_gain * it^(-adapt_kappa) * (exp(st$log_alpha) - adapt_target))
         dl <- min(max(dl, delta_bounds[1]), delta_bounds[2])
@@ -441,7 +480,7 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
        acc_post = colMeans(acc_s[post, , drop = FALSE]), outside_post = colMeans(out_s[post, , drop = FALSE]),
        ipm_post = colMeans(ipm_s[post, , drop = FALSE], na.rm = TRUE), asis_moved_post = colMeans(asis_s[post, , drop = FALSE], na.rm = TRUE),
        delta_final = delta, final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), asis_q_grid = if (asis) q_grid else NULL,
-       seconds = proc.time()[["elapsed"]] - t0)
+       seconds = proc.time()[["elapsed"]] - t0, warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0)
 }
 
 # ---- Crossing metrics ------------------------------------------------------------------------------------------------------
@@ -621,7 +660,7 @@ run_tests <- function() {
   t_start <- proc.time()[["elapsed"]]
   bm_se <- function(v, nb = 50) { b <- floor(length(v) / nb); sd(colMeans(matrix(v[1:(b * nb)], b, nb))) / sqrt(nb) }
 
-  cat("== T1: J = 1 reproduces the individual script's sampler (same seed -> identical trajectories and final RNG state) ==\n")
+  cat("== T1: J = 1 reproduces the individual script's sampler (init \"data\"; same seed -> identical trajectories and final RNG state) ==\n")
   ind <- new.env(); L <- readLines(file.path(individual_dir, "Individual_Sampler_PMALA_Augmented.R"))
   eval(parse(text = L[seq_len(grep("^# ---- Main", L)[1] - 1L)]), envir = ind)      # definitions only; its kernel loader is not called
   dat <- simulate_data(3, 80L, 0.1, "VS", "Normal")
@@ -629,7 +668,7 @@ run_tests <- function() {
                       delta_init = 0.2, lambda_init = NULL, adapt_target = 0.5, adapt_gain = 1, adapt_kappa = 0.6, delta_bounds = c(1e-8, 100),
                       metric = "curv", c_fixed = 0, rho = NULL, iters = 150L, mh = TRUE, adapt = TRUE, warm = 30L, gamma_warm = 1e4,
                       kappa = 3, adapt_all = TRUE, K = 1L, asis = TRUE, tol = 0, verbose = FALSE)
-  set.seed(11); f_ind <- do.call(ind$gibbs_pmala_aug, c(args_common, list(tau = 0.1, control = NULL, init = "y", prior_scale = "none", cmap = FALSE)))
+  set.seed(11); f_ind <- do.call(ind$gibbs_pmala_aug, c(args_common, list(tau = 0.1, control = NULL, init = "data", prior_scale = "none", cmap = FALSE)))
   rng_ind <- .Random.seed
   set.seed(11); f_jnt <- do.call(gibbs_joint_pmala, c(args_common, list(tau_list = 0.1)))
   rng_jnt <- .Random.seed

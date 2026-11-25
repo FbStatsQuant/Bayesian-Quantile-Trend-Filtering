@@ -128,12 +128,12 @@ static void band_solve_Lt(const Band& L, std::vector<double>& x) {
 // Hastings term divides it by delta and the chain stops accepting.  The increment right-hand side is O(|T(x) - x|).
 static int admm_core(const Band& A, const std::vector<double>& st, const std::vector<double>& b,
                      const std::vector<double>& x, const std::vector<double>& Dx0, double lambda, double rho, int max_iter, double tol,
-                     std::vector<double>& theta) {
+                     std::vector<double>& theta, bool* conv = nullptr) {               // conv (E-13a): set true iff the tol exit fired
   int n = (int)b.size(), m = (int)Dx0.size();
   std::vector<double> v(Dx0), u(m, 0.0), Dth(m), Dw(m), tmp(m), rhs(n), vold(m), dv(n);
   double thr = lambda / rho, bn = 0; for (int i = 0; i < n; ++i) bn += b[i] * b[i]; bn = std::sqrt(bn);
   theta.assign(x.begin(), x.end());
-  int it = 0;
+  int it = 0; if (conv) *conv = false;
   for (it = 0; it < max_iter; ++it) {
     for (int j = 0; j < m; ++j) tmp[j] = (v[j] - Dx0[j]) - u[j];
     apply_Dt(tmp, st, rhs);
@@ -153,7 +153,7 @@ static int admm_core(const Band& A, const std::vector<double>& st, const std::ve
     if (tol > 0) {
       for (int j = 0; j < m; ++j) tmp[j] = v[j] - vold[j];
       apply_Dt(tmp, st, dv); double rd = 0; for (int i = 0; i < n; ++i) rd += dv[i] * dv[i];
-      if (std::sqrt(rp) <= tol * (std::sqrt(dn) + 1e-12) && rho * std::sqrt(rd) <= tol * (bn + 1e-12)) { ++it; break; }
+      if (std::sqrt(rp) <= tol * (std::sqrt(dn) + 1e-12) && rho * std::sqrt(rd) <= tol * (bn + 1e-12)) { ++it; if (conv) *conv = true; break; }
     }
   }
   return it;
@@ -221,6 +221,23 @@ NumericVector prox_admm_metric(NumericVector x, NumericVector a, NumericVector r
   build_rhs(n, st, a, r, d, c, gamma, xv, Dx, b);
   admm_core(A, st, b, xv, Dx, lambda, rho, max_iter, tol, theta);
   return NumericVector(theta.begin(), theta.end());
+}
+
+// E-13a (burn-in warm start only): the same prox as prox_admm_metric, plus whether the residual-based exit (tol > 0) was met within
+// max_iter.  The warm start uses it to decide when to fall back to the interior-point solver of prox_box_metric.cpp.
+// [[Rcpp::export]]
+List prox_admm_metric_conv(NumericVector x, NumericVector a, NumericVector r, double lambda, double gamma, NumericVector d, double c,
+                           int k, double rho, int max_iter, double tol) {
+  int n = x.size(), p = k + 1, m = n - p;
+  if (m < 1) stop("n too small for the difference order");
+  if (!(tol > 0)) stop("prox_admm_metric_conv: tol must be > 0");
+  std::vector<double> st = diff_stencil(p);
+  Band A(n, p); build_system(n, p, st, a, d, c, gamma, rho, A);
+  std::vector<double> xv(x.begin(), x.end()), Dx(m), b(n), theta(n);
+  build_rhs(n, st, a, r, d, c, gamma, xv, Dx, b);
+  bool conv = false;
+  int its = admm_core(A, st, b, xv, Dx, lambda, rho, max_iter, tol, theta, &conv);
+  return List::create(_["theta"] = NumericVector(theta.begin(), theta.end()), _["iters"] = its, _["converged"] = conv);
 }
 
 // [[Rcpp::export]]

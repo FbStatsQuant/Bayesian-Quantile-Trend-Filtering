@@ -45,7 +45,12 @@ load_prox_cpp <- function(src) {
     if (length(f)) src <- file.path(dirname(normalizePath(f)), "prox_admm_metric.cpp")
   }
   stopifnot(file.exists(src))
-  ok <- tryCatch({ Rcpp::sourceCpp(src); TRUE }, error = function(e) FALSE)
+  # E-13a: the warm start falls back to the interior-point solver of the joint kernel (method/joint/prox_box_metric.cpp, which
+  # #includes this file); it is compiled first so that the exports of this file are the last ones bound.
+  box <- file.path(dirname(dirname(normalizePath(src))), "joint", "prox_box_metric.cpp")
+  old <- Sys.getenv("PKG_CPPFLAGS", unset = NA); Sys.setenv(PKG_CPPFLAGS = sprintf('-I"%s"', dirname(normalizePath(src))))
+  ok <- tryCatch({ Rcpp::sourceCpp(box, env = globalenv()); Rcpp::sourceCpp(src, env = globalenv()); TRUE }, error = function(e) FALSE)
+  if (is.na(old)) Sys.unsetenv("PKG_CPPFLAGS") else Sys.setenv(PKG_CPPFLAGS = old)
   if (ok) return(invisible("sourceCpp"))
   dll <- file.path(tempdir(), "prox_admm_metric.dll")
   gpp <- "C:/mingw64/bin/g++.exe"
@@ -92,7 +97,8 @@ lambda_init  <- NULL       # NULL -> m (one unit of penalty per difference) unde
 metric       <- "curv"     # "curv": P = diag(a) + kappa (lambda_eff^2/2) D'D | "fixed": I + c_metric D'D | "iso": I
 kappa_metric <- 3          # scale on the difference-precision term (3: delta ~ 0.1 at acceptance 0.5, ~2x the theta ESS of kappa = 1)
 c_metric     <- 1e4        # only used by metric = "fixed"
-theta_init   <- "y"        # "y": start at the data (rule) | "tf": glmgen fit at lambda_init
+theta_init   <- "data"     # "data" (E-13a): the data-only pilot fit (pilot_fit), sigma0 = its mean check loss, z0 ~ z | theta0, sigma0
+                           # "y": start at the data with sigma = 1, z = 1 (pre-E-13a rule) | "tf": glmgen fit at lambda_init
 mh_correct   <- TRUE       # FALSE: accept every proposal (proximal ULA; not exact, diagnostic only)
 adapt_delta  <- TRUE       # FALSE: keep delta = delta_init throughout
 adapt_all    <- TRUE       # TRUE: diminishing Robbins-Monro adaptation for the whole run (gain it^-kappa_adapt -> 0, so the chain
@@ -206,20 +212,48 @@ prox_U_glmgen <- function(x, a, r, lambda, gamma, order, control) {   # c = 0 re
   as.numeric(fit$beta[, 1])
 }
 
-# Inverse Gaussian sampler (Michael, Schucany & Haas 1976); mean mu, shape lam
+# Inverse Gaussian sampler (Michael, Schucany & Haas 1976); mean mu, shape lam.
+# E-13a: the smaller root is computed as x = mu / (1 + w + sqrt(w (w + 2))), w = mu y / (2 lam).  This equals the textbook
+# x = mu + mu^2 y/(2 lam) - (mu/(2 lam)) sqrt(4 mu lam y + mu^2 y^2) = mu (1 + w - sqrt(w^2 + 2w)) exactly (the two roots multiply to
+# mu^2), so the law is the same; the textbook form cancels catastrophically for large w (tiny residuals: mu ~ 1/|e|) and returned
+# x <= 0 (z at its 1e4 clamp) for 1% of draws at |e| = 1e-8 and 42% at 1e-10.  sqrt(w) sqrt(w + 2) avoids overflow of w^2.
 rinvgauss <- function(n, mu, lam) {
   nu <- rnorm(n); yv <- nu^2
-  xv <- mu + mu^2 * yv / (2 * lam) - (mu / (2 * lam)) * sqrt(4 * mu * lam * yv + mu^2 * yv^2)
+  w  <- mu * yv / (2 * lam)
+  xv <- mu / (1 + w + sqrt(w) * sqrt(w + 2))
   u  <- runif(n)
   ifelse(u <= mu / (mu + xv), xv, mu^2 / xv)
 }
 
 # Block 2: z_i | theta, sigma  via 1/z_i ~ InvGauss(1/(tau(1-tau)|e_i|), 1/(2 tau(1-tau) sigma))
 draw_z <- function(e, tau, sigma) {
-  ae <- pmax(abs(e), 1e-10)
+  ae <- pmax(abs(e), 1e-100)                            # |e| = 0 only: the law at |e| = 1e-100 is the |e| -> 0 limit to double precision
   v  <- rinvgauss(length(e), mu = 1 / (tau * (1 - tau) * ae), lam = 1 / (2 * tau * (1 - tau) * sigma))
   pmin(pmax(1 / v, 1e-8), 1e4)                          # floor/cap keep a_i = 1/(t2 sigma z_i) in [~4e-5, ~1e8]: P = diag(a) + c D'D stays factorisable
                                                         # (z ~ Exp(sigma) with sigma < 1, so P(z > 1e4) is nil; the cap only removes degenerate draws)
+}
+
+# ---- Warm start helpers (E-13a phase 2; used in burn-in only, identical in the individual and joint scripts) ------------------
+# pilot_fit: a data-only starting fit for every level: s = running median of y (window ~ n/20), theta0_j = s + the tau_j-quantile of
+#   y - s (ordered in tau by construction), sigma0_j = mean check loss of theta0_j (the ALD maximum-likelihood scale given theta0_j:
+#   E rho_tau(eps) = sigma under ALD(0, sigma, tau)).  No RNG, no truth.
+pilot_fit <- function(y, tau_list) {
+  n <- length(y); k <- max(5L, 2L * (n %/% 40L) + 1L); if (k > n) k <- n - (1L - n %% 2L)
+  s <- as.numeric(stats::runmed(y, k, endrule = "median")); e <- y - s
+  th <- vapply(tau_list, function(t) s + stats::quantile(e, t, names = FALSE, type = 7), numeric(n))
+  if (!is.matrix(th)) th <- matrix(th, n, length(tau_list))
+  list(theta = th, sigma = vapply(seq_along(tau_list), function(j) mean(rho_tau(y - th[, j], tau_list[j])), 0), window = k)
+}
+warm_admm_tol  <- 1e-6                     # warm start: ADMM must meet this relative primal/dual residual tolerance ...
+warm_ipm_ctrl  <- c(1, 0, 200, 1e-8, 0)    # ... else the interior-point solver of prox_box_metric.cpp (IPM only, tol 1e-8) is used
+sigma_guard    <- 10                       # burn-in only: if sigma_j > sigma_guard * sigma0_j it is reset to sigma0_j (logged)
+warm_lambda    <- "hold"                   # "hold": lambda stays at its initial value during the warm sweeps | "draw": conjugate draw (pre-E-13a)
+# Conditional MAP for the warm start: argmin sum a/2 (theta - r)^2 + lambda ||D theta||_1 + ||theta - x||_a^2 / (2 gamma) on [lower, upper].
+warm_prox <- function(x, a, r, lambda, gamma, order, lower, upper, iters) {
+  w <- prox_admm_metric_conv(x, a, r, lambda, gamma, a, 0, order, median(a), iters, warm_admm_tol)
+  if (isTRUE(w$converged) && all(w$theta >= lower & w$theta <= upper)) return(list(theta = w$theta, fallback = FALSE, ipm_conv = NA))
+  ip <- prox_box_metric(x, a, r, lambda, gamma, a, 0, order, median(a), rep(0, length(x)), iters, 0, lower, upper, warm_ipm_ctrl)
+  list(theta = ip$theta, fallback = TRUE, ipm_conv = ip$diag$converged)
 }
 
 # Block 4: sigma | theta, z
@@ -404,7 +438,7 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
                             mh = TRUE, adapt = TRUE, init = "y", warm = 0L, gamma_warm = 1e3,
                             prior_scale = "sigma", cmap = FALSE, kappa = 1, adapt_all = TRUE, K = 1L, asis = FALSE,
                             tol = 0, lamjump = FALSE, lamjump_s = 0.3, asis_q = "auto", block = 0L, block_mode = "mala",
-                            verbose = TRUE) {
+                            verbose = TRUE, warm_lam = warm_lambda, guard = sigma_guard) {
   s_lj <- lamjump_s; acc_lj <- numeric(gibbs_iter)
   q_grid <- asis_q_grid(length(y), order, asis_q)
   Ps <- if (asis || block > 0L) lapply(q_grid, function(q) asis_projector(length(y), q, order)) else NULL   # built once; cycled one per sweep
@@ -421,7 +455,14 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
   # given theta = y -- those (sigma -> 0, z -> 0, lambda -> (a0+m)/||D y||_1) are a degenerate self-consistent
   # mode of the joint posterior (interpolate the data, scale -> 0) that a Gibbs chain never leaves.
   # sigma0 = 1, z0 = sigma0 (prior mean), lambda0 = (a0+m)/b0 (conjugate mean at zero roughness).
-  if (is.list(init)) {                                                         # explicit state (diagnostics: cross-initialisation)
+  # E-13a: sigma0 from the data-only pilot fit sets the burn-in sigma guard (and the "data" init)
+  pf <- pilot_fit(y, tau); sigma0 <- pf$sigma[1]
+  if (identical(init, "data")) {                                               # data-based start (E-13a, default)
+    theta  <- pf$theta[, 1]
+    sigma  <- sigma0
+    z      <- draw_z(y - theta, tau, sigma)                                    # z0 ~ its conditional given (theta0, sigma0)
+    lambda <- if (is.null(lambda_init)) m else lambda_init
+  } else if (is.list(init)) {                                                  # explicit state (diagnostics: cross-initialisation)
     theta <- init$theta; sigma <- init$sigma; lambda <- init$lambda; z <- init$z %||% draw_z(y - theta, tau, sigma)
   } else if (init == "y") {
     theta  <- y
@@ -440,12 +481,14 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
   theta_s  <- matrix(NA_real_, keep, n); cmap_sum <- numeric(n)
   lambda_s <- sigma_s <- delta_s <- acc_s <- SD_s <- numeric(gibbs_iter)
   n_acc <- 0L
+  warm_fb <- warm_ipm_bad <- guard_s <- integer(gibbs_iter)                     # E-13a logs: warm IPM fallback, IPM not converged, sigma guard
   t0 <- proc.time()[["elapsed"]]
   for (it in seq_len(gibbs_iter)) {
     lam_eff <- if (ps) lambda / sigma else lambda                               # penalty on the check-loss scale
     if (it <= warm) {                                                          # warm start: optimisation step only
-      a <- 1 / (cst$t2 * sigma * z); r <- y - cst$psi * z                        # conditional MAP = weighted TF:
-      theta <- prox_T(theta, a, r, lam_eff, gamma_warm, a, 0, order, rho = median(a), iters = 2L * iters)  # Euclidean-in-a prox, gamma large
+      a <- 1 / (cst$t2 * sigma * z); r <- y - cst$psi * z                        # conditional MAP = weighted TF (Euclidean-in-a prox, gamma large)
+      wp <- warm_prox(theta, a, r, lam_eff, gamma_warm, order, rep(-Inf, n), rep(Inf, n), 2L * iters)   # ADMM to tolerance, else IPM
+      theta <- wp$theta; warm_fb[it] <- wp$fallback; warm_ipm_bad[it] <- isTRUE(wp$ipm_conv == 0)
       st <- list(theta = theta, accept = NA, log_alpha = NA)
     } else {                                                                   # Block 1: K P-MALA moves at fixed (z, lambda, sigma)
       acc_k <- la_k <- numeric(K)
@@ -466,7 +509,8 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
     n_acc <- n_acc + if (is.na(st$accept)) 0 else st$accept
     z      <- draw_z(y - theta, tau, sigma)                                     # Block 2
     SD     <- sum(abs(Dtheta(theta, order)))
-    lambda <- rgamma(1, shape = a0 + m, rate = b0 + if (ps) SD / sigma else SD)  # Block 3 (sufficient parameterisation)
+    if (!(it <= warm && identical(warm_lam, "hold")))                           # E-13a: lambda held at its start during the warm sweeps
+      lambda <- rgamma(1, shape = a0 + m, rate = b0 + if (ps) SD / sigma else SD)  # Block 3 (sufficient parameterisation)
     if (asis && it > warm && !ps) {                                              # Block 3b: ancillary redraw, theta rescales
       a_ <- 1 / (cst$t2 * sigma * z); r_ <- y - cst$psi * z
       as_ <- asis_step(theta, lambda, a_, r_, a0, b0, Ps[[(it - 1L) %% length(Ps) + 1L]], order); lambda <- as_$lambda; theta <- as_$theta
@@ -480,6 +524,8 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
     }
     sigma  <- draw_sigma(y, theta, z, cst, a_sigma, b_sigma,                    # Block 4
                          lambda_SD = if (ps) lambda * SD else 0, m = if (ps) m else 0)
+    if (it <= gibbs_burn && is.finite(guard) && is.finite(sigma) && sigma > guard * sigma0) {   # E-13a: burn-in sigma-runaway guard
+      sigma <- sigma0; guard_s[it] <- 1L }
     if (adapt && it > warm && (adapt_all || it <= gibbs_burn)) {                # adapt delta (diminishing gain)
       delta <- exp(log(delta) + adapt_gain * it^(-adapt_kappa) * (exp(st$log_alpha) - adapt_target))
       delta <- min(max(delta, delta_bounds[1]), delta_bounds[2])
@@ -501,7 +547,8 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
        acc_post = mean(acc_s[(gibbs_burn + 1):gibbs_iter]), delta_final = delta,
        acc_lamjump = if (lamjump) mean(acc_lj[(gibbs_burn + 1):gibbs_iter]) else NA, s_lamjump = s_lj, asis_q_grid = if (asis) q_grid else NULL,
        acc_block = acc_blk, acc_block_post = if (block > 0L) mean(acc_blk[(gibbs_burn + 1):gibbs_iter]) else NA, s_block = s_blk,
-       final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), seconds = proc.time()[["elapsed"]] - t0)
+       final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), seconds = proc.time()[["elapsed"]] - t0,
+       warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0)
 }
 
 # ---- Unit tests --------------------------------------------------------------
