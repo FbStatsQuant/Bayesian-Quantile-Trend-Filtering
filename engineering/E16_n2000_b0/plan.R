@@ -23,6 +23,14 @@ measure <- function(id) {
   cpu <- sum(last[1:2])
   cpu_rate <- result$sampler_cpu_seconds / result$iter
   wall_rate <- result$seconds / result$iter
+  log_lines <- readLines(file.path(pilot_dir, paste0(id, ".log")))
+  checkpoints <- vapply(c(500L, 1000L), function(sweep) {
+    line <- grep(sprintf("^it +%d \\|", sweep), log_lines, value = TRUE)
+    as.numeric(sub(".*\\| ([0-9]+)s$", "\\1", tail(line, 1L)))
+  }, numeric(1))
+  steady_wall_rate <- unname(diff(checkpoints) / 500)
+  steady_cpu_rate <- steady_wall_rate * cpu_rate / wall_rate
+  remaining <- full_iter - result$iter
   rss_gib <- last[4L] / 1024^2
   levels <- length(result$tau)
   draws_added <- (full_iter - full_burn) - (result$iter - result$burn)
@@ -30,8 +38,9 @@ measure <- function(id) {
   data.frame(
     id = id, kind = result$task$kind, sweeps = result$iter, cpu_seconds_per_sweep = cpu_rate,
     elapsed_seconds_per_sweep = wall_rate, peak_rss_gib = rss_gib,
-    projected_cpu_seconds = cpu_rate * full_iter + max(0, cpu - result$sampler_cpu_seconds) + 30,
-    projected_elapsed_seconds = wall_rate * full_iter + max(0, last[3L] - result$seconds) + 30,
+    steady_elapsed_seconds_per_sweep = steady_wall_rate, steady_cpu_seconds_per_sweep = steady_cpu_rate,
+    projected_cpu_seconds = cpu + remaining * steady_cpu_rate + 30,
+    projected_elapsed_seconds = last[3L] + remaining * steady_wall_rate + 30,
     reserve_gib = ceiling(rss_gib + 2 * draw_gib + 0.75),
     used_cpu_seconds = sum(attempts[, 1:2])
   )
