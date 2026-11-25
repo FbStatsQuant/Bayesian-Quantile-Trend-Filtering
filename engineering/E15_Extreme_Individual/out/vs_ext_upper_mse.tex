@@ -1,0 +1,33 @@
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error at extreme upper quantiles for the VS signal, $n=500$ and $k=2$. The joint sampler fits the six levels together; the other methods fit each level separately.}
+\label{tab:vs_ext_upper_mse}
+\begin{tabular}{lrrrrrr}
+\toprule
+Beta & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0048 & 0.0058 & 0.0087 & 0.0102 & 0.0120 & 0.0156 \\
+Onizuka (Horseshoe) & 0.0044 & 0.0054 & 0.0075 & 0.0088 & 0.0104 & 0.0138 \\
+Bayesian-PMALA & 0.0049 & 0.0061 & 0.0100 & 0.0121 & 0.0154 & 0.0230 \\
+ADMM & 0.0174 & 0.0160 & 0.0169 & 0.0174 & 0.0199 & 0.0183 \\
+Joint sampler (non-crossing) & 0.0052 & 0.0057 & 0.0083 & 0.0113 & 0.0126 & 0.0132 \\
+\midrule
+Mixed normal & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0445 & 0.0562 & 0.0992 & 0.1313 & 0.1692 & 0.2437 \\
+Onizuka (Horseshoe) & 0.0497 & 0.0627 & 0.0940 & 0.1183 & 0.1441 & 0.2123 \\
+Bayesian-PMALA & 0.0426 & 0.0535 & 0.0898 & 0.1238 & 0.1657 & 0.2596 \\
+ADMM & 0.0508 & 0.0570 & 0.0926 & 0.1244 & 0.1845 & 0.2980 \\
+Joint sampler (non-crossing) & 0.0520 & 0.0548 & 0.0760 & 0.0880 & 0.1034 & 0.1240 \\
+\midrule
+Gaussian & $0.90$ & $0.93$ & $0.96$ & $0.97$ & $0.98$ & $0.99$ \\
+\midrule
+Onizuka (Laplace) & 0.0116 & 0.0144 & 0.0225 & 0.0285 & 0.0350 & 0.0500 \\
+Onizuka (Horseshoe) & 0.0116 & 0.0142 & 0.0212 & 0.0259 & 0.0318 & 0.0453 \\
+Bayesian-PMALA & 0.0116 & 0.0145 & 0.0232 & 0.0300 & 0.0388 & 0.0606 \\
+ADMM & 0.0211 & 0.0224 & 0.0234 & 0.0265 & 0.0321 & 0.0407 \\
+Joint sampler (non-crossing) & 0.0135 & 0.0141 & 0.0188 & 0.0223 & 0.0265 & 0.0300 \\
+\bottomrule
+\end{tabular}
+\end{table}

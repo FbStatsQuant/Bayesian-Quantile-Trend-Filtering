@@ -1,0 +1,30 @@
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean squared error (MSE) for the smooth (S) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:s_int_mse}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.000295 & 0.000794 & 0.001592 & 0.002311 & 0.005225 \\
+Onizuka (Horseshoe) & 0.000423 & 0.000812 & 0.001554 & 0.002270 & 0.005342 \\
+Bayesian-PMALA & 0.000267 & 0.000644 & 0.001249 & 0.001770 & 0.005413 \\
+ADMM & 0.000183 & 0.000425 & 0.000789 & 0.001078 & 0.002464 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.071456 & 0.026312 & 0.021974 & 0.027079 & 0.067077 \\
+Onizuka (Horseshoe) & 0.074248 & 0.026449 & 0.021783 & 0.027401 & 0.072335 \\
+Bayesian-PMALA & 0.056822 & 0.018795 & 0.014297 & 0.018140 & 0.051777 \\
+ADMM & 0.030277 & 0.010993 & 0.008228 & 0.010769 & 0.023342 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.014933 & 0.006463 & 0.005581 & 0.006136 & 0.014457 \\
+Onizuka (Horseshoe) & 0.016242 & 0.006414 & 0.005364 & 0.006003 & 0.014982 \\
+Bayesian-PMALA & 0.013677 & 0.004774 & 0.003910 & 0.004411 & 0.012697 \\
+ADMM & 0.006561 & 0.003129 & 0.002456 & 0.002843 & 0.005929 \\
+\bottomrule
+\end{tabular}
+\end{table}

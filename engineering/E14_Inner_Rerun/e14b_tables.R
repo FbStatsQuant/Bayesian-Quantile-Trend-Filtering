@@ -68,6 +68,7 @@ e14b_write_claims <- function(path, published, current, comparison) {
     "S MCIW versus Onizuka"
   )
   writeLines(c("# Interior-quantile claims with b0 = 1e-3", "",
+    "HQ review only. The prior-rate decision remains open.", "",
     "The archived baseline predates E-14. The current-paper column uses the tables supplied to this build. Ratios use the displayed six-decimal MSEs. Signed percentages compare PMALA with the smaller Onizuka MSE in each cell.", "",
     "| Claim | Pre-E-14 published | Current paper | Recomputed with E-14b |",
     "| --- | --- | --- | --- |",

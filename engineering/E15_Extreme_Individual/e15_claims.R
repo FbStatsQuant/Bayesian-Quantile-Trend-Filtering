@@ -114,11 +114,12 @@ e15_write_claims <- function(path, paper, comparison = NULL) {
   new <- if (is.null(comparison)) "Pending production build" else e15_claim_values(paper, comparison)
   stopifnot(length(old) == length(claims))
   writeLines(c("# Extreme-upper-quantile manuscript claims", "",
+    "HQ review only. The prior-rate decision remains open.", "",
     "Rankings and ties use the four displayed MSE decimals. The advantage is measured relative to the smallest competing MSE in the same cell. Crossing summaries use the displayed two decimals.", "",
     "| Claim | Published | Recomputed |", "| --- | --- | --- |",
     sprintf("| %s | %s | %s |", claims, old, new), "",
     "The comparison covers the prose around the extreme MSE and crossing tables. The design still fits six levels separately for the individual sampler and counts crossings only among 0.96–0.99. The appendix counts index-level inversions, adds the specified pair counts, and averages over paired data seeds. All 48 joint crossing entries remain zero.", "",
-    "Appendix C.9 must extend the updated-sampler scope to the extreme individual runs and describe their run settings. Check the opening sentence at [appendix_pmala.tex](../../paper/sections/appendix_pmala.tex#L170).", "",
+    "Appendix C.9 scope considerations are recorded in the [draft notes](WRITING_NOTES.md).", "",
     "[Extreme MSE prose](../../paper/sections/simulations.tex#L92) · [Crossing definition](../../paper/sections/appendix_simulations.tex#L144)"
   ), path)
 }
