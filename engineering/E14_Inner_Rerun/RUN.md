@@ -86,9 +86,14 @@ full array only if all six tasks finish, all have zero σ guards and
 acceptance between 0.4 and 0.6, and the mean per-task CPU time projects
 to at most 150 core-hours for 3,000 tasks. Size the final memory request
 from the pilot's largest MaxRSS with headroom.
-The script currently requests 3 GiB, one core, and three hours per task.
-With a 2,304 GiB commons QoS per-user memory cap, 600 tasks at 3 GiB use
-1,800 GiB of the quota. Other commons jobs can use part of that quota.
+
+Pilot array `2890600` passed on 2026-11-25. All six tasks completed with
+zero σ guards and post-burn-in acceptance of 0.49585–0.50080. Mean CPU
+time was 140.780 s per task, projecting to 117.3 core-hours. The largest
+Slurm MaxRSS was 507,664 KiB (495.8 MiB) and the longest task took 150 s.
+The full array requests 768 MiB, one core, and 15 minutes per task.
+At 600 concurrent tasks the array requests 450 GiB of the 2,304 GiB
+commons per-user memory cap.
 
 ```bash
 RUN="$HOME/BQTF/runs/E14-inner-rerun-20261125"

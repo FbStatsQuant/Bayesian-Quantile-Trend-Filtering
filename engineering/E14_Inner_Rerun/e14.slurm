@@ -3,8 +3,8 @@
 #SBATCH --job-name=bqtf-e14
 #SBATCH --partition=commons
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=3G
-#SBATCH --time=03:00:00
+#SBATCH --mem=768M
+#SBATCH --time=00:15:00
 #SBATCH --output=/home/fb31/BQTF/runs/E14-inner-rerun-20261125/logs/%x_%A_%a.out
 
 set -euo pipefail
