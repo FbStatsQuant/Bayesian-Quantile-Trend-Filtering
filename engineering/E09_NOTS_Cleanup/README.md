@@ -36,7 +36,7 @@ Nothing else qualified. Every other large item is the single version in use: the
 
 ## Heavy data (E-01 path)
 
-Finished runs were sealed on NOTS on 11-24 so that the 19:00 PC pull takes them. They are deleted on NOTS from Owls only after a signed receipt and the 2-day grace period.
+Finished runs were sealed on NOTS on 11-24 so that the next 19:00 PC pull takes them. They are deleted on NOTS from Owls only after a signed receipt and the 2-day grace period.
 
 | Run | Files | Size | Manifest SHA-256 |
 |---|---|---|---|
@@ -45,7 +45,7 @@ Finished runs were sealed on NOTS on 11-24 so that the 19:00 PC pull takes them.
 | E06-ratevalid-20261122 | 8,457 | 138 MB | `a331891e…` |
 | E02-rates-20261122 | 10,545 | 2.42 GB | `a2e5b0ac…` |
 
-The E-02 seal outlived the ssh shim's 300 s control-lane limit: the shim killed the connection, but the sealer kept running on NOTS and wrote its manifest at 17:16. The run was checked afterwards: 10,545 manifest lines for 10,545 files, and no file is newer than the manifest. Receipt ids are added after the 11-24 19:00 pull.
+The E-02 seal outlived the ssh shim's 300 s control-lane limit: the shim killed the connection, but the sealer kept running on NOTS and wrote its manifest at 17:16. The run was checked afterwards: 10,545 manifest lines for 10,545 files, and no file is newer than the manifest. Receipt ids will be added after the 11-25 19:00 pull. The 11-24 pull failed on a puller bug, since fixed (see the E-01 changelog).
 
 ## After (17:35 CT)
 
