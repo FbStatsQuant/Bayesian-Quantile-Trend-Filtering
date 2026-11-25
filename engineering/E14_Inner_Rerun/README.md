@@ -21,8 +21,9 @@ The data match across old and new fits. The MCMC streams differ.
 [Old chain seeding](../../experiments/interior_quantiles/individual_nots_20261003/VS_b0001/worker.R#L37) ·
 [E-14 worker](e14_run.R#L45)
 
-From the repository root, build the six LaTeX fragments, old-vs-new
-comparison, and health report in `engineering/E14_Inner_Rerun/out/`.
+From the repository root, build the six LaTeX fragments, comparison CSV,
+and health report in `engineering/E14_Inner_Rerun/out/`. The MSE comparison
+for the owner is written to `engineering/E14_Inner_Rerun/old_vs_new_mse.md`.
 
 ```bash
 Rscript --vanilla engineering/E14_Inner_Rerun/e14_tables.R runs/E14-inner-rerun-20261125/
@@ -31,3 +32,9 @@ Rscript --vanilla engineering/E14_Inner_Rerun/e14_tables.R runs/E14-inner-rerun-
 All 3,000 results must pass validation before the builder writes the LaTeX
 fragments. The run issue report lists missing and failed fits.
 [Execution and diagnostics](RUN.md)
+
+For the Markdown health lines, place verified scheduler counts in
+`e14_attempts.csv` in the run directory. Use one row each for VS and S
+with columns `signal,n_failed_attempts,n_rerun`. The final RDS files
+provide λ ESS and current fit status. Scheduler accounting supplies
+the retry history.

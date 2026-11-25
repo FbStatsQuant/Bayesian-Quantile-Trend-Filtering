@@ -48,7 +48,31 @@ e14_read_paper <- function(root) {
   list(tables = tables, published = published)
 }
 
-e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, root) {
+e14_write_mse <- function(path, comparison, health, lambda_ess, attempts) {
+  noise_names <- c(Normal = "Gaussian", Beta = "Beta", Mixed = "Mixed normal")
+  lines <- lapply(c("VS", "S"), function(signal) {
+    selected <- comparison[comparison$signal == signal & comparison$metric == "MSE", ]
+    selected <- selected[order(match(selected$noise, names(noise_names)), selected$tau), ]
+    rows <- sprintf("| %s | %.2f | %.4f | %.4f | %.4f |", noise_names[selected$noise],
+      selected$tau, selected$old, selected$new, selected$ratio)
+    failed <- sum(health$n_failed[health$signal == signal])
+    attempt_summary <- if (is.null(attempts)) {
+      sprintf("Failed fits in final results: %d · Reruns: unavailable", failed)
+    } else {
+      counts <- attempts[attempts$signal == signal, ]
+      sprintf("Failed attempts: %d · Rerun fits: %d", counts$n_failed_attempts, counts$n_rerun)
+    }
+    ess <- lambda_ess[signal == names(lambda_ess)]
+    c(paste("##", signal), "",
+      "| Noise | τ | Published Bayesian-PMALA MSE | New Bayesian-PMALA MSE | New / old |",
+      "| --- | ---: | ---: | ---: | ---: |", rows, "",
+      sprintf("%s · Median λ ESS: %.4f", attempt_summary, median(ess)), "")
+  })
+  writeLines(c("# Interior quantiles — Bayesian-PMALA MSE", "", unlist(lines)), path)
+}
+
+e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, root,
+    mse_markdown = file.path(output_dir, "old_vs_new_mse.md"), attempts_csv = NULL) {
   paper <- e14_read_paper(root)
   published <- read.csv(published_csv, colClasses = c(value = "character", se = "numeric"))
   stopifnot(isTRUE(all.equal(published, paper$published, check.attributes = FALSE)))
@@ -61,6 +85,16 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
   candidate <- merge(cells, data.frame(seed = 1:100), by = NULL)
   stopifnot(identical(names(reps), c("signal", "noise", "tau", "seed", "kept")),
     !anyDuplicated(keys(reps)), setequal(keys(reps), keys(candidate)))
+  attempts <- NULL
+  if (!is.null(attempts_csv) && file.exists(attempts_csv)) {
+    attempts <- read.csv(attempts_csv)
+    count_columns <- c("n_failed_attempts", "n_rerun")
+    stopifnot(identical(names(attempts), c("signal", count_columns)),
+      nrow(attempts) == 2L, setequal(attempts$signal, cells$signal),
+      all(vapply(attempts[count_columns], function(x) {
+        is.numeric(x) && all(is.finite(x) & x >= 0 & x == floor(x))
+      }, logical(1L))))
+  }
   stopifnot(dir.exists(results_dir))
   if (!dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)) {
     stop("Use a new output directory: ", output_dir)
@@ -185,8 +219,9 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
       n_used = n, complete, row.names = NULL)
   }
   comparison <- do.call(rbind, comparison)
+  health <- do.call(rbind, health)
   write.csv(comparison, file.path(output_dir, "pmala_old_vs_new.csv"), row.names = FALSE)
-  write.csv(do.call(rbind, health), file.path(output_dir, "health.csv"), row.names = FALSE)
+  write.csv(health, file.path(output_dir, "health.csv"), row.names = FALSE)
 
   if (!all(comparison$complete) || length(unassigned)) {
     message("LaTeX tables require known PMALA seed eligibility and complete kept results. See ",
@@ -205,6 +240,10 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
     }
     writeLines(table$block, file.path(output_dir, paste0(id, ".tex")))
   }
+  used <- reps$kept & !missing & !failed
+  lambda_ess <- vapply(fits[used], `[[`, numeric(1L), "lambda_ess")
+  names(lambda_ess) <- reps$signal[used]
+  e14_write_mse(mse_markdown, comparison, health, lambda_ess, attempts)
   invisible(TRUE)
 }
 
@@ -219,7 +258,10 @@ if (sys.nframe() == 0L) {
   results_dir <- args[1L]
   if (dir.exists(file.path(results_dir, "out"))) results_dir <- file.path(results_dir, "out")
   output_dir <- if (length(args) >= 2L) args[2L] else file.path(folder, "out")
+  markdown_dir <- if (length(args) >= 2L) output_dir else folder
   success <- e14_build_tables(results_dir, output_dir, valid_csv,
-    file.path(folder, "published_values.csv"), file.path(folder, "..", ".."))
+    file.path(folder, "published_values.csv"), file.path(folder, "..", ".."),
+    mse_markdown = file.path(markdown_dir, "old_vs_new_mse.md"),
+    attempts_csv = file.path(args[1L], "e14_attempts.csv"))
   quit(status = if (success) 0L else 1L)
 }
