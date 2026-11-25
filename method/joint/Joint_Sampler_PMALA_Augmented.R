@@ -231,10 +231,10 @@ pilot_fit <- function(y, tau_list) {
 warm_admm_tol  <- 1e-6                     # warm start: ADMM must meet this relative primal/dual residual tolerance ...
 warm_ipm_ctrl  <- c(1, 0, 200, 1e-8, 0)    # ... else the interior-point solver of prox_box_metric.cpp (IPM only, tol 1e-8) is used
 sigma_guard    <- 10                       # burn-in only: if sigma_j > sigma_guard * sigma0_j it is reset to sigma0_j (logged)
-warm_lambda    <- "hold"                   # "hold": lambda stays at its initial value during the warm sweeps and the next lambda_hold_extra
-                                           # exact sweeps (burn-in only) | "draw": conjugate draw throughout (pre-E-13a)
-lambda_hold_extra <- 200L                  # exact (P-MALA) sweeps after the warm start with lambda still held: theta leaves the (atypically
-                                           # smooth) conditional MAP before lambda is released, so the first conjugate draw does not jump up
+warm_lambda    <- "hold"                   # "hold": lambda stays at its initial value during the warm sweeps (+ lambda_hold_extra exact
+                                           # sweeps; burn-in only) | "draw": conjugate draw throughout (pre-E-13a)
+lambda_hold_extra <- 0L                    # exact (P-MALA) sweeps after the warm start with lambda still held (0: released at the end of the
+                                           # warm start; 200 was tried in E-13a and did nothing: theta does not move while delta adapts down)
 lambda_hold_until <- function(warm, burn, warm_lam) if (identical(warm_lam, "hold") && warm > 0) min(warm + lambda_hold_extra, burn) else 0L
 # Conditional MAP for the warm start: argmin sum a/2 (theta - r)^2 + lambda ||D theta||_1 + ||theta - x||_a^2 / (2 gamma) on [lower, upper].
 warm_prox <- function(x, a, r, lambda, gamma, order, lower, upper, iters) {

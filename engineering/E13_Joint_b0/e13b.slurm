@@ -32,6 +32,7 @@ if [ "${E13B_MODE:-run}" = check ]; then
     5) cd "$E13_ROOT" && Rscript "$E/e13b_warm_check.R" ind draw ;;
     6) cd "$E13_ROOT" && Rscript "$E/e13b_warm_check.R" joint hold ;;
     7) cd "$E13_ROOT" && Rscript "$E/e13b_warm_check.R" joint draw ;;
+    9) cd "$E13_BEFORE_ROOT" && E13_ROOT="$E13_BEFORE_ROOT" Rscript "$E/e13b_joint_tests.R" ;;   # joint tests on the code before E-13a (16G)
     8) cd "$E13_BEFORE_ROOT/method/individual" && Rscript Individual_Sampler_PMALA_Augmented.R test ;;   # same tests on the code before E-13a
   esac
 else
