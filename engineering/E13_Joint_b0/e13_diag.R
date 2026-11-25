@@ -60,7 +60,8 @@ fit <- tryCatch(gibbs_joint_pmala(dat$y, TAUS, 2L, 1, b0, 0.1, 0.1, iters, max(w
                                   adapt = TRUE, warm = warm_sweeps, gamma_warm = gamma_warm, kappa = kappa_metric, adapt_all = TRUE, K = 1L,
                                   asis = ASIS, tol = 0, zeta_scale = zeta_scale, ctrl = box_ctrl, asis_q = variant, verbose = TRUE),
                 error = function(e) e)
-rec <- do.call(rbind, lapply(R$rec, function(x) as.data.frame(x[setdiff(names(x), "crash")])))
+nm <- unique(unlist(lapply(R$rec, names)))
+rec <- do.call(rbind, lapply(R$rec, function(x) { x <- x[nm]; names(x) <- nm; as.data.frame(lapply(x, function(v) if (is.null(v)) NA else v)) }))
 asis <- if (length(R$asis)) as.data.frame(do.call(rbind, R$asis)) else NULL
 saveRDS(list(tag = tag, variant = variant, b0 = b0, taus = TAUS, cap = CAP, asis_on = ASIS, fit = if (inherits(fit, "error")) NULL else fit[setdiff(names(fit), "theta")],
              final_theta = if (inherits(fit, "error")) NULL else fit$final$theta, error = if (inherits(fit, "error")) conditionMessage(fit) else NULL,
