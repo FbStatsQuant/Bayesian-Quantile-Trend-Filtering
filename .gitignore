@@ -48,3 +48,8 @@ literature/*.pdf
 
 # NFS silly-rename files (open-but-deleted files on NFS)
 .nfs*
+
+# ---- E-12: non-git working folders at the repo top level (same layout on NOTS at ~/BQTF) ----
+/ops/
+/runs/
+/tmp/
