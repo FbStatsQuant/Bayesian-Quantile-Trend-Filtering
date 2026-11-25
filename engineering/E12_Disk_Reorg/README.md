@@ -85,7 +85,7 @@ After the Owls delete these scripts will not run as they are. To rerun one, rest
   - It went live on 2026-11-25 at 12:00 CT, with HQ's and the manager's approval. The Astra fixes went in at 12:03. `bqtf_ops.sh status` ran OK through the shim (`ops/logs/20261125-120017-status.log`, and again at 12:03).
   - The old copies are in `ops/backup/`: `bqtf_ops.sh.20261125-{preE12,preResidueSwap,preAstra}`, `residue_remote.sh.20261125-{mtime,ctime1,preAstra}` and `seal_run.sh.20261125-preAstra`.
 - `bqtf_ops.sh`:
-  - The obsolete allowlist entry `dir:/scratch/fb31/BQTF/e01_mirror_test` was dropped.
+  - The allowlist key `dir:/scratch/fb31/BQTF/e01_mirror_test` is kept, with a comment, so the old ledger entry `ledger/_tests/E01-mirrortest` still verifies. It creates nothing. (This was the manager's call on 11-25, after a brief removal at 12:02.)
   - `REMOTE_RUNS` and the verified-delete `R=` keep the physical path `/projects/ml75/fb31/BQTF/runs` on purpose. The checks there compare resolved paths, like the sealer, and the PC key is scoped to that path.
 - `ops/nots/seal_run.sh`: only the usage comment changed, to `bash ~/BQTF/ops/seal_run.sh ~/BQTF/runs/<RUN_ID>`. The code lines are identical to the NOTS copy.
 - E-03:
