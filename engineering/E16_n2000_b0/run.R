@@ -31,7 +31,7 @@ load_sampler <- function(joint) {
   main <- grep("^# ---- Main", lines)
   stopifnot(length(main) == 1L)
   eval(parse(text = head(lines, main - 1L)), envir = globalenv())
-  if (joint) load_box_cpp() else load_prox_cpp()
+  if (joint) load_box_cpp() else load_prox_cpp(cpp_src)
 }
 
 count_joint_crossings <- function(draws, estimate) {
