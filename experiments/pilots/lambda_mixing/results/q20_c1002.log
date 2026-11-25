@@ -1,0 +1,19 @@
+                   var1                       
+name               "q20_c1002"                
+overrides          "chain_seed=1002 asis_q=20"
+sweeps             "30000"                    
+burn               "10000"                    
+minutes            "4.16"                     
+acc                "0.503"                    
+mse                "0.005386"                 
+coverage           "0.96"                     
+lam_mean           "2292"                     
+lam_ess            "110.6"                    
+lam_ess_per_min    "26.59"                    
+th_ess_median      "89"                       
+th_ess_min         "56"                       
+th_ess_med_per_min "21.5"                     
+sig_ess            "5252"                     
+acc_lamjump        NA                         
+null device 
+          1 

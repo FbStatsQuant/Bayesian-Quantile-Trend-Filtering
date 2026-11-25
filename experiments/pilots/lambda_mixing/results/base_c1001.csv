@@ -1,0 +1,2 @@
+"name","overrides","sweeps","burn","minutes","acc","mse","coverage","lam_mean","lam_ess","lam_ess_per_min","th_ess_median","th_ess_min","th_ess_med_per_min","sig_ess","acc_lamjump"
+"base_c1001","chain_seed=1001",30000,10000,5.74,0.499,0.005185,0.962,2391,8,1.4,85,45,14.9,3773,NA
