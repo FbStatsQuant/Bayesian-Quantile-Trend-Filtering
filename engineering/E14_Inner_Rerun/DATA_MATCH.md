@@ -191,6 +191,64 @@ displayed six-decimal precision. For a reconstruction from original ADMM
 settings, require each ADMM mean to round to its published value (absolute
 difference at most `5e-7`), and retain the per-candidate flags.
 
+### September source acceptance test
+
+The candidate mask from September run `qtf_brantley_20260908_run01`
+**fails the current paper acceptance test**. The two read-only inputs remain
+under `tmp/E14_admm_mask/`. The ADMM source on the owner's OneDrive is
+`Quantile Regression/Others/BQTF/ADMM/qtf_brantley_20260908_run01/summary/`.
+
+| Input | SHA-256 |
+| --- | --- |
+| `partial_summary.rds` | `141bfd13dcd9579e9f51ff51cdd814de2c46a04361710ec6354da1834260bc07` |
+| `onizuka_inner_quantiles_summary.xlsx` | `1d4809eb726931a1aae88e57e2dae071c324e268c53628a9e67a7af6bad46423` |
+
+For VS and S, ADMM `task_status` records 2,596 valid, 360 errors, and 44
+unusable runs. The valid keys agree exactly with the `per_seed` rows and the
+included and excluded seed lists in `summary`. The errors all say
+`error: worker error record exists`. The unusable cases all say
+`unusable: worker diagnostics failed` (2 VS, 42 S). Neither message identifies
+the failed diagnostic or λ candidate. These records establish the September
+status mask. Per-candidate flags or worker logs are needed to verify whether
+the paper's specific rule accounts for the exclusions.
+
+| Signal | Noise | τ = 0.05 | 0.25 | 0.50 | 0.75 | 0.95 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| VS | Beta | 100 | 100 | 99 | 100 | 99 |
+| VS | Mixed | 98 | 99 | 100 | 100 | 100 |
+| VS | Normal | 99 | 100 | 100 | 99 | 100 |
+| S | Beta | 55 | 64 | 72 | 74 | 68 |
+| S | Mixed | 79 | 82 | 88 | 81 | 80 |
+| S | Normal | 66 | 75 | 75 | 76 | 68 |
+
+The candidate kept counts across cells are 55 minimum, 93 median, and
+100 maximum. The Onizuka workbook marks all 3,000 tasks per method valid.
+The audit used its posterior-mean rows, joined by signal, noise, τ, and
+seed, and averaged the stored metrics over the selected seeds. The
+ADMM metrics were MSE and MAD. Its interval widths and coverage are absent.
+The test compared each mean formatted to six decimals with the exact text
+in [published_values.csv](published_values.csv).
+
+| Method | Current paper matches on ADMM-valid seeds | Current paper matches on own valid seeds | Max absolute discrepancy under either rule |
+| --- | ---: | ---: | ---: |
+| ADMM | 1 / 60 | 1 / 60 | 0.227125077 |
+| Onizuka (Laplace) | 0 / 90 | 5 / 90 | 0.149883959 |
+| Onizuka (Horseshoe) | 0 / 90 | 4 / 90 | 0.156461566 |
+| Total | 1 / 240 | 10 / 240 | |
+
+[mask_acceptance.csv](mask_acceptance.csv) lists the published and
+recomputed values for all 240 comparisons under both rules. For example,
+the September ADMM mean MSE for VS Beta at τ = 0.05 is 0.235180
+versus 0.008055 in the current paper, although all 100 seeds are valid
+in that September cell.
+
+As a provenance check, the same inputs reproduce all 240 displayed
+competitor entries in the September
+[workbook extract](../../paper/history/simulation_revision_20260914/table_source.json)
+when each method uses its own valid seeds. The ADMM-valid rule reproduces
+115 of those 240 entries. The production mask still requires the inputs
+behind the current tables.
+
 ## Published values
 
 [published_values.csv](published_values.csv) contains 330 displayed means from
