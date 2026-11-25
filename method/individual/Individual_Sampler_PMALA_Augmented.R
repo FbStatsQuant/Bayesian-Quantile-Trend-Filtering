@@ -553,7 +553,8 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
        acc_lamjump = if (lamjump) mean(acc_lj[(gibbs_burn + 1):gibbs_iter]) else NA, s_lamjump = s_lj, asis_q_grid = if (asis) q_grid else NULL,
        acc_block = acc_blk, acc_block_post = if (block > 0L) mean(acc_blk[(gibbs_burn + 1):gibbs_iter]) else NA, s_block = s_blk,
        final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), seconds = proc.time()[["elapsed"]] - t0,
-       warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0, lambda_hold_until = hold)
+       warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0, lambda_hold_until = hold,
+       n_ipm_fallback = sum(warm_fb), n_sigma_guard = sum(guard_s))           # E-13a counters: warm sweeps solved by the IPM; sigma-guard firings
 }
 
 # ---- Unit tests --------------------------------------------------------------

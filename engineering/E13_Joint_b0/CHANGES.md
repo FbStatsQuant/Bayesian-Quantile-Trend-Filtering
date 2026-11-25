@@ -18,5 +18,6 @@ Every change is in BOTH samplers (`method/individual/Individual_Sampler_PMALA_Au
 | 7 | σ guard (`sigma_guard = 10`) | During the burn-in, if a σ draw exceeds 10 × σ0_j it is reset to σ0_j and logged (`sigma_guard`). | It acts in burn-in only. It is off after the burn-in, so post-burn σ draws are the exact conditional. |
 | 8 | Logs | The fit returns `warm_fallback`, `warm_ipm_unconverged` (the IPM stopped on its stall rule; this is its normal end state and still accurate to about 1e-10 per tests P4/P6, so it is informative only), `sigma_guard`, `sigma0` and `lambda_hold_until`. | No effect on the chain. |
 | 9 | Joint test T1 | It compares J = 1 with the individual sampler under init `"data"` (it was `"y"`). | Test only: bitwise identity is still required. |
+| 10 | Counters (added for E-14) | `gibbs_pmala_aug` also returns `n_ipm_fallback` (the number of warm sweeps where the IPM replaced ADMM) and `n_sigma_guard` (the number of σ-guard firings). `gibbs_joint_pmala` returns the same, one value per level. | Return values only; no effect on the chain. |
 
 Switches back to the pre-E-13a burn-in pieces: `theta_init = "y"` (individual only), `warm_lambda = "draw"`, `sigma_guard = Inf`. The joint offsets start and the old warm solver (fixed 300 ADMM iterations, accepted whatever their accuracy) were replaced, not kept as options.

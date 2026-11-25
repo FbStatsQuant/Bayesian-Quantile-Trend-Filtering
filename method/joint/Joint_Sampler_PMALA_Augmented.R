@@ -485,7 +485,8 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
        acc_post = colMeans(acc_s[post, , drop = FALSE]), outside_post = colMeans(out_s[post, , drop = FALSE]),
        ipm_post = colMeans(ipm_s[post, , drop = FALSE], na.rm = TRUE), asis_moved_post = colMeans(asis_s[post, , drop = FALSE], na.rm = TRUE),
        delta_final = delta, final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), asis_q_grid = if (asis) q_grid else NULL,
-       seconds = proc.time()[["elapsed"]] - t0, warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0, lambda_hold_until = hold)
+       seconds = proc.time()[["elapsed"]] - t0, warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0, lambda_hold_until = hold,
+       n_ipm_fallback = colSums(warm_fb), n_sigma_guard = colSums(guard_s))   # E-13a counters per level: warm sweeps solved by the IPM; sigma-guard firings
 }
 
 # ---- Crossing metrics ------------------------------------------------------------------------------------------------------
