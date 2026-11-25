@@ -1,0 +1,83 @@
+% T-09: proof of the joint theorem. No preamble; to be \input in Appendix~\ref{app:proofs},
+% after the proof of Theorem~\ref{thm:main}. Uses the macros of sections/appendix_theory.tex.
+\subsection{Proof of Theorem~\ref{thm:joint}}\label{pf:sec:joint}
+
+As in the rest of this appendix, $r=k+1$ and $\en^2=n^{-(2r-1)/(2r)}$. Let $\Pi^{\otimes}(\cdot\mid y)$ be the product of $\Pi_1(\cdot\mid y),\dots,\Pi_J(\cdot\mid y)$, a probability measure on $(\R^n)^J$. Then \eqref{eq:joint-fixed} reads
+\[
+\Pi_{\mathcal C}(B\mid y)=\frac{\Pi^{\otimes}(B\cap\mathcal C\mid y)}{\Pi^{\otimes}(\mathcal C\mid y)} ,
+\]
+so the joint posterior is the product of the individual posteriors conditioned on $\mathcal C$. The proof has three parts: the conditioning costs at most the factor $1/\Pi^{\otimes}(\mathcal C\mid y)$ (Lemma~\ref{pf:lem:cond}); the true curves are separated (Lemma~\ref{pf:lem:gap}); and each individual posterior concentrates in the supremum norm (Lemma~\ref{pf:lem:sup}), so that $\Pi^{\otimes}(\mathcal C\mid y)\ge1/2$ with high probability. Theorem~\ref{thm:main} is then applied at each level. We take $\sigma_j=1$ for all $j$ until the last paragraph.
+
+\begin{lemma}[conditioning]\label{pf:lem:cond}
+Let $n>r$. For every $y$, $\Pi^{\otimes}(\mathcal C\mid y)>0$, so $\Pi_{\mathcal C}(\cdot\mid y)$ is a probability measure. For every $j$ and every Borel set $A\subset\R^n$,
+\[
+\Pi_{\mathcal C}(\Theta:\ \theta_j\in A\mid y)\le\frac{\Pi_j(A\mid y)}{\Pi^{\otimes}(\mathcal C\mid y)} .
+\]
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{pf:lem:coord}(b) the normalizing integral in \eqref{pf:eq:post} is finite, so each $\Pi_j(\cdot\mid y)$ has a Lebesgue density that is positive at every point of $\R^n$, and $\Pi^{\otimes}(\cdot\mid y)$ has a density that is positive at every point of $(\R^n)^J$. The set $\mathcal C$ contains the nonempty open set $\{\Theta:\ \theta_{i1}<\cdots<\theta_{iJ},\ i=1,\dots,n\}$, which has positive Lebesgue measure. Hence $\Pi^{\otimes}(\mathcal C\mid y)>0$. For the inequality, $\Pi^{\otimes}(\{\theta_j\in A\}\cap\mathcal C\mid y)\le\Pi^{\otimes}(\theta_j\in A\mid y)=\Pi_j(A\mid y)$.
+\end{proof}
+
+\begin{lemma}[separation]\label{pf:lem:gap}
+Let Assumption~\ref{ass:B} hold at the levels $\tau_1<\cdots<\tau_J$ with the constants $L$ and $\fu$, and let
+\[
+g_0=\min\Bigl\{L,\ \min_{1\le j<J}\frac{\tau_{j+1}-\tau_j}{\fu}\Bigr\}.
+\]
+Then $\thetas_{i,j+1}-\thetas_{ij}\ge g_0$ for all $n$, all $i$ and all $1\le j<J$.
+\end{lemma}
+
+\begin{proof}
+Fix $i$ and $j<J$, and write $F=F_{y_i}$. Assumption~\ref{ass:B} at the level $\tau_j$ makes $F$ continuous at the $\tau_j$-quantile $\thetas_{ij}$, so $F(\thetas_{ij})=\tau_j$, as in Lemma~\ref{pf:lem:check}(b); and $F(\thetas_{i,j+1})\ge\tau_{j+1}>\tau_j$ because $\thetas_{i,j+1}$ is a $\tau_{j+1}$-quantile. Since $F$ is nondecreasing, $d=\thetas_{i,j+1}-\thetas_{ij}>0$. If $d\le L$, Assumption~\ref{ass:B} at the level $\tau_j$ gives
+\[
+\tau_{j+1}-\tau_j\le F(\thetas_{ij}+d)-F(\thetas_{ij})\le\fu\,d .
+\]
+So either $d>L$ or $d\ge(\tau_{j+1}-\tau_j)/\fu$, and in both cases $d\ge g_0$.
+\end{proof}
+
+The next lemma concerns one level. It is stated in the setting and with the notation of Theorem~\ref{thm:main} and of its proof: $\rho_n$, $T_n$ and $K_n$ are defined before Proposition~\ref{pf:prop:local}, $C_I$ is the constant of Lemma~\ref{pf:lem:interp}, and $\Omega_E$, $\Omega_G$ and $n_2$ are those of Lemma~\ref{pf:lem:evid} and Proposition~\ref{pf:prop:local}.
+
+\begin{lemma}[supremum-norm concentration]\label{pf:lem:sup}
+In the setting of Theorem~\ref{thm:main} with $\sigma=1$, let
+\[
+s_n=C_I\bigl\{\rho_n+(\rho_n^{2r-2}T_n)^{1/(2r-1)}\bigr\},\qquad \eta_n=r!\,\bigl\{e^{-\fl n\rho_n^2/16}+e^{-n/8}\bigr\}.
+\]
+Then $s_n\to0$ and $\eta_n\to0$; the sequence $s_n$ depends only on $(c,r)$ and $\eta_n$ only on $(\fl,r)$. For $n\ge n_2$,
+\[
+\Pi_\lambda\bigl(\theta:\ \|\theta-\thetas\|_\infty>s_n\bigm|y\bigr)\le\eta_n\quad\text{on }\Omega_E\cap\Omega_G,
+\qquad
+\pr\bigl\{(\Omega_E\cap\Omega_G)^c\bigr\}\le\Bigl(\frac54+\frac{64}{\fl^2}\Bigr)n^{-1/(2r)} .
+\]
+\end{lemma}
+
+\begin{proof}
+The proof of Proposition~\ref{pf:prop:local}(a) applies Lemma~\ref{pf:lem:interp} on $K_n$ to obtain $\sup_{\delta\in K_n}\|\delta\|_\infty\le s_n$, and its display shows that $\rho_n^{2r-2}T_n\to0$; since also $\rho_n\to0$, $s_n\to0$. (Part~(a) of that proposition records only the weaker consequence $s_n\le s_0$ for $n\ge n_2$.) Hence $\{\theta:\ \|\theta-\thetas\|_\infty>s_n\}\subset\{\theta:\ \theta-\thetas\notin K_n\}$, and Proposition~\ref{pf:prop:local}(b) bounds the posterior mass of the larger set by $\eta_n$ on $\Omega_E\cap\Omega_G$. Since $n\rho_n^2\to\infty$, $\eta_n\to0$. For the probability, Lemma~\ref{pf:lem:evid} and Proposition~\ref{pf:prop:local} give $\pr(\Omega_E^c)+\pr(\Omega_G^c)\le\tfrac54(n\en^2)^{-1}+64/(\fl^2n\rho_n^2)$, and $n\rho_n^2=n^{2/(2r+1)}\log n\ge n^{1/(2r)}=n\en^2$, because $2/(2r+1)\ge1/(2r)$ and $\log n\ge1$ for $n>r\ge2$.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:joint}]
+For each level $l$, the hypotheses of Theorem~\ref{thm:main} hold at $\tau=\tau_l$ with $c=c_l$. Let $M_l$, $C_l$ and $n_{0,l}$ be the constants of that theorem, and let $s_{n,l}$, $\Omega_l=\Omega_{E,l}\cap\Omega_{G,l}$ and $n_{2,l}$ be the sequence, the event and the threshold of Lemma~\ref{pf:lem:sup} at that level; $\eta_n$ is the same at all levels. Put
+\[
+M=\max_{l}M_l,\qquad C=2\max_{l}C_l+J\Bigl(\frac54+\frac{64}{\fl^2}\Bigr),\qquad \Omega=\bigcap_{l=1}^J\Omega_l ,
+\]
+and let $n_0\ge\max_l\max\{n_{0,l},n_{2,l}\}$ be such that $\max_ls_{n,l}\le g_0/2$ and $J\eta_n\le1/2$ for all $n\ge n_0$, with $g_0$ as in Lemma~\ref{pf:lem:gap}. Such an $n_0$ exists by Lemma~\ref{pf:lem:sup}, and it depends only on the quantities listed in the theorem. Let $n\ge n_0$.
+
+\emph{The constraint.} If $\|\theta_l-\thetas_l\|_\infty\le g_0/2$ for every $l$, then by Lemma~\ref{pf:lem:gap}, for all $i$ and $j<J$,
+\[
+\theta_{i,j+1}-\theta_{ij}\ge(\thetas_{i,j+1}-\thetas_{ij})-g_0\ge0 ,
+\]
+that is, $\Theta\in\mathcal C$. Hence, by a union bound and Lemma~\ref{pf:lem:sup}, on $\Omega$
+\[
+\Pi^{\otimes}(\mathcal C^c\mid y)\le\sum_{l=1}^J\Pi_l\bigl(\theta_l:\ \|\theta_l-\thetas_l\|_\infty>s_{n,l}\bigm|y\bigr)\le J\eta_n\le\frac12 .
+\]
+
+\emph{Transfer.} Fix $j$ and let $A=\{\theta\in\R^n:\ \Delta_n^2(\theta-\thetas_j)>M\en^2\}$. By Lemma~\ref{pf:lem:cond} and the last display, $\Pi_{\mathcal C}(\theta_j\in A\mid y)\le2\,\Pi_j(A\mid y)$ on $\Omega$, and $\Pi_{\mathcal C}\le1$ on $\Omega^c$. Since $M\ge M_j$, Theorem~\ref{thm:main} at the level $\tau_j$ bounds $\E_{\thetas}\Pi_j(A\mid y)$ by $C_jn^{-1/(2r)}$. With the probability bound of Lemma~\ref{pf:lem:sup} at each level,
+\[
+\E_{\thetas}\,\Pi_{\mathcal C}(\theta_j\in A\mid y)\le\pr(\Omega^c)+2\,\E_{\thetas}\Pi_j(A\mid y)
+\le J\Bigl(\frac54+\frac{64}{\fl^2}\Bigr)n^{-1/(2r)}+2C_j\,n^{-1/(2r)}\le C\,n^{-1/(2r)} .
+\]
+All constants are those of Theorem~\ref{thm:main} and of Lemma~\ref{pf:lem:sup}, so the bound is uniform over the class. The constant $M$ depends on neither $J$ nor the spacing of the levels, and $C$ does not depend on the spacing; the spacing enters $n_0$ only, through $g_0$.
+
+\emph{General scales.} Let $\sigma_j=\sigma_{0j}>0$. Lemmas~\ref{pf:lem:cond} and~\ref{pf:lem:gap} do not involve the scales. By the reduction to $\sigma=1$ at the beginning of this appendix, the law of $\theta_l/\sigma_{0l}$ under $\Pi_l(\cdot\mid y)$ is the $\sigma=1$ posterior based on $y/\sigma_{0l}$ with $c_l$ replaced by $\sigma_{0l}c_l$, and the rescaled data satisfy the assumptions with $(L/\sigma_{0l},\sigma_{0l}\fl,\sigma_{0l}\fu)$ and $\Vb/\sigma_{0l}$. Lemma~\ref{pf:lem:sup} for the rescaled problem gives a sequence $s_{n,l}'\to0$, a sequence $\eta_{n,l}'\to0$ and an event $\Omega_l$ with $\pr(\Omega_l^c)\le\{5/4+64/(\sigma_{0l}\fl)^2\}n^{-1/(2r)}$, on which $\Pi_l(\|\theta_l-\thetas_l\|_\infty>\sigma_{0l}s_{n,l}'\mid y)\le\eta_{n,l}'$. The two steps above apply with $\sigma_{0l}s_{n,l}'$ in place of $s_{n,l}$, $\sum_l\eta_{n,l}'$ in place of $J\eta_n$, and Theorem~\ref{thm:main} for the scale $\sigma_{0j}$.
+\end{proof}
+
+The first step gives slightly more than is used: the total variation distance between $\Pi_{\mathcal C}(\cdot\mid y)$ and $\Pi^{\otimes}(\cdot\mid y)$ equals $\Pi^{\otimes}(\mathcal C^c\mid y)$, which is at most $J\eta_n$ on $\Omega$. Outside an event of probability of order $n^{-1/(2r)}$, the ordering constraint therefore changes the posterior by at most $J\eta_n$, which tends to zero faster than any power of $n$.

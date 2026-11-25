@@ -1,0 +1,29 @@
+% T-09: joint theorem, main-text block. No preamble; to be \input in Section~\ref{sec:theory}
+% (suggested place: after Section~\ref{sec:main-result}). Uses the macros of sections/theory.tex.
+\subsection{Non-crossing quantile curves}\label{sec:joint-result}
+
+Theorem~\ref{thm:main} concerns a single quantile level. The joint sampler of Section~\ref{subsec:joint} fits $J\ge2$ levels $0<\tau_1<\cdots<\tau_J<1$ together and restricts the trends to the set $\mathcal C$ of \eqref{eq:joint_order}, on which they do not cross. The same rate holds at every level of this joint posterior, under the same assumptions.
+
+For $j=1,\dots,J$, let $\thetas_j=(\thetas_{1j},\dots,\thetas_{nj})$ be the vector of the $\tau_j$-quantiles of $y_1,\dots,y_n$, let $V^{*}_j=\TV(\thetas_j)$, and let $\Pi_j(\cdot\mid\by)$ be the posterior \eqref{eq:post-fixed} at the level $\tau_j$ with penalty $\lambda_j$. Write $\Theta=(\theta_1,\dots,\theta_J)$. For every Borel set $B\subset(\R^n)^J$, the joint posterior is
+\begin{equation}\label{eq:joint-fixed}
+\Pi_{\mathcal C}(B\mid\by)=\frac{\int_{B\cap\mathcal C}\prod_{j=1}^J\Pi_j(d\theta_j\mid\by)}{\int_{\mathcal C}\prod_{j=1}^J\Pi_j(d\theta_j\mid\by)} .
+\end{equation}
+This is the conditional posterior of $\Theta$ given the penalties and the scales under \eqref{eq:joint_target}, at $\sigma_1=\cdots=\sigma_J=1$. The denominator is positive for every $\by$, so $\Pi_{\mathcal C}$ is proper (Appendix~\ref{app:proofs}). As before, $\E_{\thetas}$ is expectation under the true distribution of $\by$.
+
+\begin{theorem}\label{thm:joint}
+Let $y_1,\dots,y_n$ be independent and satisfy Assumptions~\ref{ass:A} and~\ref{ass:B} at each of the levels $\tau_1<\cdots<\tau_J$, with the same constants $L$, $\fl$ and $\fu$, and let $V^{*}_j\le\Vb$ for all $j$ and $n$. Let $\sigma_j=1$ and
+\[
+\lambda_j=c_j\,n^{(2k+1)/2},\qquad\text{equivalently}\qquad\lambda_{\TV,j}=c_j\,n^{1/2},\qquad j=1,\dots,J,
+\]
+with constants $c_j>0$. Then there exist constants $M$, $C>0$ and $n_0$, depending only on $c_1,\dots,c_J$, $k$, $L$, $\fl$, $\fu$, $\Vb$, $J$, and the smallest spacing $\min_{j<J}(\tau_{j+1}-\tau_j)$, such that for all $n\ge n_0$ and every $j=1,\dots,J$
+\[
+\E_{\thetas}\,\Pi_{\mathcal C}\bigl(\Theta:\ \Delta_n^2(\theta_j-\thetas_j)>M\,n^{-(2k+1)/(2k+2)}\bigm|\by\bigr)\le C\,n^{-1/(2k+2)}.
+\]
+The bound is uniform over all laws of $\by$ that satisfy Assumptions~\ref{ass:A} and~\ref{ass:B} at every level with the given constants and $V^{*}_j\le\Vb$. The same holds for any fixed $\sigma_j=\sigma_{0j}>0$, with constants depending also on $\sigma_{01},\dots,\sigma_{0J}$.
+\end{theorem}
+
+No assumption is added to those of Theorem~\ref{thm:main}. In particular, the true quantile curves are not assumed to be separated: Assumption~\ref{ass:B} at two fixed neighbouring levels already keeps their curves at least $\min\{L,(\tau_{j+1}-\tau_j)/\fu\}$ apart at every index. The proof, in Appendix~\ref{app:proofs}, uses this separation to show that the $J$ individual posteriors together place mass tending to one on $\mathcal C$, and then applies Theorem~\ref{thm:main} at each level.
+
+\begin{remark}[Scope]
+Theorem~\ref{thm:joint} is asymptotic. It takes effect once each individual posterior is concentrated, in the supremum norm, within half the distance between neighbouring true curves, and the supremum-norm bound that the proof provides decreases slowly: for the default $k=2$ it is of order $n^{-13/70}$, up to a logarithmic factor. At practical sample sizes the ordering constraint can bind, and the theorem does not describe that regime. As in Theorem~\ref{thm:main}, the penalties $\lambda_j$ and the scales $\sigma_j$ are fixed; the joint posterior in which the sampler learns them is not covered. The levels are also fixed, so a grid of levels that becomes finer as $n$ grows is not covered.
+\end{remark}

@@ -1,0 +1,67 @@
+\documentclass[12pt]{article}
+% T-09 wrapper: compiles STATEMENT.tex and PROOF.tex standalone.
+% The two files are written for the paper (sections/theory.tex and sections/appendix_theory.tex);
+% this preamble only reproduces the paper macros they need.
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{bm}
+\usepackage{natbib}
+\usepackage[hidelinks]{hyperref}
+
+% paper/main.tex
+\newcommand{\by}{\bm{y}}
+\newcommand{\blambda}{\bm{\lambda}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+% paper/sections/theory.tex and appendix_theory.tex
+\providecommand{\pr}{\mathrm{pr}}
+\providecommand{\TV}{\mathrm{TV}}
+\providecommand{\lamtv}{\lambda_{\TV}}
+\providecommand{\thetas}{\theta^{*}}
+\providecommand{\en}{\varepsilon_n}
+\providecommand{\fl}{\underline f}
+\providecommand{\fu}{\bar f}
+\providecommand{\Vb}{\bar V}
+\providecommand{\nn}[1]{\|#1\|_n}
+\providecommand{\ind}{\mathbf 1}
+
+\title{T-09: the joint theorem for non-crossing quantile curves}
+\author{Theory department (prover)}
+\date{25 November 2026}
+
+\begin{document}
+\maketitle
+
+\noindent This file compiles the two blocks written for the paper: the statement, for the section on posterior contraction, and the proof, for the appendix of proofs. References to labels of the paper appear as ``??'' here; the list below says what each one is.
+
+\paragraph{Cited from the paper.}
+\begin{itemize}\itemsep1pt
+\item \texttt{thm:main}: the contraction theorem for one level, with constants $(M,C,n_0)$ depending only on $(c,k,L,\fl,\fu,\Vb)$. Used as a black box, once per level.
+\item \texttt{ass:A}, \texttt{ass:B}: Assumptions A and B. \texttt{eq:post-fixed}: the posterior of one level at $\sigma=1$. \texttt{eq:joint\_order}, \texttt{eq:joint\_target}, \texttt{subsec:joint}: the set $\mathcal C$, the joint target and the section on the joint sampler.
+\item \texttt{pf:eq:post}, \texttt{pf:lem:coord}(b): the posterior in the appendix and the finiteness of its normalizing integral for $n>r$.
+\item \texttt{pf:prop:shell}: named only, to say that $J$ there is the number of knots.
+\item \texttt{pf:lem:evid}: the event $\Omega_E$, with $\pr(\Omega_E^c)\le\frac54(n\en^2)^{-1}$ for $n\ge n_1$.
+\item \texttt{pf:lem:interp}: $\|\delta\|_\infty\le C_I\{\nn{\delta}+\nn{\delta}^{(2r-2)/(2r-1)}\TV^{(r)}(\delta)^{1/(2r-1)}\}$.
+\item \texttt{pf:prop:local}: the event $\Omega_G$, with $\pr(\Omega_G^c)\le64/(\fl^2n\rho_n^2)$ for $n\ge n_2$; part (b), $\Pi_\lambda(\theta-\thetas\notin K_n\mid y)\le r!\{e^{-\fl n\rho_n^2/16}+e^{-n/8}\}$ on $\Omega_G\cap\Omega_E$; and, from the proof of part (a), $\sup_{K_n}\|\delta\|_\infty\le C_I\{\rho_n+(\rho_n^{2r-2}T_n)^{1/(2r-1)}\}$ and $\rho_n^{2r-2}T_n\to0$. Here $\rho_n^2=n^{-(2r-1)/(2r+1)}\log n$, $T_n=(4/c)\sqrt n$ and $K_n=\{\delta:\ \nn{\delta}\le\rho_n,\ \TV^{(r)}(\delta)\le T_n\}$.
+\item The subsection ``Reduction to $\sigma=1$'' of the appendix (it has no label): the law of $\theta/\sigma_0$ under the $\sigma_0$-posterior is the $\sigma=1$ posterior based on $y/\sigma_0$ with $c$ replaced by $\sigma_0c$, and the rescaled data satisfy the assumptions with $(L/\sigma_0,\sigma_0\fl,\sigma_0\fu)$ and $\Vb/\sigma_0$.
+\end{itemize}
+
+\bigskip\hrule\bigskip
+\noindent\textbf{Block 1: statement} (\texttt{STATEMENT.tex}).
+
+\input{STATEMENT}
+
+\bigskip\hrule\bigskip
+\noindent\textbf{Block 2: proof} (\texttt{PROOF.tex}).
+
+\input{PROOF}
+
+\end{document}

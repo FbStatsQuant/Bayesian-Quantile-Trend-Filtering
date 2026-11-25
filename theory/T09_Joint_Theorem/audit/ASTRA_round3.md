@@ -1,0 +1,11 @@
+CLEAN
+
+### Checked OK
+
+- **R2-A1 / R2-F2.** At `PROOF.tex:82`, each original-units loss threshold includes the factor $\max\{\sigma_{0l},\sigma_{0l}^2\}$ before the maximum over levels, as required by `paper/sections/appendix_theory.tex:49`. Each radius is also returned to original units before comparison with $g_0/2$. The joint threshold covers every single-level theorem threshold and every rescaled localization threshold.
+- **R2-A2 / R2-F1.** At `PROOF.tex:85`, the distance equals the product posterior mass of $\mathcal C^c$ (the supremum is attained at $\mathcal C^c$). The stated exceptional probability sums the level-specific bounds with $\sigma_{0l}\underline f$. On the complementary event the distance is at most $\sum_l\eta'_{n,l}$. Both expressions specialize correctly at unit scales. For fixed positive scales and fixed $J$, this distance bound decays faster than any inverse power of $n$.
+- **R2-F3.** At `PROOF.tex:85`, the Borel sets and the condition $n\ge n_0$ are explicit. On $\Omega$ the conditioning denominator is at least one half. Taking the union of the specified loss events gives the maximum-loss event, and taking expectations charges $\Pr(\Omega^c)$ only once. This gives the stated simultaneous constant.
+- **R2-F4.** At `PROOF.tex:54`, the interpolation inequality immediately gives the stated inclusion, in the correct direction. Localization bounds the mass of its right-hand side. The displayed exponent gives $s_n\to0$ for every $r\ge2$, and the two event bounds give the claimed exceptional probability.
+- **R2-F5 and the optional antecedent edit.** At `STATEMENT.tex:5` and `:22`, the opening identifies the joint posterior and the extension identifies each factor at its own fixed scale. The hypotheses, rate and uniformity agree with the proof.
+- **R2-A3 (rejected).** I agree. The section fixes $k\ge1$ at `paper/sections/theory.tex:17`, and `STATEMENT.tex:11` supplies $n>k+1$, exactly the sample-size condition used for propriety.
+- **R2-F6.** The supplied PDF shows the revised transfer inequality on two lines (page 4) and the reflowed closing paragraph (page 5). The audit records a build with zero overfull boxes. I inspected the supplied output. The Owls compute cap prevented an independent build-log check.
