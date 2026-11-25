@@ -1,0 +1,102 @@
+it   500 | acc 0.270 | delta 9.47e-02 | lambda   784.44 | sigma 0.1113 | 4s
+it  1000 | acc 0.389 | delta 9.64e-02 | lambda   857.90 | sigma 0.1070 | 8s
+it  1500 | acc 0.435 | delta 1.07e-01 | lambda  1169.72 | sigma 0.1135 | 12s
+it  2000 | acc 0.440 | delta 9.02e-02 | lambda  1631.21 | sigma 0.1132 | 16s
+it  2500 | acc 0.454 | delta 9.90e-02 | lambda  1946.77 | sigma 0.1147 | 20s
+it  3000 | acc 0.460 | delta 1.03e-01 | lambda  1672.84 | sigma 0.1049 | 24s
+it  3500 | acc 0.465 | delta 1.04e-01 | lambda  1505.15 | sigma 0.1130 | 28s
+it  4000 | acc 0.472 | delta 1.06e-01 | lambda  1547.09 | sigma 0.1045 | 32s
+it  4500 | acc 0.473 | delta 9.71e-02 | lambda  2033.02 | sigma 0.1033 | 36s
+it  5000 | acc 0.472 | delta 9.65e-02 | lambda  2128.08 | sigma 0.1136 | 40s
+it  5500 | acc 0.478 | delta 1.00e-01 | lambda  1674.82 | sigma 0.1077 | 44s
+it  6000 | acc 0.481 | delta 1.03e-01 | lambda  1797.21 | sigma 0.1216 | 48s
+it  6500 | acc 0.482 | delta 1.05e-01 | lambda  2444.00 | sigma 0.1091 | 52s
+it  7000 | acc 0.484 | delta 1.04e-01 | lambda  2331.31 | sigma 0.1163 | 56s
+it  7500 | acc 0.485 | delta 1.02e-01 | lambda  2151.03 | sigma 0.1112 | 60s
+it  8000 | acc 0.486 | delta 1.08e-01 | lambda  2642.28 | sigma 0.1058 | 64s
+it  8500 | acc 0.486 | delta 9.86e-02 | lambda  2844.76 | sigma 0.1100 | 68s
+it  9000 | acc 0.487 | delta 9.93e-02 | lambda  2740.75 | sigma 0.1121 | 72s
+it  9500 | acc 0.487 | delta 1.01e-01 | lambda  2900.13 | sigma 0.1207 | 76s
+it 10000 | acc 0.489 | delta 1.04e-01 | lambda  2907.44 | sigma 0.1082 | 80s
+it 10500 | acc 0.488 | delta 1.02e-01 | lambda  2135.90 | sigma 0.1063 | 85s
+it 11000 | acc 0.488 | delta 9.81e-02 | lambda  1995.83 | sigma 0.1086 | 89s
+it 11500 | acc 0.488 | delta 9.81e-02 | lambda  3155.15 | sigma 0.1065 | 93s
+it 12000 | acc 0.487 | delta 9.66e-02 | lambda  2467.60 | sigma 0.1085 | 97s
+it 12500 | acc 0.488 | delta 9.55e-02 | lambda  2902.84 | sigma 0.1122 | 101s
+it 13000 | acc 0.489 | delta 9.51e-02 | lambda  2449.18 | sigma 0.1048 | 105s
+it 13500 | acc 0.490 | delta 9.53e-02 | lambda  3208.44 | sigma 0.1108 | 109s
+it 14000 | acc 0.490 | delta 9.52e-02 | lambda  3872.20 | sigma 0.1193 | 113s
+it 14500 | acc 0.490 | delta 9.57e-02 | lambda  3861.84 | sigma 0.1105 | 117s
+it 15000 | acc 0.490 | delta 9.95e-02 | lambda  3943.59 | sigma 0.1115 | 121s
+it 15500 | acc 0.491 | delta 9.59e-02 | lambda  2980.76 | sigma 0.1118 | 125s
+it 16000 | acc 0.492 | delta 1.02e-01 | lambda  2364.47 | sigma 0.0993 | 129s
+it 16500 | acc 0.492 | delta 9.84e-02 | lambda  2438.03 | sigma 0.1062 | 133s
+it 17000 | acc 0.492 | delta 9.76e-02 | lambda  2653.60 | sigma 0.1104 | 137s
+it 17500 | acc 0.492 | delta 9.79e-02 | lambda  1835.59 | sigma 0.1038 | 141s
+it 18000 | acc 0.492 | delta 9.78e-02 | lambda  1702.41 | sigma 0.1028 | 145s
+it 18500 | acc 0.493 | delta 9.63e-02 | lambda  2091.94 | sigma 0.1004 | 149s
+it 19000 | acc 0.493 | delta 9.79e-02 | lambda  2265.95 | sigma 0.0996 | 153s
+it 19500 | acc 0.494 | delta 9.99e-02 | lambda  2716.40 | sigma 0.0999 | 157s
+it 20000 | acc 0.494 | delta 9.84e-02 | lambda  2332.59 | sigma 0.1094 | 161s
+it 20500 | acc 0.494 | delta 9.82e-02 | lambda  2655.84 | sigma 0.1087 | 165s
+it 21000 | acc 0.493 | delta 9.61e-02 | lambda  2504.14 | sigma 0.1109 | 169s
+it 21500 | acc 0.494 | delta 9.80e-02 | lambda  1895.19 | sigma 0.1137 | 174s
+it 22000 | acc 0.494 | delta 1.01e-01 | lambda  2282.91 | sigma 0.1207 | 178s
+it 22500 | acc 0.493 | delta 9.48e-02 | lambda  2092.58 | sigma 0.1088 | 182s
+it 23000 | acc 0.494 | delta 9.67e-02 | lambda  1554.09 | sigma 0.1079 | 186s
+it 23500 | acc 0.495 | delta 9.78e-02 | lambda  2071.14 | sigma 0.1076 | 190s
+it 24000 | acc 0.495 | delta 9.94e-02 | lambda  2045.37 | sigma 0.1105 | 194s
+it 24500 | acc 0.496 | delta 1.02e-01 | lambda  2083.37 | sigma 0.1098 | 198s
+it 25000 | acc 0.495 | delta 9.86e-02 | lambda  1940.68 | sigma 0.1117 | 202s
+it 25500 | acc 0.495 | delta 1.00e-01 | lambda  1685.71 | sigma 0.1106 | 206s
+it 26000 | acc 0.496 | delta 1.05e-01 | lambda  1967.54 | sigma 0.1017 | 210s
+it 26500 | acc 0.495 | delta 1.03e-01 | lambda  1864.30 | sigma 0.1052 | 214s
+it 27000 | acc 0.495 | delta 1.02e-01 | lambda  2129.11 | sigma 0.1122 | 218s
+it 27500 | acc 0.495 | delta 1.03e-01 | lambda  1667.21 | sigma 0.1124 | 222s
+it 28000 | acc 0.495 | delta 9.97e-02 | lambda  2249.03 | sigma 0.1060 | 226s
+it 28500 | acc 0.495 | delta 1.02e-01 | lambda  1880.73 | sigma 0.1022 | 230s
+it 29000 | acc 0.495 | delta 1.02e-01 | lambda  2654.57 | sigma 0.1000 | 234s
+it 29500 | acc 0.495 | delta 1.02e-01 | lambda  2825.12 | sigma 0.1057 | 238s
+it 30000 | acc 0.495 | delta 1.03e-01 | lambda  3579.51 | sigma 0.1110 | 242s
+   quantity                                   value           
+1  MSE (posterior mean)                       0.00518         
+2  MSE (posterior median)                     0.00536         
+3  MAD                                        0.0565          
+4  coverage of 95% bands                      0.962           
+5  mean 95% band width                        0.2876          
+6  acceptance (post burn-in)                  0.499           
+7  final step size delta                      0.103           
+8  run time (s)                               242             
+9  sweeps / burn-in                           30000 / 10000   
+10 lambda: posterior mean                     2391            
+11 lambda: 95% interval                       [1594, 3843]    
+12 lambda: ESS                                8               
+13 lambda: ESS per minute                     2.0             
+14 lambda: Geweke z                           1.25            
+15 lambda: split R-hat                        1.242           
+16 lambda: half-chain means                   2605 / 2176     
+17 sigma: posterior mean                      0.1101          
+18 sigma: 95% interval                        [0.1006, 0.1204]
+19 sigma: ESS                                 3773            
+20 sigma: ESS per minute                      933.6           
+21 sigma: Geweke z                            3.77            
+22 sigma: split R-hat                         1.003           
+23 sigma: half-chain means                    0.1103 / 0.1098 
+24 sigma reference s*phi(Phi^-1(tau)) avg     0.1060          
+25 theta: ESS min / median / max (500 coords) 45 / 85 / 164   
+26 theta: ESS per minute (median)             21.1            
+27 theta: split R-hat max                     1.175           
+28 theta[50]: ESS                             105             
+29 theta[150]: ESS                            92              
+30 theta[250]: ESS                            132             
+31 theta[350]: ESS                            118             
+32 theta[450]: ESS                            96              
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+null device 
+          1 
+done
