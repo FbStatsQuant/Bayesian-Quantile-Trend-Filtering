@@ -247,7 +247,11 @@ pilot_fit <- function(y, tau_list) {
 warm_admm_tol  <- 1e-6                     # warm start: ADMM must meet this relative primal/dual residual tolerance ...
 warm_ipm_ctrl  <- c(1, 0, 200, 1e-8, 0)    # ... else the interior-point solver of prox_box_metric.cpp (IPM only, tol 1e-8) is used
 sigma_guard    <- 10                       # burn-in only: if sigma_j > sigma_guard * sigma0_j it is reset to sigma0_j (logged)
-warm_lambda    <- "hold"                   # "hold": lambda stays at its initial value during the warm sweeps | "draw": conjugate draw (pre-E-13a)
+warm_lambda    <- "hold"                   # "hold": lambda stays at its initial value during the warm sweeps and the next lambda_hold_extra
+                                           # exact sweeps (burn-in only) | "draw": conjugate draw throughout (pre-E-13a)
+lambda_hold_extra <- 200L                  # exact (P-MALA) sweeps after the warm start with lambda still held: theta leaves the (atypically
+                                           # smooth) conditional MAP before lambda is released, so the first conjugate draw does not jump up
+lambda_hold_until <- function(warm, burn, warm_lam) if (identical(warm_lam, "hold") && warm > 0) min(warm + lambda_hold_extra, burn) else 0L
 # Conditional MAP for the warm start: argmin sum a/2 (theta - r)^2 + lambda ||D theta||_1 + ||theta - x||_a^2 / (2 gamma) on [lower, upper].
 warm_prox <- function(x, a, r, lambda, gamma, order, lower, upper, iters) {
   w <- prox_admm_metric_conv(x, a, r, lambda, gamma, a, 0, order, median(a), iters, warm_admm_tol)
@@ -482,6 +486,7 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
   lambda_s <- sigma_s <- delta_s <- acc_s <- SD_s <- numeric(gibbs_iter)
   n_acc <- 0L
   warm_fb <- warm_ipm_bad <- guard_s <- integer(gibbs_iter)                     # E-13a logs: warm IPM fallback, IPM not converged, sigma guard
+  hold <- lambda_hold_until(warm, gibbs_burn, warm_lam)
   t0 <- proc.time()[["elapsed"]]
   for (it in seq_len(gibbs_iter)) {
     lam_eff <- if (ps) lambda / sigma else lambda                               # penalty on the check-loss scale
@@ -509,14 +514,14 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
     n_acc <- n_acc + if (is.na(st$accept)) 0 else st$accept
     z      <- draw_z(y - theta, tau, sigma)                                     # Block 2
     SD     <- sum(abs(Dtheta(theta, order)))
-    if (!(it <= warm && identical(warm_lam, "hold")))                           # E-13a: lambda held at its start during the warm sweeps
+    if (it > hold)                                                              # E-13a: lambda held at its start until sweep `hold`
       lambda <- rgamma(1, shape = a0 + m, rate = b0 + if (ps) SD / sigma else SD)  # Block 3 (sufficient parameterisation)
-    if (asis && it > warm && !ps) {                                              # Block 3b: ancillary redraw, theta rescales
+    if (asis && it > max(warm, hold) && !ps) {                                              # Block 3b: ancillary redraw, theta rescales
       a_ <- 1 / (cst$t2 * sigma * z); r_ <- y - cst$psi * z
       as_ <- asis_step(theta, lambda, a_, r_, a0, b0, Ps[[(it - 1L) %% length(Ps) + 1L]], order); lambda <- as_$lambda; theta <- as_$theta
       SD <- sum(abs(Dtheta(theta, order)))
     }
-    if (lamjump && it > warm && !ps) {                                           # Block 3c: joint (lambda, theta) jump
+    if (lamjump && it > max(warm, hold) && !ps) {                                           # Block 3c: joint (lambda, theta) jump
       a_ <- 1 / (cst$t2 * sigma * z); r_ <- y - cst$psi * z
       lj <- lamjump_step(theta, lambda, a_, r_, a0, b0, m, delta, s_lj, order, kappa, rho, iters, tol)
       theta <- lj$theta; lambda <- lj$lambda; acc_lj[it] <- lj$accept; SD <- sum(abs(Dtheta(theta, order)))
@@ -548,7 +553,7 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
        acc_lamjump = if (lamjump) mean(acc_lj[(gibbs_burn + 1):gibbs_iter]) else NA, s_lamjump = s_lj, asis_q_grid = if (asis) q_grid else NULL,
        acc_block = acc_blk, acc_block_post = if (block > 0L) mean(acc_blk[(gibbs_burn + 1):gibbs_iter]) else NA, s_block = s_blk,
        final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), seconds = proc.time()[["elapsed"]] - t0,
-       warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0)
+       warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0, lambda_hold_until = hold)
 }
 
 # ---- Unit tests --------------------------------------------------------------

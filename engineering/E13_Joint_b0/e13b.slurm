@@ -1,5 +1,5 @@
 #!/bin/bash
-# E-13a phase 2 on NOTS: one task of e13b_run.R per array index (1 core), or one check (E13B_MODE=check, indices 1-7).
+# E-13a phase 2 on NOTS: one task of e13b_run.R per array index (1 core), or one check (E13B_MODE=check, indices 1-8; index 2 = joint tests, needs --mem=16G for the T2 grid).
 # Runs from the code snapshot $RUN/code (after) and $RUN/code_before (commit 772a4a3); writes only under $RUN and $HOME/BQTF/tmp/<per-task>.
 #   RUN=$HOME/BQTF/runs/E13b-joint-b0-fix-20261125
 #   checks:     sbatch --array=1-7   --mem=4G --time=01:00:00 --job-name=bqtf-e13b-check --export=ALL,RUN=$RUN,E13B_MODE=check ...
@@ -32,6 +32,7 @@ if [ "${E13B_MODE:-run}" = check ]; then
     5) cd "$E13_ROOT" && Rscript "$E/e13b_warm_check.R" ind draw ;;
     6) cd "$E13_ROOT" && Rscript "$E/e13b_warm_check.R" joint hold ;;
     7) cd "$E13_ROOT" && Rscript "$E/e13b_warm_check.R" joint draw ;;
+    8) cd "$E13_BEFORE_ROOT/method/individual" && Rscript Individual_Sampler_PMALA_Augmented.R test ;;   # same tests on the code before E-13a
   esac
 else
   cd "$E13_ROOT"

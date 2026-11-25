@@ -231,7 +231,11 @@ pilot_fit <- function(y, tau_list) {
 warm_admm_tol  <- 1e-6                     # warm start: ADMM must meet this relative primal/dual residual tolerance ...
 warm_ipm_ctrl  <- c(1, 0, 200, 1e-8, 0)    # ... else the interior-point solver of prox_box_metric.cpp (IPM only, tol 1e-8) is used
 sigma_guard    <- 10                       # burn-in only: if sigma_j > sigma_guard * sigma0_j it is reset to sigma0_j (logged)
-warm_lambda    <- "hold"                   # "hold": lambda stays at its initial value during the warm sweeps | "draw": conjugate draw (pre-E-13a)
+warm_lambda    <- "hold"                   # "hold": lambda stays at its initial value during the warm sweeps and the next lambda_hold_extra
+                                           # exact sweeps (burn-in only) | "draw": conjugate draw throughout (pre-E-13a)
+lambda_hold_extra <- 200L                  # exact (P-MALA) sweeps after the warm start with lambda still held: theta leaves the (atypically
+                                           # smooth) conditional MAP before lambda is released, so the first conjugate draw does not jump up
+lambda_hold_until <- function(warm, burn, warm_lam) if (identical(warm_lam, "hold") && warm > 0) min(warm + lambda_hold_extra, burn) else 0L
 # Conditional MAP for the warm start: argmin sum a/2 (theta - r)^2 + lambda ||D theta||_1 + ||theta - x||_a^2 / (2 gamma) on [lower, upper].
 warm_prox <- function(x, a, r, lambda, gamma, order, lower, upper, iters) {
   w <- prox_admm_metric_conv(x, a, r, lambda, gamma, a, 0, order, median(a), iters, warm_admm_tol)
@@ -420,6 +424,7 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
   lambda_s <- sigma_s <- delta_s <- acc_s <- SD_s <- out_s <- ipm_s <- asis_s <- matrix(NA_real_, gibbs_iter, J)
   n_acc <- numeric(J)
   warm_fb <- warm_ipm_bad <- guard_s <- matrix(0L, gibbs_iter, J)              # E-13a logs: warm IPM fallback, IPM not converged, sigma guard
+  hold <- lambda_hold_until(warm, gibbs_burn, warm_lam)
   t0 <- proc.time()[["elapsed"]]
   for (it in seq_len(gibbs_iter)) {
     for (j in seq_len(J)) {
@@ -444,10 +449,10 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
       n_acc[j] <- n_acc[j] + if (is.na(st$accept)) 0 else st$accept
       zj  <- draw_z(y - th, tau_list[j], sg)                                   # Block 2
       SD  <- sum(abs(Dtheta(th, order)))
-      if (!(it <= warm && identical(warm_lam, "hold")))                       # E-13a: lambda held at its start during the warm sweeps
+      if (it > hold)                                                           # E-13a: lambda held at its start until sweep `hold`
         lam <- rgamma(1, shape = a0 + m, rate = b0 + SD)                       # Block 3 (sufficient parameterisation)
       moved <- NA
-      if (asis && it > warm) {                                                 # Block 3b: ancillary redraw (restricted to the box), theta rescales
+      if (asis && it > max(warm, hold)) {                                                 # Block 3b: ancillary redraw (restricted to the box), theta rescales
         a_ <- 1 / (cs$t2 * sg * zj); r_ <- y - cs$psi * zj
         Pit <- Ps[[(it - 1L) %% length(Ps) + 1L]]
         as_ <- if (free) asis_step(th, lam, a_, r_, a0, b0, Pit, order) else asis_box_step(th, lam, a_, r_, a0, b0, Pit, order, lower, upper)
@@ -480,7 +485,7 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
        acc_post = colMeans(acc_s[post, , drop = FALSE]), outside_post = colMeans(out_s[post, , drop = FALSE]),
        ipm_post = colMeans(ipm_s[post, , drop = FALSE], na.rm = TRUE), asis_moved_post = colMeans(asis_s[post, , drop = FALSE], na.rm = TRUE),
        delta_final = delta, final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), asis_q_grid = if (asis) q_grid else NULL,
-       seconds = proc.time()[["elapsed"]] - t0, warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0)
+       seconds = proc.time()[["elapsed"]] - t0, warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0, lambda_hold_until = hold)
 }
 
 # ---- Crossing metrics ------------------------------------------------------------------------------------------------------
