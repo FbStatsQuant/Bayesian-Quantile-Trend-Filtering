@@ -80,3 +80,11 @@ if (all(vapply(unlist(ref, recursive = FALSE), Negate(is.null), TRUE))) {
                   minutes = vapply(ref[[k]], function(r) r$minutes, 0))))
   write.csv(per, file.path(ed, "e13b_reference_chains.csv"), row.names = FALSE); print(format(per, digits = 4), row.names = FALSE)
 }
+# ---- lambda drift in the before/after reference: mean of lambda over post-burn quarters (sweeps 10-15k, 15-20k, 20-25k, 25-30k) ----
+if (exists("ref") && all(vapply(unlist(ref, recursive = FALSE), Negate(is.null), TRUE))) {
+  dr <- do.call(rbind, lapply(1:2, function(k) do.call(rbind, lapply(1:4, function(ch) { r <- ref[[k]][[ch]]; l <- r$lambda
+    data.frame(version = c("before", "after")[k], chain = ch, warm_end = l[200], sweep_1000 = l[1000], sweep_5000 = l[5000],
+               q1 = mean(l[10001:15000]), q2 = mean(l[15001:20000]), q3 = mean(l[20001:25000]), q4 = mean(l[25001:30000])) }))))
+  write.csv(dr, file.path(ed, "e13b_reference_lambda_drift.csv"), row.names = FALSE)
+  cat("\nReference lambda path (warm end, sweeps 1000/5000, post-burn quarter means):\n"); print(format(dr, digits = 4), row.names = FALSE)
+}
