@@ -10,7 +10,7 @@
 
 \section{Posterior contraction}\label{sec:theory}
 
-This section studies the posterior of Section~\ref{sec:methodology} when the penalty $\lambda$ and the scale $\sigma$ are held fixed. Section~\ref{sec:assumptions} describes the setting and states two assumptions on the distribution of the data. Section~\ref{sec:main-result} presents the posterior contraction theorem and discusses its rate and the role of the working likelihood. Section~\ref{sec:joint-result} extends the rate to every level of the joint posterior of several ordered quantile levels. Section~\ref{sec:theory-remarks} relates the fixed $\lambda$ and $\sigma$ of the theorems to the priors used by the samplers. All proofs are in Appendix~\ref{app:proofs}.
+This section studies the posterior of Section~\ref{sec:methodology} when the penalty $\lambda$ and the scale $\sigma$ are held fixed. Section~\ref{sec:assumptions} describes the setting and states two assumptions on the distribution of the data. Section~\ref{sec:main-result} presents the contraction theorem for a single quantile level and discusses its rate and the role of the working likelihood. Section~\ref{sec:joint-result} presents the main result: when several levels are fitted jointly under the non-crossing constraint, the same rate holds at all levels simultaneously. Section~\ref{sec:theory-remarks} relates the fixed $\lambda$ and $\sigma$ of the theorems to the priors used by the samplers. All proofs are in Appendix~\ref{app:proofs}.
 
 \subsection{Setting and assumptions}\label{sec:assumptions}
 
@@ -19,9 +19,9 @@ Fix a quantile level $\tau\in(0,1)$ and an order $k\ge1$. We observe independent
 \TV(\theta)=n^{k}\norm{D\theta}_1,\qquad V^{*}=\TV(\thetas),\qquad
 \Delta_n^2(v)=\frac1n\sum_{i=1}^n\min\{|v_i|,v_i^2\}.
 \]
-The factor $n^k$ is the usual scaling of the differences of order $k+1$ on an equally spaced grid: if $\thetas_i=Q(i/n)$ for a function $Q$ on $[0,1]$ whose $k$th derivative has bounded variation, then $V^{*}$ remains bounded as $n$ grows. The loss $\Delta_n^2$ is that of \citet{madrid2022risk}; it is quadratic in the small errors and linear in the large ones.
+The factor $n^k$ is the usual scaling of the differences of order $k+1$ on an equally spaced grid: if $\thetas_i=Q(i/n)$ for a function $Q$ on $[0,1]$ whose $k$th derivative has bounded variation, then $V^{*}$ remains bounded as $n$ grows. The loss $\Delta_n^2$ is that of \citet{madrid2022risk}; it is quadratic in small errors and linear in large ones.
 
-In the results of this section $\lambda$ is deterministic and $\sigma$ is fixed. We take $\sigma=1$ for simplicity; Theorem~\ref{thm:main} extends to any fixed $\sigma$. Under the working likelihood \eqref{eq:ald} and the prior \eqref{eq:prior_theta}, the posterior of $\theta$ is, for every Borel set $B\subset\R^n$,
+Here $\lambda$ is a deterministic sequence, and we take $\sigma=1$ for simplicity; both theorems cover any fixed $\sigma$. Under the working likelihood \eqref{eq:ald} and the prior \eqref{eq:prior_theta}, the posterior of $\theta$ is, for every Borel set $B\subset\R^n$,
 \begin{equation}\label{eq:post-fixed}
 \Pi_\lambda(B\mid \by)=\frac{\int_B\exp\{-\sum_{i=1}^n\rho_\tau(y_i-\theta_i)-\lambda\norm{D\theta}_1\}\,d\theta}
 {\int_{\R^n}\exp\{-\sum_{i=1}^n\rho_\tau(y_i-\theta_i)-\lambda\norm{D\theta}_1\}\,d\theta}.
@@ -46,13 +46,13 @@ There exists a constant $\fu<\infty$ such that, for the same $L$, any $n$, any $
 \]
 \end{assumption}
 
-This second condition is the matching upper bound, satisfied when the density of $y_i$ is bounded above by $\fu$ on the same interval. It excludes an atom at the quantile, so $F_{y_i}(\thetas_i)=\tau$. Neither assumption involves moments of $y_i$; heavy-tailed noise such as Cauchy noise is therefore allowed.
+The upper bound holds when $y_i$ has a density bounded above by $\fu$ on the same interval. It excludes an atom at the quantile, so $F_{y_i}(\thetas_i)=\tau$. Neither assumption involves moments of $y_i$; heavy-tailed noise such as Cauchy noise is therefore allowed.
 
-The contraction result also requires a bound on the signal: there is a constant $\Vb$ such that $V^{*}\le\Vb$ for all $n$. Appendix~\ref{app:assumptions} analyzes the assumptions and verifies them for the noise distributions and signals of Section~\ref{sec:numerical}.
+The contraction results also require a bound on the signal: there is a constant $\Vb$ such that $V^{*}\le\Vb$ for all $n$. Appendix~\ref{app:assumptions} analyzes the assumptions and verifies them for the noise distributions and signals of Section~\ref{sec:numerical}.
 
-\subsection{Main result}\label{sec:main-result}
+\subsection{A single quantile level}\label{sec:main-result}
 
-The main theorem states that, with $\lambda$ of order $n^{(2k+1)/2}$, the posterior concentrates around $\thetas$ at the rate $n^{-(2k+1)/(2k+2)}$ in the loss $\Delta_n^2$. We write $\E_{\thetas}$ for expectation under the true distribution of $\by$.
+We first treat a single level; the result for several levels in Section~\ref{sec:joint-result} is built on this case. The theorem below states that, with $\lambda$ of order $n^{(2k+1)/2}$, the posterior concentrates around $\thetas$ at the rate $n^{-(2k+1)/(2k+2)}$ in the loss $\Delta_n^2$. We write $\E_{\thetas}$ for expectation under the true distribution of $\by$.
 
 \begin{theorem}\label{thm:main}
 Let $y_1,\dots,y_n$ be independent and satisfy Assumptions~\ref{ass:A} and~\ref{ass:B}, and let $V^{*}\le\Vb$ for all $n$. Let $\sigma=1$ and
@@ -66,9 +66,9 @@ with a constant $c>0$. Then there exist constants $M$, $C>0$ and $n_0$, dependin
 The bound is uniform over all laws of $\by$ that satisfy Assumptions~\ref{ass:A} and~\ref{ass:B} with the given constants and $V^{*}\le\Vb$. The same holds for any fixed $\sigma=\sigma_0>0$, with constants depending also on $\sigma_0$.
 \end{theorem}
 
-Posterior draws lie within $M\,n^{-(2k+1)/(2k+2)}$ of $\thetas$ in the loss $\Delta_n^2$, apart from posterior mass that vanishes in expectation; the posterior therefore contracts at the rate $n^{-(2k+1)/(2k+2)}$, with no logarithmic factor. For the default $k=2$, $\lambda=c\,n^{5/2}$ and the rate is $n^{-5/6}$.
+Posterior draws lie within $M\,n^{-(2k+1)/(2k+2)}$ of $\thetas$ in the loss $\Delta_n^2$, apart from posterior mass that vanishes in expectation; the rate has no logarithmic factor. For the default $k=2$, the penalty is $\lambda=c\,n^{5/2}$ and the rate is $n^{-5/6}$.
 
-The proof, in Appendix~\ref{app:proofs}, writes the posterior as a ratio and treats its two terms separately. The denominator is bounded below through the prior mass of a ball centered at a locally smoothed version of $\thetas$. The numerator is bounded above on shells around $\thetas$. A localization step first confines the posterior to a set on which $\|\theta-\thetas\|_\infty\to0$, so that Assumptions~\ref{ass:A} and~\ref{ass:B} apply to every coordinate. The localization step is where $k\ge1$ is needed.
+The proof, in Appendix~\ref{app:proofs}, writes the posterior as a ratio and treats its two terms separately. The denominator is bounded below through the prior mass of a ball centered at a locally smoothed version of $\thetas$. The numerator is bounded above on shells around $\thetas$. A localization step first confines the posterior to a set on which $\|\theta-\thetas\|_\infty\to0$, so that Assumptions~\ref{ass:A} and~\ref{ass:B} apply to every coordinate. This step is where $k\ge1$ is needed.
 
 \begin{remark}[Comparison with the rate of the estimator]
 \citet{madrid2022risk} obtained the rate $n^{-(2k+2)/(2k+3)}$, up to a logarithmic factor, for the quantile trend filtering estimator. The rate of Theorem~\ref{thm:main} is slower. Heuristically, the posterior averages over windows of order $\lambda^{1/(k+1)}$ points, so its spread in the loss $\Delta_n^2$ is of order $\lambda^{-1/(k+1)}$, while its smoothing bias is of order
@@ -79,43 +79,47 @@ The two balance at $\lambda\asymp n^{(2k+1)/2}$, which gives $n^{-(2k+1)/(2k+2)}
 \end{remark}
 
 \begin{remark}[Misspecification]
-Every probability statement in Theorem~\ref{thm:main} is under the true distribution of the data, which need not be asymmetric Laplace. The posterior is therefore a Gibbs posterior, or quasi-posterior, built on the check loss, in which $1/\sigma$ acts as a learning rate \citep{syring2023gibbs,atchade2017contraction}. It concentrates on the true $\tau$-quantile because, whatever the distribution of $y_i$, the $\tau$-quantile minimizes the expected check loss and hence the Kullback--Leibler divergence from the truth to the asymmetric Laplace family \citep{sriram2013posterior}. Misspecification affects the spread of the posterior but leaves its center at the true quantile. The theorem therefore describes where the posterior concentrates and how fast; it makes no statement about the frequentist coverage of its credible sets \citep{yang2016posterior}.
+Every probability statement in Theorem~\ref{thm:main} is under the true distribution of the data, which need not be asymmetric Laplace. The posterior is then a Gibbs posterior, or quasi-posterior, built on the check loss, in which $1/\sigma$ acts as a learning rate \citep{syring2023gibbs,atchade2017contraction}. It concentrates on the true $\tau$-quantile because, whatever the distribution of $y_i$, the $\tau$-quantile minimizes the expected check loss and hence the Kullback--Leibler divergence from the truth to the asymmetric Laplace family \citep{sriram2013posterior}. Misspecification does affect the spread of the posterior, and the theorem makes no statement about the frequentist coverage of its credible sets \citep{yang2016posterior}.
 \end{remark}
 
-\subsection{Non-crossing quantile curves}\label{sec:joint-result}
+\subsection{Several quantile levels without crossing}\label{sec:joint-result}
 
-Theorem~\ref{thm:main} concerns a single quantile level. The joint sampler of Section~\ref{subsec:joint} fits $J\ge2$ levels $0<\tau_1<\cdots<\tau_J<1$ together and restricts the trends to the set $\mathcal C$ of \eqref{eq:joint_order}, on which they do not cross. The same rate holds at every level of the joint posterior defined below, under the assumptions of Theorem~\ref{thm:main} imposed at every level.
+Theorem~\ref{thm:main} concerns a single quantile level, and curves fitted one level at a time can cross. The joint sampler of Section~\ref{subsec:joint} fits $J\ge2$ levels $0<\tau_1<\cdots<\tau_J<1$ together and restricts the trends to the set $\mathcal C$ of \eqref{eq:joint_order}, on which they do not cross. The restriction couples the levels, so the joint posterior is not a product of single-level posteriors and Theorem~\ref{thm:main} does not apply to it directly.
 
 For $j=1,\dots,J$, let $\thetas_j=(\thetas_{1j},\dots,\thetas_{nj})$ be the vector of the $\tau_j$-quantiles of $y_1,\dots,y_n$, let $V^{*}_j=\TV(\thetas_j)$, and let $\Pi_j(\cdot\mid\by)$ be the posterior \eqref{eq:post-fixed} at the level $\tau_j$ with penalty $\lambda_j$. Write $\Theta=(\theta_1,\dots,\theta_J)$. For every Borel set $B\subset(\R^n)^J$, the joint posterior is
 \begin{equation}\label{eq:joint-fixed}
 \Pi_{\mathcal C}(B\mid\by)=\frac{\int_{B\cap\mathcal C}\prod_{j=1}^J\Pi_j(d\theta_j\mid\by)}{\int_{\mathcal C}\prod_{j=1}^J\Pi_j(d\theta_j\mid\by)} .
 \end{equation}
-This is the conditional posterior of $\Theta$ given the penalties and the scales under \eqref{eq:joint_target}, at $\sigma_1=\cdots=\sigma_J=1$. For $n>k+1$ the denominator is positive for every $\by$, so $\Pi_{\mathcal C}$ is proper (Appendix~\ref{app:proofs}). As before, $\E_{\thetas}$ is expectation under the true distribution of $\by$.
+This is the conditional posterior of $\Theta$ given the penalties and the scales under \eqref{eq:joint_target}, at $\sigma_1=\cdots=\sigma_J=1$. For $n>k+1$ the denominator is positive for every $\by$, so $\Pi_{\mathcal C}$ is proper (Appendix~\ref{app:proofs}).
+
+The main theorem states that, under the assumptions of Theorem~\ref{thm:main} imposed at every level, the joint posterior concentrates around the $J$ true quantile curves simultaneously, at the rate of Theorem~\ref{thm:main}. As before, $\E_{\thetas}$ is expectation under the true distribution of $\by$.
 
 \begin{theorem}\label{thm:joint}
 Let $y_1,\dots,y_n$ be independent and satisfy Assumptions~\ref{ass:A} and~\ref{ass:B} at each of the levels $\tau_1<\cdots<\tau_J$, with the same constants $L$, $\fl$ and $\fu$, and let $V^{*}_j\le\Vb$ for all $j$ and $n$. Let $\sigma_j=1$ and
 \[
 \lambda_j=c_j\,n^{(2k+1)/2},\qquad\text{equivalently}\qquad\lambda_{\TV,j}=c_j\,n^{1/2},\qquad j=1,\dots,J,
 \]
-with constants $c_j>0$. Then there exist constants $M$, $C>0$ and $n_0$, depending only on $c_1,\dots,c_J$, $k$, $L$, $\fl$, $\fu$, $\Vb$, $J$, and the smallest spacing $\min_{j<J}(\tau_{j+1}-\tau_j)$, such that for all $n\ge n_0$ and every $j=1,\dots,J$
+with constants $c_j>0$. Then there exist constants $M$, $C>0$ and $n_0$, depending only on $c_1,\dots,c_J$, $k$, $L$, $\fl$, $\fu$, $\Vb$, $J$, and the smallest spacing $\min_{j<J}(\tau_{j+1}-\tau_j)$, such that for all $n\ge n_0$
 \[
-\E_{\thetas}\,\Pi_{\mathcal C}\bigl(\Theta:\ \Delta_n^2(\theta_j-\thetas_j)>M\,n^{-(2k+1)/(2k+2)}\bigm|\by\bigr)\le C\,n^{-1/(2k+2)}.
+\E_{\thetas}\,\Pi_{\mathcal C}\bigl(\Theta:\ \max_{1\le j\le J}\Delta_n^2(\theta_j-\thetas_j)>M\,n^{-(2k+1)/(2k+2)}\bigm|\by\bigr)\le C\,n^{-1/(2k+2)}.
 \]
 The bound is uniform over all laws of $\by$ that satisfy Assumptions~\ref{ass:A} and~\ref{ass:B} at every level with the given constants and $V^{*}_j\le\Vb$. The same holds for any fixed $\sigma_j=\sigma_{0j}>0$, where $\Pi_j$ in \eqref{eq:joint-fixed} is the posterior at the scale $\sigma_{0j}$, with constants depending also on $\sigma_{01},\dots,\sigma_{0J}$.
 \end{theorem}
 
-No assumption is added beyond those of Theorem~\ref{thm:main} at each level. In particular, the true quantile curves are not assumed to be separated: Assumption~\ref{ass:B} at two fixed neighboring levels already keeps their curves at least $\min\{L,(\tau_{j+1}-\tau_j)/\fu\}$ apart at every index. The argument has three steps. First, \eqref{eq:joint-fixed} is the product of the $J$ individual posteriors truncated to $\mathcal C$, so the truncation inflates the mass of any event by at most the inverse of the product mass of $\mathcal C$. Second, each individual posterior concentrates around its true curve in the supremum norm. Third, once that radius is below half the separation, curves close to the true ones are ordered, so the product of the individual posteriors places mass at least $1/2$ on $\mathcal C$ with probability tending to one. Theorem~\ref{thm:main} at each level then gives the rate. The proof is in Appendix~\ref{app:proofs}.
+Apart from posterior mass that vanishes in expectation, a draw from the joint posterior lies within $M\,n^{-(2k+1)/(2k+2)}$ of the true curve in the loss $\Delta_n^2$, at all $J$ levels at once. The bound for a single level follows immediately, since each $\Delta_n^2(\theta_j-\thetas_j)$ is at most the maximum. The true quantile curves are not assumed to be separated: Assumption~\ref{ass:B} at two fixed neighboring levels already keeps their curves at least $\min\{L,(\tau_{j+1}-\tau_j)/\fu\}$ apart at every index.
+
+The proof, in Appendix~\ref{app:proofs}, has three steps. First, \eqref{eq:joint-fixed} is the product of the $J$ individual posteriors truncated to $\mathcal C$, so the truncation multiplies the mass of any event by at most the inverse of the mass that the product places on $\mathcal C$. Second, each individual posterior concentrates around its true curve in the supremum norm, within a radius that tends to zero; this follows from the localization step in the proof of Theorem~\ref{thm:main}. Third, once this radius is below half the separation, curves close to the true ones are ordered, so the product places mass at least $1/2$ on $\mathcal C$ with probability tending to one. Theorem~\ref{thm:main} at each level and a union bound over the levels then give the rate.
 
 \begin{remark}[Scope]
-Theorem~\ref{thm:joint} is asymptotic. Its proof requires each individual posterior to concentrate, in the supremum norm, within half the separation $\min\{L,\min_j(\tau_{j+1}-\tau_j)/\fu\}$ guaranteed above, and the supremum-norm bound that the proof provides decreases slowly: for the default $k=2$ it is of order $n^{-13/70}$, up to a logarithmic factor. At practical sample sizes, conditioning on $\mathcal C$ can change the posterior materially, and the theorem does not describe that regime. As in Theorem~\ref{thm:main}, the penalties $\lambda_j$ and the scales $\sigma_j$ are fixed; the joint posterior with the priors used by the sampler is not covered. The levels are also fixed, so a grid of levels that becomes finer as $n$ grows is not covered.
+Theorem~\ref{thm:joint} is asymptotic. Its proof requires each individual posterior to concentrate, in the supremum norm, within half the separation $\min\{L,\min_j(\tau_{j+1}-\tau_j)/\fu\}$ of the true curves, and the supremum-norm bound that the proof provides decreases slowly: for the default $k=2$ it is of order $n^{-13/70}$, up to a logarithmic factor. At practical sample sizes, conditioning on $\mathcal C$ can change the posterior materially, and the theorem does not describe that regime. The levels are fixed, so a grid of levels that becomes finer as $n$ grows is not covered.
 \end{remark}
 
 \subsection{The penalty and the scale in practice}\label{sec:theory-remarks}
 
-The contraction result holds for a deterministic $\lambda$ of a given order and a fixed $\sigma$, whereas the sampler of Section~\ref{sec:methodology} places the priors \eqref{eq:hyperpriors} on both and updates them with the trend. We describe how the two settings relate.
+Theorems~\ref{thm:main} and~\ref{thm:joint} hold for a deterministic $\lambda$ of a given order and a fixed $\sigma$, whereas the samplers of Section~\ref{sec:methodology} place the priors \eqref{eq:hyperpriors} on both and update them with the trend. We describe how the two settings relate.
 
-For the penalty, the full conditional \eqref{eq:lambdaupdate} is $\lambda\mid\theta,\by\sim\mathrm{Gamma}(a_0+m,\ b_0+\norm{D\theta}_1)$, with mean $(a_0+m)/(b_0+\norm{D\theta}_1)$. Under a weak prior, the roughness $\norm{D\theta}_1$ of the current trend sets the penalty: $\lambda$ is large when the trend is smooth and small when it is rough. The rate $b_0$ enters only through the sum $b_0+\norm{D\theta}_1$, so it matters only when $\norm{D\theta}_1$ is of the order of $b_0$ or smaller, that is, for trends that are nearly polynomials of degree $k$. Without it, the conditional mean of $\lambda$ would be unbounded for such trends.
+The full conditional \eqref{eq:lambdaupdate} of the penalty is $\lambda\mid\theta,\by\sim\mathrm{Gamma}(a_0+m,\ b_0+\norm{D\theta}_1)$, with mean $(a_0+m)/(b_0+\norm{D\theta}_1)$. Under a weak prior, the penalty is governed by the roughness $\norm{D\theta}_1$ of the current trend: $\lambda$ is large when the trend is smooth and small when it is rough. The rate $b_0$ enters only through the sum $b_0+\norm{D\theta}_1$, so it matters only when $\norm{D\theta}_1$ is of the order of $b_0$ or smaller, that is, for trends that are nearly polynomials of degree $k$. Without it, the conditional mean of $\lambda$ would be unbounded for such trends.
 
-For the scale, once the latent variables are integrated out, $\sigma\mid\theta,\by\sim\mathrm{IG}(n+a_\sigma,\ S(\theta)+b_\sigma)$ with $S(\theta)=\sum_{i=1}^n\rho_\tau(y_i-\theta_i)$. Hence $\sigma$ concentrates near $S(\theta)/n$. This is close to the average check loss $\bar\sigma_n=n^{-1}\sum_{i=1}^n\E\,\rho_\tau(y_i-\thetas_i)$ when that average is finite and bounded away from zero, which excludes Cauchy noise. Theorem~\ref{thm:main} with $\sigma_0=\bar\sigma_n$ describes the posterior at that scale.
+The full conditional of the scale, once the latent variables are integrated out, is $\sigma\mid\theta,\by\sim\mathrm{IG}(n+a_\sigma,\ S(\theta)+b_\sigma)$ with $S(\theta)=\sum_{i=1}^n\rho_\tau(y_i-\theta_i)$. Hence $\sigma$ concentrates near $S(\theta)/n$. This is close to the average check loss $\bar\sigma_n=n^{-1}\sum_{i=1}^n\E\,\rho_\tau(y_i-\thetas_i)$ when that average is finite and bounded away from zero, which excludes Cauchy noise. Theorem~\ref{thm:main} with $\sigma_0=\bar\sigma_n$ describes the posterior at that scale.
 
 The posterior with random $\lambda$ and $\sigma$ is not covered by Theorem~\ref{thm:main} or Theorem~\ref{thm:joint}. We sample both in practice so that no penalty has to be selected by cross-validation or by an information criterion.
