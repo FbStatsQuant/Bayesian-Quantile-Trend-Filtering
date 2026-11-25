@@ -1,0 +1,30 @@
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean absolute deviation (MAD) for the smooth (S) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:s_int_mad}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.009000 & 0.017595 & 0.027191 & 0.035333 & 0.056189 \\
+Onizuka (Horseshoe) & 0.009166 & 0.016903 & 0.026235 & 0.034349 & 0.056422 \\
+Bayesian-PMALA & 0.008059 & 0.014843 & 0.022516 & 0.028817 & 0.054178 \\
+ADMM & 0.007408 & 0.013056 & 0.019253 & 0.024246 & 0.039323 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.209230 & 0.128588 & 0.117542 & 0.129947 & 0.200719 \\
+Onizuka (Horseshoe) & 0.212951 & 0.128772 & 0.116773 & 0.130281 & 0.208177 \\
+Bayesian-PMALA & 0.175310 & 0.101395 & 0.087401 & 0.099587 & 0.165263 \\
+ADMM & 0.134511 & 0.082435 & 0.071963 & 0.081493 & 0.118870 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.093516 & 0.062130 & 0.057391 & 0.060291 & 0.091704 \\
+Onizuka (Horseshoe) & 0.096546 & 0.061044 & 0.055676 & 0.059026 & 0.092177 \\
+Bayesian-PMALA & 0.082926 & 0.049742 & 0.045036 & 0.048328 & 0.080376 \\
+ADMM & 0.060896 & 0.042695 & 0.037518 & 0.040551 & 0.057551 \\
+\bottomrule
+\end{tabular}
+\end{table}

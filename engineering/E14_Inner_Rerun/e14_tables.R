@@ -68,7 +68,7 @@ e14_write_mse <- function(path, comparison, health, lambda_ess, attempts) {
       "| --- | ---: | ---: | ---: | ---: |", rows, "",
       sprintf("%s · Median λ ESS: %.4f", attempt_summary, median(ess)), "")
   })
-  writeLines(c("# Interior quantiles — Bayesian-PMALA MSE", "", unlist(lines)), path)
+  writeLines(c("# Interior quantiles — Bayesian-PMALA MSE", "", head(unlist(lines), -1L)), path)
 }
 
 e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, root,
