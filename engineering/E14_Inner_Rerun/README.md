@@ -38,3 +38,21 @@ For the Markdown health lines, place verified scheduler counts in
 with columns `signal,n_failed_attempts,n_rerun`. The final RDS files
 provide λ ESS and current fit status. Scheduler accounting supplies
 the retry history.
+
+## E-14b common-rate rebuild
+
+After GO, combine the original E-14 VS results at b0 = 1e-3 with the
+E-14b S results at b0 = 1e-3.
+
+```bash
+Rscript --vanilla engineering/E14_Inner_Rerun/e14b_tables.R \
+  runs/E14-inner-rerun-20261125/ runs/E14b-inner-S-b1e3-20261125/
+```
+
+The rebuilt fragments, MSE Markdown, detailed comparison, health reports
+and recomputed claims are written to `out/b1e3/`. The original E-14
+outputs remain in their current locations. The updated MSE report uses
+the pre-E-14 published values as its baseline. The claims report also
+shows the values from the current manuscript for comparison. Each run
+may supply its own `e14_attempts.csv` with the scheduler counts for its
+selected signal.

@@ -181,6 +181,7 @@ e15_build_tables <- function(run_dir, output_root, root, seeds = 1:100) {
       sprintf("%s · Median λ ESS: %.6f", status, median(grid$lambda_ess[grid$signal == signal])), "")
   })
   writeLines(c("# Extreme upper quantiles — individual sampler MSE", "",
+    "Published fits used the old sampler at 10k sweeps / 3k burn-in with b0 = 0.01 for VS and 0.001 for S. The rerun uses the updated sampler at 30k / 10k with b0 = 0.001 for both signals. On VS, the MSE ratio combines changes to b0, the sampler, and chain length. On S, the sampler and chain length change at the same b0.", "",
     head(unlist(blocks), -1L)), file.path(output_root, "old_vs_new_mse.md"))
   source(file.path(root, "engineering", "E15_Extreme_Individual", "e15_claims.R"), local = TRUE)
   e15_write_claims(file.path(output_root, "recomputed_claims.md"), paper$values, comparison)

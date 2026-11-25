@@ -48,7 +48,7 @@ e14_read_paper <- function(root) {
   list(tables = tables, published = published)
 }
 
-e14_write_mse <- function(path, comparison, health, lambda_ess, attempts) {
+e14_write_mse <- function(path, comparison, health, lambda_ess, attempts, notes = character()) {
   noise_names <- c(Normal = "Gaussian", Beta = "Beta", Mixed = "Mixed normal")
   lines <- lapply(c("VS", "S"), function(signal) {
     selected <- comparison[comparison$signal == signal & comparison$metric == "MSE", ]
@@ -56,14 +56,15 @@ e14_write_mse <- function(path, comparison, health, lambda_ess, attempts) {
     rows <- sprintf("| %s | %.2f | %.4f | %.4f | %.4f |", noise_names[selected$noise],
       selected$tau, selected$old, selected$new, selected$ratio)
     failed <- sum(health$n_failed[health$signal == signal])
-    attempt_summary <- if (is.null(attempts)) {
+    counts <- if (!is.null(attempts)) attempts[attempts$signal == signal, , drop = FALSE]
+    attempt_summary <- if (is.null(counts) || !nrow(counts)) {
       sprintf("Failed fits in final results: %d · Reruns: unavailable", failed)
     } else {
-      counts <- attempts[attempts$signal == signal, ]
       sprintf("Failed attempts: %d · Rerun fits: %d", counts$n_failed_attempts, counts$n_rerun)
     }
     ess <- lambda_ess[signal == names(lambda_ess)]
     c(paste("##", signal), "",
+      if (signal %in% names(notes)) c(notes[[signal]], ""),
       "| Noise | τ | Published Bayesian-PMALA MSE | New Bayesian-PMALA MSE | New / old |",
       "| --- | ---: | ---: | ---: | ---: |", rows, "",
       sprintf("%s · Median λ ESS: %.4f", attempt_summary, median(ess)), "")
@@ -72,10 +73,14 @@ e14_write_mse <- function(path, comparison, health, lambda_ess, attempts) {
 }
 
 e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, root,
-    mse_markdown = file.path(output_dir, "old_vs_new_mse.md"), attempts_csv = NULL) {
+    mse_markdown = file.path(output_dir, "old_vs_new_mse.md"), attempts_csv = NULL,
+    notes = character()) {
   paper <- e14_read_paper(root)
   published <- read.csv(published_csv, colClasses = c(value = "character", se = "numeric"))
-  stopifnot(isTRUE(all.equal(published, paper$published, check.attributes = FALSE)))
+  labels <- c("signal", "noise", "tau", "method", "metric")
+  competitors <- published$method != "Bayesian-PMALA"
+  stopifnot(identical(published[labels], paper$published[labels]),
+    identical(published$value[competitors], paper$published$value[competitors]))
   metrics <- c("mse", "mad", "mciw")
   diagnostics <- c("lambda_ess", "acc", "delta_final", "n_ipm_fallback", "n_sigma_guard", "seconds")
   old <- subset(published, method == "Bayesian-PMALA")
@@ -85,22 +90,31 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
   candidate <- merge(cells, data.frame(seed = 1:100), by = NULL)
   stopifnot(identical(names(reps), c("signal", "noise", "tau", "seed", "kept")),
     !anyDuplicated(keys(reps)), setequal(keys(reps), keys(candidate)))
-  attempts <- NULL
-  if (!is.null(attempts_csv) && file.exists(attempts_csv)) {
-    attempts <- read.csv(attempts_csv)
+  stopifnot(length(results_dir) == 1L || identical(sort(names(results_dir)), c("S", "VS")),
+    all(dir.exists(results_dir)))
+  if (length(results_dir) > 1L) stopifnot(!anyDuplicated(normalizePath(results_dir)))
+  attempts <- do.call(rbind, lapply(seq_along(attempts_csv), function(i) {
+    if (!file.exists(attempts_csv[i])) return(NULL)
+    counts <- read.csv(attempts_csv[i])
     count_columns <- c("n_failed_attempts", "n_rerun")
-    stopifnot(identical(names(attempts), c("signal", count_columns)),
-      nrow(attempts) == 2L, setequal(attempts$signal, cells$signal),
-      all(vapply(attempts[count_columns], function(x) {
+    stopifnot(identical(names(counts), c("signal", count_columns)),
+      !anyDuplicated(counts$signal), all(counts$signal %in% cells$signal),
+      all(vapply(counts[count_columns], function(x) {
         is.numeric(x) && all(is.finite(x) & x >= 0 & x == floor(x))
       }, logical(1L))))
-  }
-  stopifnot(dir.exists(results_dir))
+    if (is.null(names(attempts_csv))) counts
+    else counts[counts$signal == names(attempts_csv)[i], , drop = FALSE]
+  }))
+  stopifnot(!anyDuplicated(attempts$signal))
   if (!dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)) {
     stop("Use a new output directory: ", output_dir)
   }
 
-  files <- list.files(results_dir, pattern = "[.]rds$", recursive = TRUE, full.names = TRUE)
+  sources <- do.call(rbind, lapply(seq_along(results_dir), function(i) {
+    files <- list.files(results_dir[i], pattern = "[.]rds$", recursive = TRUE, full.names = TRUE)
+    signal <- if (length(results_dir) == 1L) NA_character_ else names(results_dir)[i]
+    data.frame(path = files, signal = rep(signal, length(files)))
+  }))
   run_keys <- keys(reps)
   fits <- vector("list", nrow(reps))
   paths <- rep(NA_character_, nrow(reps))
@@ -141,7 +155,8 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
     c(as.list(calculated), fit[diagnostics], list(commit = fit$commit))
   }
 
-  for (file in files) {
+  for (i in seq_len(nrow(sources))) {
+    file <- sources$path[i]
     fit <- tryCatch(readRDS(file), error = identity)
     identity_issue <- NULL
     if (inherits(fit, "error")) {
@@ -152,6 +167,8 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
       identity_issue <- "Missing or malformed signal/noise/tau/seed"
     }
     if (is.null(identity_issue)) {
+      source_signal <- sources$signal[i]
+      if (!is.na(source_signal) && fit$signal %in% setdiff(c("VS", "S"), source_signal)) next
       fit$noise <- noise_id(fit$noise)
       idx <- match(keys(fit), run_keys)
       if (is.na(idx)) identity_issue <- paste("Unexpected run", keys(fit))
@@ -243,7 +260,7 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
   used <- reps$kept & !missing & !failed
   lambda_ess <- vapply(fits[used], `[[`, numeric(1L), "lambda_ess")
   names(lambda_ess) <- reps$signal[used]
-  e14_write_mse(mse_markdown, comparison, health, lambda_ess, attempts)
+  e14_write_mse(mse_markdown, comparison, health, lambda_ess, attempts, notes)
   invisible(TRUE)
 }
 

@@ -80,7 +80,7 @@ claim generation, and rejection of an incomplete grid.
 
 | Setting | Published extreme individual | Published interior VS / S | E-15 individual |
 | --- | --- | --- | --- |
-| Gamma λ prior rate | 0.01 VS, 0.001 S | 0.001 VS, 0.0005 S | 0.01 VS, 0.001 S |
+| Gamma λ prior rate | 0.01 VS, 0.001 S | 0.001 VS, 0.0005 S | 0.001 for both signals |
 | Total sweeps / burn-in | 10,000 / 3,000 for both | 30,000 / 10,000 VS, 20,000 / 5,000 S | 30,000 / 10,000 for both |
 | ASIS | Off for both | On for VS, off for S | Spline-held ASIS with `asis_q = "fixed"` for both |
 | Acceptance target | 0.55 | 0.50 for both | 0.50 from the updated sampler settings |
@@ -109,7 +109,9 @@ LaTeX fragments and comparison CSV under this project's `out/`.
 It also writes `old_vs_new_mse.md` and fills in the new-value column of
 [recomputed_claims.md](recomputed_claims.md). The Markdown comparison
 pads the four-decimal published MSEs to six decimals and uses those
-published values as the ratio denominators. The LaTeX fragments retain
+published values as the ratio denominators. For VS, the ratio combines
+the prior-rate, sampler and chain-length changes. For S, both fits use
+the same prior rate. The LaTeX fragments retain
 the paper's four-decimal MSE and two-decimal crossing formats. For the
 health lines, supply an `e15_attempts.csv` in the run directory with one
 row per signal and columns `signal,n_failed_attempts,n_rerun`.
