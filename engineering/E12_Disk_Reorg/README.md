@@ -41,6 +41,23 @@ All moves were checked against sha256 lists taken before the move; the lists are
 
 The Owls originals in `runs/` stay until the PC receipt arrives.
 
+**Before the Owls copy of the session-scratch archive is deleted.** These 10 E-07 scripts point into `runs/archive-owls-session-scratch-20261125/` on Owls. Each takes the session's scratchpad as its code or data folder (`SCR`/`S`, or a `source`/`saveRDS` path).
+
+| Script (under `engineering/E07_Tuning_Free/`) | Line | Session dir |
+|---|---|---|
+| `joint/smoke_scripts/identity.R` | 1 | `5a5aaa0b…` |
+| `joint_gibbs/common_v3.R` | 6 | `12592220…` |
+| `joint_gibbs/felipe_run_v3.R` | 5 | `12592220…` |
+| `joint_gibbs/unit_v3.R` | 2 | `12592220…` |
+| `joint_gibbs/validate/analyze_b2.R` | 2 | `7aecef86…` |
+| `joint_gibbs/validate/common.R` | 6 | `7aecef86…` |
+| `joint_gibbs/validate/common2.R` | 6 | `7aecef86…` |
+| `joint_gibbs/validate/felipe_run.R` | 4 | `7aecef86…` |
+| `joint_gibbs/validate/val_b.R` | 16 | `7aecef86…` |
+| `joint_gibbs/validate/val_b_smooth.R` | 16 | `7aecef86…` |
+
+After the Owls delete these scripts will not run as they are. To rerun one, restore that session dir from the PC archive to the same path, or point its line at the restore location. These are frozen E-07 records, and the canonical sampler code in `method/` does not depend on them.
+
 ## Deleted
 
 - **Session scratch** under `/tmp/claude-71711/-home-fb31-Bayesian-Quantile-Trend-Filtering/`: 689 empty dirs with no transcript, plus 4 E-07/theory worker dirs (117M) whose content is in the archive above. The full list is in `tmp/E12_deleted_sessions.txt`, written before deletion, and the outcomes are in `tmp/E12_deleted_sessions.log`.
@@ -58,7 +75,12 @@ The Owls originals in `runs/` stay until the PC receipt arrives.
 - `.libPaths` now uses `ROOT/ops/Rlib`.
 - The NOTS job files use `$HOME/BQTF/tmp` and `$HOME/BQTF/ops/Rlib`.
 - In ops: `bqtf_ops.sh` has `OPS=ROOT/ops` and the shim path relative to `OPS`; `CLAUDE.md` has the new self-paths and the PC puller download `/projects/ml75/fb31/BQTF/ops/pc/bqtf_pull.ps1`.
-- The residue sweep moves to `ops/bin/residue_remote.sh`. It works on root `$HOME/BQTF` and prunes `.git`, `runs`, `ops` and `tmp`. It goes live after the manager approves the dry run.
+- The residue sweep moves to `ops/bin/residue_remote.sh`, called by `bqtf_ops.sh` (`residue [--dry-run]`). `ops/` is git-ignored, so the scripts are not in git.
+  - It works on root `$HOME/BQTF` and never creates `tmp/` (no more `mkdir /scratch/fb31/BQTF`).
+  - In `tmp/`, files are deleted when their **ctime** is more than 14 days old, and empty dirs when it is more than 3 days old (`-ctime +2`). Using ctime matters because `mv` and `cp -p` keep the old mtime. The 3-day limit is HQ's guard for a long Slurm job's empty TMPDIR.
+  - The untracked-cache sweep (`__pycache__`, `*.pyc`, `.Rhistory`, core dumps) prunes `.git`, `runs`, `ops` and `tmp`, and skips anything git tracks.
+  - Dry runs on 2026-11-25 listed nothing on NOTS (Opus-NOTS) or on Owls.
+  - It went live on 2026-11-25 at 12:00 CT, with HQ's and the manager's approval. `bqtf_ops.sh status` ran OK through the shim at 12:00 (`ops/logs/20261125-120017-status.log`). The old copies are in `ops/backup/` (`bqtf_ops.sh.20261125-preE12`, `bqtf_ops.sh.20261125-preResidueSwap`, `residue_remote.sh.20261125-*`).
 - E-03: only the re-clone lines changed (commit 23ca11e).
 
 ## Left alone (not BQTF, or shared)
