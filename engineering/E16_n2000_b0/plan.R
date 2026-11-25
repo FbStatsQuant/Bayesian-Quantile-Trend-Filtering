@@ -55,7 +55,7 @@ write.csv(rates, file.path(pilot_dir, "measurements.csv"), row.names = FALSE)
 print(rates, row.names = FALSE)
 print(estimates)
 # Account for the dispatcher's budget margin.
-fit <- which(estimates < 160 - 120 / 3600)
+fit <- which(estimates < 160 - 360 / 3600)
 if (!length(fit)) stop("Joint runs alone project to ", round(tail(estimates, 1), 2), " core-hours")
 chosen <- fit[1]
 keep <- reference_sets[[chosen]]
