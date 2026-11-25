@@ -107,7 +107,7 @@ n           <- 500L
 baseline_id <- "VS"
 noise_id    <- "Normal"
 order       <- 2L          # k: piecewise quadratic; D = 3rd differences
-a0 <- 1;  b0 <- 0.01       # Gamma prior on lambda (value of the current individual script)
+a0 <- 1;  b0 <- 1e-5       # Gamma prior on lambda (value of the current individual script; E-08)
 a_sigma <- 0.1; b_sigma <- 0.1
 gibbs_iter  <- 30000
 gibbs_burn  <- 10000
@@ -129,17 +129,18 @@ admm_iter    <- 150L       # ADMM iteration budget of the unbounded step inside 
 admm_tol     <- 0          # residual-based early exit of that step; 0 = full budget
 K_theta      <- 1L
 asis_lambda  <- TRUE
+asis_q       <- "auto"     # ASIS subspace (E-10), as in the individual script: "auto" (calibrated q grid, cycled per sweep) | "poly" | numeric grid
 admm_rho     <- NULL       # NULL -> 0.1 (mean(d) + c) / gamma
 zeta_scale   <- 1          # only used by the comparison method 0 (two-block ADMM): zeta_i = zeta_scale (a_i + d_i / gamma)
 box_ctrl     <- c(method = 1, try_unbounded = 1, ipm_max_iter = 100, ipm_tol = 1e-8, trace = 0)   # see prox_box_metric.cpp
 tf_control   <- trendfilter.control.list(max_iter = 2000L, obj_tol = 1e-8)
 
 # Command-line overrides for a pilot run:  Rscript Joint_Sampler_PMALA_Augmented.R gibbs_iter=3000 gibbs_burn=1000 tau_list=0.75,0.95 target_quantile=0.95
-# (keys: seed n baseline_id noise_id gibbs_iter gibbs_burn warm_sweeps tau_list target_quantile b0 admm_iter K_theta)
+# (keys: seed n baseline_id noise_id gibbs_iter gibbs_burn warm_sweeps tau_list target_quantile b0 admm_iter K_theta asis_q)
 for (kv in grep("=", commandArgs(trailingOnly = TRUE), value = TRUE)) {
   key <- sub("=.*", "", kv); val <- sub("^[^=]*=", "", kv)
   if (!exists(key)) stop("unknown setting: ", key)
-  assign(key, if (key %in% c("baseline_id", "noise_id")) val else if (key == "tau_list") as.numeric(strsplit(val, ",")[[1]]) else as.numeric(val))
+  assign(key, if (key %in% c("baseline_id", "noise_id")) val else if (key == "asis_q") (if (grepl("^[0-9,]+$", val)) as.numeric(strsplit(val, ",")[[1]]) else val) else if (key == "tau_list") as.numeric(strsplit(val, ",")[[1]]) else as.numeric(val))
 }
 n <- as.integer(n); gibbs_iter <- as.integer(gibbs_iter); gibbs_burn <- as.integer(gibbs_burn); warm_sweeps <- as.integer(warm_sweeps); admm_iter <- as.integer(admm_iter); K_theta <- as.integer(K_theta)
 
@@ -229,10 +230,13 @@ pmala_step <- function(theta, y, z, lambda, sigma, delta, cst, order, metric = "
   accept <- log(runif(1)) < log_alpha
   list(theta = if (accept) prop else theta, accept = accept, log_alpha = min(0, log_alpha))
 }
-asis_step <- function(theta, lambda, a, r, a0, b0, Q, w = 1, max_steps = 30L) {
-  th_par <- Q %*% crossprod(Q, theta); th_perp <- theta - th_par
+# Generalised interweaving move, projector and q schedule: verbatim copies of the individual script (E-10); see the comments there.
+asis_step <- function(theta, lambda, a, r, a0, b0, P, order, w = 1, max_steps = 30L, q_jac = attr(P, "q")) {
+  th_par <- P(theta); th_perp <- theta - th_par; k <- order
+  if (isTRUE(attr(P, "poly"))) { Dp <- 0; Dv <- 0 }      # D p = 0 exactly; lambda ||D v||_1 is then a constant in eta
+  else { Dp <- diff(th_par, differences = k + 1L); Dv <- diff(th_perp, differences = k + 1L) }
   logf <- function(eta) { lam <- exp(eta); th <- th_par + (lambda / lam) * th_perp
-    a0 * eta - b0 * lam - sum(a * (th - r)^2) / 2 }
+    (a0 + q_jac - k - 1) * eta - b0 * lam - sum(abs(lam * Dp + lambda * Dv)) - sum(a * (th - r)^2) / 2 }
   eta0 <- log(lambda); y0 <- logf(eta0) - rexp(1)
   L <- eta0 - runif(1) * w; U <- L + w; j <- floor(runif(1) * max_steps); kk <- max_steps - 1 - j
   while (j > 0 && logf(L) > y0) { L <- L - w; j <- j - 1 }
@@ -244,7 +248,50 @@ asis_step <- function(theta, lambda, a, r, a0, b0, Q, w = 1, max_steps = 30L) {
   lam1 <- exp(eta1)
   list(lambda = lam1, theta = as.numeric(th_par + (lambda / lam1) * th_perp))
 }
-null_basis <- function(n, order) qr.Q(qr(outer(seq_len(n) / n, 0:order, `^`)))
+null_basis <- function(n, order) qr.Q(qr(outer(seq_len(n) / n, 0:order, `^`)))   # orthonormal basis of degree-<=k polynomials
+
+# Projector theta -> P theta onto the ASIS subspace, as a closure with attributes q (dimension) and poly (q = k + 1).
+#   q = k + 1: the degree-<=k polynomials (orthonormal basis, n x (k+1)).
+#   q > k + 1: B-splines of degree max(3, k) on equally spaced knots over x = i/n, which contain the degree-<=k polynomials.
+#              B (n x q) has <= degree + 1 nonzeros per row, so B'B is banded (bandwidth = degree) and its Cholesky factor
+#              (no permutation) has no fill: P theta = B (B'B)^{-1} B' theta costs O(n) per call.
+#   basis = <matrix>: any fixed full-column-rank basis (tests).
+asis_projector <- function(n, q, order, basis = NULL) {
+  if (is.null(basis) && q == order + 1L) {
+    Q <- null_basis(n, order)
+    return(structure(function(th) as.numeric(Q %*% crossprod(Q, th)), q = q, poly = TRUE))
+  }
+  if (is.null(basis)) {
+    deg <- max(3L, order); x <- seq_len(n) / n; nin <- q - deg - 1L
+    stopifnot(nin >= 0L, q <= n)
+    inner <- if (nin > 0L) seq(x[1], x[n], length.out = nin + 2L)[-c(1L, nin + 2L)] else numeric(0)
+    knots <- c(rep(x[1], deg + 1L), inner, rep(x[n], deg + 1L))
+    basis <- splines::splineDesign(knots, x, ord = deg + 1L, sparse = TRUE)
+  }
+  B <- if (inherits(basis, "Matrix")) basis else Matrix::Matrix(basis, sparse = TRUE)
+  ch <- Matrix::Cholesky(Matrix::crossprod(B), perm = FALSE, LDL = FALSE)
+  structure(function(th) as.numeric(B %*% Matrix::solve(ch, Matrix::crossprod(B, th), system = "A")), q = ncol(B), poly = FALSE)
+}
+# The q schedule of the interweaving move: the projector cycles over a grid of q values, one per sweep (a fixed systematic scan of
+# exact kernels, hence exact).  Grid entries are clamped to [k + 2, n / 4] (and >= degree + 1 of the splines) and deduplicated.
+#   rule = "poly"  : q = k + 1 only (the original move)
+#   rule = "auto"  : the default rule (calibrated in E-10, see engineering/E10_Lambda_Mixing)
+#   rule = "n_prop": {n/50, n/25, n/12.5}           rule = "fixed": {10, 20, 40}
+#   rule = "n16"   : {10, 20, 40} (n/500)^(1/6)      rule = "geo"  : {10, 20, 40, ...} doubling up to n/12.5
+#   rule = <numeric vector>: that grid (clamped)
+asis_q_grid <- function(n, order, rule = "auto") {
+  if (identical(rule, "auto")) rule <- asis_q_default
+  if (identical(rule, "poly")) return(order + 1L)
+  g <- if (is.numeric(rule)) rule else switch(rule,
+    n_prop = n / c(50, 25, 12.5),
+    fixed  = c(10, 20, 40),
+    n16    = c(10, 20, 40) * (n / 500)^(1 / 6),
+    geo    = 10 * 2^(0:max(0, floor(log2(n / 12.5 / 10)))),
+    stop("unknown asis q rule: ", rule))
+  lo <- max(order + 2L, max(3L, order) + 1L); hi <- max(lo, floor(n / 4))
+  unique(pmin(pmax(as.integer(round(g)), lo), hi))
+}
+asis_q_default <- "fixed"    # E-10 rule; placeholder until the calibration is read (engineering/E10_Lambda_Mixing/README.md)
 
 # ---- Box pieces ----------------------------------------------------------------------------------------------------------
 box_penalties <- function(a, d, c, gamma, rho = NULL, zeta_scale = 1)
@@ -290,8 +337,9 @@ asis_scale_domain <- function(p, v, lower, upper) {
   }
   c(lo, hi)
 }
-asis_box_step <- function(theta, lambda, a, r, a0, b0, Q, lower, upper, w = 1, max_steps = 30L) {
-  th_par <- as.numeric(Q %*% crossprod(Q, theta)); th_perp <- theta - th_par
+asis_box_step <- function(theta, lambda, a, r, a0, b0, P, order, lower, upper, w = 1, max_steps = 30L, q_jac = attr(P, "q")) {
+  th_par <- P(theta); th_perp <- theta - th_par; k <- order
+  if (isTRUE(attr(P, "poly"))) { Dp <- 0; Dv <- 0 } else { Dp <- diff(th_par, differences = k + 1L); Dv <- diff(th_perp, differences = k + 1L) }
   dom <- asis_scale_domain(th_par, th_perp, lower, upper); unchanged <- list(lambda = lambda, theta = theta, moved = FALSE)
   if (!(dom[1] < dom[2]) || dom[2] <= 0) return(unchanged)
   eta0 <- log(lambda); eta_lo <- eta0 - log(dom[2]); eta_hi <- eta0 - log(dom[1])
@@ -299,7 +347,7 @@ asis_box_step <- function(theta, lambda, a, r, a0, b0, Q, lower, upper, w = 1, m
     if (eta < eta_lo || eta > eta_hi) return(-Inf)
     lam <- exp(eta); th <- th_par + (lambda / lam) * th_perp
     if (!in_box(th, lower, upper)) return(-Inf)
-    a0 * eta - b0 * lam - sum(a * (th - r)^2) / 2
+    (a0 + q_jac - k - 1) * eta - b0 * lam - sum(abs(lam * Dp + lambda * Dv)) - sum(a * (th - r)^2) / 2
   }
   y0 <- logf(eta0) - rexp(1)
   if (!is.finite(y0)) return(unchanged)
@@ -321,10 +369,11 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
                               metric = "curv", c_fixed = 0, rho = NULL, iters = 200L,
                               mh = TRUE, adapt = TRUE, warm = 0L, gamma_warm = 1e3,
                               kappa = 1, adapt_all = TRUE, K = 1L, asis = FALSE, tol = 0,
-                              zeta_scale = 1, ctrl = box_ctrl, verbose = TRUE, keep_every = 1L) {
+                              zeta_scale = 1, ctrl = box_ctrl, asis_q = "auto", verbose = TRUE, keep_every = 1L) {
   stopifnot(length(tau_list) >= 1, all(diff(tau_list) > 0), all(tau_list > 0 & tau_list < 1), warm <= gibbs_burn, gibbs_burn < gibbs_iter)
   n <- length(y); m <- n - order - 1L; J <- length(tau_list)
-  Q <- if (asis) null_basis(n, order) else NULL
+  q_grid <- asis_q_grid(n, order, asis_q)
+  Ps <- if (asis) lapply(q_grid, function(q) asis_projector(n, q, order)) else NULL   # one per sweep, cycled (same at every level)
   cst <- lapply(tau_list, ald_const)
   # init: theta_j = y + s_y (Phi^-1(tau_j) - median Phi^-1(tau)) for J > 1 (ordered, data-based, no RNG); exactly y for J = 1.
   # Hyperparameters at the individual script's data-free defaults: sigma = 1, z = sigma, lambda = m (one unit of penalty per difference).
@@ -363,7 +412,8 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
       moved <- NA
       if (asis && it > warm) {                                                 # Block 3b: ancillary redraw (restricted to the box), theta rescales
         a_ <- 1 / (cs$t2 * sg * zj); r_ <- y - cs$psi * zj
-        as_ <- if (free) asis_step(th, lam, a_, r_, a0, b0, Q) else asis_box_step(th, lam, a_, r_, a0, b0, Q, lower, upper)
+        Pit <- Ps[[(it - 1L) %% length(Ps) + 1L]]
+        as_ <- if (free) asis_step(th, lam, a_, r_, a0, b0, Pit, order) else asis_box_step(th, lam, a_, r_, a0, b0, Pit, order, lower, upper)
         moved <- if (free) TRUE else as_$moved
         lam <- as_$lambda; th <- as_$theta; SD <- sum(abs(Dtheta(th, order)))
       }
@@ -390,7 +440,7 @@ gibbs_joint_pmala <- function(y, tau_list, order, a0, b0, a_sigma, b_sigma,
   list(tau = tau_list, theta = theta_s, lambda = lambda_s, sigma = sigma_s, delta = delta_s, acc = acc_s, SD = SD_s, outside = out_s, ipm = ipm_s, asis_moved = asis_s,
        acc_post = colMeans(acc_s[post, , drop = FALSE]), outside_post = colMeans(out_s[post, , drop = FALSE]),
        ipm_post = colMeans(ipm_s[post, , drop = FALSE], na.rm = TRUE), asis_moved_post = colMeans(asis_s[post, , drop = FALSE], na.rm = TRUE),
-       delta_final = delta, final = list(theta = theta, z = z, sigma = sigma, lambda = lambda),
+       delta_final = delta, final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), asis_q_grid = if (asis) q_grid else NULL,
        seconds = proc.time()[["elapsed"]] - t0)
 }
 
@@ -614,11 +664,11 @@ run_tests <- function() {
   lp <- -(G - rep(r, each = nrow(G)))^2 %*% (a / 2) - (mm + a0_) * log(b0_ + SDg)
   wgt <- exp(lp - max(lp)); wgt <- as.vector(wgt / sum(wgt))
   m_ex <- colSums(G * wgt); s_ex <- sqrt(colSums(G^2 * wgt) - m_ex^2); lam_ex <- sum(wgt * (mm + a0_) / (b0_ + SDg))
-  Q <- null_basis(nn, ord); th <- pmin(pmax(r, lo), up); lam <- 2; M2 <- 80000L; S <- matrix(NA, M2, nn); Lm <- numeric(M2); acc <- 0; mv <- 0
+  P1 <- asis_projector(nn, ord + 1L, ord); th <- pmin(pmax(r, lo), up); lam <- 2; M2 <- 80000L; S <- matrix(NA, M2, nn); Lm <- numeric(M2); acc <- 0; mv <- 0
   for (i in seq_len(M2)) {
     st <- pmala_box_step(th, yy, zz, lam, sg, 0.5, cst, ord, lo, up, "curv", 0, iters = 150L, kappa = 3); th <- st$theta; acc <- acc + st$accept
     lam <- rgamma(1, a0_ + mm, b0_ + sum(abs(diff(th))))
-    as_ <- asis_box_step(th, lam, a, r, a0_, b0_, Q, lo, up); lam <- as_$lambda; th <- as_$theta; mv <- mv + as_$moved
+    as_ <- asis_box_step(th, lam, a, r, a0_, b0_, P1, ord, lo, up); lam <- as_$lambda; th <- as_$theta; mv <- mv + as_$moved
     S[i, ] <- th; Lm[i] <- lam
   }
   S1 <- S[-(1:5000), ]; L1 <- Lm[-(1:5000)]
@@ -627,6 +677,27 @@ run_tests <- function() {
   cat(sprintf("   acc %.2f | asis moved %.2f | all in box %s | max |mean z| = %.2f | max |sd z| = %.2f | E lambda: chain %.3f (se %.3f) vs exact %.3f\n",
               acc / M2, mv / M2, all(S >= rep(lo, each = M2) & S <= rep(up, each = M2)), max(abs(m1 - m_ex) / se1), max(abs(s1 - s_ex) / se_s1), mean(L1), bm_se(L1), lam_ex))
   stopifnot(all(S >= rep(lo, each = M2) & S <= rep(up, each = M2)), max(abs(m1 - m_ex) / se1) < 4, max(abs(s1 - s_ex) / se_s1) < 4, abs(mean(L1) - lam_ex) / bm_se(L1) < 4)
+
+  cat("== T3b: constrained generalised ASIS (enlarged held-fixed subspace) vs the same box reference; a wrong Jacobian must fail ==\n")
+  bump <- cbind(1, c(0, 1, 0.5, 0), c(0.2, 0, 1, 0.3))      # 3-dim subspace of R^4 containing the constants (null(D), k = 0)
+  Pg <- asis_projector(nn, NA, ord, basis = bump)
+  for (qj in c(3, 1)) {
+    set.seed(200 + qj); th <- pmin(pmax(r, lo), up); lam <- 2; S <- matrix(NA, M2, nn); Lm <- numeric(M2); mv <- 0
+    for (i in seq_len(M2)) {
+      st <- pmala_box_step(th, yy, zz, lam, sg, 0.5, cst, ord, lo, up, "curv", 0, iters = 150L, kappa = 3); th <- st$theta
+      lam <- rgamma(1, a0_ + mm, b0_ + sum(abs(diff(th))))
+      as_ <- asis_box_step(th, lam, a, r, a0_, b0_, Pg, ord, lo, up, q_jac = qj); lam <- as_$lambda; th <- as_$theta; mv <- mv + as_$moved
+      S[i, ] <- th; Lm[i] <- lam
+    }
+    S1 <- S[-(1:5000), ]; L1 <- Lm[-(1:5000)]
+    m1 <- colMeans(S1); se1 <- apply(S1, 2, bm_se); s1 <- apply(S1, 2, sd)
+    se_s1 <- apply(S1, 2, function(v) bm_se((v - mean(v))^2)) / (2 * s1)
+    zz_ <- c(max(abs(m1 - m_ex) / se1), max(abs(s1 - s_ex) / se_s1), abs(mean(L1) - lam_ex) / bm_se(L1)); right <- qj == 3
+    cat(sprintf("   q = 3, Jacobian q = %d (%s) | asis moved %.2f | all in box %s | max |mean z| %.2f | max |sd z| %.2f | E lambda z %.2f\n",
+                qj, if (right) "correct" else "WRONG", mv / M2, all(S >= rep(lo, each = M2) & S <= rep(up, each = M2)), zz_[1], zz_[2], zz_[3]))
+    stopifnot(all(S >= rep(lo, each = M2) & S <= rep(up, each = M2)))
+    if (right) stopifnot(max(zz_) < 4) else stopifnot(max(zz_) > 8)
+  }
 
   cat("== T4: short joint run (n = 80, three levels): ordering holds in every kept draw; movement and solver usage reported ==\n")
   dat <- simulate_data(5, 80L, c(0.5, 0.9, 0.95), "VS", "Normal")
@@ -658,7 +729,7 @@ fit <- gibbs_joint_pmala(dat$y, tau_list, order, a0, b0, a_sigma, b_sigma,
                          metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
                          mh = mh_correct, adapt = adapt_delta, warm = warm_sweeps, gamma_warm = gamma_warm,
                          kappa = kappa_metric, adapt_all = adapt_all, K = K_theta, asis = asis_lambda, tol = admm_tol,
-                         zeta_scale = zeta_scale, ctrl = box_ctrl)
+                         zeta_scale = zeta_scale, ctrl = box_ctrl, asis_q = asis_q)
 
 est <- apply(fit$theta, c(2, 3), mean)
 lo  <- apply(fit$theta, c(2, 3), quantile, 0.025); hi <- apply(fit$theta, c(2, 3), quantile, 0.975)

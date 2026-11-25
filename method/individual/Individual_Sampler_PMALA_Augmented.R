@@ -79,7 +79,7 @@ order       <- 2L          # k: piecewise quadratic; D = 3rd differences
 prior_scale <- "none"      # "none": Laplace prior exp(-lambda ||D theta||_1) (the paper's prior) | "sigma": Park-Casella scale sigma/lambda.
                            # "sigma" gives the same MSE but has a runaway mode (lambda enters sigma's rate and sigma enters lambda's:
                            # sigma -> 1e5, lambda -> (a0+m)/b0, theta detaches from the data; seen in 1 of 60 cell-runs), so "none" is the default.
-a0 <- 1;  b0 <- 0.01      # Gamma prior on lambda: rate b0 << ||D theta||_1 of a smooth fit so lambda is data-driven (b0 >= 0.1 is clearly worse)
+a0 <- 1;  b0 <- 1e-5      # Gamma prior on lambda (E-08, Felipe 2026-11-23): Gamma(1, 1e-5), rate b0 << ||D theta||_1 of any fit so lambda is data-driven
 a_sigma <- 0.1; b_sigma <- 0.1     # IG prior on sigma (paper value; 0.01/0.01 gives identical results at n = 500)
 gibbs_iter  <- 30000      # lambda equilibrates slowly for smooth truths (see notes); 30k/10k is the pilot setting
 gibbs_burn  <- 10000
@@ -111,6 +111,10 @@ lamjump_s    <- 0.3        # initial log-scale step of the lambda jump; Robbins-
 asis_lambda  <- TRUE       # ancillary-sufficient interweaving for lambda: after the conjugate draw, redraw lambda holding
                            # u~ = lambda * D theta and the polynomial part of theta fixed (theta rescales with lambda);
                            # 1-d slice sampler on log lambda, target p(lambda) * L(theta(lambda)).  Valid Gibbs variant (Yu & Meng 2011).
+asis_q       <- "auto"     # subspace held fixed by the ASIS move (E-10): "auto" = the calibrated q grid, cycled one q per sweep
+                           # (asis_q_grid); "poly" = polynomials of degree <= k only (the original move); or a numeric grid
+block_theta  <- 0L         # E-10: spline-subspace block moves on theta per sweep (same basis as the ASIS move; see block_step); 0 = off
+block_mode   <- "mala"     # "mala": MALA in the subspace coefficients, preconditioned by (B'AB)^-1 | "rw": random walk
 admm_rho     <- NULL       # ADMM penalty; NULL -> 0.1 * (mean(d) + c) / gamma at call time
 tf_control   <- trendfilter.control.list(max_iter = 2000L, obj_tol = 1e-8)   # init fit only
 
@@ -286,17 +290,24 @@ lamjump_step <- function(theta, lambda, a, r, a0, b0, m, delta, s, order, kappa,
   list(theta = if (accept) prop else theta, lambda = if (accept) lam1 else lambda, accept = accept, log_alpha = min(0, log_alpha))
 }
 
-# ASIS (ancillary-sufficient interweaving) step for lambda.  Sufficient parameterisation: lambda | theta ~ Gamma (conjugate,
-# done in Block 3).  Ancillary parameterisation: u~ = lambda * D theta, whose prior Laplace(1)^m does not involve lambda.
-# With u~ and the polynomial part theta_par = Q Q' theta (Q: orthonormal basis of null(D)) held fixed, a new lambda' implies
-#   theta(lambda') = theta_par + (lambda / lambda') (theta - theta_par),
-# and lambda' | u~, theta_par, z, sigma has density  p(lambda') * exp{-sum_i a_i (theta_i(lambda') - r_i)^2 / 2}
-# (the lambda^m prior constant cancels the Jacobian of u = u~/lambda).  Sampled by a stepping-out/shrinkage slice sampler
-# on eta = log lambda' (Jacobian: + eta).  O(n) per density evaluation.  Returns the new lambda and the rescaled theta.
-asis_step <- function(theta, lambda, a, r, a0, b0, Q, w = 1, max_steps = 30L) {
-  th_par <- Q %*% crossprod(Q, theta); th_perp <- theta - th_par
+# ASIS (ancillary-sufficient interweaving) step for lambda, generalised (E-10).  Sufficient parameterisation: lambda | theta ~ Gamma
+# (conjugate, Block 3).  Interweaving move: hold p = P theta fixed, where P is the projection onto a fixed q-dimensional subspace S
+# (q = k + 1: the polynomial null space of D, the original move; q > k + 1: cubic B-splines, which contain those polynomials), and
+# rescale the remainder v = theta - p with lambda:
+#   theta(lambda') = p + (lambda / lambda') v.
+# This is a group move (Liu & Sabatti 2000) on t = log lambda' - log lambda with Jacobian e^t (lambda) * e^{-t (n - q)} (v).
+# For the target  pi ∝ lambda^(a0 - 1 + m) e^{-b0 lambda - lambda ||D theta||_1} exp(-sum a (theta - r)^2 / 2),  m = n - k - 1,
+# the slice density on eta = log lambda' is
+#   log f(eta) = (a0 + q - k - 1) eta - b0 e^eta - ||e^eta D p + lambda D v||_1 - sum a (theta(eta) - r)^2 / 2.
+# With q = k + 1, D p = 0 and this is the original move (a0 eta - b0 e^eta - data term).  The stepping-out/shrinkage slice sampler
+# and its RNG call pattern are unchanged.  O(n) per density evaluation.  Returns the new lambda and the rescaled theta.
+# P is an asis_projector (below); q_jac is a test hook only (a deliberately wrong Jacobian for the power check).
+asis_step <- function(theta, lambda, a, r, a0, b0, P, order, w = 1, max_steps = 30L, q_jac = attr(P, "q")) {
+  th_par <- P(theta); th_perp <- theta - th_par; k <- order
+  if (isTRUE(attr(P, "poly"))) { Dp <- 0; Dv <- 0 }      # D p = 0 exactly; lambda ||D v||_1 is then a constant in eta
+  else { Dp <- diff(th_par, differences = k + 1L); Dv <- diff(th_perp, differences = k + 1L) }
   logf <- function(eta) { lam <- exp(eta); th <- th_par + (lambda / lam) * th_perp
-    a0 * eta - b0 * lam - sum(a * (th - r)^2) / 2 }          # (a0 - 1) log lam - b0 lam + eta (Jacobian) = a0 eta - b0 lam
+    (a0 + q_jac - k - 1) * eta - b0 * lam - sum(abs(lam * Dp + lambda * Dv)) - sum(a * (th - r)^2) / 2 }
   eta0 <- log(lambda); y0 <- logf(eta0) - rexp(1)
   L <- eta0 - runif(1) * w; U <- L + w; j <- floor(runif(1) * max_steps); kk <- max_steps - 1 - j
   while (j > 0 && logf(L) > y0) { L <- L - w; j <- j - 1 }
@@ -310,6 +321,81 @@ asis_step <- function(theta, lambda, a, r, a0, b0, Q, w = 1, max_steps = 30L) {
 }
 null_basis <- function(n, order) qr.Q(qr(outer(seq_len(n) / n, 0:order, `^`)))   # orthonormal basis of degree-<=k polynomials
 
+# Projector theta -> P theta onto the ASIS subspace, as a closure with attributes q (dimension) and poly (q = k + 1).
+#   q = k + 1: the degree-<=k polynomials (orthonormal basis, n x (k+1)).
+#   q > k + 1: B-splines of degree max(3, k) on equally spaced knots over x = i/n, which contain the degree-<=k polynomials.
+#              B (n x q) has <= degree + 1 nonzeros per row, so B'B is banded (bandwidth = degree) and its Cholesky factor
+#              (no permutation) has no fill: P theta = B (B'B)^{-1} B' theta costs O(n) per call.
+#   basis = <matrix>: any fixed full-column-rank basis (tests).
+asis_projector <- function(n, q, order, basis = NULL) {
+  Dk <- Matrix::Diagonal(n); for (i in seq_len(order + 1L)) Dk <- Dk[-1L, , drop = FALSE] - Dk[-nrow(Dk), , drop = FALSE]   # sparse D
+  if (is.null(basis) && q == order + 1L) {
+    Q <- null_basis(n, order)
+    return(structure(function(th) as.numeric(Q %*% crossprod(Q, th)), q = q, poly = TRUE,
+                     B = Matrix::Matrix(Q, sparse = TRUE), DB = Matrix::Matrix(0, n - order - 1L, q, sparse = TRUE)))
+  }
+  if (is.null(basis)) {
+    deg <- max(3L, order); x <- seq_len(n) / n; nin <- q - deg - 1L
+    stopifnot(nin >= 0L, q <= n)
+    inner <- if (nin > 0L) seq(x[1], x[n], length.out = nin + 2L)[-c(1L, nin + 2L)] else numeric(0)
+    knots <- c(rep(x[1], deg + 1L), inner, rep(x[n], deg + 1L))
+    basis <- splines::splineDesign(knots, x, ord = deg + 1L, sparse = TRUE)
+  }
+  B <- if (inherits(basis, "Matrix")) basis else Matrix::Matrix(basis, sparse = TRUE)
+  ch <- Matrix::Cholesky(Matrix::crossprod(B), perm = FALSE, LDL = FALSE)
+  structure(function(th) as.numeric(B %*% Matrix::solve(ch, Matrix::crossprod(B, th), system = "A")), q = ncol(B), poly = FALSE,
+            B = B, DB = Dk %*% B)                  # B and D B are reused by the theta block move (block_step)
+}
+
+# Block 1b (E-10): spline-subspace block move on theta | z, lambda, sigma.  The ASIS lambda move holds p = P theta fixed; this move
+# changes exactly that part: theta' = theta + B beta, B = the same n x q basis.  Target pi(theta) ∝ exp(-U), U = sum a (theta - r)^2 / 2
+# + lambda ||D theta||_1.  Along the fibre theta + B beta the likelihood is exactly Gaussian in beta (precision H = B'AB, A = diag(a));
+# the l1 term enters through its subgradient g(theta) = lambda (DB)' sign(D theta).  Proposal (preconditioned by H^-1):
+#   mode "mala": beta ~ N((s^2 / 2) nu(theta), s^2 H^-1),  nu(theta) = H^-1 [B'A(r - theta) - g(theta)] = -H^-1 grad_beta U
+#                (MALA in beta; s = sqrt(2) is the full Newton step of the linearised U, i.e. the exact fibre conditional when no
+#                 sign of D theta changes along the move)
+#   mode "rw"  : beta ~ N(0, s^2 H^-1)                                                          (symmetric random walk)
+# Reverse move from theta' is beta_rev = -beta under the mean at theta'.  Exact MH:
+#   log alpha = U(theta) - U(theta') + log N(-beta; m(theta'), s^2 H^-1) - log N(beta; m(theta), s^2 H^-1)
+# (H does not depend on theta, so the normalising constants cancel).
+# Cost per move: B'AB (O(n) banded), a q x q Cholesky, three O(n) products.  P must be an asis_projector (attributes B, DB).
+# wrong = TRUE drops the l1 prior from the acceptance ratio (test hook: the power check must fail).
+block_step <- function(theta, a, r, lambda, order, P, s, mode = "mala", wrong = FALSE) {
+  B <- attr(P, "B"); DB <- attr(P, "DB"); q <- ncol(B)
+  H <- as.matrix(Matrix::crossprod(B, a * B)); R <- chol(H)
+  Ut <- function(th) sum(a * (th - r)^2) / 2 + if (wrong) 0 else lambda * sum(abs(Dtheta(th, order)))
+  mfun <- function(th) if (mode == "rw") numeric(q) else {
+    rhs <- as.numeric(Matrix::crossprod(B, a * (r - th))) - lambda * as.numeric(Matrix::crossprod(DB, sign(Dtheta(th, order))))
+    (s^2 / 2) * backsolve(R, forwardsolve(t(R), rhs)) }
+  m0 <- mfun(theta); beta <- m0 + s * backsolve(R, rnorm(q))
+  prop <- theta + as.numeric(B %*% beta); m1 <- mfun(prop)
+  qf <- function(v) sum((R %*% v)^2)
+  log_alpha <- Ut(theta) - Ut(prop) + (qf(beta - m0) - qf(-beta - m1)) / (2 * s^2)
+  if (!is.finite(log_alpha)) log_alpha <- -Inf
+  accept <- log(runif(1)) < log_alpha
+  list(theta = if (accept) prop else theta, accept = accept, log_alpha = min(0, log_alpha))
+}
+# The q schedule of the interweaving move: the projector cycles over a grid of q values, one per sweep (a fixed systematic scan of
+# exact kernels, hence exact).  Grid entries are clamped to [k + 2, n / 4] (and >= degree + 1 of the splines) and deduplicated.
+#   rule = "poly"  : q = k + 1 only (the original move)
+#   rule = "auto"  : the default rule (calibrated in E-10, see engineering/E10_Lambda_Mixing)
+#   rule = "n_prop": {n/50, n/25, n/12.5}           rule = "fixed": {10, 20, 40}
+#   rule = "n16"   : {10, 20, 40} (n/500)^(1/6)      rule = "geo"  : {10, 20, 40, ...} doubling up to n/12.5
+#   rule = <numeric vector>: that grid (clamped)
+asis_q_grid <- function(n, order, rule = "auto") {
+  if (identical(rule, "auto")) rule <- asis_q_default
+  if (identical(rule, "poly")) return(order + 1L)
+  g <- if (is.numeric(rule)) rule else switch(rule,
+    n_prop = n / c(50, 25, 12.5),
+    fixed  = c(10, 20, 40),
+    n16    = c(10, 20, 40) * (n / 500)^(1 / 6),
+    geo    = 10 * 2^(0:max(0, floor(log2(n / 12.5 / 10)))),
+    stop("unknown asis q rule: ", rule))
+  lo <- max(order + 2L, max(3L, order) + 1L); hi <- max(lo, floor(n / 4))
+  unique(pmin(pmax(as.integer(round(g)), lo), hi))
+}
+asis_q_default <- "fixed"    # E-10 rule; placeholder until the calibration is read (engineering/E10_Lambda_Mixing/README.md)
+
 # ---- Gibbs sampler -----------------------------------------------------------
 gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
                             gibbs_iter, gibbs_burn, delta_init, lambda_init,
@@ -317,9 +403,13 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
                             control, metric = "curv", c_fixed = 0, rho = NULL, iters = 200L,
                             mh = TRUE, adapt = TRUE, init = "y", warm = 0L, gamma_warm = 1e3,
                             prior_scale = "sigma", cmap = FALSE, kappa = 1, adapt_all = TRUE, K = 1L, asis = FALSE,
-                            tol = 0, lamjump = FALSE, lamjump_s = 0.3, verbose = TRUE) {
+                            tol = 0, lamjump = FALSE, lamjump_s = 0.3, asis_q = "auto", block = 0L, block_mode = "mala",
+                            verbose = TRUE) {
   s_lj <- lamjump_s; acc_lj <- numeric(gibbs_iter)
-  Q <- if (asis) null_basis(length(y), order) else NULL
+  q_grid <- asis_q_grid(length(y), order, asis_q)
+  Ps <- if (asis || block > 0L) lapply(q_grid, function(q) asis_projector(length(y), q, order)) else NULL   # built once; cycled one per sweep
+  s_blk <- rep(1, length(q_grid)); acc_blk <- rep(NA_real_, gibbs_iter)        # block move: scale per q (adapted in burn-in), acceptance
+  blk_target <- if (block_mode == "rw") 0.25 else 0.574
   ps <- prior_scale == "sigma"
   # cmap: alongside the posterior mean of the theta samples, accumulate the mean over post-burn-in sweeps of the
   # CONDITIONAL MODE  argmin_theta U(theta | z, lambda, sigma)  (one weighted trend-filtering solve per sweep, banded ADMM).
@@ -331,7 +421,9 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
   # given theta = y -- those (sigma -> 0, z -> 0, lambda -> (a0+m)/||D y||_1) are a degenerate self-consistent
   # mode of the joint posterior (interpolate the data, scale -> 0) that a Gibbs chain never leaves.
   # sigma0 = 1, z0 = sigma0 (prior mean), lambda0 = (a0+m)/b0 (conjugate mean at zero roughness).
-  if (init == "y") {
+  if (is.list(init)) {                                                         # explicit state (diagnostics: cross-initialisation)
+    theta <- init$theta; sigma <- init$sigma; lambda <- init$lambda; z <- init$z %||% draw_z(y - theta, tau, sigma)
+  } else if (init == "y") {
     theta  <- y
     sigma  <- 1
     z      <- rep(sigma, n)
@@ -362,6 +454,14 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
         theta <- st$theta; acc_k[kk] <- st$accept; la_k[kk] <- exp(st$log_alpha)
       }
       st <- list(theta = theta, accept = mean(acc_k), log_alpha = log(mean(la_k)))
+      if (block > 0L) {                                                        # Block 1b: spline-subspace block move(s), same (z, lambda, sigma)
+        jq <- (it - 1L) %% length(Ps) + 1L; a_ <- 1 / (cst$t2 * sigma * z); r_ <- y - cst$psi * z; ab <- 0
+        for (bb in seq_len(block)) {
+          bs <- block_step(theta, a_, r_, lam_eff, order, Ps[[jq]], s_blk[jq], block_mode); theta <- bs$theta; ab <- ab + bs$accept / block
+          if (adapt && it <= gibbs_burn) s_blk[jq] <- min(max(exp(log(s_blk[jq]) + adapt_gain * it^(-adapt_kappa) * (exp(bs$log_alpha) - blk_target)), 1e-4), 10)
+        }                                                                      # s: adapted in burn-in only, then frozen
+        acc_blk[it] <- ab
+      }
     }
     n_acc <- n_acc + if (is.na(st$accept)) 0 else st$accept
     z      <- draw_z(y - theta, tau, sigma)                                     # Block 2
@@ -369,7 +469,7 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
     lambda <- rgamma(1, shape = a0 + m, rate = b0 + if (ps) SD / sigma else SD)  # Block 3 (sufficient parameterisation)
     if (asis && it > warm && !ps) {                                              # Block 3b: ancillary redraw, theta rescales
       a_ <- 1 / (cst$t2 * sigma * z); r_ <- y - cst$psi * z
-      as_ <- asis_step(theta, lambda, a_, r_, a0, b0, Q); lambda <- as_$lambda; theta <- as_$theta
+      as_ <- asis_step(theta, lambda, a_, r_, a0, b0, Ps[[(it - 1L) %% length(Ps) + 1L]], order); lambda <- as_$lambda; theta <- as_$theta
       SD <- sum(abs(Dtheta(theta, order)))
     }
     if (lamjump && it > warm && !ps) {                                           # Block 3c: joint (lambda, theta) jump
@@ -399,8 +499,9 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
   list(theta = theta_s, theta_cmap = if (cmap) cmap_sum / keep else NULL,
        lambda = lambda_s, sigma = sigma_s, delta = delta_s, acc = acc_s, SD = SD_s,
        acc_post = mean(acc_s[(gibbs_burn + 1):gibbs_iter]), delta_final = delta,
-       acc_lamjump = if (lamjump) mean(acc_lj[(gibbs_burn + 1):gibbs_iter]) else NA, s_lamjump = s_lj,
-       seconds = proc.time()[["elapsed"]] - t0)
+       acc_lamjump = if (lamjump) mean(acc_lj[(gibbs_burn + 1):gibbs_iter]) else NA, s_lamjump = s_lj, asis_q_grid = if (asis) q_grid else NULL,
+       acc_block = acc_blk, acc_block_post = if (block > 0L) mean(acc_blk[(gibbs_burn + 1):gibbs_iter]) else NA, s_block = s_blk,
+       final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), seconds = proc.time()[["elapsed"]] - t0)
 }
 
 # ---- Unit tests --------------------------------------------------------------
@@ -516,11 +617,11 @@ run_tests <- function() {
   lp <- -(G - rep(r, each = nrow(G)))^2 %*% (a / 2) - (mm + a0_) * log(b0_ + SDg)
   wgt <- exp(lp - max(lp)); wgt <- as.vector(wgt / sum(wgt))
   m_ex <- colSums(G * wgt); s_ex <- sqrt(colSums(G^2 * wgt) - m_ex^2); lam_ex <- sum(wgt * (mm + a0_) / (b0_ + SDg))
-  Q <- null_basis(nn, ord); th <- r; lam <- 2; M2 <- 80000L; S <- matrix(NA, M2, nn); L <- numeric(M2); acc <- 0
+  P1 <- asis_projector(nn, ord + 1L, ord); th <- r; lam <- 2; M2 <- 80000L; S <- matrix(NA, M2, nn); L <- numeric(M2); acc <- 0
   for (i in seq_len(M2)) {
     st <- pmala_step(th, yy, zz, lam, sg, 1.0, cst, ord, "curv", 0, iters = 300L, kappa = 3); th <- st$theta; acc <- acc + st$accept
     lam <- rgamma(1, a0_ + mm, b0_ + sum(abs(diff(th))))
-    as_ <- asis_step(th, lam, a, r, a0_, b0_, Q); lam <- as_$lambda; th <- as_$theta
+    as_ <- asis_step(th, lam, a, r, a0_, b0_, P1, ord); lam <- as_$lambda; th <- as_$theta
     S[i, ] <- th; L[i] <- lam
   }
   S1 <- S[-(1:5000), ]; L1 <- L[-(1:5000)]
@@ -529,6 +630,68 @@ run_tests <- function() {
   cat(sprintf("   acc %.2f | max |mean z| = %.2f | max |sd z| = %.2f | E lambda: chain %.3f (se %.3f) vs exact %.3f\n",
               acc / M2, max(abs(m1 - m_ex) / se1), max(abs(s1 - s_ex) / se_s1), mean(L1), bm_se(L1), lam_ex))
   stopifnot(max(abs(m1 - m_ex) / se1) < 4, max(abs(s1 - s_ex) / se_s1) < 4, abs(mean(L1) - lam_ex) / bm_se(L1) < 4)
+
+  cat("== test 6b: generalised ASIS (enlarged held-fixed subspace) vs the same grid reference; a wrong Jacobian must fail ==\n")
+  # Subspaces of R^4 that strictly contain the constants (null(D) for k = 0): q = 2 linear, q = 3 a non-polynomial basis (constants +
+  # two fixed bumps), each with its true Jacobian (must pass), then the q = 3 subspace with the q = 1 Jacobian (power check: must fail).
+  xs4 <- seq_len(nn) / nn
+  bases <- list(lin = cbind(1, xs4), bump = cbind(1, c(0, 1, 0.5, 0), c(0.2, 0, 1, 0.3)))
+  cases <- list(list(b = "lin", qj = 2), list(b = "bump", qj = 3), list(b = "bump", qj = 1))
+  for (cs in cases) {
+    Pg <- asis_projector(nn, NA, ord, basis = bases[[cs$b]])
+    set.seed(100 + cs$qj); th <- r; lam <- 2; S <- matrix(NA, M2, nn); L <- numeric(M2)
+    for (i in seq_len(M2)) {
+      st <- pmala_step(th, yy, zz, lam, sg, 1.0, cst, ord, "curv", 0, iters = 300L, kappa = 3); th <- st$theta
+      lam <- rgamma(1, a0_ + mm, b0_ + sum(abs(diff(th))))
+      as_ <- asis_step(th, lam, a, r, a0_, b0_, Pg, ord, q_jac = cs$qj); lam <- as_$lambda; th <- as_$theta
+      S[i, ] <- th; L[i] <- lam
+    }
+    S1 <- S[-(1:5000), ]; L1 <- L[-(1:5000)]
+    m1 <- colMeans(S1); se1 <- apply(S1, 2, bm_se); s1 <- apply(S1, 2, sd)
+    se_s1 <- apply(S1, 2, function(v) bm_se((v - mean(v))^2)) / (2 * s1)
+    zz_ <- c(max(abs(m1 - m_ex) / se1), max(abs(s1 - s_ex) / se_s1), abs(mean(L1) - lam_ex) / bm_se(L1))
+    right <- cs$qj == attr(Pg, "q")
+    cat(sprintf("   subspace %-4s q = %d, Jacobian q = %d (%s) | max |mean z| %.2f | max |sd z| %.2f | E lambda z %.2f\n",
+                cs$b, attr(Pg, "q"), cs$qj, if (right) "correct" else "WRONG", zz_[1], zz_[2], zz_[3]))
+    if (right) stopifnot(max(zz_) < 4) else stopifnot(max(zz_) > 8)     # power check: the wrong Jacobian is detected decisively
+  }
+
+  cat("== test 6c: banded B-spline projector = dense projection, reproduces quadratics, O(n) cost ==\n")
+  set.seed(14); nb <- 500; Pb <- asis_projector(nb, 20L, 2L); xb <- seq_len(nb) / nb
+  Bd <- splines::bs(xb, knots = seq(xb[1], xb[nb], length.out = 18)[-c(1, 18)], degree = 3, intercept = TRUE,
+                    Boundary.knots = range(xb)); Qd <- qr.Q(qr(Bd)); tv <- cumsum(rnorm(nb))
+  d_dense <- max(abs(Pb(tv) - Qd %*% crossprod(Qd, tv))); quad <- 3 - 2 * xb + 5 * xb^2; d_quad <- max(abs(Pb(quad) - quad))
+  tm <- sapply(c(2000L, 20000L), function(nt) { Pt <- asis_projector(nt, as.integer(nt / 25), 2L); v <- rnorm(nt)
+    system.time(for (i in 1:50) Pt(v))[["elapsed"]] / 50 })
+  cat(sprintf("   |P - dense| = %.1e | |P quad - quad| = %.1e | per call: n = 2000 %.2f ms, n = 20000 %.2f ms (ratio %.1f for 10x n, q = n/25)\n",
+              d_dense, d_quad, 1e3 * tm[1], 1e3 * tm[2], tm[2] / tm[1]))
+  stopifnot(d_dense < 1e-8, d_quad < 1e-8, attr(Pb, "q") == 20L, tm[2] / tm[1] < 25)
+
+  cat("== test 6d: theta block move (spline subspace, q = 5, n = 7, k = 1) + P-MALA vs importance sampling; a wrong ratio must fail ==\n")
+  # target theta | z, lambda, sigma: exp(-sum a (theta - r)^2 / 2 - lambda ||D theta||_1).  IS reference: proposal N(r, A^-1) (the
+  # likelihood factor, exact), weight exp(-lambda ||D theta||_1) <= 1; its standard error enters the z-scores.
+  set.seed(15); nn <- 7; ord <- 1L; lam <- 3; sg <- 0.5; tt <- 0.3; cst <- ald_const(tt)
+  yy <- cumsum(rnorm(nn, 0, 0.3)); zz <- rexp(nn, 1 / sg); a <- 1 / (cst$t2 * sg * zz); r <- yy - cst$psi * zz
+  Nis <- 2e6; G <- matrix(rnorm(Nis * nn), Nis, nn) / rep(sqrt(a), each = Nis) + rep(r, each = Nis)
+  lw <- -lam * rowSums(abs(G[, 3:nn] - 2 * G[, 2:(nn - 1)] + G[, 1:(nn - 2)])); w <- exp(lw - max(lw)); w <- w / sum(w)
+  m_ex <- colSums(G * w); C <- G - rep(m_ex, each = Nis); v_ex <- colSums(C^2 * w); s_ex <- sqrt(v_ex)
+  se_m_is <- sqrt(colSums(w^2 * C^2)); se_s_is <- sqrt(colSums(w^2 * (C^2 - rep(v_ex, each = Nis))^2)) / (2 * s_ex)
+  ess_is <- 1 / sum(w^2); rm(G, C)
+  P5 <- asis_projector(nn, 5L, ord); M3 <- 60000L
+  for (cs in list(list(mode = "mala", wrong = FALSE), list(mode = "rw", wrong = FALSE), list(mode = "rw", wrong = TRUE))) {
+    set.seed(200 + cs$wrong); th <- r; S <- matrix(NA, M3, nn); accb <- 0; s_b <- 0.2   # s = 0.2: block acceptance ~0.5 (mala) / ~0.4 (rw) here
+    for (i in seq_len(M3)) {
+      st <- pmala_step(th, yy, zz, lam, sg, 1.0, cst, ord, "curv", 0, iters = 300L, kappa = 3); th <- st$theta
+      bs <- block_step(th, a, r, lam, ord, P5, s_b, cs$mode, wrong = cs$wrong); th <- bs$theta; accb <- accb + bs$accept
+      S[i, ] <- th
+    }
+    S1 <- S[-(1:5000), ]; m1 <- colMeans(S1); se1 <- apply(S1, 2, bm_se); s1 <- apply(S1, 2, sd)
+    se_s1 <- apply(S1, 2, function(v) bm_se((v - mean(v))^2)) / (2 * s1)
+    zm <- max(abs(m1 - m_ex) / sqrt(se1^2 + se_m_is^2)); zs <- max(abs(s1 - s_ex) / sqrt(se_s1^2 + se_s_is^2))
+    cat(sprintf("   block %-4s %-7s | block acc %.2f | IS ESS %.0f | max |mean z| %.2f | max |sd z| %.2f | max |sd ratio - 1| %.3f\n",
+                cs$mode, if (cs$wrong) "WRONG" else "correct", accb / M3, ess_is, zm, zs, max(abs(s1 / s_ex - 1))))
+    if (!cs$wrong) stopifnot(max(zm, zs) < 4) else stopifnot(max(zm, zs) > 8)
+  }
 
   cat("== test 7: joint (lambda, theta) jump move + conjugate lambda draw vs the same grid reference ==\n")
   th <- r; lam <- 2; S <- matrix(NA, M2, nn); L <- numeric(M2); accj <- 0
@@ -560,7 +723,7 @@ fit <- gibbs_pmala_aug(dat$y, tau, order, a0, b0, a_sigma, b_sigma,
                        metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
                        mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = warm_sweeps, gamma_warm = gamma_warm,
                        K = K_theta, asis = asis_lambda, tol = admm_tol, lamjump = lamjump, lamjump_s = lamjump_s,
-                       prior_scale = prior_scale, cmap = FALSE, kappa = kappa_metric, adapt_all = adapt_all)
+                       prior_scale = prior_scale, cmap = FALSE, kappa = kappa_metric, adapt_all = adapt_all, asis_q = asis_q, block = block_theta, block_mode = block_mode)
 
 est  <- colMeans(fit$theta)
 lo   <- apply(fit$theta, 2, quantile, 0.025); hi <- apply(fit$theta, 2, quantile, 0.975)
