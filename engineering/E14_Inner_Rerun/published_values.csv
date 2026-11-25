@@ -1,0 +1,361 @@
+"signal","noise","tau","method","metric","value","se"
+"VS","Beta",0.05,"Onizuka (Laplace)","MSE","0.000513",NA
+"VS","Beta",0.25,"Onizuka (Laplace)","MSE","0.001024",NA
+"VS","Beta",0.5,"Onizuka (Laplace)","MSE","0.001942",NA
+"VS","Beta",0.75,"Onizuka (Laplace)","MSE","0.002994",NA
+"VS","Beta",0.95,"Onizuka (Laplace)","MSE","0.007269",NA
+"VS","Beta",0.05,"Onizuka (Horseshoe)","MSE","0.000512",NA
+"VS","Beta",0.25,"Onizuka (Horseshoe)","MSE","0.000943",NA
+"VS","Beta",0.5,"Onizuka (Horseshoe)","MSE","0.001802",NA
+"VS","Beta",0.75,"Onizuka (Horseshoe)","MSE","0.002778",NA
+"VS","Beta",0.95,"Onizuka (Horseshoe)","MSE","0.006493",NA
+"VS","Beta",0.05,"Bayesian-PMALA","MSE","0.000541",NA
+"VS","Beta",0.25,"Bayesian-PMALA","MSE","0.001032",NA
+"VS","Beta",0.5,"Bayesian-PMALA","MSE","0.001966",NA
+"VS","Beta",0.75,"Bayesian-PMALA","MSE","0.003035",NA
+"VS","Beta",0.95,"Bayesian-PMALA","MSE","0.007911",NA
+"VS","Beta",0.05,"ADMM","MSE","0.008055",NA
+"VS","Beta",0.25,"ADMM","MSE","0.004120",NA
+"VS","Beta",0.5,"ADMM","MSE","0.006632",NA
+"VS","Beta",0.75,"ADMM","MSE","0.007613",NA
+"VS","Beta",0.95,"ADMM","MSE","0.014649",NA
+"VS","Mixed",0.05,"Onizuka (Laplace)","MSE","0.075391",NA
+"VS","Mixed",0.25,"Onizuka (Laplace)","MSE","0.031684",NA
+"VS","Mixed",0.5,"Onizuka (Laplace)","MSE","0.027303",NA
+"VS","Mixed",0.75,"Onizuka (Laplace)","MSE","0.031800",NA
+"VS","Mixed",0.95,"Onizuka (Laplace)","MSE","0.077075",NA
+"VS","Mixed",0.05,"Onizuka (Horseshoe)","MSE","0.073529",NA
+"VS","Mixed",0.25,"Onizuka (Horseshoe)","MSE","0.031743",NA
+"VS","Mixed",0.5,"Onizuka (Horseshoe)","MSE","0.028090",NA
+"VS","Mixed",0.75,"Onizuka (Horseshoe)","MSE","0.033608",NA
+"VS","Mixed",0.95,"Onizuka (Horseshoe)","MSE","0.079668",NA
+"VS","Mixed",0.05,"Bayesian-PMALA","MSE","0.081173",NA
+"VS","Mixed",0.25,"Bayesian-PMALA","MSE","0.033267",NA
+"VS","Mixed",0.5,"Bayesian-PMALA","MSE","0.026919",NA
+"VS","Mixed",0.75,"Bayesian-PMALA","MSE","0.031086",NA
+"VS","Mixed",0.95,"Bayesian-PMALA","MSE","0.074781",NA
+"VS","Mixed",0.05,"ADMM","MSE","0.096462",NA
+"VS","Mixed",0.25,"ADMM","MSE","0.092891",NA
+"VS","Mixed",0.5,"ADMM","MSE","0.071678",NA
+"VS","Mixed",0.75,"ADMM","MSE","0.049944",NA
+"VS","Mixed",0.95,"ADMM","MSE","0.068415",NA
+"VS","Normal",0.05,"Onizuka (Laplace)","MSE","0.020916",NA
+"VS","Normal",0.25,"Onizuka (Laplace)","MSE","0.008284",NA
+"VS","Normal",0.5,"Onizuka (Laplace)","MSE","0.006932",NA
+"VS","Normal",0.75,"Onizuka (Laplace)","MSE","0.007558",NA
+"VS","Normal",0.95,"Onizuka (Laplace)","MSE","0.018128",NA
+"VS","Normal",0.05,"Onizuka (Horseshoe)","MSE","0.019990",NA
+"VS","Normal",0.25,"Onizuka (Horseshoe)","MSE","0.008067",NA
+"VS","Normal",0.5,"Onizuka (Horseshoe)","MSE","0.006651",NA
+"VS","Normal",0.75,"Onizuka (Horseshoe)","MSE","0.007358",NA
+"VS","Normal",0.95,"Onizuka (Horseshoe)","MSE","0.017762",NA
+"VS","Normal",0.05,"Bayesian-PMALA","MSE","0.019703",NA
+"VS","Normal",0.25,"Bayesian-PMALA","MSE","0.007962",NA
+"VS","Normal",0.5,"Bayesian-PMALA","MSE","0.006803",NA
+"VS","Normal",0.75,"Bayesian-PMALA","MSE","0.007469",NA
+"VS","Normal",0.95,"Bayesian-PMALA","MSE","0.018675",NA
+"VS","Normal",0.05,"ADMM","MSE","0.088108",NA
+"VS","Normal",0.25,"ADMM","MSE","0.025091",NA
+"VS","Normal",0.5,"ADMM","MSE","0.020181",NA
+"VS","Normal",0.75,"ADMM","MSE","0.014800",NA
+"VS","Normal",0.95,"ADMM","MSE","0.022334",NA
+"S","Beta",0.05,"Onizuka (Laplace)","MSE","0.000295",NA
+"S","Beta",0.25,"Onizuka (Laplace)","MSE","0.000794",NA
+"S","Beta",0.5,"Onizuka (Laplace)","MSE","0.001592",NA
+"S","Beta",0.75,"Onizuka (Laplace)","MSE","0.002311",NA
+"S","Beta",0.95,"Onizuka (Laplace)","MSE","0.005225",NA
+"S","Beta",0.05,"Onizuka (Horseshoe)","MSE","0.000423",NA
+"S","Beta",0.25,"Onizuka (Horseshoe)","MSE","0.000812",NA
+"S","Beta",0.5,"Onizuka (Horseshoe)","MSE","0.001554",NA
+"S","Beta",0.75,"Onizuka (Horseshoe)","MSE","0.002270",NA
+"S","Beta",0.95,"Onizuka (Horseshoe)","MSE","0.005342",NA
+"S","Beta",0.05,"Bayesian-PMALA","MSE","0.000251",NA
+"S","Beta",0.25,"Bayesian-PMALA","MSE","0.000649",NA
+"S","Beta",0.5,"Bayesian-PMALA","MSE","0.001255",NA
+"S","Beta",0.75,"Bayesian-PMALA","MSE","0.001832",NA
+"S","Beta",0.95,"Bayesian-PMALA","MSE","0.006169",NA
+"S","Beta",0.05,"ADMM","MSE","0.000183",NA
+"S","Beta",0.25,"ADMM","MSE","0.000425",NA
+"S","Beta",0.5,"ADMM","MSE","0.000789",NA
+"S","Beta",0.75,"ADMM","MSE","0.001078",NA
+"S","Beta",0.95,"ADMM","MSE","0.002464",NA
+"S","Mixed",0.05,"Onizuka (Laplace)","MSE","0.071456",NA
+"S","Mixed",0.25,"Onizuka (Laplace)","MSE","0.026312",NA
+"S","Mixed",0.5,"Onizuka (Laplace)","MSE","0.021974",NA
+"S","Mixed",0.75,"Onizuka (Laplace)","MSE","0.027079",NA
+"S","Mixed",0.95,"Onizuka (Laplace)","MSE","0.067077",NA
+"S","Mixed",0.05,"Onizuka (Horseshoe)","MSE","0.074248",NA
+"S","Mixed",0.25,"Onizuka (Horseshoe)","MSE","0.026449",NA
+"S","Mixed",0.5,"Onizuka (Horseshoe)","MSE","0.021783",NA
+"S","Mixed",0.75,"Onizuka (Horseshoe)","MSE","0.027401",NA
+"S","Mixed",0.95,"Onizuka (Horseshoe)","MSE","0.072335",NA
+"S","Mixed",0.05,"Bayesian-PMALA","MSE","0.079543",NA
+"S","Mixed",0.25,"Bayesian-PMALA","MSE","0.022323",NA
+"S","Mixed",0.5,"Bayesian-PMALA","MSE","0.017629",NA
+"S","Mixed",0.75,"Bayesian-PMALA","MSE","0.021790",NA
+"S","Mixed",0.95,"Bayesian-PMALA","MSE","0.072843",NA
+"S","Mixed",0.05,"ADMM","MSE","0.030277",NA
+"S","Mixed",0.25,"ADMM","MSE","0.010993",NA
+"S","Mixed",0.5,"ADMM","MSE","0.008228",NA
+"S","Mixed",0.75,"ADMM","MSE","0.010769",NA
+"S","Mixed",0.95,"ADMM","MSE","0.023342",NA
+"S","Normal",0.05,"Onizuka (Laplace)","MSE","0.014933",NA
+"S","Normal",0.25,"Onizuka (Laplace)","MSE","0.006463",NA
+"S","Normal",0.5,"Onizuka (Laplace)","MSE","0.005581",NA
+"S","Normal",0.75,"Onizuka (Laplace)","MSE","0.006136",NA
+"S","Normal",0.95,"Onizuka (Laplace)","MSE","0.014457",NA
+"S","Normal",0.05,"Onizuka (Horseshoe)","MSE","0.016242",NA
+"S","Normal",0.25,"Onizuka (Horseshoe)","MSE","0.006414",NA
+"S","Normal",0.5,"Onizuka (Horseshoe)","MSE","0.005364",NA
+"S","Normal",0.75,"Onizuka (Horseshoe)","MSE","0.006003",NA
+"S","Normal",0.95,"Onizuka (Horseshoe)","MSE","0.014982",NA
+"S","Normal",0.05,"Bayesian-PMALA","MSE","0.016324",NA
+"S","Normal",0.25,"Bayesian-PMALA","MSE","0.005068",NA
+"S","Normal",0.5,"Bayesian-PMALA","MSE","0.004114",NA
+"S","Normal",0.75,"Bayesian-PMALA","MSE","0.004793",NA
+"S","Normal",0.95,"Bayesian-PMALA","MSE","0.015674",NA
+"S","Normal",0.05,"ADMM","MSE","0.006561",NA
+"S","Normal",0.25,"ADMM","MSE","0.003129",NA
+"S","Normal",0.5,"ADMM","MSE","0.002456",NA
+"S","Normal",0.75,"ADMM","MSE","0.002843",NA
+"S","Normal",0.95,"ADMM","MSE","0.005929",NA
+"VS","Beta",0.05,"Onizuka (Laplace)","MAD","0.012702",NA
+"VS","Beta",0.25,"Onizuka (Laplace)","MAD","0.020517",NA
+"VS","Beta",0.5,"Onizuka (Laplace)","MAD","0.030557",NA
+"VS","Beta",0.75,"Onizuka (Laplace)","MAD","0.040591",NA
+"VS","Beta",0.95,"Onizuka (Laplace)","MAD","0.066465",NA
+"VS","Beta",0.05,"Onizuka (Horseshoe)","MAD","0.011300",NA
+"VS","Beta",0.25,"Onizuka (Horseshoe)","MAD","0.018849",NA
+"VS","Beta",0.5,"Onizuka (Horseshoe)","MAD","0.028763",NA
+"VS","Beta",0.75,"Onizuka (Horseshoe)","MAD","0.038443",NA
+"VS","Beta",0.95,"Onizuka (Horseshoe)","MAD","0.062328",NA
+"VS","Beta",0.05,"Bayesian-PMALA","MAD","0.012738",NA
+"VS","Beta",0.25,"Bayesian-PMALA","MAD","0.020634",NA
+"VS","Beta",0.5,"Bayesian-PMALA","MAD","0.030695",NA
+"VS","Beta",0.75,"Bayesian-PMALA","MAD","0.040913",NA
+"VS","Beta",0.95,"Bayesian-PMALA","MAD","0.069349",NA
+"VS","Beta",0.05,"ADMM","MAD","0.027314",NA
+"VS","Beta",0.25,"ADMM","MAD","0.029267",NA
+"VS","Beta",0.5,"ADMM","MAD","0.044214",NA
+"VS","Beta",0.75,"ADMM","MAD","0.052848",NA
+"VS","Beta",0.95,"ADMM","MAD","0.076817",NA
+"VS","Mixed",0.05,"Onizuka (Laplace)","MAD","0.215556",NA
+"VS","Mixed",0.25,"Onizuka (Laplace)","MAD","0.139979",NA
+"VS","Mixed",0.5,"Onizuka (Laplace)","MAD","0.128822",NA
+"VS","Mixed",0.75,"Onizuka (Laplace)","MAD","0.138850",NA
+"VS","Mixed",0.95,"Onizuka (Laplace)","MAD","0.215747",NA
+"VS","Mixed",0.05,"Onizuka (Horseshoe)","MAD","0.212371",NA
+"VS","Mixed",0.25,"Onizuka (Horseshoe)","MAD","0.140284",NA
+"VS","Mixed",0.5,"Onizuka (Horseshoe)","MAD","0.129614",NA
+"VS","Mixed",0.75,"Onizuka (Horseshoe)","MAD","0.141514",NA
+"VS","Mixed",0.95,"Onizuka (Horseshoe)","MAD","0.218726",NA
+"VS","Mixed",0.05,"Bayesian-PMALA","MAD","0.223228",NA
+"VS","Mixed",0.25,"Bayesian-PMALA","MAD","0.139281",NA
+"VS","Mixed",0.5,"Bayesian-PMALA","MAD","0.127013",NA
+"VS","Mixed",0.75,"Bayesian-PMALA","MAD","0.137967",NA
+"VS","Mixed",0.95,"Bayesian-PMALA","MAD","0.212757",NA
+"VS","Mixed",0.05,"ADMM","MAD","0.218535",NA
+"VS","Mixed",0.25,"ADMM","MAD","0.183889",NA
+"VS","Mixed",0.5,"ADMM","MAD","0.169139",NA
+"VS","Mixed",0.75,"ADMM","MAD","0.157936",NA
+"VS","Mixed",0.95,"ADMM","MAD","0.201602",NA
+"VS","Normal",0.05,"Onizuka (Laplace)","MAD","0.109980",NA
+"VS","Normal",0.25,"Onizuka (Laplace)","MAD","0.070160",NA
+"VS","Normal",0.5,"Onizuka (Laplace)","MAD","0.063856",NA
+"VS","Normal",0.75,"Onizuka (Laplace)","MAD","0.067192",NA
+"VS","Normal",0.95,"Onizuka (Laplace)","MAD","0.103017",NA
+"VS","Normal",0.05,"Onizuka (Horseshoe)","MAD","0.106356",NA
+"VS","Normal",0.25,"Onizuka (Horseshoe)","MAD","0.068189",NA
+"VS","Normal",0.5,"Onizuka (Horseshoe)","MAD","0.061950",NA
+"VS","Normal",0.75,"Onizuka (Horseshoe)","MAD","0.065668",NA
+"VS","Normal",0.95,"Onizuka (Horseshoe)","MAD","0.101007",NA
+"VS","Normal",0.05,"Bayesian-PMALA","MAD","0.107777",NA
+"VS","Normal",0.25,"Bayesian-PMALA","MAD","0.069189",NA
+"VS","Normal",0.5,"Bayesian-PMALA","MAD","0.063468",NA
+"VS","Normal",0.75,"Bayesian-PMALA","MAD","0.067009",NA
+"VS","Normal",0.95,"Bayesian-PMALA","MAD","0.104810",NA
+"VS","Normal",0.05,"ADMM","MAD","0.141630",NA
+"VS","Normal",0.25,"ADMM","MAD","0.087809",NA
+"VS","Normal",0.5,"ADMM","MAD","0.085612",NA
+"VS","Normal",0.75,"ADMM","MAD","0.081531",NA
+"VS","Normal",0.95,"ADMM","MAD","0.107235",NA
+"VS","Beta",0.05,"Onizuka (Laplace)","MCIW","0.072159",NA
+"VS","Beta",0.25,"Onizuka (Laplace)","MCIW","0.100837",NA
+"VS","Beta",0.5,"Onizuka (Laplace)","MCIW","0.132473",NA
+"VS","Beta",0.75,"Onizuka (Laplace)","MCIW","0.158571",NA
+"VS","Beta",0.95,"Onizuka (Laplace)","MCIW","0.168685",NA
+"VS","Beta",0.05,"Onizuka (Horseshoe)","MCIW","0.067523",NA
+"VS","Beta",0.25,"Onizuka (Horseshoe)","MCIW","0.100344",NA
+"VS","Beta",0.5,"Onizuka (Horseshoe)","MCIW","0.134284",NA
+"VS","Beta",0.75,"Onizuka (Horseshoe)","MCIW","0.161300",NA
+"VS","Beta",0.95,"Onizuka (Horseshoe)","MCIW","0.166118",NA
+"VS","Beta",0.05,"Bayesian-PMALA","MCIW","0.063025",NA
+"VS","Beta",0.25,"Bayesian-PMALA","MCIW","0.097430",NA
+"VS","Beta",0.5,"Bayesian-PMALA","MCIW","0.129048",NA
+"VS","Beta",0.75,"Bayesian-PMALA","MCIW","0.154243",NA
+"VS","Beta",0.95,"Bayesian-PMALA","MCIW","0.157493",NA
+"VS","Beta",0.05,"ADMM","MCIW",NA,NA
+"VS","Beta",0.25,"ADMM","MCIW",NA,NA
+"VS","Beta",0.5,"ADMM","MCIW",NA,NA
+"VS","Beta",0.75,"ADMM","MCIW",NA,NA
+"VS","Beta",0.95,"ADMM","MCIW",NA,NA
+"VS","Mixed",0.05,"Onizuka (Laplace)","MCIW","0.557248",NA
+"VS","Mixed",0.25,"Onizuka (Laplace)","MCIW","0.564334",NA
+"VS","Mixed",0.5,"Onizuka (Laplace)","MCIW","0.569489",NA
+"VS","Mixed",0.75,"Onizuka (Laplace)","MCIW","0.565218",NA
+"VS","Mixed",0.95,"Onizuka (Laplace)","MCIW","0.559566",NA
+"VS","Mixed",0.05,"Onizuka (Horseshoe)","MCIW","0.578243",NA
+"VS","Mixed",0.25,"Onizuka (Horseshoe)","MCIW","0.613924",NA
+"VS","Mixed",0.5,"Onizuka (Horseshoe)","MCIW","0.620905",NA
+"VS","Mixed",0.75,"Onizuka (Horseshoe)","MCIW","0.624492",NA
+"VS","Mixed",0.95,"Onizuka (Horseshoe)","MCIW","0.599896",NA
+"VS","Mixed",0.05,"Bayesian-PMALA","MCIW","0.539558",NA
+"VS","Mixed",0.25,"Bayesian-PMALA","MCIW","0.514693",NA
+"VS","Mixed",0.5,"Bayesian-PMALA","MCIW","0.509364",NA
+"VS","Mixed",0.75,"Bayesian-PMALA","MCIW","0.514597",NA
+"VS","Mixed",0.95,"Bayesian-PMALA","MCIW","0.538398",NA
+"VS","Mixed",0.05,"ADMM","MCIW",NA,NA
+"VS","Mixed",0.25,"ADMM","MCIW",NA,NA
+"VS","Mixed",0.5,"ADMM","MCIW",NA,NA
+"VS","Mixed",0.75,"ADMM","MCIW",NA,NA
+"VS","Mixed",0.95,"ADMM","MCIW",NA,NA
+"VS","Normal",0.05,"Onizuka (Laplace)","MCIW","0.289501",NA
+"VS","Normal",0.25,"Onizuka (Laplace)","MCIW","0.286599",NA
+"VS","Normal",0.5,"Onizuka (Laplace)","MCIW","0.285566",NA
+"VS","Normal",0.75,"Onizuka (Laplace)","MCIW","0.284948",NA
+"VS","Normal",0.95,"Onizuka (Laplace)","MCIW","0.280193",NA
+"VS","Normal",0.05,"Onizuka (Horseshoe)","MCIW","0.296111",NA
+"VS","Normal",0.25,"Onizuka (Horseshoe)","MCIW","0.301798",NA
+"VS","Normal",0.5,"Onizuka (Horseshoe)","MCIW","0.301683",NA
+"VS","Normal",0.75,"Onizuka (Horseshoe)","MCIW","0.301976",NA
+"VS","Normal",0.95,"Onizuka (Horseshoe)","MCIW","0.290053",NA
+"VS","Normal",0.05,"Bayesian-PMALA","MCIW","0.272470",NA
+"VS","Normal",0.25,"Bayesian-PMALA","MCIW","0.274165",NA
+"VS","Normal",0.5,"Bayesian-PMALA","MCIW","0.272616",NA
+"VS","Normal",0.75,"Bayesian-PMALA","MCIW","0.275244",NA
+"VS","Normal",0.95,"Bayesian-PMALA","MCIW","0.269605",NA
+"VS","Normal",0.05,"ADMM","MCIW",NA,NA
+"VS","Normal",0.25,"ADMM","MCIW",NA,NA
+"VS","Normal",0.5,"ADMM","MCIW",NA,NA
+"VS","Normal",0.75,"ADMM","MCIW",NA,NA
+"VS","Normal",0.95,"ADMM","MCIW",NA,NA
+"S","Beta",0.05,"Onizuka (Laplace)","MAD","0.009000",NA
+"S","Beta",0.25,"Onizuka (Laplace)","MAD","0.017595",NA
+"S","Beta",0.5,"Onizuka (Laplace)","MAD","0.027191",NA
+"S","Beta",0.75,"Onizuka (Laplace)","MAD","0.035333",NA
+"S","Beta",0.95,"Onizuka (Laplace)","MAD","0.056189",NA
+"S","Beta",0.05,"Onizuka (Horseshoe)","MAD","0.009166",NA
+"S","Beta",0.25,"Onizuka (Horseshoe)","MAD","0.016903",NA
+"S","Beta",0.5,"Onizuka (Horseshoe)","MAD","0.026235",NA
+"S","Beta",0.75,"Onizuka (Horseshoe)","MAD","0.034349",NA
+"S","Beta",0.95,"Onizuka (Horseshoe)","MAD","0.056422",NA
+"S","Beta",0.05,"Bayesian-PMALA","MAD","0.008426",NA
+"S","Beta",0.25,"Bayesian-PMALA","MAD","0.015465",NA
+"S","Beta",0.5,"Bayesian-PMALA","MAD","0.023818",NA
+"S","Beta",0.75,"Bayesian-PMALA","MAD","0.031182",NA
+"S","Beta",0.95,"Bayesian-PMALA","MAD","0.061033",NA
+"S","Beta",0.05,"ADMM","MAD","0.007408",NA
+"S","Beta",0.25,"ADMM","MAD","0.013056",NA
+"S","Beta",0.5,"ADMM","MAD","0.019253",NA
+"S","Beta",0.75,"ADMM","MAD","0.024246",NA
+"S","Beta",0.95,"ADMM","MAD","0.039323",NA
+"S","Mixed",0.05,"Onizuka (Laplace)","MAD","0.209230",NA
+"S","Mixed",0.25,"Onizuka (Laplace)","MAD","0.128588",NA
+"S","Mixed",0.5,"Onizuka (Laplace)","MAD","0.117542",NA
+"S","Mixed",0.75,"Onizuka (Laplace)","MAD","0.129947",NA
+"S","Mixed",0.95,"Onizuka (Laplace)","MAD","0.200719",NA
+"S","Mixed",0.05,"Onizuka (Horseshoe)","MAD","0.212951",NA
+"S","Mixed",0.25,"Onizuka (Horseshoe)","MAD","0.128772",NA
+"S","Mixed",0.5,"Onizuka (Horseshoe)","MAD","0.116773",NA
+"S","Mixed",0.75,"Onizuka (Horseshoe)","MAD","0.130281",NA
+"S","Mixed",0.95,"Onizuka (Horseshoe)","MAD","0.208177",NA
+"S","Mixed",0.05,"Bayesian-PMALA","MAD","0.221367",NA
+"S","Mixed",0.25,"Bayesian-PMALA","MAD","0.116848",NA
+"S","Mixed",0.5,"Bayesian-PMALA","MAD","0.104087",NA
+"S","Mixed",0.75,"Bayesian-PMALA","MAD","0.116396",NA
+"S","Mixed",0.95,"Bayesian-PMALA","MAD","0.210121",NA
+"S","Mixed",0.05,"ADMM","MAD","0.134511",NA
+"S","Mixed",0.25,"ADMM","MAD","0.082435",NA
+"S","Mixed",0.5,"ADMM","MAD","0.071963",NA
+"S","Mixed",0.75,"ADMM","MAD","0.081493",NA
+"S","Mixed",0.95,"ADMM","MAD","0.118870",NA
+"S","Normal",0.05,"Onizuka (Laplace)","MAD","0.093516",NA
+"S","Normal",0.25,"Onizuka (Laplace)","MAD","0.062130",NA
+"S","Normal",0.5,"Onizuka (Laplace)","MAD","0.057391",NA
+"S","Normal",0.75,"Onizuka (Laplace)","MAD","0.060291",NA
+"S","Normal",0.95,"Onizuka (Laplace)","MAD","0.091704",NA
+"S","Normal",0.05,"Onizuka (Horseshoe)","MAD","0.096546",NA
+"S","Normal",0.25,"Onizuka (Horseshoe)","MAD","0.061044",NA
+"S","Normal",0.5,"Onizuka (Horseshoe)","MAD","0.055676",NA
+"S","Normal",0.75,"Onizuka (Horseshoe)","MAD","0.059026",NA
+"S","Normal",0.95,"Onizuka (Horseshoe)","MAD","0.092177",NA
+"S","Normal",0.05,"Bayesian-PMALA","MAD","0.097563",NA
+"S","Normal",0.25,"Bayesian-PMALA","MAD","0.054812",NA
+"S","Normal",0.5,"Bayesian-PMALA","MAD","0.049118",NA
+"S","Normal",0.75,"Bayesian-PMALA","MAD","0.053120",NA
+"S","Normal",0.95,"Bayesian-PMALA","MAD","0.095053",NA
+"S","Normal",0.05,"ADMM","MAD","0.060896",NA
+"S","Normal",0.25,"ADMM","MAD","0.042695",NA
+"S","Normal",0.5,"ADMM","MAD","0.037518",NA
+"S","Normal",0.75,"ADMM","MAD","0.040551",NA
+"S","Normal",0.95,"ADMM","MAD","0.057551",NA
+"S","Beta",0.05,"Onizuka (Laplace)","MCIW","0.051618",NA
+"S","Beta",0.25,"Onizuka (Laplace)","MCIW","0.086614",NA
+"S","Beta",0.5,"Onizuka (Laplace)","MCIW","0.118115",NA
+"S","Beta",0.75,"Onizuka (Laplace)","MCIW","0.140828",NA
+"S","Beta",0.95,"Onizuka (Laplace)","MCIW","0.144257",NA
+"S","Beta",0.05,"Onizuka (Horseshoe)","MCIW","0.055748",NA
+"S","Beta",0.25,"Onizuka (Horseshoe)","MCIW","0.087738",NA
+"S","Beta",0.5,"Onizuka (Horseshoe)","MCIW","0.119125",NA
+"S","Beta",0.75,"Onizuka (Horseshoe)","MCIW","0.144581",NA
+"S","Beta",0.95,"Onizuka (Horseshoe)","MCIW","0.152374",NA
+"S","Beta",0.05,"Bayesian-PMALA","MCIW","0.036528",NA
+"S","Beta",0.25,"Bayesian-PMALA","MCIW","0.067746",NA
+"S","Beta",0.5,"Bayesian-PMALA","MCIW","0.095498",NA
+"S","Beta",0.75,"Bayesian-PMALA","MCIW","0.120977",NA
+"S","Beta",0.95,"Bayesian-PMALA","MCIW","0.144979",NA
+"S","Beta",0.05,"ADMM","MCIW",NA,NA
+"S","Beta",0.25,"ADMM","MCIW",NA,NA
+"S","Beta",0.5,"ADMM","MCIW",NA,NA
+"S","Beta",0.75,"ADMM","MCIW",NA,NA
+"S","Beta",0.95,"ADMM","MCIW",NA,NA
+"S","Mixed",0.05,"Onizuka (Laplace)","MCIW","0.530973",NA
+"S","Mixed",0.25,"Onizuka (Laplace)","MCIW","0.541054",NA
+"S","Mixed",0.5,"Onizuka (Laplace)","MCIW","0.546983",NA
+"S","Mixed",0.75,"Onizuka (Laplace)","MCIW","0.542001",NA
+"S","Mixed",0.95,"Onizuka (Laplace)","MCIW","0.528167",NA
+"S","Mixed",0.05,"Onizuka (Horseshoe)","MCIW","0.572392",NA
+"S","Mixed",0.25,"Onizuka (Horseshoe)","MCIW","0.581571",NA
+"S","Mixed",0.5,"Onizuka (Horseshoe)","MCIW","0.576684",NA
+"S","Mixed",0.75,"Onizuka (Horseshoe)","MCIW","0.582025",NA
+"S","Mixed",0.95,"Onizuka (Horseshoe)","MCIW","0.573076",NA
+"S","Mixed",0.05,"Bayesian-PMALA","MCIW","0.554772",NA
+"S","Mixed",0.25,"Bayesian-PMALA","MCIW","0.499975",NA
+"S","Mixed",0.5,"Bayesian-PMALA","MCIW","0.495835",NA
+"S","Mixed",0.75,"Bayesian-PMALA","MCIW","0.502117",NA
+"S","Mixed",0.95,"Bayesian-PMALA","MCIW","0.553304",NA
+"S","Mixed",0.05,"ADMM","MCIW",NA,NA
+"S","Mixed",0.25,"ADMM","MCIW",NA,NA
+"S","Mixed",0.5,"ADMM","MCIW",NA,NA
+"S","Mixed",0.75,"ADMM","MCIW",NA,NA
+"S","Mixed",0.95,"ADMM","MCIW",NA,NA
+"S","Normal",0.05,"Onizuka (Laplace)","MCIW","0.250570",NA
+"S","Normal",0.25,"Onizuka (Laplace)","MCIW","0.262358",NA
+"S","Normal",0.5,"Onizuka (Laplace)","MCIW","0.265880",NA
+"S","Normal",0.75,"Onizuka (Laplace)","MCIW","0.262720",NA
+"S","Normal",0.95,"Onizuka (Laplace)","MCIW","0.248729",NA
+"S","Normal",0.05,"Onizuka (Horseshoe)","MCIW","0.274999",NA
+"S","Normal",0.25,"Onizuka (Horseshoe)","MCIW","0.276615",NA
+"S","Normal",0.5,"Onizuka (Horseshoe)","MCIW","0.274603",NA
+"S","Normal",0.75,"Onizuka (Horseshoe)","MCIW","0.273819",NA
+"S","Normal",0.95,"Onizuka (Horseshoe)","MCIW","0.269150",NA
+"S","Normal",0.05,"Bayesian-PMALA","MCIW","0.258425",NA
+"S","Normal",0.25,"Bayesian-PMALA","MCIW","0.230489",NA
+"S","Normal",0.5,"Bayesian-PMALA","MCIW","0.226939",NA
+"S","Normal",0.75,"Bayesian-PMALA","MCIW","0.229488",NA
+"S","Normal",0.95,"Bayesian-PMALA","MCIW","0.255030",NA
+"S","Normal",0.05,"ADMM","MCIW",NA,NA
+"S","Normal",0.25,"ADMM","MCIW",NA,NA
+"S","Normal",0.5,"ADMM","MCIW",NA,NA
+"S","Normal",0.75,"ADMM","MCIW",NA,NA
+"S","Normal",0.95,"ADMM","MCIW",NA,NA
