@@ -1,0 +1,105 @@
+# E-14 Interior quantile rerun
+
+The 3,000 Bayesian-PMALA chains cover VS and S at `n = 500`, trend filtering
+order 2, five quantiles (0.05, 0.25, 0.50, 0.75, 0.95), three noises
+(`Normal`, `Beta`, `Mixed`), and data seeds 1–100. Slurm indices are 0–2999.
+Seed varies fastest, then quantile, noise, and signal, in the orders listed
+above. The chain seed is `10001 + index`, set after data generation with
+Mersenne-Twister, Inversion, and Rejection RNG settings. For example, index 0
+is `VS_Normal_t05_s001`, with chain seed 10001.
+
+Each chain runs 30,000 sweeps with 10,000 discarded as burn-in, including
+200 warm sweeps. Both signals use the spline-held ASIS move
+(`asis = TRUE`, `asis_q = "fixed"`, cycling through dimensions 10, 20, and
+40), no θ block move, and diminishing adaptation throughout the run.
+The σ prior is IG(0.1, 0.1). The λ prior is Gamma with shape 1 and rate
+0.001 for VS or 0.0005 for S. The remaining settings come from the pinned
+sampler script.
+
+Each successful task writes an `out/<id>.rds` containing the posterior mean
+(`est`), pointwise 95% interval (`lo`, `hi`, R quantile type 7), truth,
+metrics, diagnostics, sampler commit, and host. The λ and σ traces keep at
+most 1,000 points over the full chain with their sweep indices. λ ESS uses
+`coda::effectiveSize` on the full post-burn-in λ trace. `seconds` measures
+the sampler's elapsed time. Caught R errors write `out/<id>.fail.rds` and
+return a nonzero status. An interruption before the runner can write a
+file leaves a missing ID and a Slurm log. Reruns skip existing success
+files and clear the failure marker when a retry succeeds.
+
+## Metric definitions
+
+The original [`process_results.R`](../../experiments/interior_quantiles/individual_nots_20261003/process_results.R)
+recomputes metrics with the following call and averages them over seeds in
+each cell.
+
+```r
+    recalculated <- curve_metrics(x$est, x$lo, x$hi, x$dat$truth)
+```
+
+```r
+  for (key in c("MSE", "MAD", "MCIW", "coverage")) {
+    out[[paste0("mean_", key)]] <- mean(d[[key]])
+    out[[paste0("se_", key)]] <- sd(d[[key]]) / sqrt(nrow(d))
+  }
+```
+
+The corresponding equations are defined in the original
+[`common.R`](../../experiments/interior_quantiles/individual_nots_20261003/common.R).
+
+```r
+curve_metrics <- function(est, lo, hi, truth) c(
+  MSE = mean((est - truth)^2), MAD = mean(abs(est - truth)),
+  MCIW = mean(hi - lo), coverage = mean(truth >= lo & truth <= hi))
+```
+
+## Snapshot and Slurm
+
+After the sampler commit and GO arrive, assemble a snapshot from the repo
+root. Set `SAMPLER_REF` to the approved sampler commit and
+`ENGINEERING_REF` to a commit containing the runner and E-14 data function.
+Set `SNAPSHOT` to an empty local staging directory under `tmp/E14/`.
+
+```bash
+set -euo pipefail
+sampler_commit=$(git rev-parse --verify "${SAMPLER_REF:?}^{commit}")
+engineering_commit=$(git rev-parse --verify "${ENGINEERING_REF:?}^{commit}")
+e14=engineering/E14_Inner_Rerun
+original=experiments/interior_quantiles/individual_nots_20261003/source
+git archive "$sampler_commit" method/individual/Individual_Sampler_PMALA_Augmented.R \
+    method/individual/prox_admm_metric.cpp method/joint/prox_box_metric.cpp |
+    tar -xf - -C "${SNAPSHOT:?}"
+git archive "$engineering_commit" "$e14/e14_run.R" "$e14/e14_check.R" "$e14/e14.slurm" \
+    "$e14/e14_data.R" "$original/Individual_Sampler_PMALA_Augmented.R" |
+    tar -xf - -C "$SNAPSHOT"
+printf 'Sampler-Commit: %s\nEngineering-Commit: %s\n' "$sampler_commit" "$engineering_commit" \
+    > "$SNAPSHOT/run_manifest.dcf"
+```
+
+Copy the snapshot contents into `$RUN/code` and create `$RUN/logs` before
+submission. Use a separate run directory for the pilot. Confirm memory and
+wall time on the approved sampler before submitting the full array.
+The script currently requests 3 GiB, one core, and three hours per task.
+With a 2,304 GiB commons QoS per-user memory cap, 600 tasks at 3 GiB use
+1,800 GiB of the quota. Other commons jobs can use part of that quota.
+
+```bash
+RUN="$HOME/BQTF/runs/E14-inner-rerun-20261125"
+code="$RUN/code/engineering/E14_Inner_Rerun"
+mkdir -p "$RUN/logs"
+sbatch --array=0-2999%600 --export="ALL,RUN=$RUN" \
+    --output="$RUN/logs/%x_%A_%a.out" "$code/e14.slurm"
+```
+
+The job uses the GCC/14.3.0 and R/4.5.2 modules and reads packages from
+`/home/fb31/R/library`. Its task-specific temporary files and Rcpp cache
+go under `$HOME/BQTF/tmp/<array_jobid>_<taskid>`. The exit handler retries
+directory cleanup on NFS.
+
+Once the array has finished, run the checker to list missing IDs,
+failure files, and a command to resubmit the missing tasks with the same
+throttle. It exits with status 1 while any tasks are missing or failure
+markers remain.
+
+```bash
+Rscript --vanilla "$code/e14_check.R" "$RUN" 600
+```
