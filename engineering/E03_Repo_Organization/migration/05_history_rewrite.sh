@@ -94,7 +94,7 @@ cat <<MSG
 Handoff (HQ force-pushes; nobody else pushes meanwhile):
   cd $WORK/work && git push --force origin main
 Then every other clone is stale:
-  NOTS : re-clone at /projects/ml75/fb31/BQTF/repo (keep the ~/Bayesian-Quantile-Trend-Filtering symlink pointing there)
-  Owls : mv ~/Bayesian-Quantile-Trend-Filtering ~/Bayesian-Quantile-Trend-Filtering.pre-rewrite && git clone $ORIGIN_URL ~/Bayesian-Quantile-Trend-Filtering
+  NOTS : cd /projects/ml75/fb31 && mv BQTF BQTF.pre-rewrite && git clone $ORIGIN_URL BQTF && mv BQTF.pre-rewrite/ops BQTF.pre-rewrite/runs BQTF.pre-rewrite/tmp BQTF/   (no running jobs; ~/BQTF symlink unchanged)
+  Owls : mv ~/Bayesian-Quantile-Trend-Filtering ~/Bayesian-Quantile-Trend-Filtering.pre-rewrite && git clone $ORIGIN_URL ~/Bayesian-Quantile-Trend-Filtering && mv ~/Bayesian-Quantile-Trend-Filtering.pre-rewrite/ops ~/Bayesian-Quantile-Trend-Filtering.pre-rewrite/runs ~/Bayesian-Quantile-Trend-Filtering.pre-rewrite/tmp ~/Bayesian-Quantile-Trend-Filtering/   (no E-01 run in progress)
   PC   : see the one-line instruction in CHECKLIST.md
 MSG
