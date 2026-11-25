@@ -1,8 +1,8 @@
-.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))
-SCR <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/archive-owls-session-scratch-20261125/12592220-6c98-4d66-a1f5-aba8b81d5bdd/scratchpad"
-Sys.setenv(E07_CACHE = file.path(SCR, "cache"))
-source("/home/fb31/Bayesian-Quantile-Trend-Filtering/engineering/E07_Tuning_Free/joint_gibbs/e07_joint_v3.R")
-e07v3_load(cache = file.path(SCR, "cache"))
+ROOT <- local({ f <- sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)); d <- if (length(f)) dirname(normalizePath(f[1])) else getwd(); r <- tryCatch(system2("git", c("-C", shQuote(d), "rev-parse", "--show-toplevel"), stdout = TRUE, stderr = FALSE), error = function(e) character(0)); if (!length(r) || !nzchar(r[1])) stop("E07: cannot find the repo root; run from inside the checkout"); r[1] })   # E-12: repo root (Owls or NOTS), no absolute paths
+.libPaths(c(file.path(ROOT, "ops/Rlib"), .libPaths()))
+Sys.setenv(E07_CACHE = file.path(ROOT, "tmp/rcpp_cache"))   # E-12: was the session scratchpad cache
+source(file.path(ROOT, "engineering/E07_Tuning_Free/joint_gibbs/e07_joint_v3.R"))
+e07v3_load(cache = file.path(ROOT, "tmp/rcpp_cache"))
 set.seed(5); n <- 20; m <- n - 3
 D <- diff(diag(n), differences = 3)
 w <- rexp(n) + 0.5; r <- rnorm(n); x <- rexp(m) + 0.2; th <- rnorm(n)

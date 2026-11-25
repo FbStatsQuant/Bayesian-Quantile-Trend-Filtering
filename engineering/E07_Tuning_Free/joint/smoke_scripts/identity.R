@@ -1,4 +1,5 @@
-source("/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/archive-owls-session-scratch-20261125/5a5aaa0b-5c86-47ef-8fba-2096636ee464/scratchpad/common.R")
+ROOT <- local({ f <- sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)); d <- if (length(f)) dirname(normalizePath(f[1])) else getwd(); r <- tryCatch(system2("git", c("-C", shQuote(d), "rev-parse", "--show-toplevel"), stdout = TRUE, stderr = FALSE), error = function(e) character(0)); if (!length(r) || !nzchar(r[1])) stop("E07: cannot find the repo root; run from inside the checkout"); r[1] })   # E-12: repo root (Owls or NOTS), no absolute paths
+source(file.path(ROOT, "engineering/E07_Tuning_Free/joint/smoke_scripts/common.R"))   # E-12: tracked twin of the archived scratchpad common.R (differs only in the R-library and Rcpp-cache lines)
 taus <- c(0.90, 0.93)
 dat <- e_new$simulate_data(1, 200L, taus, "VS", "Normal")
 iter <- 260L; burn <- 220L    # warm = 200, so 60 post-warm exact-kernel sweeps

@@ -1,13 +1,13 @@
 # Felipe's joint sampler (E07lamjump copy, lamjump = FALSE == his), paper settings (experiments/joint_upper_levels/config.R) except iteration counts.
 # Args: iter burn out.rds
 a <- commandArgs(TRUE); iter <- as.integer(a[1]); burn <- as.integer(a[2]); outf <- a[3]
-.libPaths(c("/home/fb31/Bayesian-Quantile-Trend-Filtering/ops/Rlib", .libPaths()))
-SCR <- "/home/fb31/Bayesian-Quantile-Trend-Filtering/runs/archive-owls-session-scratch-20261125/12592220-6c98-4d66-a1f5-aba8b81d5bdd/scratchpad"
-options(rcpp.cache.dir = file.path(SCR, "rcpp_felipe"))
-ROOT <- "/home/fb31/Bayesian-Quantile-Trend-Filtering"; setwd(ROOT)
+ROOT <- local({ f <- sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE)); d <- if (length(f)) dirname(normalizePath(f[1])) else getwd(); r <- tryCatch(system2("git", c("-C", shQuote(d), "rev-parse", "--show-toplevel"), stdout = TRUE, stderr = FALSE), error = function(e) character(0)); if (!length(r) || !nzchar(r[1])) stop("E07: cannot find the repo root; run from inside the checkout"); r[1] })   # E-12: repo root (Owls or NOTS), no absolute paths
+.libPaths(c(file.path(ROOT, "ops/Rlib"), .libPaths()))
+options(rcpp.cache.dir = file.path(ROOT, "tmp/rcpp_cache/rcpp_felipe"))   # E-12: was the session scratchpad
+setwd(ROOT)
 L <- readLines("engineering/E07_Tuning_Free/joint/Joint_Sampler_PMALA_Augmented_E07lamjump.R"); k <- grep("^# ---- Main", L)[1]
 e <- new.env(parent = globalenv()); eval(parse(text = L[seq_len(k - 1)]), e)
-eval(quote(load_box_cpp(joint_dir = "/home/fb31/Bayesian-Quantile-Trend-Filtering/method/joint", ind_dir = "/home/fb31/Bayesian-Quantile-Trend-Filtering/method/individual")), e)
+eval(quote(load_box_cpp(joint_dir = file.path(ROOT, "method/joint"), ind_dir = file.path(ROOT, "method/individual"))), e)
 taus <- c(0.90, 0.93, 0.96, 0.97, 0.98, 0.99)
 d <- e$simulate_data(1, 500L, taus, "VS", "Normal")
 truths <- sapply(taus, function(t) e$simulate_data(1, 500L, t, "VS", "Normal")$truth)

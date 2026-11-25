@@ -41,22 +41,22 @@ All moves were checked against sha256 lists taken before the move; the lists are
 
 The Owls originals in `runs/` stay until the PC receipt arrives.
 
-**Before the Owls copy of the session-scratch archive is deleted.** These 10 E-07 scripts point into `runs/archive-owls-session-scratch-20261125/` on Owls. Each takes the session's scratchpad as its code or data folder (`SCR`/`S`, or a `source`/`saveRDS` path).
+**The E-07 scripts no longer depend on this archive (HQ, checkpoint 3).** Ten E-07 scripts used to point into `runs/archive-owls-session-scratch-20261125/`. Each now finds the repo root itself (`git rev-parse --show-toplevel`, from the script's own location), so it runs on Owls and on NOTS. No file outside `runs/`, `tmp/` and `ops/` names the archive any more; only this record does.
 
-| Script (under `engineering/E07_Tuning_Free/`) | Line | Session dir |
+Inputs read from the archived scratchpads, followed through sourced files:
+
+| Script (under `engineering/E07_Tuning_Free/`) | Read from the archive | Now |
 |---|---|---|
-| `joint/smoke_scripts/identity.R` | 1 | `5a5aaa0b…` |
-| `joint_gibbs/common_v3.R` | 6 | `12592220…` |
-| `joint_gibbs/felipe_run_v3.R` | 5 | `12592220…` |
-| `joint_gibbs/unit_v3.R` | 2 | `12592220…` |
-| `joint_gibbs/validate/analyze_b2.R` | 2 | `7aecef86…` |
-| `joint_gibbs/validate/common.R` | 6 | `7aecef86…` |
-| `joint_gibbs/validate/common2.R` | 6 | `7aecef86…` |
-| `joint_gibbs/validate/felipe_run.R` | 4 | `7aecef86…` |
-| `joint_gibbs/validate/val_b.R` | 16 | `7aecef86…` |
-| `joint_gibbs/validate/val_b_smooth.R` | 16 | `7aecef86…` |
+| `joint/smoke_scripts/identity.R` | `5a5aaa0b…/scratchpad/common.R` (1,547 B, sourced) | sources the tracked twin `joint/smoke_scripts/common.R`. It differs only in the R-library and Rcpp-cache lines, and its paths are now ROOT-relative too. |
+| `joint_gibbs/validate/analyze_b2.R` | `7aecef86…/scratchpad/{v2_c1, v2_c2, felipe_full}.rds` (295,068 + 294,853 + 489,476 B) | reads the tracked copies in `joint_gibbs/validate/inputs/` (checksums in `SHA256SUMS`). Re-run on 11-25 from the copies; it gives the same table ("median ESS/s ratio v2/F: 3.44"). |
 
-After the Owls delete these scripts will not run as they are. To rerun one, restore that session dir from the PC archive to the same path, or point its line at the restore location. These are frozen E-07 records, and the canonical sampler code in `method/` does not depend on them.
+The other scripts never read anything from the archive:
+- `joint_gibbs/{common_v3, unit_v3, felipe_run_v3}.R` and `joint_gibbs/validate/{common, common2, felipe_run}.R` used it only as an Rcpp cache or as the output folder `SCR`.
+- `joint_gibbs/validate/{val_b, val_b_smooth}.R` only wrote `val_b.rds` and `val_b_smooth.rds` there.
+- Rcpp caches now go to `ROOT/tmp/rcpp_cache`.
+- The outputs written through `SCR` now go to `ROOT/runs/E07-outputs/` (git-ignored, created on first use): `val_b.rds`, `val_b_smooth.rds`, and also `val_a.rds` and `val_j1_v3.rds` from `validate/val_a.R` and `val_j1_v3.R`, which use the same `SCR`.
+
+The inputs total 1.08 MB (under 5 MB), so they are tracked next to the scripts. Nothing has to be restored from the PC to re-run these scripts.
 
 ## Deleted
 
@@ -71,7 +71,7 @@ After the Owls delete these scripts will not run as they are. To rerun one, rest
 ## Path updates
 
 - The repo scripts' `BQTF_runs` defaults now point to `ROOT/runs`.
-- The E-07 session-scratch paths now point to the archive above, and the E-07 Rcpp caches now go to `ROOT/tmp/rcpp_cache`.
+- The E-07 scripts no longer use the session scratch at all (see the table above). Their inputs are tracked in `joint_gibbs/validate/inputs/`, their outputs go to `ROOT/runs/E07-outputs/`, and their Rcpp caches go to `ROOT/tmp/rcpp_cache`.
 - `.libPaths` now uses `ROOT/ops/Rlib`.
 - The NOTS job files use `$HOME/BQTF/tmp` and `$HOME/BQTF/ops/Rlib`.
 - In ops: `bqtf_ops.sh` has `OPS=ROOT/ops` and the shim path relative to `OPS`; `CLAUDE.md` has the new self-paths and the PC puller download `/projects/ml75/fb31/BQTF/ops/pc/bqtf_pull.ps1`.
