@@ -39,7 +39,7 @@ umask 077
 campaign=$1 throttle=$2 run_id=$3 head=$4 slurm=$5 indices=$6 count=$7 job=$8
 root="$HOME/BQTF"
 staged="$root/tmp/e17-code-$head"
-run="$root/runs/$run_id"
+run="$root/tmp/e17-results/$run_id"
 code="$run/code"
 [[ ! -e "$run/slurm_job_id" ]]
 if [[ -d "$run/out" && -n "$(find "$run/out" -type f -print -quit)" ]]; then

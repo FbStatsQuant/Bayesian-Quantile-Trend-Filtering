@@ -10,7 +10,7 @@ ops=$(cd "$(dirname "$0")" && pwd)
 remote=$(cat <<'REMOTE'
 set -euo pipefail
 umask 077
-run="$HOME/BQTF/runs/$1"
+run="$HOME/BQTF/tmp/e17-results/$1"
 campaign=$2 count=$3
 cd "$run"
 id=$(cut -d';' -f1 slurm_job_id)
@@ -60,7 +60,7 @@ stage=$(mktemp -d "$(dirname "$dest")/.e17-results.XXXXXXXX")
 trap 'rm -rf -- "$stage"' EXIT
 printf -v cmd ' %q' bash -c '
     set -euo pipefail
-    cd "$HOME/BQTF/runs/$1"
+    cd "$HOME/BQTF/tmp/e17-results/$1"
     sha256sum -c --quiet E17_RESULTS.sha256 >&2
     tar -cf - out e17_summary.csv e17_health.csv E17_RESULTS.sha256
 ' e17-pull "$run_id"

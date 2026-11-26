@@ -32,10 +32,10 @@ individual sampler, original generators, and worker scripts.
 
 ```bash
 ops=engineering/E17_b0_1e5/ops
-slurm=engineering/E17_b0_1e5/e17.slurm
+slurm=engineering/E17_b0_1e5/e17_private.slurm
 throttle=300
 head=$(git bundle list-heads "$BUNDLE" HEAD | awk '$2=="HEAD"{print $1}')
-bash "$ops/stage_bundle.sh" "$BUNDLE"
+bash "$ops/stage_bundle.sh" "$BUNDLE" "$BUNDLE_SHA256"
 bash "$ops/submit.sh" interior pilot "$throttle" E17-interior-pilot-20261125 "$head" "$slurm"
 bash "$ops/submit.sh" extreme pilot "$throttle" E17-extreme-pilot-20261125 "$head" "$slurm"
 ```
@@ -82,5 +82,7 @@ bash "$ops/collect.sh" extreme E17-extreme-20261125 "$PWD/runs/E17-extreme-20261
 ```
 
 Send results to the Engineering head only. The collection script uses
-`E17_RESULTS.sha256` for integrity checking and leaves the run outside
-the automatic E-01 pickup.
+`E17_RESULTS.sha256` for integrity checking. NOTS pilot and production
+outputs live under `$HOME/BQTF/tmp/e17-results/`, outside the automatic
+E-01 pickup. The staged private Slurm entry point changes only the
+allowed run directory from the bundle's original Slurm script.

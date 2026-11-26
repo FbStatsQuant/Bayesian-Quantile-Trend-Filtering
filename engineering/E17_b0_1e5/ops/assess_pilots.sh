@@ -7,8 +7,8 @@ ops=$(cd "$(dirname "$0")" && pwd)
 remote=$(cat <<'REMOTE'
 set -euo pipefail
 umask 077
-interior="$HOME/BQTF/runs/$1"
-extreme="$HOME/BQTF/runs/$2"
+interior="$HOME/BQTF/tmp/e17-results/$1"
+extreme="$HOME/BQTF/tmp/e17-results/$2"
 ij=$(cut -d';' -f1 "$interior/slurm_job_id")
 ej=$(cut -d';' -f1 "$extreme/slurm_job_id")
 scratch=$(mktemp -d "$HOME/BQTF/tmp/e17-pilot-accounting.XXXXXXXX")
