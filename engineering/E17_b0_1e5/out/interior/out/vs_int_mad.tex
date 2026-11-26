@@ -1,0 +1,30 @@
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean absolute deviation (MAD) for the varying-smoothness (VS) signal ($k=2$), $n=500$, at interior quantile levels.}
+\label{tab:vs_int_mad}
+\begin{tabular}{lrrrrr}
+\toprule
+Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.012702 & 0.020517 & 0.030557 & 0.040591 & 0.066465 \\
+Onizuka (Horseshoe) & 0.011300 & 0.018849 & 0.028763 & 0.038443 & 0.062328 \\
+Bayesian-PMALA & 0.012590 & 0.020623 & 0.030606 & 0.040617 & 0.068982 \\
+ADMM & 0.027314 & 0.029267 & 0.044214 & 0.052848 & 0.076817 \\
+\midrule
+Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.215556 & 0.139979 & 0.128822 & 0.138850 & 0.215747 \\
+Onizuka (Horseshoe) & 0.212371 & 0.140284 & 0.129614 & 0.141514 & 0.218726 \\
+Bayesian-PMALA & 0.217127 & 0.147141 & 0.132533 & 0.141386 & 0.208296 \\
+ADMM & 0.218535 & 0.183889 & 0.169139 & 0.157936 & 0.201602 \\
+\midrule
+Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+\midrule
+Onizuka (Laplace) & 0.109980 & 0.070160 & 0.063856 & 0.067192 & 0.103017 \\
+Onizuka (Horseshoe) & 0.106356 & 0.068189 & 0.061950 & 0.065668 & 0.101007 \\
+Bayesian-PMALA & 0.105817 & 0.069279 & 0.063614 & 0.067438 & 0.103270 \\
+ADMM & 0.141630 & 0.087809 & 0.085612 & 0.081531 & 0.107235 \\
+\bottomrule
+\end{tabular}
+\end{table}

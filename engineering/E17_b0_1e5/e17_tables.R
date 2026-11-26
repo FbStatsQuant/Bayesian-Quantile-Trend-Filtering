@@ -1,6 +1,9 @@
 # Usage: Rscript --vanilla e17_tables.R E17_INTERIOR E17_EXTREME E14 E14B E15 [NEW_OUTPUT_DIR]
 e17_fit_health <- function(repo, runs, references) {
   workers <- e17_workers(repo)
+  original <- new.env()
+  sys.source(file.path(repo, "experiments", "extreme_quantiles", "packages",
+    "Extreme_Individual", "common_extreme.R"), envir = original)
   do.call(rbind, lapply(names(runs), function(design) {
     tasks <- e17_tasks(workers, design)
     do.call(rbind, lapply(c("reference", "e17"), function(cohort) {
@@ -24,10 +27,23 @@ e17_fit_health <- function(repo, runs, references) {
         diagnostics <- unlist(x[c("mse", "lambda_ess", "acc_post", "n_sigma_guard", "n_ipm_fallback")])
         stopifnot(length(diagnostics) == 5L, all(is.finite(diagnostics)), x$mse >= 0,
           x$lambda_ess >= 0, x$acc_post >= 0, x$acc_post <= 1)
-        c(diagnostics, lambda_thinned_mean = mean(x$lambda[x$trace_sweep > x$burn]))
+        list(metrics = c(diagnostics, lambda_thinned_mean = mean(x$lambda[x$trace_sweep > x$burn])),
+          est = if (design == "interior") x$est)
       })
-      data.frame(design, b0 = rate, tasks[c("signal", "noise", "tau", "seed")],
-        do.call(rbind, vals), row.names = NULL)
+      h <- data.frame(design, b0 = rate, tasks[c("id", "signal", "noise", "tau", "seed")],
+        do.call(rbind, lapply(vals, `[[`, "metrics")), row.names = NULL)
+      h$cross_nb <- h$cross_all <- NA_real_
+      if (design == "interior") {
+        groups <- split(seq_len(nrow(h)), interaction(h$signal, h$noise, h$seed, drop = TRUE))
+        for (i in groups) {
+          i <- i[order(h$tau[i])]
+          est <- vapply(vals[i], `[[`, numeric(500L), "est")
+          crossings <- original$crossing_counts(est, h$tau[i])$per_level
+          h$cross_nb[i] <- crossings$crossings_neighbor
+          h$cross_all[i] <- crossings$crossings_all
+        }
+      }
+      h
     }))
   }))
 }
@@ -64,7 +80,9 @@ e17_write_mse <- function(path, design, comparison, health) {
       sprintf("| %s | %s | %.6f | %.6f | %.6f | %.6f |%s", labels[d$noise], tau,
         d$published, d$b0_1e3, d$b0_1e5, d$e17_over_published, extra_cell), "",
       sprintf("Median λ ESS on the full post-burn-in λ trace: %.6f at b0 = 1e-3, %.6f at b0 = 1e-5.",
-        previous, current), "")
+        previous, current),
+      sprintf("E-17 fits below 0.40 post-burn-in acceptance: %d.",
+        sum(h$b0 == e17_rate & h$acc_post < .4)), "")
   })
   reference <- if (extreme) {
     "The b0 = 1e-3 column uses E-15. Published MSEs use four decimals, padded here to six. Rows at τ = **0.99** are marked in bold."
@@ -82,9 +100,25 @@ e17_health_by_tau <- function(health) {
     data.frame(h[1L, keys], n_fits = nrow(h), median_lambda_ess = median(h$lambda_ess),
       min_lambda_ess = min(h$lambda_ess), median_run_mean_lambda = median(h$lambda_thinned_mean),
       median_acc_post = median(h$acc_post), n_sigma_guard = sum(h$n_sigma_guard),
+      n_low_acceptance = sum(h$acc_post < .4),
       n_ipm_fallback = sum(h$n_ipm_fallback), row.names = NULL)
   }))
   summary[order(summary$design, summary$signal, summary$tau, -summary$b0), ]
+}
+
+e17_interior_crossings <- function(health) {
+  h <- subset(health, design == "interior")
+  keys <- c("signal", "noise", "tau")
+  first <- subset(h, b0 == 1e-3)
+  second <- subset(h, b0 == e17_rate)
+  m <- c("cross_nb", "cross_all")
+  do.call(rbind, lapply(m, function(metric) {
+    ref <- aggregate(first[metric], first[keys], mean)
+    cur <- aggregate(second[metric], second[keys], mean)
+    names(ref)[4L] <- "b0_1e3"
+    names(cur)[4L] <- "b0_1e5"
+    data.frame(merge(ref, cur, by = keys), metric)
+  }))
 }
 
 e17_verify_mse <- function(design, comparison, health) {
@@ -131,6 +165,10 @@ e17_build_tables <- function(repo, runs, references, output_root) {
   }
 
   health <- e17_fit_health(repo, runs, references)
+  low <- subset(health, b0 == e17_rate & acc_post < .4,
+    select = c(design, id, signal, noise, tau, seed, acc_post, lambda_ess))
+  low$is_extreme_tau_099 <- low$design == "extreme" & low$tau == .99
+  write.csv(low, file.path(stage, "low_acceptance_fits.csv"), row.names = FALSE)
   by_tau <- e17_health_by_tau(health)
   write.csv(subset(by_tau, design == "interior"), file.path(stage, "health_by_tau.csv"),
     row.names = FALSE)
@@ -146,15 +184,20 @@ e17_build_tables <- function(repo, runs, references, output_root) {
   e17_verify_mse("extreme", cmp15, health)
   if (!extreme_paper) dir.create(extreme)
   extreme_ess <- subset(by_tau, design == "extreme",
-    select = c(signal, tau, b0, n_fits, median_lambda_ess, min_lambda_ess))
+    select = c(signal, tau, b0, n_fits, median_lambda_ess, min_lambda_ess,
+      median_run_mean_lambda, n_low_acceptance))
   extreme_ess$is_extreme_tau_099 <- extreme_ess$tau == .99
   write.csv(extreme_ess, file.path(extreme, "lambda_ess_by_tau.csv"), row.names = FALSE)
   write.csv(cmp14, file.path(interior, "comparison.csv"), row.names = FALSE)
   write.csv(subset(cmp15, metric == "mse"), file.path(extreme, "comparison.csv"), row.names = FALSE)
-  write.csv(subset(cmp15, metric %in% c("cross_nb", "cross_all")),
-    file.path(extreme, "crossing_comparison.csv"), row.names = FALSE)
+  cross14 <- e17_interior_crossings(health)
+  cross15 <- subset(cmp15, metric %in% c("cross_nb", "cross_all"))
+  write.csv(cross14, file.path(interior, "crossing_comparison.csv"), row.names = FALSE)
+  write.csv(cross15, file.path(extreme, "crossing_comparison.csv"), row.names = FALSE)
   e17_write_mse(file.path(interior, "old_vs_new_mse.md"), "interior", cmp14, health)
   e17_write_mse(file.path(extreme, "old_vs_new_mse.md"), "extreme", cmp15, health)
+  sys.source(file.path(repo, "engineering", "E17_b0_1e5", "e17_headlines.R"), envir = environment())
+  e17_write_headlines(file.path(stage, "headlines.md"), cmp14, cmp15, cross14, cross15, health, low)
   note <- "E-17 individual fits at b0 = 1e-5. Prepared for HQ review."
   e14b_write_claims(file.path(interior, "recomputed_claims.md"),
     read.csv(published, colClasses = c(value = "character")), e14_read_paper(repo)$published,

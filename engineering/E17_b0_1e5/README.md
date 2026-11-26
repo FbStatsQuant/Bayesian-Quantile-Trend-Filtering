@@ -99,12 +99,12 @@ is the ratio denominator.
 
 Reports land under `out/interior/` and `out/extreme/` only after
 both grids pass. The interior report includes `old_vs_new_mse.md`,
-the detailed comparison, `recomputed_claims.md`, and six LaTeX
+the detailed MSE, MAD, MCIW and crossing comparisons, `recomputed_claims.md`, and six LaTeX
 fragments with the published competitor rows. HQ holds those artifacts
 for release.
 
 The extreme report is for comparison only. It includes `old_vs_new_mse.md`
-and CSV comparisons for MSE, crossings, and λ ESS. It shows E-17 relative
+and CSV comparisons for MSE, crossings, λ ESS, and λ medians. It shows E-17 relative
 to both published values and E-15. The Markdown emphasizes every τ = 0.99
 row, and all three extreme CSVs mark those rows with
 `is_extreme_tau_099`. The crossing comparison records neighboring
@@ -115,12 +115,17 @@ disabled pending the owner's decision.
 
 `health_by_tau.csv` summarizes each interior signal, τ, and prior rate
 over the 300 noise/seed fits. `extreme/lambda_ess_by_tau.csv` summarizes
-the corresponding extreme ESS. The λ ESS values use
+the corresponding extreme ESS and λ medians. The λ ESS values use
 `coda::effectiveSize` on all 20,000 post-burn-in λ draws, matching
 the earlier engineering reports. λ medians are medians of per-fit
 means from the same every-30-sweeps posterior trace in each cohort.
 This common trace summary also covers E-14 VS, whose compact
 outputs predate the full-trace λ mean field.
+
+Interior crossings use all five levels with the same within-seed
+definition. The HQ headlines count each pair once across 100 seeds in
+each of the three noises. The reports count fits below 0.40 acceptance
+and name those fits in `low_acceptance_fits.csv`.
 
 The full-size fixture exercised both builders with 6,600 synthetic
 E-17 fits and their 6,600 archived references. The synthetic curves

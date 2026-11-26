@@ -1,0 +1,4 @@
+"design","id","signal","noise","tau","seed","acc_post","lambda_ess","is_extreme_tau_099"
+"interior","S_Mixed_t05_s090","S","Mixed",0.05,90,0.38845,10.4597495475042,FALSE
+"extreme","S_Beta_t96_s026","S","Beta",0.96,26,0.39705,14.6661301115826,FALSE
+"extreme","S_Mixed_t96_s016","S","Mixed",0.96,16,0.398,6.2081325819627,FALSE
