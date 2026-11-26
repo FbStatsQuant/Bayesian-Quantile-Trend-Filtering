@@ -8,6 +8,8 @@ import BQTF.Gram
 import BQTF.Smooth
 import BQTF.SmallBall
 import BQTF.QuadShift
+import BQTF.Prior.Geometry
+import BQTF.Prior.Window
 import BQTF.PriorMass
 import BQTF.Denominator
 import BQTF.Width
@@ -18,4 +20,6 @@ import BQTF.Score
 import BQTF.Shells
 import BQTF.Asym.Rates
 import BQTF.Main
+import BQTF.Scale.Posterior
+import BQTF.Scale.Data
 import BQTF.Reduction

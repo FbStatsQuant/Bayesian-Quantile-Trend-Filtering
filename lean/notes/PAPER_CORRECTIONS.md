@@ -41,3 +41,30 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Why it was needed:** a missing measurability condition. Without it the expectation is not defined; formally, a lower integral would be bounded. This is the paper-side counterpart of difference D3 in docs/statements.md.
 - **Lean:** the measurability conjunct of `BQTF.MainConclusion`, proved in `BQTF.main_theorem` via the private `measurable_posterior_apply`, in `lean/BQTF/Main.lean`.
 - **Status:** **open**. Main is merged, but it is not finalized and checked: it still depends on sorried modules. The packet goes out once Main's axiom check shows only the 3 standard axioms.
+
+## C-03: the finiteness step in Lemma coord(b) says the c-integral is "free of u"
+
+- **Paper label:** appendix, proof of Lemma `pf:lem:coord`(b), the finiteness of N(ℝⁿ).
+- **Current paper text:** "For finiteness: ρ_τ(x) ≥ min{τ,1−τ}|x| and ‖y−Nc−Su‖₁ ≥ ‖c−Nᵀ(y−Su)‖₂, so the c-integral is finite and free of u."
+- **Correct version:** "…so the c-integral is at most ∫exp{−a‖c − Nᵀ(y−Su)‖₂}dc = ∫exp{−a‖c‖₂}dc < ∞, with a = min{τ,1−τ}, a bound that does not depend on u; integrating it against the probability measure Q_λ gives N(ℝⁿ) < ∞. Positivity of the integrand gives N(ℝⁿ) > 0."
+- **Why it was needed:** a wrong proof step, in its wording. The c-integral itself depends on u (Sol reviewer's example: n = 2, r = 1, y = θ* = 0, τ = 1/2, N = (1,1)ᵀ/√2, S = (0,1)ᵀ gives √2(|u|+2)e^{−|u|/2}). Only its upper bound is u-free, and that is what the argument uses.
+- **Lean:** `BQTF.posterior_eq_ratio` (the clause 0 < Nmass univ < ∞), in `lean/BQTF/Coord.lean`.
+- **Status:** **open**. Found in the Coord review on 2026-11-25. The packet goes out when Coord is finalized and checked.
+
+## C-04: Lemma interp uses Lemma coord at window size w = r, where Lemma coord assumes n > r
+
+- **Paper label:** appendix, proof of Lemma `pf:lem:interp`.
+- **Current paper text:** "On a window W ∋ i₀ of w ≥ r consecutive indices, Lemma coord applied to δ_W gives δ_W = p + S_w u_W …". But Lemma `pf:lem:coord` begins "Let n > r", and the choice w = ⌈n x*⌉ can equal r.
+- **Correct version:** add "(if w = r, δ_W is itself the evaluation of a polynomial of degree ≤ r−1, by interpolation at r points, so take p = δ_W and ϱ_w = 0)", or require w > r and adjust the case split.
+- **Why it was needed:** a proof gap at a boundary case. The bound survives unchanged.
+- **Lean:** `BQTF.interp`, in `lean/BQTF/Interp.lean` (Neon-A, not proved yet). The Lean proof must handle w = r.
+- **Status:** **open**. It was found by the Coord reviewer while reading the paper, not yet confirmed by a Lean proof. It is confirmed or withdrawn when Interp is formalized.
+
+## C-05: in the reduction to σ = 1, the TV bound refers to the original target
+
+- **Paper label:** appendix, §`pf:sec:reduction` ("Reduction to σ = 1").
+- **Current paper text:** "The data y/σ₀ satisfy A and B with (L/σ₀, σ₀f̲, σ₀f̄), and V* ≤ V̄/σ₀." Here V* = TV^{(r)}(θ*) is defined for the original target (appendix opening paragraph).
+- **Correct version:** "…satisfy A and B with (L/σ₀, σ₀f̲, σ₀f̄) at the target θ*/σ₀, whose total variation is TV^{(r)}(θ*/σ₀) = V*/σ₀ ≤ V̄/σ₀."
+- **Why it was needed:** a wrong statement in a proof step. As written, the inequality fails for σ₀ > 1 when V* = V̄ > 0. The argument needs the bound for the rescaled target.
+- **Lean:** `BQTF.main_theorem_scale`, in `lean/BQTF/Reduction.lean`, with the data rescaling in `lean/BQTF/Scale/Data.lean`.
+- **Status:** **open**. Found in the Reduction review on 2026-11-25. Reduction is merged but depends on `main_theorem`; the packet goes out when the axiom check is clean.
