@@ -19,7 +19,7 @@ In simulations with varying-smoothness and smooth signals under Gaussian, Beta, 
 | `paper/` | The manuscript: `main.tex`, `references.bib`, `sections/`, `figures/`, `history/` (dated edit-session notes, reviews, to-do). |
 | `method/` | Canonical sampler code, the thing a user runs: `individual/` (single-quantile P-MALA), `joint/` (non-crossing joint sampler), `admm_qtf/` (ADMM quantile trend filtering baseline). |
 | `experiments/` | Everything that produced numbers in the paper. `experiments/README.md` maps each table and figure to its folder. |
-| `applications/` | Real-data analyses (`Growth/`, `Air Quality/`, `Munich Rent/`). Open items are listed in its README. |
+| `applications/` | Real-data analyses (`Growth/`, `Air Quality/`; the dropped Munich application is in `archive/munich_rent/code/`). Open items are listed in its README. |
 | `theory/` | Theory Department task folders (T-01 ...). Theory commits only here. |
 | `engineering/` | Engineering Department task folders (E-01 ...), including `E03_Repo_Organization/`. |
 | `writing/` | Writing Department task folders (W-01 ...: statement drafts, reviews). The Writing Department commits only here. |
