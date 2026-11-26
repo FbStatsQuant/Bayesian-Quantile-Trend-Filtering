@@ -146,3 +146,18 @@ told the reset time. Submitted jobs keep running.
 - The pairing gate blocked submission. No Slurm job IDs were assigned,
   and NOTS usage was 0 core-hours. The pilot projection and E-19 verdict
   are unavailable.
+
+### 2026-11-26 pairing amendment
+
+HQ approved this amendment because E-14 never stored the responses
+(`y`). For every E-19 fit, the regenerated truth must still match the
+corresponding archived E-14 truth bit for bit. The response is regenerated
+using the exact `e14_data.R` blob at `01526e1`
+(`b2023dc92bb6d3a51136a6013fd63d7b6d6ee7d9`), verified in the run's code
+copy on Owls and NOTS.
+
+Before the pilot, all 12 cases in [DATA_MATCH.md](../E14_Inner_Rerun/DATA_MATCH.md)
+must match both reference SHA-256 digests, calculated over little-endian
+IEEE-754 double bytes of the response and truth. Any mismatch stops the
+run. Each E-19 RDS records the SHA-256 of its regenerated response using
+the same byte encoding. All other preregistered settings and gates apply.

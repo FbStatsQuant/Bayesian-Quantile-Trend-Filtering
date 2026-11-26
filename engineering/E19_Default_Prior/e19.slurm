@@ -38,5 +38,8 @@ export FLEXIBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 BLIS_NUM_THREADS=1 VECLIB_MAXIM
 export RCPP_PARALLEL_NUM_THREADS=1 MAKEFLAGS=-j1
 
 echo "[$(date -Is)] host=$(hostname) task=$task"
+if [[ -z "${SLURM_ARRAY_TASK_ID:-}" ]]; then
+    Rscript --vanilla "$code/e19_run.R" "$RUN" --preflight
+fi
 Rscript --vanilla "$code/e19_run.R" "$RUN" "$task" "$comparator"
 echo "[$(date -Is)] done"
