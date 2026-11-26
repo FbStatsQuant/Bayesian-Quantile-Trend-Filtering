@@ -26,6 +26,12 @@ Since E-03 the settings block of `individual/Individual_Sampler_PMALA_Augmented.
 
 R >= 4.4: `Rcpp`, `RcppArmadillo`, `glmgen`, `Matrix`; joint tests also `clarabel`. A C++17 compiler. On Windows the scripts fall back to a mingw `g++` if `Rcpp::sourceCpp` fails.
 
+Install `glmgen` 0.0.3 from GitHub with the `remotes` package:
+
+```r
+remotes::install_github("glmgen/glmgen", ref = "9e6061503d6dd103712a0c07f6be7293c1c58aaf", subdir = "R_pkg/glmgen", upgrade = "never")
+```
+
 Install `clarabel` with `install.packages("clarabel")`. The CRAN source package
 declares Cargo, `rustc` >= 1.70.0, and GNU Make. Version 0.11.3 passed the
 joint optimisation-kernel tests with R 4.6.0 and Rust 1.100.0. [CRAN package requirements](https://CRAN.R-project.org/package=clarabel)
