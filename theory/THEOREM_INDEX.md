@@ -36,7 +36,7 @@ These are the statements the paper now carries. Under the owner's policy of 2026
 - **Conclusion:** E Π_C(max_j Δ²_n(θ_j − θ*_j) > M n^{−(2k+1)/(2k+2)} | y) ≤ C n^{−1/(2k+2)}.
   - Constants depend on (c_1, …, c_J, k, L, f̲, f̄, V̄, J) and the minimum level spacing; the spacing enters n₀ only.
   - No new assumption: B separates the true curves by min{L, spacing/f̄}.
-- **Status:** AUDITED (fresh Fable and Astra, three rounds, clean).
+- **Status:** AUDITED (fresh Fable and Astra, three rounds, clean). **Formally verified in Lean** (main d0366d5, 2026-11-26): `joint_theorem` and `joint_theorem_scale` use only the standard axioms. The only paper packet was C-11, measurability of y ↦ Π_C(B|y), in 3cae0ec. No statement or constant changed. The T09 source constant was aligned to 2Σ_l C^{(l)} in f7b8e38.
 
 ### Appendix constant g_r > 0 (T-10; Lean correction C-01)
 - **Files:** `T10_gr_positivity/NOTE.md`. In the paper since Writing's 906be2b.
