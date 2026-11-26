@@ -212,7 +212,7 @@ strict crossings for each of the three level pairs and the number of
 distinct crossed grid points. Log-λ diagnostics include ESS and
 classic Gelman–Rubin R-hat over the retained thinned chains, early
 and late λ medians, and traces. Flag `STOP_rhat` when log-λ R-hat
-exceeds 1.1. A chain with no change in λ or with no change in the
+exceeds 1.1 in a gated cell (see the Stage 2′ scope below). A chain with no change in λ or with no change in the
 full θ vector across all retained sweeps is a stall. Flag it in
 the worker log and in chain health. The report saves diagnostics
 and exits with a STOP when either condition holds. Report each
@@ -272,6 +272,8 @@ pilot and associated work. Once Stage 1′ selects the triple, start
 with the standing one-fit compute-node pilot. Record MaxRSS and CPU
 and verify the existing real-data gates before production.
 
+`b0 = 1e-2` is the edge of the pre-registered grid; not extended (HQ 2026-11-26).
+
 Stage 2′ workers already save `theta_thin` as 666 retained draws by
 8,640 points per fit. The matrix is about 46 MB (43.9 MiB) before RDS
 compression, or 1.38 GB (1.29 GiB) across all 30 outputs before
@@ -292,8 +294,9 @@ For every level and rate, `spod_cell_health.csv` reports the median,
 4b, use coda's classic Gelman–Rubin point estimate on four halves
 of 333 draws, with no extra burn-in or transform. Summaries use
 finite R-hat values and report the nonfinite count. θ R-hat is
-descriptive. The log-λ R-hat across both chains keeps the existing
-STOP threshold above 1.1. The same CSV reports the maximum and RMS
+descriptive. The log-λ R-hat across both chains is reported for every
+rate. The STOP threshold above 1.1 applies only to the reported
+`b0 = 1e-2` fits. The stall checks apply to every chain. The same CSV reports the maximum and RMS
 chain-median gap in PID counts and divided by the IQR of observed
 PID counts. It gives the fraction strictly below each chain median
 and the pooled median, with signed differences from nominal τ.

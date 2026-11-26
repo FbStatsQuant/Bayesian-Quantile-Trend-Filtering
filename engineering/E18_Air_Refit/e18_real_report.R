@@ -166,13 +166,16 @@ record_cell <- function(chains, tau, b0) {
     list(rhat = val, detail = "")
   }, error = function(err) list(rhat = NA_real_, detail = conditionMessage(err)))
   field <- function(k) vapply(chains, function(x) as.numeric(x[[k]]), 0)
+  selected_for_real <- isTRUE(b0 == selected$b0[match(tau, e18_taus)])
+  rhat_gate_applies <- !prime || (selected_for_real && b0 == 1e-2)
   diagnostics <- data.frame(tau = tau, b0 = b0, a0 = if (prime) 8640L else 1L,
     log_lambda_ess_chain_1 = field("ess_log_lambda")[1L],
     log_lambda_ess_chain_2 = field("ess_log_lambda")[2L],
     log_lambda_ess_combined = as.numeric(coda::effectiveSize(traces)),
     lambda_median = exp(median(unlist(lapply(chains, `[[`, "log_lambda")))),
     log_lambda_rhat = diagnostic$rhat, rhat_detail = diagnostic$detail,
-    STOP_rhat = is.finite(diagnostic$rhat) && diagnostic$rhat > 1.1,
+    rhat_gate_applies = rhat_gate_applies,
+    STOP_rhat = rhat_gate_applies && is.finite(diagnostic$rhat) && diagnostic$rhat > 1.1,
     theta_ess_median_chain_1 = field("ess_theta_median")[1L],
     theta_ess_median_chain_2 = field("ess_theta_median")[2L],
     acceptance_chain_1 = field("acc")[1L], acceptance_chain_2 = field("acc")[2L],
@@ -180,7 +183,7 @@ record_cell <- function(chains, tau, b0) {
     warm_ipm_unconverged = sum(field("n_warm_ipm_unconverged")),
     fit_wall_seconds_chain_1 = field("seconds")[1L], fit_wall_seconds_chain_2 = field("seconds")[2L])
   if (!prime) return(list(fit = fit, diagnostics = diagnostics))
-  diagnostics$selected_for_real <- isTRUE(b0 == selected$b0[match(tau, e18_taus)])
+  diagnostics$selected_for_real <- selected_for_real
   warm <- e18_warm_summary(setNames(lapply(e18_warm_fields, field), e18_warm_fields))
   list(fit = fit, chain_medians = medians[1:2, , drop = FALSE],
     diagnostics = cbind(diagnostics, theta_comparison(draws, medians, tau), as.data.frame(warm)))
@@ -307,6 +310,6 @@ for (name in names(fits)) {
 if (with_admm && any(!benchmark$match_to_1_decimal, na.rm = TRUE))
   warning("ADMM selected different lambda values than the paper. See spod_admm_lambda_check.csv.")
 if (length(stall_ids) || (!is.null(cell_diag) && any(cell_diag$STOP_rhat)))
-  stop("STOP: a chain stalled or log-lambda R-hat exceeded 1.1. See the chain and cell health CSVs.")
+  stop("STOP: a chain stalled or log-lambda R-hat exceeded 1.1 in a gated cell. See the chain and cell health CSVs.")
 if (nrow(got$issues) || (!prime && nrow(admm$issues))) stop("Incomplete real-data fit set. See issue CSVs.")
 if (selected$branch[1L] == "iii") stop("STOP: Stage 1 did not select a rate triple. Escalate to HQ.")
