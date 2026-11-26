@@ -55,11 +55,11 @@ cluster from frozen packages; each experiment folder ships its summaries.
 
 | In the paper | Folder | How to run | Time |
 |---|---|---|---|
-| Section 2, Algorithms 1–2: the two samplers | [`method/`](method) | from the repository root: `Rscript method/individual/Individual_Sampler_PMALA_Augmented.R test`; `Rscript method/joint/Joint_Sampler_PMALA_Augmented.R test_prox` | [Eng: time of a complete run, after F12]; [Eng: time of a complete run with `clarabel`] |
+| Section 2, Algorithms 1–2: the two samplers | [`method/`](method) | from the repository root: `Rscript method/individual/Individual_Sampler_PMALA_Augmented.R test`; `Rscript method/joint/Joint_Sampler_PMALA_Augmented.R test_prox` | about 5 min (individual, including compilation); about 70 s (joint, including compilation) |
 | Section 3 and Appendix A: Theorems 1 and 2 | [`lean/`](lean) | in `lean/`: `lake exe cache get`, `lake build`, `lake env lean AxiomCheck.lean` | about 15–20 min on 3 cores, with the prebuilt Mathlib |
 | Section 4.1 and Appendix D: simulations at interior levels (Tables 1–2) | [`experiments/interior_quantiles/`](experiments/interior_quantiles) (the individual-sampler package of 2026-10-03) | shipped: `paper_reference/simulations.tex` and `paper_reference/appendix_pmala.tex` in that package. Full run, on a Slurm cluster: `bash submit.sh RUN_NAME` from the package folder | 3,000 cluster tasks |
 | Section 4.1 and Appendix D: joint estimation of extreme upper levels (Tables 3–4), crossing tables | [`experiments/extreme_quantiles/`](experiments/extreme_quantiles), [`experiments/joint_upper_levels/`](experiments/joint_upper_levels) | shipped: `experiments/extreme_quantiles/tables_20261023/mse_consolidated_oct7.csv`, `experiments/extreme_quantiles/tables_20261008/crossings_*.csv`, `experiments/joint_upper_levels/paper_reference/table2_mse.csv`. Full joint run, on a Slurm cluster: `cd experiments/joint_upper_levels && bash submit.sh RUN_NAME` | 300 cluster tasks for the joint run |
-| Section 4.2: cost per sweep (Table 5, Figures 1–2) | [`experiments/scalability/`](experiments/scalability) | see the paper's table; the script is being updated | |
+| Section 4.2: cost per sweep (Table 5, Figures 1–2) | [`experiments/scalability/`](experiments/scalability) | historical record, not runnable: see the folder's README; the paper's cost table is the reference | |
 | Section 4.3: air-quality simulation (Table 6) | [`experiments/air_simulation/`](experiments/air_simulation) | [E-18: command] | [E-18] |
 | Section 4.4: air-quality sensor data | [`applications/Air Quality/`](applications/Air%20Quality) | [E-18: command] | [E-18] |
 | Section 4.4 and Appendix E: growth centiles | [`applications/Growth/`](applications/Growth) | in `applications/Growth/`: `Rscript Growth_plots_k2.R` redraws the figures of the shipped joint-sampler fit and overwrites `results_joint_k2/figures/growth_joint_*`; `Rscript Growth_Joint_PMALA_k2.R sex=boy out=results_refit/boy` refits the boys into a new folder | [Eng: time]; [Eng: time] |
@@ -363,8 +363,8 @@ typed at the repository root unless a `cd` is shown.
 **Check the samplers.**
 
 ```sh
-Rscript method/individual/Individual_Sampler_PMALA_Augmented.R test    # [Eng: last line and time of a complete run, after F12]
-Rscript method/joint/Joint_Sampler_PMALA_Augmented.R test_prox         # needs the R package clarabel; [Eng: last line and time]
+Rscript method/individual/Individual_Sampler_PMALA_Augmented.R test    # prints "all tests passed"; about 5 min including compilation
+Rscript method/joint/Joint_Sampler_PMALA_Augmented.R test_prox         # needs the R package clarabel; prints "all optimisation-kernel tests passed"; about 70 s
 ```
 
 If a bitwise test fails by about 2e-16, see the compiler note in [`method/README.md`](method/README.md).
@@ -410,7 +410,8 @@ sha256sum -c SHA256SUMS.txt     # the Lean sources are the ones we checked
 
 - **R** 4.4 or later, with a C++17 compiler: `Rcpp`, `RcppArmadillo`, `glmgen`, `Matrix`. The
   joint sampler's tests also need `clarabel`, and the figure scripts need `ggplot2`.
-- `glmgen` is not on CRAN. Install it with [Eng: install line].
+- `glmgen` is not on CRAN. Install it with
+  `remotes::install_github("glmgen/glmgen", ref = "9e6061503d6dd103712a0c07f6be7293c1c58aaf", subdir = "R_pkg/glmgen", upgrade = "never")`.
 - **Lean**: [elan](https://github.com/leanprover/elan) installs the pinned toolchain
   (`leanprover/lean4:v4.35.0-rc2`); `lake` fetches the Mathlib revision pinned in
   `lean/lake-manifest.json`.
