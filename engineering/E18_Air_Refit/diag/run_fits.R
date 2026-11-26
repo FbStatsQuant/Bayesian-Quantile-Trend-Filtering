@@ -6,6 +6,7 @@ stopifnot(length(args) %in% 1:3)
 out <- normalizePath(args[1L], mustWork = TRUE)
 mode <- if (length(args) >= 2L) args[2L] else "owls"
 stopifnot(mode %in% c("owls", "admm"), mode == "admm" || length(args) <= 2L)
+if (mode == "owls" && !nzchar(Sys.getenv("OWLS_JOB_CORES"))) stop("Use owls_run for the Owls diagnostics.")
 source("engineering/E18_Air_Refit/e18_common.R")
 pin <- file.path(out, "pin")
 e14 <- new.env()
@@ -91,8 +92,9 @@ fit_air <- function(arm, seed) {
     thinned_sweeps = trace), file.path(out, sprintf("arm%d_s%03d.rds", arm, seed)))
   write.csv(summary, file.path(out, sprintf("arm%d_s%03d.csv", arm, seed)), row.names = FALSE)
 }
+interior_ids <- c("S_Beta_t50_s001", "VS_Mixed_t25_s001", "S_Normal_t75_s001")
 replay_e14 <- function(seed) {
-  id <- c("S_Beta_t50_s001", "VS_Mixed_t25_s001", "S_Normal_t75_s001")[seed]
+  id <- interior_ids[seed]
   grid <- e14$e14_tasks()
   t <- as.list(grid[grid$id == id, ])
   old <- readRDS(file.path("runs/E14-inner-rerun-20261125/out", paste0(id, ".rds")))
@@ -122,6 +124,8 @@ work <- function(i) {
   arm <- jobs$arm[i]
   seed <- jobs$seed[i]
   label <- sprintf("arm%d_s%03d", arm, seed)
+  expected <- if (arm == 14L) paste0("replay_", interior_ids[seed], ".csv") else paste0(label, c(".csv", ".rds"))
+  if (all(file.exists(file.path(out, expected)))) return(TRUE)
   tryCatch({
     if (nzchar(Sys.getenv("OWLS_JOB_CORES"))) memory_gate()
     message("START ", label)
