@@ -23,7 +23,7 @@ def rss_mib(value):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("sim", "real"))
+    parser.add_argument("mode", choices=("sim", "real", "sim-prime", "real-prime"))
     parser.add_argument("accounting", type=Path)
     args = parser.parse_args()
     allocations, batches = {}, {}
@@ -40,7 +40,8 @@ def main():
             raise SystemExit(f"Duplicate accounting record for {job}")
         rows[match[1]] = (state, cpu, elapsed, rss, exit_code, fields[7:])
 
-    expected = 6 if args.mode == "sim" else 3
+    simulated = args.mode in ("sim", "sim-prime")
+    expected = 6 if simulated else 3
     if len(allocations) != expected or allocations.keys() != batches.keys():
         raise SystemExit("Pilot accounting is incomplete")
     if any(row[0] != "COMPLETED" or row[4] != "0:0" for row in allocations.values()):
@@ -60,14 +61,19 @@ def main():
             print(f"{task} | {queued:.0f} | {int(row[2])} | {cpu_seconds(row[1]):.3f}")
     print(f"Pilot CPU: {pilot_hours:.6f} core-hours")
     print(f"Peak MaxRSS: {peak:.1f} MiB; rounded request with headroom: {memory}M")
-    if args.mode == "sim":
+    if simulated:
+        fit_count = 1500 if args.mode == "sim-prime" else 1200
         per_fit = sum(seconds) / expected
-        projection = 1200 * per_fit / 3600 + pilot_hours
+        projection = fit_count * per_fit / 3600 + pilot_hours
         print(f"Mean CPU: {per_fit:.3f} s/fit")
-        print(f"Projected 1,200 fits plus pilot: {projection:.3f} core-hours")
-        print(f"Remaining under the 80 core-hour cap: {80 - projection:.3f} core-hours (before ADMM)")
+        print(f"Projected {fit_count:,} fits plus pilot: {projection:.3f} core-hours")
+        print(f"Remaining under the 80 core-hour cap: {80 - projection:.3f} core-hours")
+        if args.mode == "sim-prime" and projection > 80:
+            raise SystemExit("STOP: Stage 1-prime exceeds 80 core-hours. Keep the full design and report to HQ.")
     else:
         print(f"Budget left under 40 core-hours: {40 - pilot_hours:.3f} core-hours (before detrendr)")
+        if args.mode == "real-prime":
+            print(f"CPU minutes per each of 30 full runs before detrendr: {(40 - pilot_hours) * 60 / 30:.3f}")
         print("Extrapolate using each pilot's executed sweeps before sizing the complete production fit.")
 
 

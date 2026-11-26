@@ -1,8 +1,10 @@
 e18_pin <- "63f2a56205b8d2ec311565db8c98874cd96754b2"
 e18_taus <- c(.01, .05, .10)
 e18_rates <- 10^-(3:6)
+e18_prime_rates <- 10^-(2:6)
 e18_h <- c(.5, .75, 1, 1.2)
 e18_pilot_indices <- c(0L, 100L, 200L, 900L, 1000L, 1100L)
+e18_prime_pilot_indices <- c(0L, 100L, 200L, 1200L, 1300L, 1400L)
 e18_post <- 10001:30000
 # E-14's every-30th-sweep trace, restricted to the retained portion.
 e18_thin <- seq.int(1L, 30000L, by = 30L)
@@ -15,7 +17,9 @@ e18_onizuka_sha <- "58e073e2da8297ff6bacfcf598252c2a429cbd9e276252b4522f91018563
 
 e18_grid <- function(stage) {
   g <- if (stage == "sim") expand.grid(seed = 1:100, tau = e18_taus, b0 = e18_rates)
+    else if (stage == "sim-prime") expand.grid(seed = 1:100, tau = e18_taus, b0 = e18_prime_rates, a0 = 500L)
     else if (stage == "real") expand.grid(seed = 1:2, tau = e18_taus, b0 = e18_rates)
+    else if (stage == "real-prime") expand.grid(seed = 1:2, tau = e18_taus, b0 = e18_prime_rates, a0 = 8640L)
     else if (stage %in% c("admm-sim", "onizuka-hs", "onizuka-lap"))
       expand.grid(seed = 1:100, tau = e18_taus)
     else if (stage == "admm-real") data.frame(seed = 1L, tau = e18_taus)
@@ -116,7 +120,8 @@ e18_fit <- function(code, task, y, truth = NULL, save_theta = FALSE) {
   set.seed(chain_seed)
   t0 <- proc.time()[["elapsed"]]
   fit <- gibbs_pmala_aug(
-    y, task$tau, order = 2L, a0 = 1, b0 = task$b0, a_sigma = .1, b_sigma = .1,
+    y, task$tau, order = 2L, a0 = if (is.null(task$a0)) 1 else task$a0,
+    b0 = task$b0, a_sigma = .1, b_sigma = .1,
     gibbs_iter = 30000L, gibbs_burn = 10000L, delta_init = delta_init,
     lambda_init = lambda_init, adapt_target = adapt_target, adapt_gain = adapt_gain,
     adapt_kappa = adapt_kappa, delta_bounds = delta_bounds, control = tf_control,

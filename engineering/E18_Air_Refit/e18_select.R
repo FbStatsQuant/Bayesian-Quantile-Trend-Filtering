@@ -1,6 +1,10 @@
 # Rscript --vanilla e18_select.R PER_FIT_CSV
 e18_select <- function(fits) {
-  g <- e18_grid("sim")[c("tau", "b0", "seed")]
+  prime <- "a0" %in% names(fits) && all(fits$a0 == 500L)
+  if ("a0" %in% names(fits)) stopifnot(!anyNA(fits$a0), prime || all(fits$a0 == 1L))
+  g <- e18_grid(if (prime) "sim-prime" else "sim")
+  rates <- unique(g$b0)
+  g <- g[c("tau", "b0", "seed")]
   fields <- c("mse", "coverage", "acc_post", "n_sigma_guard_postburn")
   stopifnot(all(c(names(g), "failed", fields) %in% names(fits)),
     nrow(fits) == nrow(g), !anyNA(fits[c(names(g), "failed")]), is.logical(fits$failed))
@@ -69,13 +73,18 @@ e18_select <- function(fits) {
     trace$chosen_at_tau[chosen] <- TRUE
   }
 
-  choice <- e18_choose_triple(trace)
+  choice <- e18_choose_triple(trace, rates)
   trace$selected_for_real <- trace$b0 == choice$selected$b0[match(trace$tau, e18_taus)]
+  if (prime) {
+    trace$a0 <- 500L
+    choice$selected$a0 <- 500L
+    choice$triples$a0 <- 500L
+  }
   list(trace = trace, selected = choice$selected, triples = choice$triples)
 }
 
-e18_choose_triple <- function(trace) {
-  triples <- expand.grid(b0_01 = e18_rates, b0_05 = e18_rates, b0_10 = e18_rates,
+e18_choose_triple <- function(trace, grid_rates = e18_rates) {
+  triples <- expand.grid(b0_01 = grid_rates, b0_05 = grid_rates, b0_10 = grid_rates,
     KEEP.OUT.ATTRS = FALSE)
   rates <- as.matrix(triples)
   powers <- round(-log10(rates))
@@ -148,12 +157,14 @@ e18_write_selection <- function(selection, dir) {
   print(selection$selected, row.names = FALSE)
 }
 
-e18_read_selected <- function(path) {
+e18_read_selected <- function(path, prime = FALSE) {
   x <- read.csv(path)
   stopifnot(identical(x$tau, e18_taus), length(unique(x$branch)) == 1L,
     all(x$branch %in% c("i", "ii", "iii")))
   if (x$branch[1L] == "iii") stopifnot(all(is.na(x$b0)))
-  else stopifnot(all(x$b0 %in% e18_rates), diff(range(round(-log10(x$b0)))) <= 1L)
+  else stopifnot(all(x$b0 %in% if (prime) e18_prime_rates else e18_rates),
+    diff(range(round(-log10(x$b0)))) <= 1L)
+  if (prime) stopifnot(length(x$a0) == nrow(x), all(x$a0 == 500L))
   x
 }
 

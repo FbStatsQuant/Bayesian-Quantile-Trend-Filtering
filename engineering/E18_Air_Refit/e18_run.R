@@ -3,6 +3,8 @@ args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 3L) stop("Usage: e18_run.R STAGE RUN_DIR ZERO_BASED_INDEX")
 stage <- args[1L]
 run <- normalizePath(args[2L], mustWork = TRUE)
+if (stage %in% c("sim", "real", "sim-prime", "real-prime"))
+  stopifnot(endsWith(stage, "-prime") == startsWith(basename(run), "E18-prime-"))
 code <- file.path(run, "code")
 source(file.path(code, "engineering", "E18_Air_Refit", "e18_common.R"))
 manifest <- read.dcf(file.path(code, "run_manifest.dcf"), fields = "Sampler-Commit")
@@ -13,7 +15,8 @@ stopifnot(grepl("^[0-9]+$", args[3L]), index %in% grid$index)
 task <- as.list(grid[index + 1L, ])
 local_qnorm <- qnorm(task$tau)
 platform <- list(R.version.string = R.version.string, qnorm_tau = sprintf("%.17g", local_qnorm))
-is_real <- stage %in% c("real", "admm-real")
+is_real <- stage %in% c("real", "real-prime", "admm-real")
+a0_value <- if ("b0" %in% names(task)) if (is.null(task$a0)) 1L else task$a0 else NA_integer_
 if (is_real) input <- e18_real_input(run)
 out <- file.path(run, stage)
 dir.create(out, showWarnings = FALSE)
@@ -30,9 +33,9 @@ run_fit <- function() {
   if (is_real) {
     y <- input$data$standardized
     stopifnot(length(y) == 8640L, all(is.finite(y)))
-    fit <- if (stage == "real") e18_fit(code, task, y, save_theta = TRUE)
+    fit <- if (stage %in% c("real", "real-prime")) e18_fit(code, task, y, save_theta = TRUE)
       else e18_admm(y, task$tau, exp(-2:12))
-    return(c(list(task = task, stage = stage, input_sha = input$sha,
+    return(c(list(task = task, stage = stage, a0 = a0_value, input_sha = input$sha,
       truth_sha = NA_character_), platform, fit))
   }
   RNGkind("Mersenne-Twister", "Inversion", "Rejection")
@@ -47,11 +50,11 @@ run_fit <- function() {
   stopifnot(identical(y_sha, audit$y_sha256[task$seed]),
             identical(baseline_sha, audit$baseline_sha256[task$seed]),
             identical(truth_sha, audit[[q_col]][task$seed]))
-  fit <- if (stage == "sim") e18_fit(code, task, d$y, truth)
+  fit <- if (stage %in% c("sim", "sim-prime")) e18_fit(code, task, d$y, truth)
     else if (stage == "admm-sim") e18_admm(d$y, task$tau, 500^seq(0, 1.4, length.out = 15L))
     else e18_onizuka(code, stage, task, d$y)
   metrics <- e18_metrics(d$y, fit$est, truth, d$s, task$tau, fit$lo, fit$hi)
-  c(list(task = task, stage = stage, y_sha = y_sha, baseline_sha = baseline_sha,
+  c(list(task = task, stage = stage, a0 = a0_value, y_sha = y_sha, baseline_sha = baseline_sha,
     truth_sha = truth_sha, metrics = metrics), platform, fit)
 }
 t0 <- proc.time()[["elapsed"]]
@@ -68,8 +71,8 @@ status <- tryCatch({
   0L
 }, error = function(err) {
   message(task$id, " failed: ", conditionMessage(err))
-  e18_atomic(c(list(task = task, stage = stage, truth_sha = NA_character_,
-    commit = if (stage %in% c("sim", "real")) e18_pin, error = conditionMessage(err),
+  e18_atomic(c(list(task = task, stage = stage, a0 = a0_value, truth_sha = NA_character_,
+    commit = if (!is.na(a0_value)) e18_pin, error = conditionMessage(err),
     seconds = proc.time()[["elapsed"]] - t0), platform), failure)
   1L
 })

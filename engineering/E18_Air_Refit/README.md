@@ -228,3 +228,32 @@ is the published old-PMALA MSE of 0.0138.
 - **BOTH or NEITHER.** Stop and report to HQ.
 
 Report arm 5 in every case.
+
+## Stage 1′ and Stage 2′ (HOLD)
+
+Use this design only in the **PRIOR** case above and after authorization.
+The sampler stays pinned at `63f2a56`. The sealed inputs, fixed truth
+offsets, sweep counts, interweaving, and acceptance target are unchanged.
+Stage 1′ sets `a0 = n = 500`. For each of the three levels and five rates
+`b0 ∈ {1e-2, 1e-3, 1e-4, 1e-5, 1e-6}`, use seeds 1–100 (1,500 fits).
+Stage 2′ sets `a0 = n = 8640` and fits both chains at each of the 15 cells
+(30 runs). Use `E18-prime-*` run IDs and `sim-prime` or `real-prime` as
+the worker stage. The grids and fit outputs record `a0` explicitly.
+
+Use the selection rule in commit `e18e52f`, with the same seed-paired
+MSE, eligibility gates, coverage ranking, spread limit of 10, tie-breaks,
+and escalation for an NA triple. The five-rate grid is the only change
+to the candidates. Use the same reporting scripts on the new run names.
+
+The Stage 1′ pilot uses seed 1 at `b0 = 1e-2` and `1e-6` at each level,
+indices `0,100,200,1200,1300,1400`. The existing six-fit acceptance and
+guard gates apply. Record measured Slurm TotalCPU and MaxRSS. Run
+`ops/pilot_resources.py sim-prime ACCOUNTING_FILE` to project the total
+as `sum(pilot CPU seconds) / 3600 + 1500 * mean(pilot CPU seconds) / 3600`.
+The dedicated 80-core-hour cap includes this pilot and is separate from
+the 53 core-hours used by Stage 1. If the projection exceeds 80, stop
+and report it to HQ. Keep all five rates and 100 replications per cell.
+
+Stage 2′ has a separate 40-core-hour cap for its 30 runs, including its
+pilot and associated work. It keeps the same authorization and real-data
+diagnostic gates as Stage 2.

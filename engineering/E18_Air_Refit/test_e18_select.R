@@ -112,3 +112,26 @@ main <- function() {
   cat("E-18 Felipe amendment CSV tests passed.\n")
 }
 main()
+
+local({
+  source("engineering/E18_Air_Refit/e18_select.R")
+  g <- e18_grid("sim-prime")
+  real <- e18_grid("real-prime")
+  pilot <- g[g$index %in% e18_prime_pilot_indices, ]
+  stopifnot(nrow(g) == 1500L, nrow(real) == 30L, all(real$a0 == 8640L),
+    all(pilot$seed == 1L), all(pilot$a0 == 500L),
+    identical(pilot$b0, rep(c(1e-2, 1e-6), each = 3L)))
+  target <- c(1e-2, 1e-4, 1e-3)
+  g <- transform(g, mse = .02, coverage = .75, acc_post = .5,
+    n_sigma_guard_postburn = 0L, failed = FALSE)
+  g$coverage[g$b0 == target[match(g$tau, e18_taus)]] <- .95
+  g$coverage[g$tau == .05 & g$b0 == 1e-3] <- .94
+  result <- e18_select(g)
+  stopifnot(nrow(result$trace) == 15L, nrow(result$triples) == 125L,
+    all(result$trace$a0 == 500L), all(result$selected$a0 == 500L),
+    identical(result$selected$b0, c(1e-2, 1e-3, 1e-3)),
+    all(result$selected$branch == "i"))
+  wide <- subset(result$triples, b0_01 == 1e-2 & b0_05 == 1e-4 & b0_10 == 1e-3)
+  stopifnot(nrow(wide) == 1L, wide$spread == 100, !wide$qualifies, is.na(wide$rank))
+  cat("E-18 Stage 1-prime five-rate grid and spread test passed.\n")
+})

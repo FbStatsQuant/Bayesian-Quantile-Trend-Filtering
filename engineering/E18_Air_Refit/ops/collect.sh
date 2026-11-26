@@ -43,7 +43,7 @@ awk -F'|' -v number="$task_count" -v allow="$allow" '
     ' "$status_tmp"
 if (( allow )); then
     case "$out:$expected:$task_count" in
-        sim:1200:1200|admm-sim:300:300|onizuka-hs:300:300|onizuka-lap:300:300) ;;
+        sim:1200:1200|sim-prime:1500:1500|admm-sim:300:300|onizuka-hs:300:300|onizuka-lap:300:300) ;;
         *) echo 'Permissive collection is available for terminal production simulation arrays.' >&2; exit 2 ;;
     esac
     mkdir -p "$out"

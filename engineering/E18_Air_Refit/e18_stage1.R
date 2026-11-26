@@ -2,6 +2,8 @@
 args <- commandArgs(trailingOnly = TRUE)
 if (!length(args)) stop("Usage: e18_stage1.R RUN_DIR [--pilot | --METHOD=REFIT_DIR ...]")
 run <- normalizePath(args[1L])
+prime <- startsWith(basename(run), "E18-prime-")
+stage_pmala <- if (prime) "sim-prime" else "sim"
 folder <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))))
 source(file.path(folder, "e18_common.R"))
 source(file.path(folder, "e18_report_common.R"))
@@ -43,11 +45,12 @@ check_data <- function(x) {
     all(is.finite(x$metrics[paste0("CAA_", e18_h)]) == (audit$n_signal[seed] > 0L)))
   e18_checked_offset(offsets[j], as.numeric(x$qnorm_tau))
 }
-grid <- e18_grid("sim")
-if (pilot) grid <- grid[grid$index %in% e18_pilot_indices, ]
-got <- e18_collect(run, "sim", grid, function(x) {
+grid <- e18_grid(stage_pmala)
+if (pilot) grid <- grid[grid$index %in% if (prime) e18_prime_pilot_indices else e18_pilot_indices, ]
+got <- e18_collect(run, stage_pmala, grid, function(x) {
   check_data(x)
   e18_validate_fit(x, 500L, fields)
+  if (prime) stopifnot(x$a0 == 500L)
   stopifnot(x$metrics[["coverage"]] %in% (0:500 / 500),
     x$n_sigma_guard_postburn >= 0, x$n_sigma_guard_postburn <= x$n_sigma_guard,
     x$n_sigma_guard <= 30000L)
@@ -63,6 +66,7 @@ per_fit <- do.call(rbind, lapply(seq_len(nrow(grid)), function(i) {
   if (is.null(x)) result[match("seconds", c(metric_cols, fit_cols))] <- got$failure_seconds[i]
   else result <- c(x$metrics, e18_stat(x, fields))
   row <- grid[i, c("tau", "b0", "seed")]
+  row$a0 <- if (prime) grid$a0[i] else 1L
   row[c(metric_cols, fit_cols)] <- as.list(result)
   row[provenance_fields] <- if (is.null(x)) as.list(rep(NA_character_, length(provenance_fields)))
     else x[provenance_fields]
@@ -90,6 +94,7 @@ summarize <- function(d, method, tau, b0, n, status, eligible = NA, chosen = NA,
     n_CAA_defined = if (is.na(n)) NA_integer_ else sum(is.finite(d[["CAA_0.5"]])),
     n_failed_or_missing = 100L - n, eligible = eligible,
     chosen_at_tau = chosen, selected_for_real = selected, status = status)
+  if (prime) row$a0 <- if (method == "Bayesian-PMALA") 500L else NA_integer_
   for (k in metric_cols) row[[k]] <- mean_finite(d[[k]])
   row$lambda_ess <- median_finite(d$lambda_ess)
   row$lambda_ess_p10 <- p10_finite(d$lambda_ess)
@@ -192,9 +197,11 @@ paired_summary <- function(method) {
       delta <- d[[paste0(k, "_pmala")]] - d[[paste0(k, "_benchmark")]]
       delta <- delta[is.finite(delta)]
       m <- length(delta)
-      data.frame(method = method, tau = t$tau, b0 = t$b0, metric = k,
+      row <- data.frame(method = method, tau = t$tau, b0 = t$b0, metric = k,
         n_pairs = m, mean_pmala_minus_benchmark = mean_finite(delta),
         paired_se = if (m > 1L) sd(delta) / sqrt(m) else NA_real_)
+      if (prime) row$a0 <- 500L
+      row
     }))
   }))
 }

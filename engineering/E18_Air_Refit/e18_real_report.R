@@ -2,12 +2,14 @@
 args <- commandArgs(trailingOnly = TRUE)
 if (!length(args) %in% 2:3) stop("Usage: e18_real_report.R RUN_DIR SELECTED_B0_CSV [ADMM_RUN_DIR]")
 run <- normalizePath(args[1L])
+prime <- startsWith(basename(run), "E18-prime-")
+stage_pmala <- if (prime) "real-prime" else "real"
 admm_run <- if (length(args) == 3L) normalizePath(args[3L]) else run
 code <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))))
 source(file.path(code, "e18_common.R"))
 source(file.path(code, "e18_report_common.R"))
 source(file.path(code, "e18_select.R"))
-selected <- e18_read_selected(args[2L])
+selected <- e18_read_selected(args[2L], prime)
 input <- e18_real_input(run)
 d <- input$data
 n <- length(d$standardized)
@@ -15,14 +17,17 @@ stopifnot(n == 8640L, all(is.finite(d$standardized)), all(is.finite(d$block_mean
 out <- file.path(run, "report")
 dir.create(out, showWarnings = FALSE)
 emit <- function(x, file) write.csv(x, file.path(out, paste0(file, ".csv")), row.names = FALSE)
+if (prime) selected$a0_real <- 8640L
 emit(selected, "spod_selected_b0")
 
-real_grid <- e18_grid("real")
+real_grid <- e18_grid(stage_pmala)
+grid_rates <- unique(real_grid$b0)
 admm_grid <- e18_grid("admm-real")
 same_input <- function(x) stopifnot(identical(x$input_sha, input$sha))
 check_real <- function(x) {
   same_input(x)
   e18_validate_fit(x, n)
+  if (prime) stopifnot(x$a0 == 8640L)
   stopifnot(identical(dim(x$theta_thin), c(666L, n)), all(is.finite(x$theta_thin)),
     all(vapply(x[c("lambda_stalled", "theta_stalled")],
       function(v) is.logical(v) && length(v) == 1L && !is.na(v), FALSE)),
@@ -34,7 +39,7 @@ check_admm <- function(x) {
   stopifnot(startsWith(x$remote_sha, "17e3e7c"), x$lambda_selected %in% exp(-2:12),
     length(x$est) == n, all(is.finite(x$est)))
 }
-got <- e18_collect(run, "real", real_grid, check_real)
+got <- e18_collect(run, stage_pmala, real_grid, check_real)
 admm <- e18_collect(admm_run, "admm-real", admm_grid, check_admm)
 emit(got$issues, "spod_pmala_issues")
 emit(admm$issues, "spod_admm_issues")
@@ -71,7 +76,7 @@ if (length(ok)) {
         col = colors, lty = 1, bty = "n")
     }
   }
-  invisible(lapply(e18_rates, plot_trace))
+  invisible(lapply(grid_rates, plot_trace))
 }
 expected <- exp(c(4, 7, 7))
 benchmark <- data.frame(tau = e18_taus, paper_lambda = expected,
@@ -91,7 +96,7 @@ record_cell <- function(chains, tau, b0) {
     list(rhat = val, detail = "")
   }, error = function(err) list(rhat = NA_real_, detail = conditionMessage(err)))
   field <- function(k) vapply(chains, function(x) as.numeric(x[[k]]), 0)
-  list(fit = fit, diagnostics = data.frame(tau = tau, b0 = b0,
+  list(fit = fit, diagnostics = data.frame(tau = tau, b0 = b0, a0 = if (prime) 8640L else 1L,
     log_lambda_ess_chain_1 = field("ess_log_lambda")[1L],
     log_lambda_ess_chain_2 = field("ess_log_lambda")[2L],
     log_lambda_ess_combined = as.numeric(coda::effectiveSize(traces)),
@@ -106,21 +111,21 @@ record_cell <- function(chains, tau, b0) {
     fit_wall_seconds_chain_1 = field("seconds")[1L], fit_wall_seconds_chain_2 = field("seconds")[2L]))
 }
 
-pmala <- setNames(lapply(e18_rates, function(b0) {
+pmala <- setNames(lapply(grid_rates, function(b0) {
   lapply(e18_taus, function(tau) {
     which <- real_grid$tau == tau & real_grid$b0 == b0
     record_cell(got$records[which], tau, b0)
   })
-}), sprintf("pmala_r%d", round(-log10(e18_rates))))
+}), sprintf("pmala_r%d", round(-log10(grid_rates))))
 cell_diag <- do.call(rbind, unlist(lapply(pmala, function(cells)
   lapply(cells, `[[`, "diagnostics")), recursive = FALSE))
 if (!is.null(cell_diag)) emit(cell_diag, "spod_cell_health")
 
 fits <- lapply(pmala, function(cells) lapply(cells, `[[`, "fit"))
-b0_by_view <- lapply(e18_rates, rep, times = length(e18_taus))
+b0_by_view <- lapply(grid_rates, rep, times = length(e18_taus))
 names(b0_by_view) <- names(fits)
 fits$pmala_selected <- lapply(seq_along(e18_taus), function(i) {
-  if (!is.na(selected$b0[i])) pmala[[match(selected$b0[i], e18_rates)]][[i]]$fit
+  if (!is.na(selected$b0[i])) pmala[[match(selected$b0[i], grid_rates)]][[i]]$fit
 })
 b0_by_view$pmala_selected <- selected$b0
 fits$admm <- lapply(admm$records, function(x)
