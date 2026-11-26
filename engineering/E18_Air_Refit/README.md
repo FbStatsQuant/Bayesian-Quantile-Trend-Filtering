@@ -215,3 +215,16 @@ the worker log and in chain health. The report saves diagnostics
 and exits with a STOP when either condition holds. Report each
 chain's θ ESS, acceptance, guards, and elapsed time. The baseline
 and detrended figures also cover all four constant-rate views and ADMM.
+
+## Diagnostic decision rule (HQ, 2026-11-26)
+
+The decision uses mean MSE at τ = 0.05 on seeds 1–5. The reference
+is the published old-PMALA MSE of 0.0138.
+
+- **PRIOR.** Arm 4 (`a0 = n`) has mean MSE ≤ 0.021, and arms 2 and 3
+  both stay above 0.021. Proceed to Stage 1′.
+- **CONVERGENCE.** Arm 2 or arm 3 reaches mean MSE ≤ 0.021 with
+  `a0 = 1`. Stop and report to HQ for Felipe's decision.
+- **BOTH or NEITHER.** Stop and report to HQ.
+
+Report arm 5 in every case.
