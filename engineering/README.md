@@ -29,3 +29,7 @@ Work is tracked as `T-xx` (Theory, `theory/T0x_*`), `E-xx` (Engineering, `engine
 - `tmp/` is scratch.
 
 Each compute machine keeps one checkout with this same layout; see `engineering/E12_Disk_Reorg/`.
+
+## Rerunning older experiments after F12
+
+F12 (`4fceea8`) removed the unadopted λ jump move from `method/individual/Individual_Sampler_PMALA_Augmented.R`. Its default fits are bit-identical to the old ones. The E-14, E-15, E-16, E-18 and E-20 runners still pass the old `lamjump` arguments. These runners are records of the runs they made and are not edited. To rerun one, build its code copy with `method/individual/Individual_Sampler_PMALA_Augmented.R` and `prox_admm_metric.cpp` restored to their blobs at sampler commit `63f2a56` (`git show 63f2a56:<path>`), and check the two blob hashes before fitting. E-19 does this (see its Run log).
