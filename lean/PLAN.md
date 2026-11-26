@@ -130,6 +130,8 @@ Namespace `BQTF`. The labels are the appendix's.
 
 ### Theorem 2
 
+*(Superseded by Section 5, the draft module map of 2026-11-25. This table is kept for history.)*
+
 | Appendix item | Module | Content | Status |
 |---|---|---|---|
 | Lemma cond | `Conditioning` | Π^⊗(𝒞\|y) > 0 (positive density, 𝒞 ⊇ a nonempty open set); Π_𝒞(θ_j ∈ A) ≤ Π_j(A)/Π^⊗(𝒞) | `Measure.pi`, open sets have positive measure: exist |
@@ -227,9 +229,10 @@ The maximum effort for every agent is "high". Fable is not on this team.
 
 **Assignment of Theorem 1** (final; launched 2026-11-25 on the skeleton at aa70682, one worktree per prover):
 - **Neon-A:** `Falling`, `Coord`, `Gram` (g_r > 0, by Theory's T10 proof), `SplineApprox`, `Smooth`, `Interp`, `SmallBall`, plus helper files under `BQTF/Lin/`.
-- **Neon-B:** `CheckLoss`, `Score`, `Concentration`, `Width`, `QuadShift`, plus helper files under `BQTF/Prob/`. On 2026-11-25, `Denominator`, `Localization` and `Shells` moved to Sol-W1 because Neon-B was overloaded; Neon-B was told first.
+- **Neon-B:** `CheckLoss`, `Score`, `Concentration`, plus helper files under `BQTF/Prob/`. On 2026-11-25, `Denominator`, `Localization` and `Shells` moved to Sol-W1, and `QuadShift` and `Width` moved to Sol-W2, to balance the load; Neon-B was told first both times.
 - **Sol-W1** (gpt-6.2-sol, high; HQ authorization of 2026-11-25): `Main`, plus helpers under `BQTF/Asym/`. It proves the assembly against the frozen statements, as an early test that the interfaces suffice. `Main` was proved on 2026-11-25 (8b10d87, now under Sol review). Since 2026-11-25 Sol-W1 also owns `Shells`, `Localization` and `Denominator`, on branch `t3/sol-w1-assembly`.
-- **Sol-W2** (gpt-6.2-sol, high): `Reduction`, then `PriorMass`, plus helpers under `BQTF/Scale/` and `BQTF/Prior/`.
+- **Sol-W2** (gpt-6.2-sol, high): `Reduction`, then `PriorMass` (both proved on 2026-11-25, 7265e3e, under review), plus helpers under `BQTF/Scale/` and `BQTF/Prior/`. Since 2026-11-25 it also owns `QuadShift` and `Width` (helpers under `BQTF/Shift/`), on branch `t3/sol-w2-shift-width`.
+- **Opus worker** (Claude Opus 5.5 via `antigravity`; HQ authorization of 2026-11-25): at most 1, spawned only when needed. Not spawned yet.
 - The head proves no lemmas. A file never has two owners at once.
 
 Every module merge gets a fresh Sol review, written to `notes/reviews/<module>_<date>.md`. The head rules on each finding before merging.
@@ -240,6 +243,102 @@ Every module merge gets a fresh Sol review, written to `notes/reviews/<module>_<
 
 Each row is an explicit, documented hypothesis until it is proved. It also appears in `docs/statements.md` ("Differences") while open. The final `MainStatement` carries none of them.
 
+**HQ rule (2026-11-25).** Hypothesis-first is a staging step only: state the input as an explicit lemma, use it, and prove it in parallel. Theorem 1 is **not** done while any input is still a hypothesis or an extra argument. The final `#print axioms main_theorem` must show only the 3 standard axioms, with no hypotheses beyond the frozen `MainStatement`. Any input that looks multi-week, or that we would want to leave as a stated assumption, goes to HQ with its inventory (statement, nearest Mathlib result, cost). The head does not decide that alone.
+
 | Input | Where it enters | Status |
 |---|---|---|
 | (none yet) | | |
+
+## 5. Theorem 2 module map (draft, 2026-11-25; planning only)
+
+**Trigger (HQ, 2026-11-25).** Theorem 2 work starts only when Theorem 1 is **done and checked**:
+- every Theorem 1 module is merged;
+- `#print axioms main_theorem` on main shows only `propext`, `Classical.choice` and `Quot.sound`, with no extra hypotheses;
+- every Sol review has been ruled on;
+- the corrections packets have gone out.
+
+Until then this section is a plan only. The skeleton goes on a branch once Theorem 1 has a few modules left and is merged at the trigger. The paper-corrections policy applies to Theorem 2 unchanged.
+
+**Source.** The statement is `thm:joint` (`paper/sections/theory.tex`, eq. `joint-fixed`, with 𝒞 from eq. `joint_order` in `methodology.tex`: weak order θ_{i1} ≤ ⋯ ≤ θ_{iJ}, matching `orderSet`). The proof is in `paper/sections/appendix_theory.tex`, §`pf:sec:joint`, and has four steps: Lemma `pf:lem:cond` (truncation), Lemma `pf:lem:gap` (separation), Lemma `pf:lem:sup` (sup-norm concentration), then the transfer and union bound in the proof of the theorem, including the "General scales" paragraph.
+
+### 5.1 Key structural finding: no joint version of any Theorem 1 module is needed
+
+The paper's proof works **one level at a time** and combines the levels only through a finite union bound over j = 1, …, J. A shared θ across levels never enters a Theorem 1 argument: the coupling happens only through 𝒞, and Lemma `cond` removes it at the cost of the factor 1/Π^⊗(𝒞 | y) ≤ 2 on the good event. So:
+- **J does not enter any Theorem 1 rate or threshold.** It enters only Theorem 2's own constants:
+  - M = max_l M^{(l)};
+  - C = 2 Σ_l C^{(l)} + J(5/4 + 64/f̲²);
+  - n₀, through J η_n ≤ 1/2 and max_l s_{n,l} ≤ g₀/2.
+- The spacing min_j(τ_{j+1} − τ_j) enters **n₀ only**, through g₀ = min{L, spacing/f̄} (Lemma `gap`). M and C are free of it.
+- Each Theorem 1 interface is applied J times, at (τ, c) = (τ_l, c_l), with the same (L, f̲, f̄, V̄).
+
+| Theorem 1 piece | Reused in Theorem 2 as | Change needed |
+|---|---|---|
+| `main_theorem` (`Main`) | the bound E Π_l(A_l \| y) ≤ C^{(l)} n^{−1/(2r)} at each level | none (as-is) |
+| `main_theorem_scale` (`Reduction`) | the same at scale σ_{0l} | none (as-is) |
+| `posterior_isProbability`, `posterior_eq_ratio` (`Coord`) | each Π_l is a probability measure with an everywhere-positive density, for Lemma `cond`; D5 | none |
+| `interp` (`Interp`) | δ ∈ K_n ⇒ ‖δ‖_∞ ≤ s_n, for Lemma `sup` | none |
+| `localization` (`Localization`), part (b) and the Ω_G bound | Π(θ − θ* ∉ K_n \| y) ≤ η_n on Ω_E ∩ Ω_G, for Lemma `sup` | none |
+| `denominator` (`Denominator`) | P(Ω_Eᶜ) ≤ (5/4)/(n ε_n²), for Lemma `sup` | none |
+| `Scale/Posterior`, `Scale/Data` (Sol-W2's helpers) | push-forward of Π_l under θ ↦ θ/σ_{0l}; rescaled A, B, TV, for "General scales" | possibly promote private lemmas to public |
+| `Asym/Rates` | n ε_n² = n^{1/(2r)}, ρ_n vs ε_n, the eventual thresholds | add s_n → 0, η_n → 0 (new, in Lemma `sup`) |
+
+**Interface risk to check at the trigger.** The paper's proof uses only Lemma `sup`'s *conclusions*, and those follow from the frozen `localization` + `interp` + `denominator` statements. I checked the frozen `localization` (Ω_G, s0, the posterior bound on Ω_G ∩ Ω_E): it exposes what Lemma `sup` needs. If a frozen Theorem 1 statement turns out too weak for Lemma `sup`, that is a statement change: a new Astra check and a report to HQ.
+
+### 5.2 New statements (Spec additions; Astra statement gate first)
+
+| Lean name | Paper | Content |
+|---|---|---|
+| `JointConclusion` | eq. `joint-fixed`, `thm:joint` display | Measurability of y ↦ Π_𝒞(U_M \| y), and E Π_𝒞(U_M \| y) ≤ ofReal(C n^{−1/(2k+2)}), where U_M = {Θ : ∃ j, Δ²_n(Θ_j − θ*_j) > M n^{−(2k+1)/(2k+2)}} (= "max_j > M rate"). |
+| `JointStatement` | `thm:joint`, σ_j = 1 | ∀ k ≥ 1, ∀ J, ∀ c : Fin J → ℝ (all > 0), ∀ L f̲ f̄ V̄ (L, f̲ > 0), ∀ gmin > 0, ∃ M C n₀ > 0 such that ∀ n ≥ n₀, ∀ τ : Fin J → ℝ strictly increasing in (0,1) with τ_{j+1} − τ_j ≥ gmin, ∀ μ, ∀ θ* : Fin J → Fin n → ℝ with `DataHyp` at every level (same L, f̲, f̄, V̄), `JointConclusion` holds for `jointPosterior τ 1 (lamSeq c_j)`. |
+| `JointStatementScale` | `thm:joint`, last sentence | The same, with σ₀ : Fin J → ℝ (all > 0) quantified before ∃. |
+
+Planned **Differences**, for `docs/statements.md`:
+- **D5** (already listed): normalizers cancelled; equivalent once `jointPosterior_eq_cond` is proved.
+- **D6**: "constants depend on the smallest spacing" is encoded as a lower bound gmin on the spacing, quantified before ∃. This is safe: take gmin equal to the actual smallest spacing.
+- **D7**: J ranges over all ℕ. J = 0 and J = 1 are degenerate and allowed (J = 1 is Theorem 1 with 𝒞 = everything). The paper has J ≥ 2, so the Lean statement is safe or equivalent.
+- **D8**: measurability is part of the conclusion, as in D3.
+
+To decide at the gate: whether τ is quantified after ∃ (as in Theorem 1's D-reading, where the constants are free of τ beyond the spacing). The paper's dependence list has the spacing but not τ itself, so the plan is yes.
+
+### 5.3 New modules (files under `BQTF/Joint/`)
+
+| # | Module | Paper label | Lean content | Est. lines |
+|---|---|---|---|---|
+| J0 | `Joint/Spec` additions in `Spec.lean` + `docs/statements.md` §3 | `thm:joint` | statements above; head-owned; Astra gate | 100–200 |
+| J1 | `Joint/Product` | §`pf:sec:joint` opening display; D5 | Π^⊗ := `Measure.pi` of the Π_l; `jointPosterior_eq_cond`: Π_𝒞(B) = Π^⊗(B ∩ 𝒞)/Π^⊗(𝒞); measurability of y ↦ Π_𝒞(B \| y) for measurable B; `orderSet` measurable | 250–450 |
+| J2 | `Joint/Conditioning` | Lemma `pf:lem:cond` | Π^⊗(𝒞 \| y) > 0 for n > r (𝒞 ⊇ a nonempty open set; positive density); Π_𝒞(θ_j ∈ A) ≤ Π_j(A)/Π^⊗(𝒞); Π_𝒞 is a probability measure | 150–300 |
+| J3 | `Joint/Gap` | Lemma `pf:lem:gap` | θ*_{i,j+1} − θ*_{ij} ≥ g₀ = min{L, min_j(τ_{j+1}−τ_j)/f̄}, from B + quantile; reuses `distFn_quantile_eq` (CheckLoss) | 80–150 |
+| J4 | `Joint/SupNorm` | Lemma `pf:lem:sup` | s_n, η_n; s_n → 0 (dependence (c, r)), η_n → 0 (dependence (f̲, r)); for n ≥ n₂, Π(‖θ−θ*‖_∞ > s_n) ≤ η_n on Ω_E ∩ Ω_G; P((Ω_E∩Ω_G)ᶜ) ≤ (5/4 + 64/f̲²) n^{−1/(2r)} | 200–350 |
+| J5 | `Joint/SupNormScale` | `thm:joint` proof, "General scales" | Lemma `sup` at scale σ₀ via the reduction: s′, η′, Ω with P(Ωᶜ) ≤ {5/4 + 64/(σ₀f̲)²} n^{−1/(2r)} | 200–400 |
+| J6 | `Joint/Transfer` | `thm:joint` proof, "The constraint" and "Transfer" | on Ω: Π^⊗(𝒞ᶜ) ≤ J η_n ≤ 1/2; Π_𝒞(U) ≤ 2 Σ_j Π_j(A_j); then E-bound assembly with the bad-event split (measurable hull, as in `Main`) | 250–450 |
+| J7 | `Joint/Main` | `thm:joint` | `joint_theorem : JointStatement` (σ = 1), `joint_theorem_scale : JointStatementScale`; constant choice M = max, C = 2ΣC^{(l)} + Σ(5/4 + 64/(σ₀f̲)²), n₀ | 200–400 |
+
+**Total about 1,450–2,700 lines.** This replaces the earlier 600–1,000 estimate, which predates the scale step and the measurability work.
+
+**Dependency order:**
+
+```
+J0 (statement gate) ─┬─ J1 ── J2 ─┐
+                     ├─ J3 ───────┤
+                     ├─ J4 ── J5 ─┼─ J6 ── J7
+                     └────────────┘   (J7 also uses main_theorem, main_theorem_scale)
+```
+
+J1, J3 and J4 can start in parallel right after the gate. J6 can be proved against the frozen J2–J5 statements while they are still `sorry`, which tests that the interfaces suffice, as `Main` did for Theorem 1.
+
+**Proposed assignment at the trigger** (to confirm with HQ at the time):
+- **Neon-A:** J1 `Product` + J2 `Conditioning` (measure theory on products; Neon-A did `Coord`).
+- **Neon-B:** J3 `Gap` + J4 `SupNorm`. Neon-B did `CheckLoss`, which J3 reuses.
+- **Sol-W2:** J5 `SupNormScale` + the scale half of J7, reusing its own `Scale/`.
+- **Sol-W1:** J6 `Transfer` + J7 `Main`, the assembly against frozen interfaces, as for Theorem 1.
+- **Opus worker:** reserve.
+
+**Estimate:** about 1–1.5 weeks after the trigger, with 4 provers. The gate (Astra plus head rulings) takes about half a day.
+
+### 5.4 Points for Theory to confirm (sent 2026-11-25)
+
+1. The statement list and the dependency order above, including that no Theorem 1 lemma needs a joint or union-bound version.
+2. **Lemma `sup` at general scales.** The paper's "General scales" paragraph applies Lemma `sup` to the rescaled problem with (L/σ₀, σ₀f̲, σ₀f̄, V̄/σ₀) and c replaced by σ₀c. Confirm that s′_n, η′_n and n₂ then depend only on the allowed constants including σ₀, and that s_{n,l} in original units is σ_{0l} s′_{n,l}.
+3. **Measurability of y ↦ Π_𝒞(U \| y).** As with C-02, the paper takes E_{θ*} Π_𝒞(U \| y) without stating measurability. This will likely be a candidate correction for Theorem 2, and I propose to fold it into the C-02 text.
+4. **Quantifier order for τ.** Confirm that τ may be chosen after (M, C, n₀), given a spacing lower bound, so that the constants depend on the spacing but not on τ otherwise.
+5. **Lemma `cond` positivity.** Π^⊗(𝒞 \| y) > 0 needs n > r (properness via Lemma `coord`) and that 𝒞 contains the nonempty open set of strictly ordered vectors. The theorem only needs n ≥ n₀ > r. Confirm there is no other use of n > r.
