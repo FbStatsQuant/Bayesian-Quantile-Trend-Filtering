@@ -86,3 +86,12 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Why it was needed:** a proof gap. The negative case was missing, and the printed formula is wrong for t < 0. The constants are unchanged.
 - **Lean:** `BQTF.remK_moments`, in `lean/BQTF/CheckLoss.lean`. The negative-shift case uses the weight 2(s−t) on (t,0).
 - **Status:** **sent** (2026-11-25) to Writing and Theory, CC HQ. CheckLoss was finalized and checked at merge 5f8ba95. Found in the CheckLoss review.
+
+## C-08: the Laplace mgf in the Shells score bound is used without its domain
+
+- **Paper label:** appendix, the proof of the shell bound (Lemma `pf:lem:shells`). It is the "Score, on Ω_ζ" paragraph, at appendix_theory.tex line ≈314.
+- **Current paper text:** "By (pf:eq:vol) and $\int e^{sx}(\lambda/2)e^{-\lambda|x|}dx=(1-s^2/\lambda^2)^{-1}$, $I_1\le\dots\prod_j(1-4t_j^2/\lambda^2)^{-1}$." The condition |s| < λ is never stated. The integral is +∞ for |s| ≥ λ. The next paragraph gives the fact that makes the formula applicable, 4‖t‖∞²/λ² ≤ 1/2 for n ≥ n₃, but only after the formula has been used.
+- **Correct version:** "…and $\int e^{sx}(\lambda/2)e^{-\lambda|x|}dx=(1-s^2/\lambda^2)^{-1}$ for $|s|<\lambda$ (applicable with $s=2t_j$ since $4\|t\|_\infty^2/\lambda^2\le\frac12$ for $n\ge n_3$, shown below), …"
+- **Why it was needed:** a missing condition in a displayed identity, and a proof-order gap. The bound is unchanged.
+- **Lean:** `BQTF.shells`, in `lean/BQTF/Shells.lean` (Sol-W1). It establishes |2t_j| < λ before using the mgf formula, using `lean/BQTF/Asym/Laplace.lean`.
+- **Status:** **open**. Found in the Shells review on 2026-11-25. The packet goes out when Shells is finalized and checked.
