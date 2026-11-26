@@ -36,11 +36,9 @@ density. For one level the map is a fixed number of banded ADMM iterations, so a
 in n: a median 2.0 ms at n = 250 and 36.6 ms at n = 4,000 (τ = 0.5, k = 2, one laptop core). In the joint sampler the map is box-constrained: the same ADMM when no
 bound binds, otherwise banded interior-point steps, each linear in n.
 
-![Height of 4,817 Dutch boys: shaded band between the jointly sampled 0.1 and 0.9 quantile curves, data points on top](examples/readme_figures/reference_outputs/readme_growth_boys.png)
+![A shaded band between two estimated quantile curves, with the data points on top](examples/readme_figures/reference_outputs/readme_combined.png)
 
-![Height of 5,190 Dutch girls: shaded band between the jointly sampled 0.1 and 0.9 quantile curves, data points on top](examples/readme_figures/reference_outputs/readme_growth_girls.png)
-
-*Bands between jointly sampled 0.1 and 0.9 quantile curves, which cannot cross. (a) Height of 4,817 Dutch boys; the band holds 80.5% of the children. (b) Height of 5,190 Dutch girls; the band holds 80.3% of the children.*
+*Bands between jointly sampled 0.1 and 0.9 quantile curves, which cannot cross. (a) Height of 4,817 Dutch boys, joint-sampler fit; the band holds 80.5% of the children. (b) Height of 5,190 Dutch girls, joint-sampler fit; the band holds 80.3% of the children.*
 
 In the peak-detection simulation of Brantley et al. (2020) for air-quality sensors, the MSE for
 the peak-free baseline is [E-18: MSE PMALA, τ = 0.01] for the sampler against
@@ -59,7 +57,7 @@ cluster from frozen packages; each experiment folder ships its summaries.
 |---|---|---|---|
 | Section 2, Algorithms 1–2: the two samplers | [`method/`](method) | from the repository root: `Rscript method/individual/Individual_Sampler_PMALA_Augmented.R test`; `Rscript method/joint/Joint_Sampler_PMALA_Augmented.R test_prox` | [Eng: time of a complete run, after F12]; [Eng: time of a complete run with `clarabel`] |
 | Section 3 and Appendix A: Theorems 1 and 2 | [`lean/`](lean) | in `lean/`: `lake exe cache get`, `lake build`, `lake env lean AxiomCheck.lean` | about 15–20 min on 3 cores, with the prebuilt Mathlib |
-| Section 4.1 and Appendix D: simulations at interior levels (Tables 1–2) | [`experiments/interior_quantiles/individual_***_20261003/`](experiments/interior_quantiles/individual_***_20261003) | shipped: `paper_reference/simulations.tex` and `paper_reference/appendix_pmala.tex` in that folder. Full run, on a Slurm cluster: `cd experiments/interior_quantiles/individual_***_20261003 && bash submit.sh RUN_NAME` | 3,000 cluster tasks |
+| Section 4.1 and Appendix D: simulations at interior levels (Tables 1–2) | [`experiments/interior_quantiles/`](experiments/interior_quantiles) (the individual-sampler package of 2026-10-03) | shipped: `paper_reference/simulations.tex` and `paper_reference/appendix_pmala.tex` in that package. Full run, on a Slurm cluster: `bash submit.sh RUN_NAME` from the package folder | 3,000 cluster tasks |
 | Section 4.1 and Appendix D: joint estimation of extreme upper levels (Tables 3–4), crossing tables | [`experiments/extreme_quantiles/`](experiments/extreme_quantiles), [`experiments/joint_upper_levels/`](experiments/joint_upper_levels) | shipped: `experiments/extreme_quantiles/tables_20261023/mse_consolidated_oct7.csv`, `experiments/extreme_quantiles/tables_20261008/crossings_*.csv`, `experiments/joint_upper_levels/paper_reference/table2_mse.csv`. Full joint run, on a Slurm cluster: `cd experiments/joint_upper_levels && bash submit.sh RUN_NAME` | 300 cluster tasks for the joint run |
 | Section 4.2: cost per sweep (Table 5, Figures 1–2) | [`experiments/scalability/`](experiments/scalability) | see the paper's table; the script is being updated | |
 | Section 4.3: air-quality simulation (Table 6) | [`experiments/air_simulation/`](experiments/air_simulation) | [E-18: command] | [E-18] |

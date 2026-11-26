@@ -11,9 +11,9 @@ The hero and growth panels shade the area between the estimated τ = 0.1 and τ 
 From the repository root:
 
 ```
-Rscript writing/W08_Repo/figures/make_readme_figures.R --demo        # hero from stand-in data
-Rscript writing/W08_Repo/figures/make_readme_figures.R               # hero from engineering/E20_Showcase/
-Rscript writing/W08_Repo/figures/make_readme_figures.R --e20 <file>  # hero from a given E-20 file
+Rscript examples/readme_figures/make_readme_figures.R --demo        # hero from stand-in data
+Rscript examples/readme_figures/make_readme_figures.R               # hero from engineering/E20_Showcase/curves.csv; without it, growth panels (a)(b) only
+Rscript examples/readme_figures/make_readme_figures.R --e20 <file>  # hero from a given E-20 file
 ```
 
 | Flag | Effect |
@@ -26,7 +26,7 @@ Rscript writing/W08_Repo/figures/make_readme_figures.R --e20 <file>  # hero from
 
 The script locates its own folder, so it runs from any working directory. All paths are relative.
 
-## Outputs (`out/`)
+## Outputs (`reference_outputs/`; `--demo` writes to `out/`, never published)
 
 | File | Content |
 |---|---|
