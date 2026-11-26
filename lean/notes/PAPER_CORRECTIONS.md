@@ -117,3 +117,19 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Why it was needed:** a proof gap at a boundary case, plus an unjustified step. The statement, hypotheses and constant b are unchanged; Lean uses b verbatim.
 - **Lean:** `BQTF.small_ball`, in `lean/BQTF/SmallBall.lean` (Neon-A): the trace bound is at SmallBall.lean ≈274, and q = 1 is a separate branch.
 - **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. SmallBall was finalized and checked at merge 058c2ab (`small_ball`: standard axioms only). The SmallBall review found it (F2), and the EckartYoung review raised the q = 1 case first.
+
+## C-10: the quad-shift lemma omits ϱ > 0 and takes a log before restricting |t|
+
+- **Paper label:** appendix, the quadratic-shift lemma and its proof (appendix_theory.tex lines ≈151–160).
+- **Current paper text:**
+  - (a) "Let $m\ge2$, $A$ any real matrix with columns $a_1,\dots,a_m$, $B_\varrho$ and $\varphi$ as above for this $A$ …", then "$K=\frac{4\delta_A\varphi(\varrho/4)}{\lambda\varrho}$" (line 153). Nothing in the statement requires ϱ > 0 or λ > 0. With ϱ = 0, K is 0/0, and the zero-radius ball can have prior mass 0.
+  - (b) "$\Lambda(s)=\log Q_{-j}\{\|A_{-j}v\|_2\le s\}$. Shifting $v$ by $-te_{j'}$ gives $g(t)\ge e^{-\lambda|t|}e^{\Lambda(\varrho-|t|\delta_A)}$" (line 160). The restriction "For $|t|\le1/\lambda$" comes only later. For large |t| the reduced radius is negative and Λ is log 0. Example: λ = 1, ϱ = 2, A = [0, 1], t = 3.
+- **Correct version:**
+  - (a) Open the lemma with "Let $m\ge2$, $\lambda>0$ and $\varrho>0$. Let $A$ be any real matrix with columns $a_1,\dots,a_m$, and define $B_\varrho$ and $\varphi$ as above for this $A$. Set $\delta_A=\max_{j<m}\|a_{j+1}-a_j\|_2$."
+  - (b) Replace the first use by "For $s>0$, write $\Lambda(s)=\log Q_{-j}\{\|A_{-j}v\|_2\le s\}$. For $|t|\le1/\lambda$ we have $\varrho-|t|\delta_A\ge\varrho/2>0$, and shifting $v$ by $-te_{j'}$ gives $g(t)\ge e^{-\lambda|t|+\Lambda(\varrho-|t|\delta_A)}$." The later concavity claims apply on $(0,\infty)$.
+- **Why it was needed:**
+  - (a) is a missing hypothesis that the formula needs in order to be defined. The paper's only application uses ϱ = ε_n/2 > 0 (line 187), so no downstream result changes.
+  - (b) is a proof-order gap. Every use in the integral is already in the band, so the bound is unchanged.
+  - No constant changes.
+- **Lean:** `BQTF.quad_shift`, in `lean/BQTF/QuadShift.lean` (Sol-W2). It assumes `hϱ : 0 < ϱ` and `hlam : 0 < λ`. It proves the translation bound in probabilities for all t (QuadShift.lean ≈176), and takes the log cost only for |t| ≤ 1/λ (≈258).
+- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. QuadShift was finalized and checked at the merge recorded below: `quad_shift` and `prior_mass` use the standard axioms only. Found by the PrekopaLaplace review and confirmed by the QuadShift review (lean/notes/reviews/QuadShift_2026-11-26.md).

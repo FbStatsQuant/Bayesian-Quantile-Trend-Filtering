@@ -7,6 +7,9 @@ import BQTF.SplineApprox
 import BQTF.Gram
 import BQTF.Smooth
 import BQTF.SmallBall
+import BQTF.Shift.LaplaceMeasure
+import BQTF.Shift.ScalarBounds
+import BQTF.Shift.SliceBounds
 import BQTF.QuadShift
 import BQTF.Prior.Geometry
 import BQTF.Prior.Window
