@@ -1,0 +1,7 @@
+regex:^(Data Applications|applications)/Air Quality/S08_[^/]*\.csv$
+regex:^(?:(?:Data Applications|applications)/Munich Rent|archive/munich_rent/code)/Others/results[^/]*/.*\.[rR][dD][sS]$
+regex:^(?:Project_Paper/notes|paper/history)/.*/(?:Brantley_2020|Onizuka_2023)\.txt$
+regex:^(?:Papers|literature)/(?!Large Prior\.pdf$).*\.[pP][dD][fF]$
+regex:^(?:Project_Paper/notes|paper/history)/[^/]+/(?:before|build)/main\.pdf$
+regex:^(?:Simulations/Joint/NOTS|experiments/joint_upper_levels)/runs/[^/]+/metadata/monitor/history\.jsonl$
+regex:(?:^|/)__pycache__/.*\.pyc$

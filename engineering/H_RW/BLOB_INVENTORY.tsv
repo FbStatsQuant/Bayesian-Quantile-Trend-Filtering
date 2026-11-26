@@ -1,0 +1,393 @@
+historical path	version	bytes	recommendation
+Data Applications/Air Quality/S08_2018-06-15.csv	1	20021011	Purge; confirm archive where needed
+Data Applications/Air Quality/S08_2018-06-16.csv	1	20058876	Purge; confirm archive where needed
+Data Applications/Air Quality/S08_2018-06-17.csv	1	20091148	Purge; confirm archive where needed
+Data Applications/Air Quality/S08_2018-06-18.csv	1	20090383	Purge; confirm archive where needed
+Data Applications/Air Quality/S08_2018-06-19.csv	1	20086240	Purge; confirm archive where needed
+Data Applications/Air Quality/S08_2018-06-20.csv	1	19918147	Purge; confirm archive where needed
+Data Applications/Air Quality/S08_2018-06-21.csv	1	19919522	Purge; confirm archive where needed
+Data Applications/Growth/results_joint_k2/figures/growth_joint_boys.pdf	1	277559	Keep first-party artifact if needed; review provenance
+Data Applications/Growth/results_joint_k2/figures/growth_joint_girls.pdf	1	297659	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results/all_quantile_fits.rds	1	12476827	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results/fit_tau_10.rds	1	2680451	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results/fit_tau_30.rds	1	2734111	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results/fit_tau_50.rds	1	2624722	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results/fit_tau_70.rds	1	2517179	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results/fit_tau_90.rds	1	1913151	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results/munich_individual_sampler.pdf	1	198214	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results/munich_sandwich_10_90.pdf	1	109964	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results/validated/munich_individual_sampler.pdf	1	200997	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results_onizuka/fit_tau_10.rds	1	4835388	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka/fit_tau_30.rds	1	4835716	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka/fit_tau_50.rds	1	4806164	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka/fit_tau_70.rds	1	4775020	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka/fit_tau_90.rds	1	4775254	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka/munich_onizuka_q10_q90.pdf	1	108662	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results_onizuka/munich_onizuka_q30_q50_q70.pdf	1	109884	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results_onizuka_k2/all_quantile_fits.rds	1	24115580	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka_k2/fit_tau_10.rds	1	4864235	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka_k2/fit_tau_30.rds	1	4846664	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka_k2/fit_tau_50.rds	1	4820844	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka_k2/fit_tau_70.rds	1	4794628	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka_k2/fit_tau_90.rds	1	4789010	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_onizuka_k2/munich_onizuka_q10_q90.pdf	1	108760	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results_onizuka_k2/munich_onizuka_q30_q50_q70.pdf	1	109723	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results_pmala/fit_tau_10.rds	1	2695378	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_pmala/fit_tau_30.rds	1	3197967	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_pmala/fit_tau_50.rds	1	3123830	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_pmala/fit_tau_70.rds	1	2831025	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_pmala/fit_tau_90.rds	1	2268437	Purge; confirm archive where needed
+Data Applications/Munich Rent/Others/results_pmala/munich_pmala_q10_q90.pdf	1	109621	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results_pmala/munich_pmala_q30_q50_q70.pdf	1	109899	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results_pmala_k2/munich_pmala_q10_q90.pdf	1	109402	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/Others/results_pmala_k2/munich_pmala_q30_q50_q70.pdf	1	109351	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/results_k2/figures/munich_onizuka_q10_q90.pdf	1	108920	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/results_k2/figures/munich_onizuka_q30_q50_q70.pdf	1	109414	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/results_k2/figures/munich_pmala_q10_q90.pdf	1	108777	Keep first-party artifact if needed; review provenance
+Data Applications/Munich Rent/results_k2/figures/munich_pmala_q30_q50_q70.pdf	1	109718	Keep first-party artifact if needed; review provenance
+Papers/Agapiou_2021_pExponentialPriorsContraction.pdf	1	541324	Purge; confirm archive where needed
+Papers/Agapiou_2024_LaplacePriorsSpatialInhomogeneity.pdf	1	551409	Purge; confirm archive where needed
+Papers/Atchade_2017_Quasi_Posterior_Contraction.pdf	1	415635	Purge; confirm archive where needed
+Papers/Bach_Klein_2022_Bayesian_PSpline_Rates.pdf	1	948623	Purge; confirm archive where needed
+Papers/Brantley_2020.pdf	1	1597883	Purge; confirm archive where needed
+Papers/Castillo_2015_BayesianLinearRegressionSparsePriors.pdf	1	395387	Purge; confirm archive where needed
+Papers/Fill_2004_SmallDeviationsIntegratedBrownianSheets.pdf	1	329287	Purge; confirm archive where needed
+Papers/Ghosal_2007_ConvergenceRatesNoniid.pdf	1	394213	Purge; confirm archive where needed
+Papers/Giordano_2023_BesovLaplacePriors.pdf	1	493888	Purge; confirm archive where needed
+Papers/Kowal_Dynamic_Shrinkage.pdf	1	4383585	Purge; confirm archive where needed
+Papers/Large Prior.pdf	1	1326688	Owner handles separately
+Papers/Onizuka_2023.pdf	1	2504714	Purge; confirm archive where needed
+Papers/Padilla_Risk Bounds for Quantile Trend Filtering.pdf	1	3227346	Purge; confirm archive where needed
+Papers/Pereyra 2016.pdf	1	1539752	Purge; confirm archive where needed
+Papers/Sriram_2013_PosteriorConsistencyMisspecifiedALD.pdf	1	379276	Purge; confirm archive where needed
+Papers/Syring_Martin 2023.pdf	1	790269	Purge; confirm archive where needed
+Papers/TF_2014.pdf	1	1252376	Purge; confirm archive where needed
+Papers/Wang_2014_FallingFactorialBasis.pdf	1	502526	Purge; confirm archive where needed
+Project_Paper/figures/_superseded_k1_munich/munich_onizuka_q10_q90.pdf	1	108662	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/_superseded_k1_munich/munich_onizuka_q30_q50_q70.pdf	1	109884	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/_superseded_k1_munich/munich_pmala_q10_q90.pdf	1	109621	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/_superseded_k1_munich/munich_pmala_q30_q50_q70.pdf	1	109899	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/cost_scaling.pdf	1	17777	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/growth_lms_boys.pdf	1	246831	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/growth_lms_girls.pdf	1	261738	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/growth_pmala_boys.pdf	1	246553	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/growth_pmala_girls.pdf	1	261765	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/munich_individual_sampler.pdf	1	199549	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/munich_onizuka_q10_q90.pdf	1	108920	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/munich_onizuka_q30_q50_q70.pdf	1	109414	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/munich_pmala_q10_q90.pdf	1	108777	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/munich_pmala_q30_q50_q70.pdf	1	109718	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/nile_individual_sampler.pdf	1	42069	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/scal_breakdown.pdf	1	20012	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/scal_pmala_per_obs.pdf	1	15572	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/scal_speedup.pdf	1	17436	Keep first-party artifact if needed; review provenance
+Project_Paper/figures/scal_time.pdf	1	16879	Keep first-party artifact if needed; review provenance
+Project_Paper/main.pdf	1	2262464	Keep current paper; review stale versions
+Project_Paper/noncrossing_review/noncrossing_evaluation_plan.pdf	1	210586	Keep first-party artifact if needed; review provenance
+Project_Paper/notes/air_drop_se_20261027/before/main.pdf	1	2705785	Purge; confirm archive where needed
+Project_Paper/notes/air_lap_rows_20261027/before/main.pdf	1	2704861	Purge; confirm archive where needed
+Project_Paper/notes/extreme_six_levels_20261023/before/main.pdf	1	2704574	Purge; confirm archive where needed
+Project_Paper/notes/joint_extreme_results_20261002/before/main.pdf	1	2766146	Purge; confirm archive where needed
+Project_Paper/notes/joint_sampler_rewrite_20261001/before/main.pdf	1	2690023	Purge; confirm archive where needed
+Project_Paper/notes/mixture_gibbs.pdf	1	247359	Keep first-party artifact if needed; review provenance
+Project_Paper/notes/munich_k2_update_20261013/before/figures/munich_onizuka_q10_q90.pdf	1	108760	Keep first-party artifact if needed; review provenance
+Project_Paper/notes/munich_k2_update_20261013/before/figures/munich_onizuka_q30_q50_q70.pdf	1	109723	Keep first-party artifact if needed; review provenance
+Project_Paper/notes/munich_k2_update_20261013/before/figures/munich_pmala_q10_q90.pdf	1	109402	Keep first-party artifact if needed; review provenance
+Project_Paper/notes/munich_k2_update_20261013/before/figures/munich_pmala_q30_q50_q70.pdf	1	109351	Keep first-party artifact if needed; review provenance
+Project_Paper/notes/munich_k2_update_20261013/before/main.pdf	1	2704514	Purge; confirm archive where needed
+Project_Paper/notes/simulation_revision_20260914/Brantley_2020.txt	1	54396	Purge; confirm archive where needed
+Project_Paper/notes/simulation_revision_20260914/Onizuka_2023.txt	1	95326	Purge; confirm archive where needed
+Project_Paper/notes/simulation_revision_20260914/before/main.pdf	1	2709038	Purge; confirm archive where needed
+Project_Paper/notes/simulation_revision_20260914/build/main.pdf	1	2662702	Purge; confirm archive where needed
+Project_Paper/notes/writing_sync_20260914/before/main.pdf	1	2708996	Purge; confirm archive where needed
+Simulations/Air/lap_20261023/attempt_20261023T171713_511660/results.rds	1	2242139	Keep byte-exact pending manifest or seal decision
+Simulations/Individual/NOTS/inner_individual/deployment/validation_1785936.tar.gz	1	1487365	Keep byte-exact pending manifest or seal decision
+Simulations/Joint/NOTS/runs/VS_upper6_100seeds_Rdefaults_b001_20261002/metadata/monitor/history.jsonl	1	10834398	Purge; confirm archive where needed
+Simulations/Joint/NOTS/runs/VS_upper6_100seeds_Rdefaults_b001_20261002/paper_reference/main.pdf	1	2740000	Keep byte-exact pending manifest or seal decision
+Simulations/Joint/results_joint/joint_summary_VS_Normal_n500_seed1_b0_0.001_taus_0.75-0.95.rds	1	1376942	Review provenance; keep reproducibility input or archive large output
+Simulations/Joint/results_joint/joint_summary_VS_Normal_n500_seed1_taus_0.75-0.95.rds	1	1373934	Review provenance; keep reproducibility input or archive large output
+applications/Air Quality/S08_2018-06-15.csv	1	20021011	Purge; confirm archive where needed
+applications/Air Quality/S08_2018-06-16.csv	1	20058876	Purge; confirm archive where needed
+applications/Air Quality/S08_2018-06-17.csv	1	20091148	Purge; confirm archive where needed
+applications/Air Quality/S08_2018-06-18.csv	1	20090383	Purge; confirm archive where needed
+applications/Air Quality/S08_2018-06-19.csv	1	20086240	Purge; confirm archive where needed
+applications/Air Quality/S08_2018-06-20.csv	1	19918147	Purge; confirm archive where needed
+applications/Air Quality/S08_2018-06-21.csv	1	19919522	Purge; confirm archive where needed
+applications/Growth/results_joint_k2/figures/growth_joint_boys.pdf	1	277559	Keep first-party artifact if needed; review provenance
+applications/Growth/results_joint_k2/figures/growth_joint_girls.pdf	1	297659	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results/all_quantile_fits.rds	1	12476827	Purge; confirm archive where needed
+applications/Munich Rent/Others/results/fit_tau_10.rds	1	2680451	Purge; confirm archive where needed
+applications/Munich Rent/Others/results/fit_tau_30.rds	1	2734111	Purge; confirm archive where needed
+applications/Munich Rent/Others/results/fit_tau_50.rds	1	2624722	Purge; confirm archive where needed
+applications/Munich Rent/Others/results/fit_tau_70.rds	1	2517179	Purge; confirm archive where needed
+applications/Munich Rent/Others/results/fit_tau_90.rds	1	1913151	Purge; confirm archive where needed
+applications/Munich Rent/Others/results/munich_individual_sampler.pdf	1	198214	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results/munich_sandwich_10_90.pdf	1	109964	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results/validated/munich_individual_sampler.pdf	1	200997	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results_onizuka/fit_tau_10.rds	1	4835388	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka/fit_tau_30.rds	1	4835716	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka/fit_tau_50.rds	1	4806164	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka/fit_tau_70.rds	1	4775020	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka/fit_tau_90.rds	1	4775254	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka/munich_onizuka_q10_q90.pdf	1	108662	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results_onizuka/munich_onizuka_q30_q50_q70.pdf	1	109884	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results_onizuka_k2/all_quantile_fits.rds	1	24115580	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka_k2/fit_tau_10.rds	1	4864235	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka_k2/fit_tau_30.rds	1	4846664	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka_k2/fit_tau_50.rds	1	4820844	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka_k2/fit_tau_70.rds	1	4794628	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka_k2/fit_tau_90.rds	1	4789010	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_onizuka_k2/munich_onizuka_q10_q90.pdf	1	108760	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results_onizuka_k2/munich_onizuka_q30_q50_q70.pdf	1	109723	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results_pmala/fit_tau_10.rds	1	2695378	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_pmala/fit_tau_30.rds	1	3197967	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_pmala/fit_tau_50.rds	1	3123830	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_pmala/fit_tau_70.rds	1	2831025	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_pmala/fit_tau_90.rds	1	2268437	Purge; confirm archive where needed
+applications/Munich Rent/Others/results_pmala/munich_pmala_q10_q90.pdf	1	109621	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results_pmala/munich_pmala_q30_q50_q70.pdf	1	109899	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results_pmala_k2/munich_pmala_q10_q90.pdf	1	109402	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/Others/results_pmala_k2/munich_pmala_q30_q50_q70.pdf	1	109351	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/results_k2/figures/munich_onizuka_q10_q90.pdf	1	108920	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/results_k2/figures/munich_onizuka_q30_q50_q70.pdf	1	109414	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/results_k2/figures/munich_pmala_q10_q90.pdf	1	108777	Keep first-party artifact if needed; review provenance
+applications/Munich Rent/results_k2/figures/munich_pmala_q30_q50_q70.pdf	1	109718	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results/all_quantile_fits.rds	1	12476827	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results/fit_tau_10.rds	1	2680451	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results/fit_tau_30.rds	1	2734111	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results/fit_tau_50.rds	1	2624722	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results/fit_tau_70.rds	1	2517179	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results/fit_tau_90.rds	1	1913151	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results/munich_individual_sampler.pdf	1	198214	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results/munich_sandwich_10_90.pdf	1	109964	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results/validated/munich_individual_sampler.pdf	1	200997	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results_onizuka/fit_tau_10.rds	1	4835388	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka/fit_tau_30.rds	1	4835716	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka/fit_tau_50.rds	1	4806164	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka/fit_tau_70.rds	1	4775020	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka/fit_tau_90.rds	1	4775254	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka/munich_onizuka_q10_q90.pdf	1	108662	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results_onizuka/munich_onizuka_q30_q50_q70.pdf	1	109884	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results_onizuka_k2/all_quantile_fits.rds	1	24115580	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka_k2/fit_tau_10.rds	1	4864235	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka_k2/fit_tau_30.rds	1	4846664	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka_k2/fit_tau_50.rds	1	4820844	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka_k2/fit_tau_70.rds	1	4794628	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka_k2/fit_tau_90.rds	1	4789010	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_onizuka_k2/munich_onizuka_q10_q90.pdf	1	108760	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results_onizuka_k2/munich_onizuka_q30_q50_q70.pdf	1	109723	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results_pmala/fit_tau_10.rds	1	2695378	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_pmala/fit_tau_30.rds	1	3197967	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_pmala/fit_tau_50.rds	1	3123830	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_pmala/fit_tau_70.rds	1	2831025	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_pmala/fit_tau_90.rds	1	2268437	Purge; confirm archive where needed
+archive/munich_rent/code/Others/results_pmala/munich_pmala_q10_q90.pdf	1	109621	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results_pmala/munich_pmala_q30_q50_q70.pdf	1	109899	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results_pmala_k2/munich_pmala_q10_q90.pdf	1	109402	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/Others/results_pmala_k2/munich_pmala_q30_q50_q70.pdf	1	109351	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/results_k2/figures/munich_onizuka_q10_q90.pdf	1	108920	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/results_k2/figures/munich_onizuka_q30_q50_q70.pdf	1	109414	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/results_k2/figures/munich_pmala_q10_q90.pdf	1	108777	Keep first-party artifact if needed; review provenance
+archive/munich_rent/code/results_k2/figures/munich_pmala_q30_q50_q70.pdf	1	109718	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/_superseded_k1_munich/munich_onizuka_q10_q90.pdf	1	108662	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/_superseded_k1_munich/munich_onizuka_q30_q50_q70.pdf	1	109884	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/_superseded_k1_munich/munich_pmala_q10_q90.pdf	1	109621	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/_superseded_k1_munich/munich_pmala_q30_q50_q70.pdf	1	109899	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/munich_individual_sampler.pdf	1	199549	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/munich_onizuka_q10_q90.pdf	1	108920	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/munich_onizuka_q30_q50_q70.pdf	1	109414	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/munich_pmala_q10_q90.pdf	1	108777	Keep first-party artifact if needed; review provenance
+archive/munich_rent/figures/munich_pmala_q30_q50_q70.pdf	1	109718	Keep first-party artifact if needed; review provenance
+engineering/E06_Rate_Validation/figs/fig_e06_headline.pdf	1	8051	Keep first-party artifact if needed; review provenance
+engineering/E06_Rate_Validation/figs/fig_e06_headline_rough.pdf	1	8052	Keep first-party artifact if needed; review provenance
+engineering/E10_Lambda_Mixing/h2h_n2000/h2h_n2000_VS_t075.png	1	1118438	Keep first-party artifact if needed; review provenance
+engineering/E10_Lambda_Mixing/h2h_n2000/h2h_n2000_VS_t095.png	1	1166411	Keep first-party artifact if needed; review provenance
+experiments/air_simulation/onizuka_laplace_20261023/attempt_20261023T171713_511660/results.rds	1	2242139	Keep byte-exact pending manifest or seal decision
+experiments/interior_quantiles/individual_nots_20261003/deployment/validation_1785936.tar.gz	1	1487365	Keep byte-exact pending manifest or seal decision
+experiments/joint_upper_levels/runs/VS_upper6_100seeds_Rdefaults_b001_20261002/metadata/monitor/history.jsonl	1	10834398	Purge; confirm archive where needed
+experiments/joint_upper_levels/runs/VS_upper6_100seeds_Rdefaults_b001_20261002/paper_reference/main.pdf	1	2740000	Keep byte-exact pending manifest or seal decision
+experiments/pilots/joint_results_joint/joint_summary_VS_Normal_n500_seed1_b0_0.001_taus_0.75-0.95.rds	1	1376942	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/joint_results_joint/joint_summary_VS_Normal_n500_seed1_taus_0.75-0.95.rds	1	1373934	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/lambda_mixing/results/base_c1001.rds	1	1172090	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/lambda_mixing/results/base_c1002.rds	1	1171672	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/lambda_mixing/results/q20_c1001.rds	1	1175125	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/lambda_mixing/results/q20_c1002.rds	1	1174344	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/lambda_mixing/results/q40_c1001.rds	1	1166041	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/lambda_mixing/results/q40_c1002.rds	1	1166407	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/lambda_mixing/results/q80_c1001.rds	1	1152672	Review provenance; keep reproducibility input or archive large output
+experiments/pilots/lambda_mixing/results/q80_c1002.rds	1	1152464	Review provenance; keep reproducibility input or archive large output
+experiments/scalability/figures_unused/cost_scaling.pdf	1	17777	Keep first-party artifact if needed; review provenance
+experiments/scalability/figures_unused/scal_pmala_per_obs.pdf	1	15572	Keep first-party artifact if needed; review provenance
+experiments/scalability/figures_unused/scal_speedup.pdf	1	17436	Keep first-party artifact if needed; review provenance
+literature/Agapiou_2021_pExponentialPriorsContraction.pdf	1	541324	Purge; confirm archive where needed
+literature/Agapiou_2024_LaplacePriorsSpatialInhomogeneity.pdf	1	551409	Purge; confirm archive where needed
+literature/Atchade_2017_Quasi_Posterior_Contraction.pdf	1	415635	Purge; confirm archive where needed
+literature/Bach_Klein_2022_Bayesian_PSpline_Rates.pdf	1	948623	Purge; confirm archive where needed
+literature/Brantley_2020.pdf	1	1597883	Purge; confirm archive where needed
+literature/Castillo_2015_BayesianLinearRegressionSparsePriors.pdf	1	395387	Purge; confirm archive where needed
+literature/Fill_2004_SmallDeviationsIntegratedBrownianSheets.pdf	1	329287	Purge; confirm archive where needed
+literature/Ghosal_2007_ConvergenceRatesNoniid.pdf	1	394213	Purge; confirm archive where needed
+literature/Giordano_2023_BesovLaplacePriors.pdf	1	493888	Purge; confirm archive where needed
+literature/Kowal_Dynamic_Shrinkage.pdf	1	4383585	Purge; confirm archive where needed
+literature/Large Prior.pdf	1	1326688	Owner handles separately
+literature/Onizuka_2023.pdf	1	2504714	Purge; confirm archive where needed
+literature/Padilla_Risk Bounds for Quantile Trend Filtering.pdf	1	3227346	Purge; confirm archive where needed
+literature/Pereyra 2016.pdf	1	1539752	Purge; confirm archive where needed
+literature/Sriram_2013_PosteriorConsistencyMisspecifiedALD.pdf	1	379276	Purge; confirm archive where needed
+literature/Syring_Martin 2023.pdf	1	790269	Purge; confirm archive where needed
+literature/TF_2014.pdf	1	1252376	Purge; confirm archive where needed
+literature/Wang_2014_FallingFactorialBasis.pdf	1	502526	Purge; confirm archive where needed
+paper/figures/_superseded_k1_munich/munich_onizuka_q10_q90.pdf	1	108662	Keep first-party artifact if needed; review provenance
+paper/figures/_superseded_k1_munich/munich_onizuka_q30_q50_q70.pdf	1	109884	Keep first-party artifact if needed; review provenance
+paper/figures/_superseded_k1_munich/munich_pmala_q10_q90.pdf	1	109621	Keep first-party artifact if needed; review provenance
+paper/figures/_superseded_k1_munich/munich_pmala_q30_q50_q70.pdf	1	109899	Keep first-party artifact if needed; review provenance
+paper/figures/cost_scaling.pdf	1	17777	Keep first-party artifact if needed; review provenance
+paper/figures/growth_lms_boys.pdf	1	246831	Keep first-party artifact if needed; review provenance
+paper/figures/growth_lms_girls.pdf	1	261738	Keep first-party artifact if needed; review provenance
+paper/figures/growth_pmala_boys.pdf	1	246553	Keep first-party artifact if needed; review provenance
+paper/figures/growth_pmala_girls.pdf	1	261765	Keep first-party artifact if needed; review provenance
+paper/figures/munich_individual_sampler.pdf	1	199549	Keep first-party artifact if needed; review provenance
+paper/figures/munich_onizuka_q10_q90.pdf	1	108920	Keep first-party artifact if needed; review provenance
+paper/figures/munich_onizuka_q30_q50_q70.pdf	1	109414	Keep first-party artifact if needed; review provenance
+paper/figures/munich_pmala_q10_q90.pdf	1	108777	Keep first-party artifact if needed; review provenance
+paper/figures/munich_pmala_q30_q50_q70.pdf	1	109718	Keep first-party artifact if needed; review provenance
+paper/figures/nile_individual_sampler.pdf	1	42069	Keep first-party artifact if needed; review provenance
+paper/figures/scal_breakdown.pdf	1	20012	Keep first-party artifact if needed; review provenance
+paper/figures/scal_pmala_per_obs.pdf	1	15572	Keep first-party artifact if needed; review provenance
+paper/figures/scal_speedup.pdf	1	17436	Keep first-party artifact if needed; review provenance
+paper/figures/scal_time.pdf	1	16879	Keep first-party artifact if needed; review provenance
+paper/history/air_drop_se_20261027/before/main.pdf	1	2705785	Purge; confirm archive where needed
+paper/history/air_lap_rows_20261027/before/main.pdf	1	2704861	Purge; confirm archive where needed
+paper/history/extreme_six_levels_20261023/before/main.pdf	1	2704574	Purge; confirm archive where needed
+paper/history/joint_extreme_results_20261002/before/main.pdf	1	2766146	Purge; confirm archive where needed
+paper/history/joint_sampler_rewrite_20261001/before/main.pdf	1	2690023	Purge; confirm archive where needed
+paper/history/mixture_gibbs.pdf	1	247359	Keep first-party artifact if needed; review provenance
+paper/history/munich_k2_update_20261013/before/figures/munich_onizuka_q10_q90.pdf	1	108760	Keep first-party artifact if needed; review provenance
+paper/history/munich_k2_update_20261013/before/figures/munich_onizuka_q30_q50_q70.pdf	1	109723	Keep first-party artifact if needed; review provenance
+paper/history/munich_k2_update_20261013/before/figures/munich_pmala_q10_q90.pdf	1	109402	Keep first-party artifact if needed; review provenance
+paper/history/munich_k2_update_20261013/before/figures/munich_pmala_q30_q50_q70.pdf	1	109351	Keep first-party artifact if needed; review provenance
+paper/history/munich_k2_update_20261013/before/main.pdf	1	2704514	Purge; confirm archive where needed
+paper/history/noncrossing_review/noncrossing_evaluation_plan.pdf	1	210586	Keep first-party artifact if needed; review provenance
+paper/history/simulation_revision_20260914/Brantley_2020.txt	1	54396	Purge; confirm archive where needed
+paper/history/simulation_revision_20260914/Onizuka_2023.txt	1	95326	Purge; confirm archive where needed
+paper/history/simulation_revision_20260914/before/main.pdf	1	2709038	Purge; confirm archive where needed
+paper/history/simulation_revision_20260914/build/main.pdf	1	2662702	Purge; confirm archive where needed
+paper/history/writing_sync_20260914/before/main.pdf	1	2708996	Purge; confirm archive where needed
+paper/main.pdf	1	826090	Keep current paper; review stale versions
+paper/main.pdf	2	2426169	Keep current paper; review stale versions
+paper/main.pdf	3	2403789	Keep current paper; review stale versions
+paper/main.pdf	4	2440224	Keep current paper; review stale versions
+paper/main.pdf	5	2424027	Keep current paper; review stale versions
+paper/main.pdf	6	2438492	Keep current paper; review stale versions
+paper/main.pdf	7	2436603	Keep current paper; review stale versions
+paper/main.pdf	8	2423831	Keep current paper; review stale versions
+paper/main.pdf	9	2436591	Keep current paper; review stale versions
+paper/main.pdf	10	2430778	Keep current paper; review stale versions
+paper/main.pdf	11	2431331	Keep current paper; review stale versions
+paper/main.pdf	12	2403974	Keep current paper; review stale versions
+paper/main.pdf	13	2438008	Keep current paper; review stale versions
+paper/main.pdf	14	2429372	Keep current paper; review stale versions
+paper/main.pdf	15	2389789	Keep current paper; review stale versions
+paper/main.pdf	16	2424333	Keep current paper; review stale versions
+paper/main.pdf	17	281341	Keep current paper; review stale versions
+paper/main.pdf	18	2430814	Keep current paper; review stale versions
+paper/main.pdf	19	2262464	Keep current paper; review stale versions
+paper/main.pdf	20	2443071	Keep current paper; review stale versions
+paper/main.pdf	21	2404733	Keep current paper; review stale versions
+paper/main.pdf	22	2404715	Keep current paper; review stale versions
+paper/main.pdf	23	2441770	Keep current paper; review stale versions
+paper/main.pdf	24	2426894	Keep current paper; review stale versions
+paper/main.pdf	25	2441520	Keep current paper; review stale versions
+paper/main.pdf	26	2430829	Keep current paper; review stale versions
+paper/main.pdf	27	2403798	Keep current paper; review stale versions
+paper/main.pdf	28	2440651	Keep current paper; review stale versions
+paper/main.pdf	29	2438606	Keep current paper; review stale versions
+paper/main.pdf	30	2450060	Keep current paper; review stale versions
+paper/main.pdf	31	2279188	Keep current paper; review stale versions
+paper/main.pdf	32	1099363	Keep current paper; review stale versions
+paper/main.pdf	33	2426215	Keep current paper; review stale versions
+paper/main.pdf	34	2438018	Keep current paper; review stale versions
+paper/main.pdf	35	2404694	Keep current paper; review stale versions
+paper/main.pdf	36	2450945	Keep current paper; review stale versions
+paper/main.pdf	37	2441122	Keep current paper; review stale versions
+paper/main.pdf	38	2437030	Keep current paper; review stale versions
+paper/main.pdf	39	942241	Keep current paper; review stale versions
+paper/main.pdf	40	2423835	Keep current paper; review stale versions
+paper/main.pdf	41	2441440	Keep current paper; review stale versions
+paper/main.pdf	42	2426137	Keep current paper; review stale versions
+paper/main.pdf	43	2438738	Keep current paper; review stale versions
+paper/main.pdf	44	2437058	Keep current paper; review stale versions
+paper/main.pdf	45	2437025	Keep current paper; review stale versions
+paper/main.pdf	46	2403811	Keep current paper; review stale versions
+paper/main.pdf	47	2424654	Keep current paper; review stale versions
+paper/main.pdf	48	2436703	Keep current paper; review stale versions
+paper/main.pdf	49	2430766	Keep current paper; review stale versions
+paper/main.pdf	50	2429933	Keep current paper; review stale versions
+paper/main.pdf	51	2395233	Keep current paper; review stale versions
+paper/main.pdf	52	2442343	Keep current paper; review stale versions
+paper/main.pdf	53	2464617	Keep current paper; review stale versions
+paper/main.pdf	54	2437086	Keep current paper; review stale versions
+theory/T07_Bayes_Thm3/T07a_statement.pdf	1	267456	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07a_statement.pdf	2	267197	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07a_statement.pdf	3	263116	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07a_statement.pdf	4	267558	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07a_statement.pdf	5	258613	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07a_statement.pdf	6	258747	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07c_proof.pdf	1	435689	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07c_proof.pdf	2	455916	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07c_proof.pdf	3	460382	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07c_proof.pdf	4	457823	Keep first-party artifact if needed; review provenance
+theory/T07_Bayes_Thm3/T07c_proof.pdf	5	459377	Keep first-party artifact if needed; review provenance
+theory/T09_Joint_Theorem/T09.pdf	1	193862	Keep first-party artifact if needed; review provenance
+theory/T09_Joint_Theorem/T09.pdf	2	193269	Keep first-party artifact if needed; review provenance
+theory/T09_Joint_Theorem/T09.pdf	3	193871	Keep first-party artifact if needed; review provenance
+theory/T09_Joint_Theorem/T09.pdf	4	192188	Keep first-party artifact if needed; review provenance
+theory/T09_Joint_Theorem/T09.pdf	5	192045	Keep first-party artifact if needed; review provenance
+theory/T09_Joint_Theorem/T09.pdf	6	193781	Keep first-party artifact if needed; review provenance
+writing/W01_Statements/statements.pdf	1	394247	Keep first-party artifact if needed; review provenance
+writing/W01_Statements/statements.pdf	2	412257	Keep first-party artifact if needed; review provenance
+writing/W01_Statements/statements.pdf	3	431675	Keep first-party artifact if needed; review provenance
+writing/W01_Statements/statements.pdf	4	432639	Keep first-party artifact if needed; review provenance
+writing/W01_Statements/statements.pdf	5	372229	Keep first-party artifact if needed; review provenance
+writing/W02_Theorems/theorems.pdf	1	2721	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	2	435426	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	3	434644	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	4	428636	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	5	423956	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	6	423219	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	7	436785	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	8	423491	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	9	420717	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	10	432505	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	11	423923	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	12	423269	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	13	423859	Keep byte-exact pending manifest or seal decision
+writing/W02_Theorems/theorems.pdf	14	432350	Keep byte-exact pending manifest or seal decision
+writing/W03_Theorem/theorem.pdf	1	331224	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_combined_DEMO.pdf	1	224220	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_combined_DEMO.pdf	2	231854	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_combined_DEMO.pdf	3	231854	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_combined_DEMO.pdf	4	231854	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_combined_DEMO_bands.pdf	1	255870	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_boys.pdf	1	174277	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_boys.pdf	2	174277	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_boys.pdf	3	174277	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_boys.pdf	4	166467	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_boys.pdf	5	174277	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_boys.pdf	6	174277	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_boys.pdf	7	174277	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_boys_bands.pdf	1	179379	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_girls.pdf	1	184733	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_girls.pdf	2	184733	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_girls.pdf	3	184733	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_girls.pdf	4	176360	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_girls.pdf	5	184733	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_girls.pdf	6	184733	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_girls.pdf	7	184733	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_growth_girls_bands.pdf	1	189506	Keep first-party artifact if needed; review provenance
+writing/W08_Repo/figures/out/readme_hero_vs_DEMO.pdf	1	81316	Keep byte-exact pending manifest or seal decision
+writing/W08_Repo/figures/out/readme_hero_vs_DEMO.pdf	2	81316	Keep byte-exact pending manifest or seal decision
+writing/W08_Repo/figures/out/readme_hero_vs_DEMO.pdf	3	81316	Keep byte-exact pending manifest or seal decision
+writing/W08_Repo/figures/out/readme_hero_vs_DEMO_bands.pdf	1	102461	Keep first-party artifact if needed; review provenance
+Simulations/Extreme/Extreme_Onizuka/source/BQTF-function.R	1	23539	Review Onizuka source provenance and license before retaining
+experiments/extreme_quantiles/packages/Extreme_Onizuka/source/BQTF-function.R	1	23539	Review Onizuka source provenance and license before retaining
