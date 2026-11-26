@@ -98,7 +98,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "(e) For $t>0$, $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$; for $t<0$, $R_i(t)^2=\int_t^0 2(s-t)\ind(s<Z_i<0)ds$ and $\tau-F_i(s)\le\fu|s|$ give the same bound $\fu|t|^3/3$."
 - **Why it was needed:** a proof gap. The negative case was missing, and the printed formula is wrong for t < 0. The constants are unchanged.
 - **Lean:** `BQTF.remK_moments`, in `lean/BQTF/CheckLoss.lean`. The negative-shift case uses the weight 2(s−t) on (t,0).
-- **Status:** **in paper (30625fd)**; fidelity check running. Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. CheckLoss was finalized and checked at merge 5f8ba95. Found in the CheckLoss review.
+- **Status:** **in paper (30625fd)**; Theory CONFIRMED (math and text); independent fidelity check running. Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. CheckLoss was finalized and checked at merge 5f8ba95. Found in the CheckLoss review.
 
 ## C-08: the Laplace mgf in the Shells score bound is used without its domain
 
