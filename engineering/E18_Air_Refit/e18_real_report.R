@@ -148,12 +148,17 @@ theta_comparison <- function(draws, medians, tau) {
 record_cell <- function(chains, tau, b0) {
   if (any(vapply(chains, is.null, FALSE))) return(NULL)
   draws <- lapply(chains, `[[`, "theta_thin")
+  selected_for_real <- isTRUE(b0 == selected$b0[match(tau, e18_taus)])
+  export_intervals <- prime && selected_for_real && b0 == 1e-2
   if (prime) {
-    medians <- d$center + d$scale * vapply(seq_len(n), function(i) {
+    pointwise <- d$center + d$scale * vapply(seq_len(n), function(i) {
       a <- draws[[1L]][, i]
       b <- draws[[2L]][, i]
-      c(median(a), median(b), median(c(a, b)))
-    }, numeric(3L))
+      pooled <- c(a, b)
+      limits <- if (export_intervals) quantile(pooled, c(.025, .975), type = 7L, names = FALSE)
+      c(median(a), median(b), median(pooled), limits)
+    }, numeric(if (export_intervals) 5L else 3L))
+    medians <- pointwise[1:3, , drop = FALSE]
     fit <- medians[3L, ]
   } else {
     fit <- d$center + d$scale * apply(do.call(rbind, draws), 2L, median)
@@ -166,7 +171,6 @@ record_cell <- function(chains, tau, b0) {
     list(rhat = val, detail = "")
   }, error = function(err) list(rhat = NA_real_, detail = conditionMessage(err)))
   field <- function(k) vapply(chains, function(x) as.numeric(x[[k]]), 0)
-  selected_for_real <- isTRUE(b0 == selected$b0[match(tau, e18_taus)])
   rhat_gate_applies <- !prime || (selected_for_real && b0 == 1e-2)
   diagnostics <- data.frame(tau = tau, b0 = b0, a0 = if (prime) 8640L else 1L,
     log_lambda_ess_chain_1 = field("ess_log_lambda")[1L],
@@ -186,6 +190,7 @@ record_cell <- function(chains, tau, b0) {
   diagnostics$selected_for_real <- selected_for_real
   warm <- e18_warm_summary(setNames(lapply(e18_warm_fields, field), e18_warm_fields))
   list(fit = fit, chain_medians = medians[1:2, , drop = FALSE],
+    limits = if (export_intervals) pointwise[4:5, , drop = FALSE],
     diagnostics = cbind(diagnostics, theta_comparison(draws, medians, tau), as.data.frame(warm)))
 }
 
@@ -202,9 +207,10 @@ if (!is.null(cell_diag)) emit(cell_diag, "spod_cell_health")
 fits <- lapply(pmala, function(cells) lapply(cells, `[[`, "fit"))
 b0_by_view <- lapply(grid_rates, rep, times = length(e18_taus))
 names(b0_by_view) <- names(fits)
-fits$pmala_selected <- lapply(seq_along(e18_taus), function(i) {
-  if (!is.na(selected$b0[i])) pmala[[match(selected$b0[i], grid_rates)]][[i]]$fit
+selected_cells <- lapply(seq_along(e18_taus), function(i) {
+  if (!is.na(selected$b0[i])) pmala[[match(selected$b0[i], grid_rates)]][[i]]
 })
+fits$pmala_selected <- lapply(selected_cells, `[[`, "fit")
 b0_by_view$pmala_selected <- selected$b0
 if (with_admm) {
   fits$admm <- lapply(admm$records, function(x)
@@ -310,7 +316,7 @@ plot_chain_overlay <- function(tau, b0, medians) {
 if (prime) {
   for (i in which(!is.na(selected$b0))) {
     b0 <- selected$b0[i]
-    cell <- pmala[[match(b0, grid_rates)]][[i]]
+    cell <- selected_cells[[i]]
     if (!is.null(cell)) plot_chain_overlay(e18_taus[i], b0, cell$chain_medians)
   }
 }
@@ -330,3 +336,15 @@ if (length(stall_ids) || (!is.null(cell_diag) && any(cell_diag$STOP_rhat)))
   stop("STOP: a chain stalled or log-lambda R-hat exceeded 1.1 in a gated cell. See the chain and cell health CSVs.")
 if (nrow(got$issues) || (!prime && nrow(admm$issues))) stop("Incomplete real-data fit set. See issue CSVs.")
 if (selected$branch[1L] == "iii") stop("STOP: Stage 1 did not select a rate triple. Escalate to HQ.")
+if (prime && isTRUE(all(selected$b0 == 1e-2))) {
+  seconds <- d$offsets
+  clock <- sprintf("%02d:%02d:%02d", seconds %/% 3600L, seconds %/% 60L %% 60L, seconds %% 60L)
+  curves <- data.frame(time = clock, y = d$block_mean)
+  columns <- c("q01", "q05", "q10")
+  curves[columns] <- fits$pmala_selected
+  for (i in seq_along(columns)) {
+    limits <- selected_cells[[i]]$limits
+    curves[paste0(columns[i], c("_lo", "_hi"))] <- list(limits[1L, ], limits[2L, ])
+  }
+  emit(curves, "spod_curves")
+}

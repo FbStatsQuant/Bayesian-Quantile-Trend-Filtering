@@ -337,11 +337,16 @@ root with the Owls wrapper.
 
 The export writes the Table 2 estimates and SEs, the paired PMALA-minus-ADMM
 differences over common seeds, and the warm-up summary for both prime stages
-under `results_a0_n/`. The per-cell Stage 2′ diagnostics are in
+under `results_a0_n/`. It also writes `spod_curves.csv`, with 8,640 local
+clock labels, the observed block means in PID counts, and the Figure 6
+pointwise medians at τ = 0.01, 0.05, and 0.10 at `b0 = 1e-2`.
+The pointwise 95% limits use type-7 quantiles of the same 1,332 pooled
+draws. Medians and limits are back-transformed using the prepared center
+and scale. The per-cell Stage 2′ diagnostics are in
 `$REAL_RUN/report/spod_diagnostics_by_cell.csv`. Fit core-hours use Slurm
 `TotalCPU` from the collected production array's `slurm_accounting.psv`.
 Report pilot CPU separately. The Writing export requires all 30 chain
-reports and checks `STOP_stall` and `STOP_rhat` before writing the three CSVs.
+reports and checks `STOP_stall` and `STOP_rhat` before writing the CSVs.
 
 ## Fit reproducibility
 

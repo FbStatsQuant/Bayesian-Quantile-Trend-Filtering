@@ -65,6 +65,9 @@ stopifnot(nrow(real_selected) == 3L, setequal(real_selected$tau, e18_taus),
   all(real_selected$b0 == 1e-2))
 if (any(chain$STOP_stall) || any(cell$STOP_rhat))
   stop("STOP: Stage 2-prime diagnostics require HQ review before export.")
+curves <- load_csv(real, "spod_curves")
+stopifnot(nrow(curves) == 8640L, identical(names(curves), c("time", "y", "q01", "q05", "q10",
+  "q01_lo", "q01_hi", "q05_lo", "q05_hi", "q10_lo", "q10_hi")))
 
 fits <- load_csv(sim, "per_fit")
 stopifnot(nrow(fits) == 1500L, all(fits$a0 == 500L), !anyDuplicated(fits[c("tau", "b0", "seed")]))
@@ -132,3 +135,4 @@ dir.create(out, recursive = TRUE, showWarnings = FALSE)
 emit(paper, out, "paper_air_table")
 emit(differences, out, "paired_pmala_minus_admm")
 emit(warmup, out, "warmup_counters_by_cell")
+emit(curves, out, "spod_curves")
