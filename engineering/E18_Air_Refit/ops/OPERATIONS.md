@@ -59,12 +59,13 @@ ADMM. The cap is 80 core-hours. Use the bundled starting memory
 allocation for the pilot and measure MaxRSS before setting production
 memory.
 Stage 1 closed at 77.424 of 80 core-hours. The approved ADMM result
-contains 299 fits. Reuse the sealed Laplace archive. HQ ruled against
-an HS refit, so there are no further HS submissions.
+contains 299 fits. Reuse the sealed Laplace archive. The scope ruling
+excludes all Onizuka submissions.
 
 ## Stage 1′ (held)
 
-Wait for the Engineering head's authorized bundle SHA. This design uses
+Wait for the Engineering head's authorized bundle SHA. Run PMALA
+Stage 1′ before PMALA Stage 2′. Stage 1′ uses
 `a0 = n = 500`, three quantiles, five rates, and 100 seeds per cell,
 for 1,500 production fits. Use `E18-prime-*` run IDs, with
 `sim-prime-pilot` for the pilot and `sim-prime` for production. Pilot
@@ -92,7 +93,7 @@ for extra retained posterior draws when the pilot used a shorter chain.
 For sizing context, a dense matrix of 20,000 by 8,640 doubles alone
 uses 1.29 GiB. If all pilots use 45 CPU minutes, 37.75 core-hours remain
 for 24 production fits and the detrendr rerun, or 94.375 minutes per
-fit before detrendr. Send the measured projection to the Engineering
+fit before any optional detrendr work. Send the measured projection to the Engineering
 head. Stop if the sampler stalls at n = 8,640 or continuing would
 require changing the E-14/E-17 algorithm.
 
@@ -101,6 +102,11 @@ R-hat when both production chains for a quantile and rate are
 available. Read `log_lambda_rhat` in `spod_cell_health.csv`, which
 `e18_real_report.R` calculates from the retained log-λ draws using
 classic Gelman–Rubin R-hat. Stop and report any value above 1.1.
+
+For Stage 2′, prioritize the PMALA fit set. Real-data ADMM is
+optional. Proceed with its full array only if a measured one-fit
+pilot shows it takes minutes and it can run without delaying PMALA.
+Otherwise skip the ADMM refit.
 
 ## Collection
 
