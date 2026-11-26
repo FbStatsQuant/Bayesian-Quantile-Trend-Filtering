@@ -8,7 +8,7 @@ The hero and growth panels shade the area between the estimated τ = 0.1 and τ 
 
 ## Run
 
-From the repo root (on Owls, always through the wrapper):
+From the repository root:
 
 ```
 Rscript writing/W08_Repo/figures/make_readme_figures.R --demo        # hero from stand-in data

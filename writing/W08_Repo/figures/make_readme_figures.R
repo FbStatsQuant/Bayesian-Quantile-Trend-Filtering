@@ -282,7 +282,11 @@ spod_from_file <- function(path) {
   sp <- spod_panel(tm, d$y, d$q01, d$q10, d$q05, time_lab = lab)
   if (inherits(tm, "POSIXct"))
     sp$plot <- sp$plot + scale_x_continuous(                # ticks every 6 hours of the clock labels
-      breaks = function(lim) seq(ceiling(lim[1] / 21600) * 21600, lim[2], by = 21600),
+      breaks = function(lim) {                              # empty when the span holds no 6-hour tick
+        b0 <- ceiling(lim[1] / 21600) * 21600
+        if (!is.finite(b0) || b0 > lim[2]) return(numeric(0))
+        seq(b0, lim[2], by = 21600)
+      },
       labels = function(v) format(as.POSIXct(v, origin = "1970-01-01", tz = "UTC"), "%H:%M"))
   cat(sprintf("spod: file %s, n = %d, order check: %d crossing(s) (q01 > q05 or q05 > q10), %s; share below q10 = %.4f\n",
               show(path), sp$n, sp$n_cross, if (sp$band_drawn) "band drawn" else "FALLBACK: tau = 0.05 curve only, no band",
