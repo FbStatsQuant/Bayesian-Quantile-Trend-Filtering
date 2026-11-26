@@ -133,3 +133,12 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
   - No constant changes.
 - **Lean:** `BQTF.quad_shift`, in `lean/BQTF/QuadShift.lean` (Sol-W2). It assumes `hϱ : 0 < ϱ` and `hlam : 0 < λ`. It proves the translation bound in probabilities for all t (QuadShift.lean ≈176), and takes the log cost only for |t| ≤ 1/λ (≈258).
 - **Status:** **in paper (922fa52)**; **verified** (2026-11-26, Lean head). Writing applied (a) and (b) verbatim, plus Theory's amendment ("since δ_A ≤ λϱ/2"; "On (0,∞), Λ is …"), which matches QuadShift.lean ≈258. Earlier: **sent** (2026-11-26) to Writing and Theory, CC HQ; QuadShift finalized and checked at merge 1b141e0. Found by the PrekopaLaplace review and confirmed by the QuadShift review (lean/notes/reviews/QuadShift_2026-11-26.md).
+
+## C-11: measurability of the joint posterior mass is not stated
+
+- **Paper label:** appendix, proof of `thm:joint`, the "Transfer" display taking E Π_𝒞(U | y) (appendix_theory.tex ≈427–431, reused at general scales ≈436). This is the joint-theorem counterpart of C-02.
+- **Current paper text:** the expectation of y ↦ Π_𝒞(U | y) is split over the good event, but nowhere is it said that this map is measurable.
+- **Correct version:** add one sentence before the display: "For every Borel B the map y ↦ Π_𝒞(B | y) is Borel measurable: the product weight is jointly measurable in (y, Θ), so its integrals over B ∩ 𝒞 and over the closed set 𝒞 are measurable in y by Tonelli, and the denominator is positive and finite (Lemma~\ref{pf:lem:cond}), so their ratio is measurable."
+- **Why it was needed:** a missing measurability condition. Without it the expectation is undefined. It is the paper-side counterpart of D8 in docs/statements.md. No constant changes.
+- **Lean:** the measurability conjunct of `BQTF.JointConclusion`, from `BQTF.measurable_jointPosterior_apply` (`lean/BQTF/Joint/Product.lean`), used in `BQTF.joint_assembly` (`lean/BQTF/Joint/Transfer.lean`).
+- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. Theorem 2 was finalized and checked at the merge that adds this entry: `joint_theorem` and `joint_theorem_scale` use only propext, Classical.choice and Quot.sound. Found in the J6/J7 review (lean/notes/reviews/JointTransferMain_2026-11-26.md).
