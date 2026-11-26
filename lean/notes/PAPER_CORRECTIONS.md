@@ -55,7 +55,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "…so the c-integral is at most ∫exp{−a‖c − Nᵀ(y−Su)‖₂}dc = ∫exp{−a‖c‖₂}dc < ∞, with a = min{τ,1−τ}, a bound that does not depend on u; integrating it against the probability measure Q_λ gives N(ℝⁿ) < ∞. Positivity of the integrand gives N(ℝⁿ) > 0."
 - **Why it was needed:** a wrong proof step, in its wording. The c-integral itself depends on u (Sol reviewer's example: n = 2, r = 1, y = θ* = 0, τ = 1/2, N = (1,1)ᵀ/√2, S = (0,1)ᵀ gives √2(|u|+2)e^{−|u|/2}). Only its upper bound is u-free, and that is what the argument uses.
 - **Lean:** `BQTF.posterior_eq_ratio` (the clause 0 < Nmass univ < ∞), in `lean/BQTF/Coord.lean`.
-- **Status:** **in paper (3f5dff1)**; fidelity check running. Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. Coord finalized and checked at merge 5913b27 (`posterior_eq_ratio`: standard axioms only). Found in the Coord review.
+- **Status:** **in paper (3f5dff1)**; Theory CONFIRMED (wording only); independent fidelity check running. Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. Coord finalized and checked at merge 5913b27 (`posterior_eq_ratio`: standard axioms only). Found in the Coord review.
 
 ## C-04: Lemma interp uses Lemma coord at window size w = r, where Lemma coord assumes n > r
 
