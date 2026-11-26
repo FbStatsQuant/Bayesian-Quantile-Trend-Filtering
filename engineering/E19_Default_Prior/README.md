@@ -205,3 +205,46 @@ generator and verified against all 24 exact SHA-256 digests in
 [reference RDS](preflight/reference_owls.rds) SHA-256 is
 `6a2972c8fcc9cd3a70148fa1037972ef6dde349e63539713e630fb7f4715359d`.
 All other preregistered settings and gates apply.
+
+### 2026-11-26 completed run
+
+- Second amendment and reference commit `b667a28`. Before submission,
+  Owls and NOTS verified the bundle and matched snapshot commit
+  `1ed7885d8a6a185e01aeb272ad25aeafa0e586cf`, the pinned sampler and
+  kernel blobs, the data generator blob, and the reference SHA-256.
+- One-fit test `2932596` passed all 24 reference comparisons on the
+  NOTS compute node, with a largest absolute difference of
+  `8.881784197001252e-16`. The fit completed with exit `0:0`, zero σ
+  guards and acceptance 0.50160. TotalCPU was 160.283 s and MaxRSS
+  was 624,420 KiB (609.785 MiB).
+- Pilot `2932737` completed all six fits with exit `0:0`, zero σ
+  guards, and acceptance 0.49665–0.50210 (median 0.499975).
+  The sampler, chain schedule, prior, and pairing checks passed for
+  every fit. Allocation TotalCPU was 949.123 s (0.263645 core-hours)
+  and maximum MaxRSS was 646,364 KiB (631.215 MiB). Projected usage was
+  132.086284 core-hours, or 132.131282 including the preceding
+  attempts. [Pilot accounting](e19_pilot_resources.csv)
+- Production `2932799` ran with `%300` and 896 MiB per task. It
+  completed 3,000 of 3,000 fits with exit `0:0`, zero σ guards,
+  acceptance 0.48030–0.50955 (median 0.49970), and zero maximum
+  absolute truth delta against E-14. The sampler, chain schedule,
+  prior, and pairing checks passed for every fit. All results
+  have a response digest. The monitor was restarted at 15:33 CT
+  after an output-file rename interrupted its directory scan. No
+  production fits were retried.
+- Production allocation TotalCPU was 501,944.888 s (139.429136
+  core-hours). Total usage across all five jobs, including the failed
+  preflights, was **139.737779 core-hours** of the 160 core-hour cap.
+  Owls verified all 3,003 entries in `E19_RESULTS.sha256`. The
+  manifest SHA-256 is
+  `3defec190b32fcf3f91503e837576c592618c0a78dd9656f6ca3c6a9be4ff12a`.
+
+**FAIL.** Condition 1 required geometric mean MSE ratios at most
+1.00. VS had 8.859499 and S had 0.784494. Condition 2 required zero
+significantly worse cells. All 15 VS cells and zero S cells had
+both paired z > 2 and MSE ratio > 1.10. Condition 3 required E-19
+median coverage of at least 0.82348 for VS and 0.83444 for S, based
+on E-14 medians of 0.87348 and 0.88444. E-19 medians were 0.53614
+for VS and 0.71394 for S. The air-only framing stands.
+[Per-cell results](e19_cells.csv) · [Verdict](e19_verdict.csv)
+· [Analysis](e19_analyze.R), commit `45be85b`.
