@@ -228,7 +228,9 @@ The maximum effort for every agent is "high". Fable is not on this team.
 **Assignment of Theorem 1** (final; launched 2026-11-25 on the skeleton at aa70682, one worktree per prover):
 - **Neon-A:** `Falling`, `Coord`, `Gram` (g_r > 0, by Theory's T10 proof), `SplineApprox`, `Smooth`, `Interp`, `SmallBall`, plus helper files under `BQTF/Lin/`.
 - **Neon-B:** `CheckLoss`, `Score`, `Concentration`, `Width`, `QuadShift`, `Denominator`, `Localization`, `Shells`, plus helper files under `BQTF/Prob/`.
-- **Not yet assigned:** `PriorMass`, `Main`, `Reduction`. These are assembly modules, and they go to a Neon once their inputs close. Per HQ, the head does not prove lemmas.
+- **Sol-W1** (gpt-6.2-sol, high; HQ authorization of 2026-11-25): `Main`, plus helpers under `BQTF/Asym/`. It proves the assembly against the frozen statements, as an early test that the interfaces suffice.
+- **Sol-W2** (gpt-6.2-sol, high): `Reduction`, then `PriorMass`, plus helpers under `BQTF/Scale/` and `BQTF/Prior/`.
+- The head proves no lemmas. A file never has two owners at once.
 
 Every module merge gets a fresh Sol review, written to `notes/reviews/<module>_<date>.md`. The head rules on each finding before merging.
 
