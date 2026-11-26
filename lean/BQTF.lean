@@ -24,3 +24,5 @@ import BQTF.Scale.Posterior
 import BQTF.Scale.Data
 import BQTF.Reduction
 import BQTF.Prob.Contraction
+import BQTF.Prob.EfronStein
+import BQTF.Lin.EckartYoung
