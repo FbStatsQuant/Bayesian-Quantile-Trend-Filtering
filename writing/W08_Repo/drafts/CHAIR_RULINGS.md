@@ -74,7 +74,8 @@ caption -> "Our work" table -> "Formal verification in Lean" (LEAN_SECTION) -> Q
   (recommend removing from the tip); (d) SPod raw-data redistribution terms (DATA.md TODO);
   (e) oversized files after E-18; (f) b0 default text (R6).
 
-## R8. Lean section (goes in as written in LEAN_SECTION.md, with these verified corrections)
+## R8. Lean section. SUPERSEDED: the Lean head's corrected LEAN_SECTION.md (7b61442) goes in verbatim; the list below is history only.
+lean/notes scrub: paths only, header "Paths generalized for publication, <date>; content otherwise verbatim", Lean head confirms first.
 - Module map: add Prior/ (Geometry.lean, Window.lean: prior geometry/window); Localization row =
   Proposition pf:prop:local (Localization.lean:11); Asym/ has 8 files.
 - Qualified names: BQTF.Prob.symmetrization_finset, BQTF.prekopa_laplace, BQTF.Lin.eckartYoung_tail.
