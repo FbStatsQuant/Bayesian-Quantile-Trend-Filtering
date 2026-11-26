@@ -408,13 +408,8 @@ if (!is.null(spod_path)) {
 if (!is.null(hero)) {
   S <- SIZES$stack
   rows <- list(gb$make(S, "a"), hero$make(S, "b"))   # owner 11-26: growth (boys, titled "children") then the simulation; no girls panel
-  if (!is.null(spod) && spod$n_cross == 0) {
-    rows[[3]] <- spod$make(S, "c")
-    cat("combined: SPod order check 0 crossings -> panel (c) added\n")
-  } else if (!is.null(spod)) {
-    cat(sprintf("combined: SPod curves cross at %d time point(s) -> panel (d) left out; hero stays at 2 panels\n",
-                spod$n_cross))
-  }
+  # Owner 11-26: the hero is these two panels only; the SPod panel is written as its own file (readme_spod) and is
+  # never added to the hero.
   combine(rows, paste0("readme_combined", hero$tag, sfx))
 } else {
   # No E-20 curves yet: the combined hero is the two growth panels, lettered (a) and (b)
