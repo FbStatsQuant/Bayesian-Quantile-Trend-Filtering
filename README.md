@@ -65,7 +65,7 @@ cluster from frozen packages; each experiment folder ships its summaries. The ta
 | Section 4.2: cost per sweep (Table 5, Figures 1–2) | [`paper/`](paper) (Table 5) | the paper's cost table is the reference; `experiments/scalability/` is a historical record and does not run | |
 | Section 4.3: air-quality simulation (Table 6) | [`experiments/air_simulation/`](experiments/air_simulation), [`engineering/E18_Air_Refit/`](engineering/E18_Air_Refit) | shipped: `engineering/E18_Air_Refit/results_a0_n/paper_air_table.csv` and `paired_pmala_minus_admm.csv`. Full refit, on a Slurm cluster: see [`engineering/E18_Air_Refit/README.md`](engineering/E18_Air_Refit/README.md) | 300 cluster fits |
 | Section 4.4: air-quality sensor data | [`applications/Air Quality/`](applications/Air%20Quality), [`engineering/E18_Air_Refit/`](engineering/E18_Air_Refit) | from the repository root: `Rscript paper/figures/make_spod_pmala_figure.R` redraws the figure from the shipped curves (`engineering/E18_Air_Refit/results_a0_n/spod_curves.csv`). The fits ran on a Slurm cluster: see the E-18 README | six chains of 37–49 min each for the fits |
-| Section 4.4 and Appendix E: growth centiles | [`applications/Growth/`](applications/Growth) | in `applications/Growth/`: `Rscript Growth_plots_k2.R` redraws the figures of the shipped joint-sampler fit and overwrites `results_joint_k2/figures/growth_joint_*`; `Rscript Growth_Joint_PMALA_k2.R sex=boy out=results_refit/boy` refits the boys into a new folder | [Eng: time]; [Eng: time] |
+| Section 4.4 and Appendix E: growth centiles | [`applications/Growth/`](applications/Growth) | in `applications/Growth/`: `Rscript Growth_plots_k2.R` redraws the figures of the shipped joint-sampler fit and overwrites `results_joint_k2/figures/growth_joint_*`; `Rscript Growth_Joint_PMALA_k2.R sex=boy out=results_refit/boy` refits the boys into a new folder | a few seconds for the figures; about 40 min on one core for the refit, which reproduces the shipped fit's diagnostics |
 | The figure above | [`examples/readme_figures/`](examples/readme_figures) | `Rscript examples/readme_figures/make_readme_figures.R` | under 30 s on one core |
 | The paper | [`paper/`](paper) | read `main.pdf`, or in `paper/`: `latexmk -pdf main.tex` | |
 
@@ -213,8 +213,9 @@ sample size or the quantile level, edit the settings block. `Rscript
 method/joint/Joint_Sampler_PMALA_Augmented.R` does the same for several levels at once, with
 λ ~ Gamma(1, 10⁻²). Each default matches the paper's runs of that sampler; the paper's scripts set
 their own priors: rates 10⁻³ and 5·10⁻⁴ for the two interior-quantile signals, and
-Gamma(n, 10⁻²) for the air-quality data (Section 4.3).
-[Eng: time for the default runs]
+Gamma(n, 10⁻²) for the air-quality data (Section 4.3). On one core of a workstation the default
+run takes about 7.5 minutes for the individual sampler and about 28 minutes for the joint sampler,
+which needs the R package `clarabel` and writes to `method/joint/results_joint/`.
 
 **Redraw the figure above.**
 
@@ -225,7 +226,7 @@ Rscript examples/readme_figures/make_readme_figures.R    # draws from the saved 
 **Redraw the growth centiles** from the shipped joint-sampler fit:
 
 ```sh
-cd applications/Growth && Rscript Growth_plots_k2.R    # overwrites results_joint_k2/figures/growth_joint_*
+cd applications/Growth && Rscript Growth_plots_k2.R    # a few seconds; overwrites results_joint_k2/figures/growth_joint_*
 ```
 
 **Check the proofs.** Install [elan](https://github.com/leanprover/elan), then
@@ -283,7 +284,8 @@ They are not needed to use the method or to reproduce the paper.
 
 - **Growth.** `applications/Growth/data/fdgs.csv` is the Fifth Dutch Growth Study sample
   (Schönbeck et al., 2013) as distributed with the R package `mice` (van Buuren and
-  Groothuis-Oudshoorn, 2011), exported from version 3.19.0. [Eng: licence of the package data]
+  Groothuis-Oudshoorn, 2011), exported from version 3.19.0. `mice` is distributed under the GNU
+  GPL (version 2 or later); the package states no separate licence for the data.
 - **Air quality.** The source is Brantley, Guinness and Chi (2020), "Baseline drift estimation for
   air quality data using quantile trend filtering", *The Annals of Applied Statistics* 14(2),
   585–604: readings of low-cost SPod sensors, which record every second at the perimeter of
