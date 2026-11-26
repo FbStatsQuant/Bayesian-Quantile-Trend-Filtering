@@ -232,9 +232,16 @@ is the published old-PMALA MSE of 0.0138.
 
 Report arm 5 in every case.
 
-## Stage 1′ and Stage 2′ (HOLD)
+**2026-11-26 owner decision.** Before the diagnostic completed, Felipe
+approved `a0 = n`. This supersedes the Stage 1′ gate in `d1a8776`.
+The diagnostic was finished for the record under its original
+numerical rule, with one τ = .01 arm 5 seed omitted under the CPU cap.
 
-Use this design only in the **PRIOR** case above and after authorization.
+## Stage 1′ and Stage 2′
+
+Felipe approved `a0 = n` and the Stage 1′ pilot. Production still
+requires the pilot gates and budget approval. Stage 2′ requires
+separate authorization.
 The sampler stays pinned at `63f2a56`. The sealed inputs, fixed truth
 offsets, sweep counts, interweaving, and acceptance target are unchanged.
 Stage 1′ sets `a0 = n = 500`. For each of the three levels and five rates
@@ -246,7 +253,10 @@ the worker stage. The grids and fit outputs record `a0` explicitly.
 Use the selection rule in commit `e18e52f`, with the same seed-paired
 MSE, eligibility gates, coverage ranking, spread limit of 10, tie-breaks,
 and escalation for an NA triple. The five-rate grid is the only change
-to the candidates. Use the same reporting scripts on the new run names.
+to the candidates. Run `e18_stage1.R RUN_DIR --admm-sim=ADMM_RUN_DIR` on
+the collected `E18-prime-*` run. It emits the 15 coverage and ESS cell
+rows, the benchmark table, and the selection trace, triples and
+selected rates.
 
 The Stage 1′ pilot uses seed 1 at `b0 = 1e-2` and `1e-6` at each level,
 indices `0,100,200,1200,1300,1400`. The existing six-fit acceptance and
