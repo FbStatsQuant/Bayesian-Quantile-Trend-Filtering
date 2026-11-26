@@ -148,7 +148,7 @@ $\sum_{q>J}\mu_q\le n^{-1}\sum_jV_j\|(I-P_J)s_j\|_2^2\le b_0J^{-(2r-1)}$ with $b
 \end{proof}
 
 \begin{lemma}[quadratic shift]\label{pf:lem:qshift}
-Let $m\ge2$, $A$ any real matrix with columns $a_1,\dots,a_m$, $B_\varrho$ and $\varphi$ as above for this $A$, and $\delta_A=\max_{j<m}\|a_{j+1}-a_j\|_2$. If $\delta_A\le\lambda\varrho/2$, then for every $h\in\R^m$
+Let $m\ge2$, $\lambda>0$ and $\varrho>0$. Let $A$ be any real matrix with columns $a_1,\dots,a_m$, and define $B_\varrho$ and $\varphi$ as above for this $A$. Set $\delta_A=\max_{j<m}\|a_{j+1}-a_j\|_2$. If $\delta_A\le\lambda\varrho/2$, then for every $h\in\R^m$
 \[
 \Ql(h+B_\varrho)\ge\Ql(B_\varrho)\exp\{-c_K\lambda^2\|h\|_2^2\},\qquad c_K=\frac{1+K/2}{1-e^{-2}},\quad K=\frac{4\delta_A\varphi(\varrho/4)}{\lambda\varrho}.
 \]
@@ -157,7 +157,7 @@ Let $m\ge2$, $A$ any real matrix with columns $a_1,\dots,a_m$, $B_\varrho$ and $
 \begin{proof}
 Let $B=B_\varrho$ and $\pi$ the density of $\Ql$. By symmetry, $\Ql(h+B)$ is the average of $\int_B\pi(w\pm h)dw$; the AM--GM inequality, $|w_j+h_j|+|w_j-h_j|=2\max\{|w_j|,|h_j|\}$ and Jensen give $\Ql(h+B)\ge\Ql(B)\exp\{-\lambda\sum_j\E_B(|h_j|-|w_j|)_+\}$, with $\E_B$ under $\Ql(\cdot\mid B)$. The marginal density $f_j$ of $w_j$ under $\Ql(\cdot\mid B)$ is symmetric and log-concave \citep{prekopa1973logarithmic}, so $\E_B(|h_j|-|w_j|)_+\le f_j(0)h_j^2$ and
 $\Ql(h+B)\ge\Ql(B)\exp\{-\lambda\|h\|_2^2\max_jf_j(0)\}$.
-It remains to show $f_j(0)\le c_K\lambda$. Let $j'$ be a neighbor of $j$, $A_{-j}$ the matrix without column $j$, $Q_{-j}$ the law of the other coordinates, $g(t)=Q_{-j}\{\|A_{-j}v+ta_j\|_2\le\varrho\}$ and $\Lambda(s)=\log Q_{-j}\{\|A_{-j}v\|_2\le s\}$. Shifting $v$ by $-te_{j'}$ gives $g(t)\ge e^{-\lambda|t|}e^{\Lambda(\varrho-|t|\delta_A)}$. $\Lambda$ is nondecreasing, nonpositive and concave \citep{prekopa1973logarithmic,borell1975convex}, and $-\Lambda(\varrho/4)\le\varphi(\varrho/4)$ (sections of $B_{\varrho/4}$ have largest measure at $w_j=0$). Concavity gives $\Lambda(\varrho)-\Lambda(\varrho-a)\le4\varphi(\varrho/4)a/\varrho$ for $0\le a\le\varrho/2$. For $|t|\le1/\lambda$, $a=|t|\delta_A\le\varrho/2$, so $g(t)\ge g(0)e^{-\lambda|t|(1+K)}$ and
+It remains to show $f_j(0)\le c_K\lambda$. Let $j'$ be a neighbor of $j$, $A_{-j}$ the matrix without column $j$, $Q_{-j}$ the law of the other coordinates, $g(t)=Q_{-j}\{\|A_{-j}v+ta_j\|_2\le\varrho\}$ and, for $s>0$, $\Lambda(s)=\log Q_{-j}\{\|A_{-j}v\|_2\le s\}$. For $|t|\le1/\lambda$ we have $\varrho-|t|\delta_A\ge\varrho/2>0$, since $\delta_A\le\lambda\varrho/2$, and shifting $v$ by $-te_{j'}$ gives $g(t)\ge e^{-\lambda|t|+\Lambda(\varrho-|t|\delta_A)}$. On $(0,\infty)$, $\Lambda$ is nondecreasing, nonpositive and concave \citep{prekopa1973logarithmic,borell1975convex}, and $-\Lambda(\varrho/4)\le\varphi(\varrho/4)$ (sections of $B_{\varrho/4}$ have largest measure at $w_j=0$). Concavity gives $\Lambda(\varrho)-\Lambda(\varrho-a)\le4\varphi(\varrho/4)a/\varrho$ for $0\le a\le\varrho/2$. For $|t|\le1/\lambda$, $a=|t|\delta_A\le\varrho/2$, so $g(t)\ge g(0)e^{-\lambda|t|(1+K)}$ and
 $\Ql(B)=\int(\lambda/2)e^{-\lambda|t|}g(t)dt\ge g(0)(1-e^{-2})/(2+K)$. Hence $f_j(0)=(\lambda/2)g(0)/\Ql(B)\le c_K\lambda$.
 \end{proof}
 
