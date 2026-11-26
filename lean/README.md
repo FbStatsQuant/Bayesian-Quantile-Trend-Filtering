@@ -52,6 +52,8 @@ Both theorems have the paper's hypotheses and conclusions. [`docs/statements.md`
 
   These do not affect the two theorems, whose constants are existential in the paper too.
 
+  D10 and D12 make two Lean intermediate results weaker than the paper's standalone lemmas: the coefficients of the appendix denominator and prior-mass bound, and Lemma sup. Both are still sufficient for Theorems 1 and 2, as the independent final audit confirms ([`notes/reviews/FINAL_AUDIT_astra.md`](notes/reviews/FINAL_AUDIT_astra.md)).
+
 Formalizing found eleven places where the paper's proofs needed a fix: missing cases, unstated side conditions, or a wrong intermediate claim. None changes a theorem statement or a rate. They are listed in [`notes/PAPER_CORRECTIONS.md`](notes/PAPER_CORRECTIONS.md), with the Lean declaration that settles each one.
 
 ## Files
