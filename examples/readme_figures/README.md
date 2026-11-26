@@ -4,7 +4,7 @@
 
 ## Idea
 
-The hero and growth panels shade the area between the estimated τ = 0.1 and τ = 0.9 quantile curves. The data points sit on top of the band, and a note gives the share of points inside it (nominal 0.80). Both are joint-sampler fits, whose curves cannot cross, so the lower edge of the band is never above its upper edge. The SPod panel is different: its three levels are separate fits of the individual sampler, so the script checks their order before it draws a band (see Panels, item 3).
+The hero and growth panels shade the area between the estimated τ = 0.1 and τ = 0.9 quantile curves. The data points sit on top of the band, and a note gives the share of points inside it (nominal 0.80). Both are joint-sampler fits, whose curves cannot cross, so the lower edge of the band is never above its upper edge. The optional SPod panel is different: its three levels are separate fits of the individual sampler, so the script checks their order before it draws a band (see Panels, item 3). It is a standalone file and is never part of the README image.
 
 ## Run
 
@@ -22,7 +22,7 @@ Rscript examples/readme_figures/make_readme_figures.R --e20 <file>  # hero from 
 | `--e20 <path>` | Path to the E-20 file (`.csv` or `.rds`). By default the script uses `engineering/E20_Showcase/curves.csv`. If it is missing, the script skips the hero, and the combined image holds the two growth panels, lettered (a) and (b). |
 | `--bands` | Adds the per-curve credible bands as a faint variant. Off by default. Output files get the suffix `_bands`. |
 | `--no-median` | Drops the thin τ = 0.5 line from the growth panels. |
-| `--spod <path>` | Also draws the SPod panel from a curve file (`.csv` with the columns `time, y, q01, q05, q10` and the optional `_lo`/`_hi` limits; the names live in the block marked `SPOD COLUMN MAPPING`). Off by default. Writes `readme_spod.{png,pdf}`, and adds the SPod panel as row (d) of the combined image only when its order check finds no crossing. |
+| `--spod <path>` | Also draws the SPod panel from a curve file (`.csv` with the columns `time, y, q01, q05, q10` and the optional `_lo`/`_hi` limits; the names live in the block marked `SPOD COLUMN MAPPING`). Off by default. Writes `readme_spod.{png,pdf}` only; the SPod panel is never added to the combined image (owner 11-26; the E-18 curves cross at 1,097 of 8,640 points). |
 
 The script locates its own folder, so it runs from any working directory. All paths are relative.
 
@@ -30,7 +30,7 @@ The script locates its own folder, so it runs from any working directory. All pa
 
 | File | Content |
 |---|---|
-| `readme_combined[_DEMO].{png,pdf}` | README image: full-width panels stacked vertically, with aligned plot areas: (a) hero, (b) growth boys, (c) growth girls, (d) SPod only with `--spod` and no crossing. PNG 3000 px wide at 300 dpi, 1000 px per panel (3000 × 3000 for three panels); PDF 10 in wide. Without the E-20 file: the two growth panels, 3000 × 2000. |
+| `readme_combined[_DEMO].{png,pdf}` | README image: two full-width panels stacked vertically, with aligned plot areas: (a) growth of 4,817 Dutch children (the boys fit; the panel names no sex), (b) the joint-sampler fit to n = 1,000 points simulated from an explicit function (E-20). PNG 3000 × 2000 at 300 dpi; PDF 10 in wide. Without the E-20 file: the two growth panels as (a) and (b), also 3000 × 2000. |
 | `readme_hero_vs[_DEMO].{png,pdf}` | Hero alone: VS simulation, n = 1,000. |
 | `readme_growth_boys.{png,pdf}`, `readme_growth_girls.{png,pdf}` | Growth panels. |
 
@@ -56,5 +56,5 @@ The font is Liberation Sans, with the default sans as a fallback.
 ## Panels
 
 1. **Hero: VS simulation, n = 1,000, Normal errors (E-20).** The script reads a tidy CSV with the columns `method, x, y, truth, q10, q90` and the optional `q10_lo, q10_hi, q90_lo, q90_hi`. It keeps only the rows with `method == "joint"`. These names live in a single block marked `E-20 COLUMN MAPPING` in the script, which is the one place to edit if the schema changes.
-2. **Growth (fdgs, joint sampler, k = 2).** Data: `applications/Growth/data/fdgs.csv`, rows with missing height dropped. Curves: `applications/Growth/results_joint_k2/{boy,girl}/posterior_summary.csv`. This is a joint-sampler fit (b0 = 0.01, 30,000 sweeps of which 10,000 are burn-in), labelled "joint-sampler fit; the curves cannot cross". It is not the run behind the paper's growth figure. The share inside is computed per child by linear interpolation of the τ = 0.1 and 0.9 curves at that child's age. The combined image shows both sexes as full-width rows; each is also written as a separate file.
+2. **Growth (fdgs, joint sampler, k = 2).** Data: `applications/Growth/data/fdgs.csv`, rows with missing height dropped. Curves: `applications/Growth/results_joint_k2/{boy,girl}/posterior_summary.csv`. This is a joint-sampler fit (b0 = 0.01, 30,000 sweeps of which 10,000 are burn-in), labelled "joint-sampler fit; the curves cannot cross". It is not the run behind the paper's growth figure. The share inside is computed per child by linear interpolation of the τ = 0.1 and 0.9 curves at that child's age. The combined image uses the boys fit as panel (a), titled "children"; both sexes are also written as separate files.
 3. **SPod air quality (after the E-18 refit; drawn only with `--spod <path>`).** `spod_panel(time, y, lower, upper, middle, tau_lo = 0.01, tau_hi = 0.10, tau_mid = 0.05)` draws the low baseline beneath the readings, so the plumes stand clearly above it. The three levels are separate fits of the individual sampler, so nothing guarantees their order. The function checks all three curves at every time point and counts the crossings (points where the τ = 0.01 curve is above the 0.05 curve, or the 0.05 curve above the 0.10 curve). With no crossing it draws the band between the 0.01 and 0.10 curves and the 0.05 curve as the line. With one crossing or more it draws the 0.05 curve alone and no band. The count is printed in the panel note and on the console either way. The note also gives the share of readings below the 0.10 curve (nominal 0.10), not a share inside. The subtitle says "Each level fitted separately (individual sampler)"; the panel never says "joint" or "cannot cross". Tested on synthetic data on 2026-11-26: 0 crossings gives the band; 187 planted crossings in 8,640 points are counted as 187 and give the line alone.

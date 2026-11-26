@@ -3,15 +3,15 @@
 # Idea of panels (a) to (c): the area between the estimated tau = 0.1 and tau = 0.9 quantile curves is a band around
 # the whole series.  These panels use joint-sampler fits, whose curves never cross, so the lower edge of the band is
 # never above its upper edge.  Points are drawn on top of the band and each panel reports the share of points inside it.
-# Panel (d) is different: the SPod levels are three SEPARATE fits of the individual sampler, so their order is checked
-# before any band is drawn (see spod_panel()).
+# The optional SPod panel is different: its levels are three SEPARATE fits of the individual sampler, so their order
+# is checked before any band is drawn (see spod_panel()).
 #
 # Panels
-#   (a) hero   : VS simulation signal, n = 1,000, Normal errors (E-20 fits; --demo builds stand-in data)
-#   (b) growth : Dutch growth data (fdgs), joint k = 2 fits, boys
-#   (c) growth : the same, girls
-#   (d) spod   : SPod air quality, only with --spod <file>, and in the combined hero only when the order check finds
-#                0 crossings (see spod_panel())
+#   hero   : VS simulation signal, n = 1,000, Normal errors (E-20 fits; --demo builds stand-in data)
+#   growth : Dutch growth data (fdgs), joint k = 2 fits, boys and girls (separate files)
+#   spod   : SPod air quality, only with --spod <file>; its own file, never in the combined image
+# Combined README image (owner 11-26): (a) growth boys, titled "children", (b) hero. Without E-20: growth boys and
+# girls as (a) and (b).
 #
 # Usage (from the repo root):
 #   Rscript examples/readme_figures/make_readme_figures.R --demo
@@ -134,7 +134,7 @@ JOINT_SUB <- "Joint-sampler fit; the curves cannot cross"
 lettered <- function(letter, text) if (is.null(letter)) text else paste0("(", letter, ") ", text)
 
 # =====================================================================================================================
-# (a) HERO: VS simulation, n = 1,000, Normal errors
+# HERO: VS simulation, n = 1,000, Normal errors
 # =====================================================================================================================
 # ---- E-20 COLUMN MAPPING (the ONLY block to edit when Engineering fixes the E-20 schema) ------------------------------
 # Left: name used here.  Right: column name in the E-20 file.  Optional entries may be absent from the file.
@@ -213,7 +213,7 @@ hero_panel <- function() {
 }
 
 # =====================================================================================================================
-# (b), (c) GROWTH: fdgs heights, joint k = 2 fits
+# GROWTH: fdgs heights, joint k = 2 fits
 # =====================================================================================================================
 growth_panel <- function(sex) {
   kids <- read.csv(rp("applications", "Growth", "data", "fdgs.csv"))
@@ -246,7 +246,7 @@ growth_panel <- function(sex) {
 }
 
 # =====================================================================================================================
-# (d) SPOD air quality (curves come after the E-18 refit; drawn only with --spod <file>)
+# SPOD air quality (curves come after the E-18 refit; drawn only with --spod <file>)
 # =====================================================================================================================
 # The SPod fits only have tau = 0.01, 0.05 and 0.10 (no upper quantiles), so the SPod story is a LOW baseline band
 # sitting beneath the data, with the pollution plumes clearly above it.  The note reports the share of readings BELOW
@@ -256,10 +256,9 @@ growth_panel <- function(sex) {
 # guarantees their order.  spod_panel() therefore checks all three curves at every time point and counts the crossings:
 # a time point is a crossing when lower > middle or middle > upper.  The count is printed in the stand-alone panel note
 # and on the console.
-#   0 crossings  : band between the tau_lo and tau_hi curves, the tau_mid curve as the line; the panel is also added to
-#                  the combined hero as row (d)
-#   >= 1 crossing: NO band; only the tau_mid curve is drawn (median-only fallback) in the stand-alone figure, and the
-#                  combined hero keeps its three joint panels
+#   0 crossings  : band between the tau_lo and tau_hi curves, the tau_mid curve as the line
+#   >= 1 crossing: NO band; only the tau_mid curve is drawn (median-only fallback)
+# Either way the panel is a stand-alone file; it is never added to the combined image (owner 11-26).
 # The panel never says "joint" or "cannot cross".
 #
 # spod_panel(time, y, lower, upper, middle, tau_lo = 0.01, tau_hi = 0.10, tau_mid = 0.05, time_lab = "Time",
