@@ -47,12 +47,12 @@ Both theorems have the paper's hypotheses and conclusions. [`docs/statements.md`
 - **Safe generalizations.** In Theorem 2, the dependence on the smallest level spacing is encoded as a lower bound gmin > 0 on the spacings (D6). The number of levels J ranges over all of ℕ (D7).
 - **Intermediate lemmas.**
   - Some constants that the paper gives explicitly are existential in Lean: C_E in Lemma evid, C_pr in Proposition prior, and the quad-shift coefficient (D10).
-  - Lemma gap is formalized pairwise, as `quantile_gap`, which needs Assumption B only (D11).
-  - Lemma sup concludes with an existential good event; the proof exhibits Ω_E ∩ Ω_G (D12).
+  - Lemma gap is `level_gap_of_assB`, which needs Assumption B only, with the pairwise core `quantile_gap` (D11).
+  - Lemma sup is proved on the paper's named event Ω_G ∩ Ω_E, as `supNorm_concentration_events`. The joint proof uses its existential-event wrapper, `supNorm_concentration` (D12).
 
   These do not affect the two theorems, whose constants are existential in the paper too.
 
-  D10 and D12 make two Lean intermediate results weaker than the paper's standalone lemmas: the coefficients of the appendix denominator and prior-mass bound, and Lemma sup. Both are still sufficient for Theorems 1 and 2, as the independent final audit confirms ([`notes/reviews/FINAL_AUDIT_astra.md`](notes/reviews/FINAL_AUDIT_astra.md)).
+  D10 makes the Lean coefficients of the appendix denominator and prior-mass bound weaker than the paper's standalone lemmas, which give them explicitly. They are still sufficient for Theorems 1 and 2, as the independent final audit confirms ([`notes/reviews/FINAL_AUDIT_astra.md`](notes/reviews/FINAL_AUDIT_astra.md)). The audit found the same for D12. Since then, the named-event version `supNorm_concentration_events` has been added, so Lemma sup now matches the paper.
 
 Formalizing found eleven places where the paper's proofs needed a fix: missing cases, unstated side conditions, or a wrong intermediate claim. None changes a theorem statement or a rate. They are listed in [`notes/PAPER_CORRECTIONS.md`](notes/PAPER_CORRECTIONS.md), with the Lean declaration that settles each one.
 
