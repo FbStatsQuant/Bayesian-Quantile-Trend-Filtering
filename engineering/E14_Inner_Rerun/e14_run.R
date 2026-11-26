@@ -38,7 +38,8 @@ e14_counter <- function(fit, name, trace) {
 }
 
 e14_fit <- function(task, code, smoke, b0 = c(VS = 1e-3, S = 5e-4)[[task$signal]],
-                    chain_seed = 10001L + task$index, save_posterior_means = FALSE) {
+                    chain_seed = 10001L + task$index, save_posterior_means = FALSE,
+                    a0 = 1, check_data = NULL, save_diagnostics = FALSE) {
   e14_load_sampler(code)
 
   data_file <- file.path(code, "engineering", "E14_Inner_Rerun", "e14_data.R")
@@ -48,18 +49,20 @@ e14_fit <- function(task, code, smoke, b0 = c(VS = 1e-3, S = 5e-4)[[task$signal]
   stopifnot(is.numeric(dat$y), is.numeric(dat$truth),
             length(dat$y) == 500L, length(dat$truth) == 500L,
             all(is.finite(dat$y)), all(is.finite(dat$truth)))
+  if (!is.null(check_data)) check_data(dat)
 
   sweeps <- if (smoke) 300L else 30000L
   burn <- if (smoke) 220L else 10000L
+  warm <- 200L
   RNGkind("Mersenne-Twister", "Inversion", "Rejection")
   set.seed(chain_seed)
   fit <- gibbs_pmala_aug(
-    dat$y, task$tau, order = 2L, a0 = 1, b0 = b0, a_sigma = 0.1, b_sigma = 0.1,
+    dat$y, task$tau, order = 2L, a0 = a0, b0 = b0, a_sigma = 0.1, b_sigma = 0.1,
     gibbs_iter = sweeps, gibbs_burn = burn, delta_init = delta_init,
     lambda_init = lambda_init, adapt_target = adapt_target, adapt_gain = adapt_gain,
     adapt_kappa = adapt_kappa, delta_bounds = delta_bounds, control = tf_control,
     metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
-    mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = 200L,
+    mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = warm,
     gamma_warm = gamma_warm, prior_scale = prior_scale, cmap = FALSE,
     kappa = kappa_metric, adapt_all = TRUE, K = K_theta, asis = TRUE,
     tol = admm_tol, lamjump = lamjump, lamjump_s = lamjump_s, asis_q = "fixed",
@@ -89,6 +92,20 @@ e14_fit <- function(task, code, smoke, b0 = c(VS = 1e-3, S = 5e-4)[[task$signal]
     n_sigma_guard = e14_counter(fit, "n_sigma_guard", "sigma_guard"),
     seconds = fit$seconds
   )
+  if (save_diagnostics) {
+    theta_ess <- coda::effectiveSize(fit$theta)
+    result <- append(result, list(
+      n_warm_ipm_unconverged = e14_counter(fit, "n_warm_ipm_unconverged", "warm_ipm_unconverged")
+    ), after = match("n_ipm_fallback", names(result)))
+    result$y <- dat$y
+    result$a0 <- a0
+    result$b0 <- b0
+    result$warm <- warm
+    result$lambda_hold_until <- fit$lambda_hold_until
+    result$log_lambda_ess <- as.numeric(coda::effectiveSize(log(fit$lambda[post])))
+    result$theta_ess_median <- median(theta_ess)
+    result$theta_ess_p05 <- unname(quantile(theta_ess, 0.05))
+  }
   if (save_posterior_means) {
     result$b0 <- b0
     result$coverage <- mean(dat$truth >= lo & dat$truth <= hi)
