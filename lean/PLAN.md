@@ -225,10 +225,12 @@ The maximum effort for every agent is "high". Fable is not on this team.
 
 **Gate.** No proof work starts until the Theorem 1 statement passes the Astra audit. Every finding is checked by the head, and only the findings that hold lead to changes.
 
-**Assignment of Theorem 1** (after the statement passes; a proposal, to be finalized at assignment):
-- **Neon-A, the "deterministic/algebraic" half:** `Falling`, `Coord`, `SplineApprox`, `Gram`, `Smooth`, `Interp`, `Asymptotics`, and then `SmallBall` with its linear-algebra inputs (Eckart–Young).
-- **Neon-B, the "probabilistic" half:** `CheckLoss`, `Laplace`, `Score`, `Width`, `Denominator`, `Shells`, `Concentration` (with its probability inputs), `QuadShift`, `Localization`.
-- **Head:** `PriorMass`, `Main`, `Reduction` and `SupNorm` assembly. These are written against the other modules' statements, which are frozen first as a skeleton.
+**Assignment of Theorem 1** (final; launched 2026-11-25 on the skeleton at aa70682, one worktree per prover):
+- **Neon-A:** `Falling`, `Coord`, `Gram` (g_r > 0, by Theory's T10 proof), `SplineApprox`, `Smooth`, `Interp`, `SmallBall`, plus helper files under `BQTF/Lin/`.
+- **Neon-B:** `CheckLoss`, `Score`, `Concentration`, `Width`, `QuadShift`, `Denominator`, `Localization`, `Shells`, plus helper files under `BQTF/Prob/`.
+- **Not yet assigned:** `PriorMass`, `Main`, `Reduction`. These are assembly modules, and they go to a Neon once their inputs close. Per HQ, the head does not prove lemmas.
+
+Every module merge gets a fresh Sol review, written to `notes/reviews/<module>_<date>.md`. The head rules on each finding before merging.
 
 **Skeleton first.** Before the provers start, the head writes every module's lemma *statements* with `sorry` proofs, following the appendix. This fixes the interfaces. Each prover then owns a disjoint set of files and replaces the `sorry`s in them. A statement in the skeleton changes only with the head's sign-off.
 
