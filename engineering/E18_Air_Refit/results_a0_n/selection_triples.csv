@@ -1,0 +1,126 @@
+"b0_01","b0_05","b0_10","spread","branch","coverage_score","geometric_mse_ratio","qualifies","rejection_reason","rank","tie_break","a0"
+0.01,0.01,0.01,1,"i",0.5822,NA,TRUE,"",1,"primary score",500
+0.001,0.01,0.01,10,"i",0.63514,NA,FALSE,"rate fails admissible",NA,"",500
+1e-04,0.01,0.01,100,"i",0.63972,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,0.01,0.01,1000,"i",0.641493333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.01,0.01,10000,"i",0.63992,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,0.001,0.01,10,"i",0.677326666666667,NA,FALSE,"rate fails admissible",NA,"",500
+0.001,0.001,0.01,10,"i",0.730266666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-04,0.001,0.01,100,"i",0.734846666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,0.001,0.01,1000,"i",0.73662,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.001,0.01,10000,"i",0.735046666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-04,0.01,100,"i",0.685493333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-04,0.01,100,"i",0.738433333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-04,0.01,100,"i",0.743013333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-04,0.01,1000,"i",0.744786666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,1e-04,0.01,10000,"i",0.743213333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-05,0.01,1000,"i",0.685753333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-05,0.01,1000,"i",0.738693333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-05,0.01,1000,"i",0.743273333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-05,0.01,1000,"i",0.745046666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,1e-05,0.01,10000,"i",0.743473333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-06,0.01,10000,"i",0.6853,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-06,0.01,10000,"i",0.73824,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-06,0.01,10000,"i",0.74282,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-06,0.01,10000,"i",0.744593333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,1e-06,0.01,10000,"i",0.74302,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,0.01,0.001,10,"i",0.699153333333333,NA,FALSE,"rate fails admissible",NA,"",500
+0.001,0.01,0.001,10,"i",0.752093333333333,NA,FALSE,"rate fails admissible",NA,"",500
+1e-04,0.01,0.001,100,"i",0.756673333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,0.01,0.001,1000,"i",0.758446666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.01,0.001,10000,"i",0.756873333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,0.001,0.001,10,"i",0.79428,NA,FALSE,"rate fails admissible",NA,"",500
+0.001,0.001,0.001,1,"i",0.84722,NA,FALSE,"rate fails admissible",NA,"",500
+1e-04,0.001,0.001,10,"i",0.8518,NA,FALSE,"rate fails admissible",NA,"",500
+1e-05,0.001,0.001,100,"i",0.853573333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.001,0.001,1000,"i",0.852,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-04,0.001,100,"i",0.802446666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-04,0.001,10,"i",0.855386666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-04,1e-04,0.001,10,"i",0.859966666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-05,1e-04,0.001,100,"i",0.86174,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,1e-04,0.001,1000,"i",0.860166666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-05,0.001,1000,"i",0.802706666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-05,0.001,100,"i",0.855646666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-05,0.001,100,"i",0.860226666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-05,0.001,100,"i",0.862,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,1e-05,0.001,1000,"i",0.860426666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-06,0.001,10000,"i",0.802253333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-06,0.001,1000,"i",0.855193333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-06,0.001,1000,"i",0.859773333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-06,0.001,1000,"i",0.861546666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,1e-06,0.001,1000,"i",0.859973333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,0.01,1e-04,100,"i",0.71012,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,0.01,1e-04,100,"i",0.76306,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,0.01,1e-04,100,"i",0.76764,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,0.01,1e-04,1000,"i",0.769413333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.01,1e-04,10000,"i",0.76784,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,0.001,1e-04,100,"i",0.805246666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,0.001,1e-04,10,"i",0.858186666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-04,0.001,1e-04,10,"i",0.862766666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-05,0.001,1e-04,100,"i",0.86454,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.001,1e-04,1000,"i",0.862966666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-04,1e-04,100,"i",0.813413333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-04,1e-04,10,"i",0.866353333333333,NA,FALSE,"rate fails admissible",NA,"",500
+1e-04,1e-04,1e-04,1,"i",0.870933333333333,NA,FALSE,"rate fails admissible",NA,"",500
+1e-05,1e-04,1e-04,10,"i",0.872706666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-06,1e-04,1e-04,100,"i",0.871133333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-05,1e-04,1000,"i",0.813673333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-05,1e-04,100,"i",0.866613333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-05,1e-04,10,"i",0.871193333333333,NA,FALSE,"rate fails admissible",NA,"",500
+1e-05,1e-05,1e-04,10,"i",0.872966666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-06,1e-05,1e-04,100,"i",0.871393333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-06,1e-04,10000,"i",0.81322,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-06,1e-04,1000,"i",0.86616,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-06,1e-04,100,"i",0.87074,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-06,1e-04,100,"i",0.872513333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,1e-06,1e-04,100,"i",0.87094,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,0.01,1e-05,1000,"i",0.711933333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,0.01,1e-05,1000,"i",0.764873333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,0.01,1e-05,1000,"i",0.769453333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,0.01,1e-05,1000,"i",0.771226666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.01,1e-05,10000,"i",0.769653333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,0.001,1e-05,1000,"i",0.80706,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,0.001,1e-05,100,"i",0.86,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,0.001,1e-05,100,"i",0.86458,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,0.001,1e-05,100,"i",0.866353333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.001,1e-05,1000,"i",0.86478,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-04,1e-05,1000,"i",0.815226666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-04,1e-05,100,"i",0.868166666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-04,1e-05,10,"i",0.872746666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-05,1e-04,1e-05,10,"i",0.87452,NA,FALSE,"rate fails admissible",NA,"",500
+1e-06,1e-04,1e-05,100,"i",0.872946666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-05,1e-05,1000,"i",0.815486666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-05,1e-05,100,"i",0.868426666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-05,1e-05,10,"i",0.873006666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-05,1e-05,1e-05,1,"i",0.87478,NA,FALSE,"rate fails admissible",NA,"",500
+1e-06,1e-05,1e-05,10,"i",0.873206666666667,NA,FALSE,"rate fails admissible",NA,"",500
+0.01,1e-06,1e-05,10000,"i",0.815033333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-06,1e-05,1000,"i",0.867973333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-06,1e-05,100,"i",0.872553333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-06,1e-05,10,"i",0.874326666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-06,1e-06,1e-05,10,"i",0.872753333333333,NA,FALSE,"rate fails admissible",NA,"",500
+0.01,0.01,1e-06,10000,"i",0.71164,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,0.01,1e-06,10000,"i",0.76458,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,0.01,1e-06,10000,"i",0.76916,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,0.01,1e-06,10000,"i",0.770933333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.01,1e-06,10000,"i",0.76936,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,0.001,1e-06,10000,"i",0.806766666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,0.001,1e-06,1000,"i",0.859706666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,0.001,1e-06,1000,"i",0.864286666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,0.001,1e-06,1000,"i",0.86606,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,0.001,1e-06,1000,"i",0.864486666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-04,1e-06,10000,"i",0.814933333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-04,1e-06,1000,"i",0.867873333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-04,1e-06,100,"i",0.872453333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-04,1e-06,100,"i",0.874226666666667,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-06,1e-04,1e-06,100,"i",0.872653333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.01,1e-05,1e-06,10000,"i",0.815193333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-05,1e-06,1000,"i",0.868133333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-05,1e-06,100,"i",0.872713333333333,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-05,1e-06,10,"i",0.874486666666667,NA,FALSE,"rate fails admissible",NA,"",500
+1e-06,1e-05,1e-06,10,"i",0.872913333333333,NA,FALSE,"rate fails admissible",NA,"",500
+0.01,1e-06,1e-06,10000,"i",0.81474,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+0.001,1e-06,1e-06,1000,"i",0.86768,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-04,1e-06,1e-06,100,"i",0.87226,NA,FALSE,"spread > 10; rate fails admissible",NA,"",500
+1e-05,1e-06,1e-06,10,"i",0.874033333333333,NA,FALSE,"rate fails admissible",NA,"",500
+1e-06,1e-06,1e-06,1,"i",0.87246,NA,FALSE,"rate fails admissible",NA,"",500

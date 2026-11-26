@@ -180,6 +180,7 @@ record_cell <- function(chains, tau, b0) {
     warm_ipm_unconverged = sum(field("n_warm_ipm_unconverged")),
     fit_wall_seconds_chain_1 = field("seconds")[1L], fit_wall_seconds_chain_2 = field("seconds")[2L])
   if (!prime) return(list(fit = fit, diagnostics = diagnostics))
+  diagnostics$selected_for_real <- isTRUE(b0 == selected$b0[match(tau, e18_taus)])
   warm <- e18_warm_summary(setNames(lapply(e18_warm_fields, field), e18_warm_fields))
   list(fit = fit, chain_medians = medians[1:2, , drop = FALSE],
     diagnostics = cbind(diagnostics, theta_comparison(draws, medians, tau), as.data.frame(warm)))

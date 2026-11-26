@@ -297,6 +297,8 @@ STOP threshold above 1.1. The same CSV reports the maximum and RMS
 chain-median gap in PID counts and divided by the IQR of observed
 PID counts. It gives the fraction strictly below each chain median
 and the pooled median, with signed differences from nominal τ.
+The `selected_for_real` field identifies the rates used in the
+reported curves.
 
 Both prime stages retain `n_ipm_fallback` and
 `n_warm_ipm_unconverged` in the per-fit RDS and CSV outputs

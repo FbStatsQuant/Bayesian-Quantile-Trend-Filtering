@@ -1,0 +1,2 @@
+"method","tau","seed","reason"
+"ADMM",0.05,62,"Slurm timeout"
