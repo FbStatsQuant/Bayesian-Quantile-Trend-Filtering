@@ -13,9 +13,15 @@ midnight <- as.POSIXct("2018-06-15 00:00:00", tz = "UTC")
 s <- as.numeric(difftime(t, midnight, units = "secs"))
 stopifnot(length(s) == 86213L, all(is.finite(s)), all(s == floor(s)))
 day <- s >= 0 & s < 86400
-pid <- raw[["d PID (counts)"]][day]
+pid_raw <- raw[["d PID (counts)"]][day]
 s <- s[day]
-stopifnot(length(s) == 86209L, !anyDuplicated(s), all(is.finite(pid)))
+stopifnot(length(s) == 86209L, !anyDuplicated(s))
+missing_pid <- pid_raw == "N/A"
+stopifnot(all(!is.na(missing_pid)), sum(missing_pid) == 30L,
+  identical(s[missing_pid], as.double(seq.int(46908L, 46937L))))
+pid <- as.numeric(pid_raw[!missing_pid])
+s <- s[!missing_pid]
+stopifnot(length(pid) == 86179L, all(is.finite(pid)))
 
 n <- 8640L
 block <- as.integer(s %/% 10L + 1L)
@@ -23,7 +29,8 @@ n_readings <- tabulate(block, nbins = n)
 observed <- n_readings > 0L
 totals <- rowsum(pid, group = block, reorder = TRUE)
 stopifnot(identical(as.integer(rownames(totals)), which(observed)),
-  sum(!observed) == 16L, sum(observed & n_readings < 10L) == 6L,
+  sum(observed) == 8621L, sum(!observed) == 19L,
+  sum(observed & n_readings < 10L) == 6L,
   observed[1L], observed[n])
 block_mean <- rep(NA_real_, n)
 block_mean[observed] <- totals[, 1L] / n_readings[observed]
@@ -38,7 +45,9 @@ out <- list(day = "2018-06-15", sensor = "d PID (counts)", source_sha = sha,
 path <- args[1L]
 stopifnot(dir.exists(dirname(path)), !file.exists(path))
 e18_atomic(out, path)
-cat(sprintf("June 15: %d readings; %d partial, %d interpolated, %d total blocks.\n",
-  length(s), sum(observed & n_readings < 10L), sum(!observed), n))
+cat(sprintf("June 15: dropped %d literal N/A PID readings; retained %d numeric readings.\n",
+  sum(missing_pid), length(pid)))
+cat(sprintf("%d nonempty blocks (%d partial); %d interpolated; %d total.\n",
+  sum(observed), sum(observed & n_readings < 10L), sum(!observed), n))
 cat(sprintf("Four June 16 readings excluded. Center %.12g; sample SD %.12g.\n", center, scale))
 cat("Prepared-input SHA-256:", e18_sha(path), "\n")
