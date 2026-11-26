@@ -1,22 +1,25 @@
 # make_readme_figures.R -- README figures for the BQTF repo (W-08, item C of writing/W08_Repo/BRIEF.md).
 #
-# Idea of every panel: the area between the estimated tau = 0.1 and tau = 0.9 quantile curves is a band around the
-# whole series ("the series has its own 80% interval").  The joint sampler's curves never cross, so the band is always
-# a valid region.  Points are drawn on top of the band and each panel reports the share of points inside it.
+# Idea of panels (1) and (2): the area between the estimated tau = 0.1 and tau = 0.9 quantile curves is a band around
+# the whole series.  These two panels use joint-sampler fits, whose curves never cross, so the lower edge of the band is
+# never above its upper edge.  Points are drawn on top of the band and each panel reports the share of points inside it.
+# Panel (3) is different: the SPod levels are three SEPARATE fits of the individual sampler, so their order is checked
+# before any band is drawn (see spod_panel()).
 #
 # Panels
 #   (1) hero   : VS simulation signal, n = 1,000, Normal errors (E-20 fits; --demo builds stand-in data)
 #   (2) growth : Dutch growth data (fdgs), joint k = 2 fits, boys (girls and both-sex panels are also written)
-#   (3) spod   : SPod air-quality hook, a stub until the E-18 refit (see spod_panel() below)
+#   (3) spod   : SPod air quality, only with --spod <file> (the curves come after the E-18 refit; see spod_panel())
 #
 # Usage (from the repo root, through the cluster wrapper):
-#   owls_run -j 1 -- Rscript writing/W08_Repo/figures/make_readme_figures.R --demo
-#   owls_run -j 1 -- Rscript writing/W08_Repo/figures/make_readme_figures.R --e20 engineering/E20_Showcase/<file>.csv
+#   Rscript writing/W08_Repo/figures/make_readme_figures.R --demo
+#   Rscript writing/W08_Repo/figures/make_readme_figures.R --e20 engineering/E20_Showcase/<file>.csv
 # Flags
 #   --demo          hero panel from stand-in data (true signal + Normal quantiles); files and image are labelled DEMO
 #   --e20 <path>    E-20 fit file (.csv or .rds); default: the first .csv/.rds in engineering/E20_Showcase/
 #   --bands         also draw the per-curve credible bands as a faint variant (OFF by default)
 #   --median        draw the growth tau = 0.5 curve as a thin dark line (ON by default; --no-median turns it off)
+#   --spod <path>   also draw the SPod panel from a curve file (.csv; columns in the SPOD COLUMN MAPPING block)
 # Outputs: writing/W08_Repo/figures/out/  (PNG 2400 px wide at 300 dpi, and PDF)
 
 suppressPackageStartupMessages(library(ggplot2))
@@ -73,16 +76,17 @@ theme_bqtf <- function(base = 10) {
 # pts   : data.frame(x, y)                      data points
 # curve : data.frame(x, q10, q90, [q10_lo, q10_hi, q90_lo, q90_hi], [truth], [median])  on a grid
 # note  : text for the corner note (e.g. share of points inside the band, computed by the caller at the points' own x)
+# band  : FALSE draws no ribbon and no band edges (curve then needs only x and median); used by the SPod fallback
 band_panel <- function(pts, curve, note, title, subtitle, xlab, ylab, point_size = 0.55, point_alpha = 0.75,
-                       truth_lab = NULL, demo = FALSE) {
-  p <- ggplot(curve, aes(x = x)) +
-    geom_ribbon(aes(ymin = q10, ymax = q90), fill = pal$band, colour = NA)
-  if (SHOW_BANDS && all(c("q10_lo", "q10_hi", "q90_lo", "q90_hi") %in% names(curve)))
+                       truth_lab = NULL, demo = FALSE, band = TRUE) {
+  p <- ggplot(curve, aes(x = x))
+  if (band) p <- p + geom_ribbon(aes(ymin = q10, ymax = q90), fill = pal$band, colour = NA)
+  if (band && SHOW_BANDS && all(c("q10_lo", "q10_hi", "q90_lo", "q90_hi") %in% names(curve)))
     p <- p + geom_ribbon(aes(ymin = q10_lo, ymax = q10_hi), fill = pal$ci, alpha = 0.45) +
              geom_ribbon(aes(ymin = q90_lo, ymax = q90_hi), fill = pal$ci, alpha = 0.45)
-  p <- p + geom_line(aes(y = q10), colour = pal$edge, linewidth = 0.35) +
-           geom_line(aes(y = q90), colour = pal$edge, linewidth = 0.35) +
-           geom_point(data = pts, aes(x = x, y = y), colour = pal$point, size = point_size, alpha = point_alpha,
+  if (band) p <- p + geom_line(aes(y = q10), colour = pal$edge, linewidth = 0.35) +
+                     geom_line(aes(y = q90), colour = pal$edge, linewidth = 0.35)
+  p <- p + geom_point(data = pts, aes(x = x, y = y), colour = pal$point, size = point_size, alpha = point_alpha,
                       stroke = 0, shape = 16)
   if ("median" %in% names(curve)) p <- p + geom_line(aes(y = median), colour = pal$median, linewidth = 0.45)
   if ("truth" %in% names(curve))  p <- p + geom_line(aes(y = truth), colour = pal$bg, linewidth = 1.3) +
@@ -214,36 +218,76 @@ growth_panel <- function(sex) {
 }
 
 # =====================================================================================================================
-# (3) SPOD air quality: HOOK ONLY (curves come after the E-18 refit)
+# (3) SPOD air quality (curves come after the E-18 refit; drawn only with --spod <file>)
 # =====================================================================================================================
 # The SPod fits only have tau = 0.01, 0.05 and 0.10 (no upper quantiles), so the SPod story is a LOW baseline band
 # sitting beneath the data, with the pollution plumes clearly above it.  The note reports the share of readings BELOW
-# the upper curve of the band (nominal = tau_hi), not a share inside.
+# the tau_hi curve (nominal = tau_hi), not a share inside.
 #
-# spod_panel(time, y, lower, upper, middle = NULL, tau_lo = 0.01, tau_hi = 0.10, tau_mid = 0.05, time_lab = "Time")
+# The three levels are SEPARATE fits of the individual sampler (paper/sections/data_application.tex), so nothing
+# guarantees their order.  spod_panel() therefore checks all three curves at every time point and counts the crossings:
+# a time point is a crossing when lower > middle or middle > upper.  The count is printed in the panel note.
+#   0 crossings  : band between the tau_lo and tau_hi curves, the tau_mid curve as the line
+#   >= 1 crossing: NO band; only the tau_mid curve is drawn (median-only fallback)
+# The panel never says "joint" or "cannot cross".
+#
+# spod_panel(time, y, lower, upper, middle, tau_lo = 0.01, tau_hi = 0.10, tau_mid = 0.05, time_lab = "Time")
 #   time    : numeric or POSIXct, length n (one reading per point)
 #   y       : SPod reading, length n
-#   lower   : posterior-mean curve at tau_lo, evaluated at `time` (length n); NULL draws only the `middle` curve
-#   upper   : posterior-mean curve at tau_hi, evaluated at `time` (length n)
-#   middle  : optional curve at tau_mid (e.g. the 0.05 baseline), drawn as the thin dark line
-# Returns list(plot, share_below).  Not called by default.  When the E-18 curves exist, load them and add e.g.
-#   sp <- spod_panel(d$time, d$y, d$q01, d$q10, d$q05); save_both(sp$plot, "readme_spod")
-spod_panel <- function(time, y, lower, upper, middle = NULL, tau_lo = 0.01, tau_hi = 0.10, tau_mid = 0.05,
+#   lower, middle, upper : fitted curves at tau_lo, tau_mid, tau_hi, evaluated at `time` (length n each, no NA)
+# Returns list(plot, share_below, n_cross, n, band_drawn).
+spod_crossings <- function(lower, middle, upper) sum(lower > middle | middle > upper)
+
+spod_panel <- function(time, y, lower, upper, middle, tau_lo = 0.01, tau_hi = 0.10, tau_mid = 0.05,
                        time_lab = "Time") {
-  n <- length(y); stopifnot(length(time) == n, is.null(lower) || length(lower) == n, length(upper) == n)
+  n <- length(y)
+  stopifnot(length(time) == n, length(lower) == n, length(middle) == n, length(upper) == n,
+            !anyNA(lower), !anyNA(middle), !anyNA(upper))
+  n_cross <- spod_crossings(lower, middle, upper)
+  band_ok <- n_cross == 0
   o <- order(time); x <- as.numeric(time)[o]
-  if (is.null(lower)) lower <- upper                     # zero-width band: only the curve(s) show
-  curve <- data.frame(x = x, q10 = lower[o], q90 = upper[o])  # band_panel's q10/q90 = generic lower/upper edges
-  if (!is.null(middle)) curve$median <- middle[o]
+  curve <- data.frame(x = x, median = middle[o])
+  if (band_ok) { curve$q10 <- lower[o]; curve$q90 <- upper[o] }   # band_panel's q10/q90 = generic lower/upper edges
   share_below <- mean(y < upper)
-  note <- sprintf("%.1f%% of readings below the \u03c4 = %.2f curve (nominal %.0f%%)", 100 * share_below, tau_hi,
-                  100 * tau_hi)
+  note <- sprintf("%.1f%% of readings below the \u03c4 = %.2f curve (nominal %.0f%%)\n%s", 100 * share_below, tau_hi,
+                  100 * tau_hi,
+                  if (band_ok) sprintf("Order check: 0 of %s time points with crossed curves", format(n, big.mark = ","))
+                  else sprintf("Order check: curves cross at %s of %s time points; band not drawn",
+                               format(n_cross, big.mark = ","), format(n, big.mark = ",")))
   p <- band_panel(pts = data.frame(x = x, y = y[o]), curve = curve, note = note,
                   title = "Air quality: SPod sensor baseline",
-                  subtitle = paste0("Joint-sampler band between \u03c4 = ", tau_lo, " and ", tau_hi,
-                                    if (!is.null(middle)) paste0("; line: \u03c4 = ", tau_mid) else ""),
-                  xlab = time_lab, ylab = "Reading", point_size = 0.7, point_alpha = 0.7)
-  list(plot = p, share_below = share_below)
+                  subtitle = paste0("Each level fitted separately (individual sampler). ",
+                                    if (band_ok) paste0("Band: \u03c4 = ", tau_lo, " to ", tau_hi, "; line: \u03c4 = ", tau_mid)
+                                    else paste0("Line: \u03c4 = ", tau_mid, " only")),
+                  xlab = time_lab, ylab = "Reading", point_size = 0.7, point_alpha = 0.7, band = band_ok)
+  list(plot = p, share_below = share_below, n_cross = n_cross, n = n, band_drawn = band_ok)
+}
+
+# ---- SPOD COLUMN MAPPING (the ONLY block to edit when Engineering fixes the E-18 curve file) --------------------------
+SPOD_COLS <- c(time = "time", y = "y", q01 = "q01", q05 = "q05", q10 = "q10")   # all five required
+# ---- end of mapping ---------------------------------------------------------------------------------------------------
+
+spod_from_file <- function(path) {
+  raw <- read.csv(path, check.names = FALSE)
+  miss <- SPOD_COLS[!SPOD_COLS %in% names(raw)]
+  if (length(miss)) stop("SPod file ", show(path), " lacks required column(s): ", paste(miss, collapse = ", "),
+                         "\n  columns found: ", paste(names(raw), collapse = ", "),
+                         "\n  edit the SPOD_COLS block in make_readme_figures.R")
+  d <- setNames(raw[SPOD_COLS], names(SPOD_COLS))
+  tm <- d$time; lab <- "Time"
+  if (!is.numeric(tm)) {                                  # clock labels: parse, else fall back to the reading index
+    tm <- tryCatch(as.POSIXct(tm, tz = "UTC"), error = function(e) NULL)
+    if (is.null(tm) || anyNA(tm)) { tm <- seq_len(nrow(d)); lab <- "Reading index" }
+  }
+  sp <- spod_panel(tm, d$y, d$q01, d$q10, d$q05, time_lab = lab)
+  if (inherits(tm, "POSIXct"))
+    sp$plot <- sp$plot + scale_x_continuous(                # ticks every 6 hours of the clock labels
+      breaks = function(lim) seq(ceiling(lim[1] / 21600) * 21600, lim[2], by = 21600),
+      labels = function(v) format(as.POSIXct(v, origin = "1970-01-01", tz = "UTC"), "%H:%M"))
+  cat(sprintf("spod: file %s, n = %d, order check: %d crossing(s) (q01 > q05 or q05 > q10), %s; share below q10 = %.4f\n",
+              show(path), sp$n, sp$n_cross, if (sp$band_drawn) "band drawn" else "FALLBACK: tau = 0.05 curve only, no band",
+              sp$share_below))
+  sp
 }
 
 # =====================================================================================================================
@@ -259,6 +303,12 @@ gg <- growth_panel("girl")
 if (!is.null(hero)) save_both(hero$plot, paste0("readme_hero_vs", hero$tag, sfx))
 save_both(gb$plot, paste0("readme_growth_boys", sfx))
 save_both(gg$plot, paste0("readme_growth_girls", sfx))
+
+spod_path <- opt("--spod")
+if (!is.null(spod_path)) {
+  if (!grepl("^/", spod_path)) spod_path <- rp(spod_path)
+  save_both(spod_from_file(spod_path)$plot, "readme_spod")
+}
 
 # Combined multi-panel image (grid layout, no extra packages): hero | growth boys
 combine <- function(plots, stem, w_in = PNG_W_IN, h_in = 3.6) {
