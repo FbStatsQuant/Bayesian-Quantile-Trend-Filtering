@@ -11,7 +11,9 @@ e18_collect <- function(run, stage, grid, validate) {
             length(fail$seconds) == 1L && is.finite(fail$seconds)) failure_seconds[i] <<- fail$seconds
         stop("Failure record: ", fail$error)
       }
-      result <- readRDS(paste0(stem, ".rds"))
+      path <- paste0(stem, ".rds")
+      if (!file.exists(path)) stop("Missing worker result")
+      result <- readRDS(path)
       stopifnot(identical(result$task, task), identical(result$stage, stage))
       validate(result)
       result

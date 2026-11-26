@@ -1,4 +1,4 @@
-# Rscript --vanilla e18_stage1.R RUN_DIR [--pilot | --admm-sim=DIR --onizuka-hs=DIR --onizuka-lap=DIR]
+# Rscript --vanilla e18_stage1.R RUN_DIR [--pilot | --admm-sim=DIR --onizuka-hs=DIR]
 args <- commandArgs(trailingOnly = TRUE)
 if (!length(args)) stop("Usage: e18_stage1.R RUN_DIR [--pilot | --METHOD=REFIT_DIR ...]")
 run <- normalizePath(args[1L])
@@ -6,7 +6,7 @@ folder <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs
 source(file.path(folder, "e18_common.R"))
 source(file.path(folder, "e18_report_common.R"))
 source(file.path(folder, "e18_select.R"))
-benchmark_stages <- c("admm-sim", "onizuka-hs", "onizuka-lap")
+benchmark_stages <- c("admm-sim", "onizuka-hs")
 benchmark_methods <- c("ADMM", "Onizuka (HS)", "Onizuka (Laplace)")
 pilot <- identical(args[-1L], "--pilot")
 roots <- setNames(rep(run, length(benchmark_stages)), benchmark_stages)
@@ -94,10 +94,18 @@ by_cell <- do.call(rbind, lapply(seq_len(nrow(trace)), function(i) {
 }))
 emit(by_cell, "pmala_cells")
 
-# The old aggregate values are retained for historical reference. Benchmark
-# rows used for the refit comparison come only from verified E-18 outputs.
+# Published aggregates are historical reference. Comparisons use per-seed data.
 emit(read.csv(file.path(folder, "published_stage1.csv")), "published_table2_reference")
-benchmarks <- lapply(seq_along(benchmark_stages), function(i) {
+benchmark_rows <- function(fits, method, available, source) {
+  do.call(rbind, lapply(e18_taus, function(tau) {
+    d <- if (is.null(fits)) data.frame() else fits[fits$tau == tau, ]
+    n <- if (available) nrow(d) else NA_integer_
+    status <- if (!available) "refit pending"
+      else if (n < 100L) "refit incomplete; see discarded_reps.csv" else source
+    summarize(d, method, tau, NA_real_, n, status)
+  }))
+}
+benchmarks <- setNames(lapply(seq_along(benchmark_stages), function(i) {
   stage <- benchmark_stages[i]
   method <- benchmark_methods[i]
   root <- roots[[stage]]
@@ -115,37 +123,63 @@ benchmarks <- lapply(seq_along(benchmark_stages), function(i) {
     row[metric_cols] <- as.list(x$metrics)
     row
   }))
-  if (available) emit(results$issues, paste0(stage, "_issues"))
+  issues <- data.frame(method = character(), tau = numeric(), seed = integer(), reason = character())
+  if (available) {
+    emit(results$issues, paste0(stage, "_issues"))
+    missing <- results$issues
+    issues <- data.frame(method = rep(method, nrow(missing)), tau = missing$tau,
+      seed = missing$seed, reason = missing$detail)
+  }
   if (length(ok)) emit(fits, paste0(stage, "_per_fit"))
-  rows <- do.call(rbind, lapply(e18_taus, function(tau) {
-    d <- if (is.null(fits)) data.frame() else fits[fits$tau == tau, ]
-    n <- if (available) nrow(d) else NA_integer_
-    status <- if (!available) "refit pending; archive did not pass reuse audit"
-      else if (n < 100L) "refit incomplete; see issue file" else "complete refit"
-    summarize(d, method, tau, NA_real_, n, status)
-  }))
-  list(rows = rows, fits = fits)
-})
+  list(rows = benchmark_rows(fits, method, available, "complete refit"),
+    fits = fits, issues = issues)
+}), benchmark_methods[seq_along(benchmark_stages)])
+emit(do.call(rbind, lapply(benchmarks, `[[`, "issues")), "discarded_reps")
+
+archive <- e18_table2_archive(file.path(folder, "..", ".."))
+lap <- archive$per_task
+keys <- expand.grid(seed = 1:100, tau = e18_taus)
+stopifnot(nrow(lap) == nrow(keys), all(lap$method == "onizuka_lap"),
+  setequal(paste(lap$tau, lap$seed), paste(keys$tau, keys$seed)),
+  all(is.finite(lap$MSE)), all(is.finite(lap$CL)), all(is.finite(lap$coverage)),
+  all(vapply(lap[paste0("CAA_", e18_h)], function(x)
+    identical(is.finite(x), audit$n_signal[lap$seed] > 0L), FALSE)))
+laplace_fits <- lap[c("tau", "seed", "seconds", metrics, "coverage")]
+names(laplace_fits)[names(laplace_fits) == "MSE"] <- "mse"
+emit(laplace_fits, "onizuka-lap_per_fit")
+laplace_method <- benchmark_methods[3L]
+benchmarks[[laplace_method]] <- list(
+  rows = benchmark_rows(laplace_fits, laplace_method, TRUE, "sealed Table 2 archive"),
+  fits = laplace_fits)
+
 columns <- names(benchmarks[[1L]]$rows)
 table <- do.call(rbind, c(list(by_cell[columns]), lapply(benchmarks, `[[`, "rows")))
 emit(table[order(table$tau, match(table$method, c("Bayesian-PMALA", benchmark_methods)), -table$b0), ],
   "report_table")
 
-if (!is.null(benchmarks[[1L]]$fits)) {
-  # Paired comparisons to ADMM use the intersection of successful seeds.
-  pairs <- merge(per_fit[!per_fit$failed, c("tau", "seed", "b0", metrics[-1L], "mse")],
-    benchmarks[[1L]]$fits, by = c("tau", "seed"), suffixes = c("_pmala", "_admm"))
-  joined <- do.call(rbind, lapply(seq_len(nrow(trace)), function(i) {
+paired_summary <- function(method) {
+  fits <- benchmarks[[method]]$fits
+  if (is.null(fits)) return(NULL)
+  paired_metrics <- if (method == "ADMM") setdiff(metric_cols, "coverage") else metric_cols
+  pairs <- merge(per_fit[!per_fit$failed, c("tau", "seed", "b0", paired_metrics)],
+    fits[c("tau", "seed", paired_metrics)], by = c("tau", "seed"),
+    suffixes = c("_pmala", "_benchmark"))
+  do.call(rbind, lapply(seq_len(nrow(trace)), function(i) {
     t <- trace[i, ]
     d <- pairs[pairs$tau == t$tau & pairs$b0 == t$b0, ]
-    do.call(rbind, lapply(metric_cols[metric_cols != "coverage"], function(k) {
-      delta <- d[[paste0(k, "_pmala")]] - d[[paste0(k, "_admm")]]
+    do.call(rbind, lapply(paired_metrics, function(k) {
+      delta <- d[[paste0(k, "_pmala")]] - d[[paste0(k, "_benchmark")]]
       delta <- delta[is.finite(delta)]
       m <- length(delta)
-      data.frame(tau = t$tau, b0 = t$b0, metric = k, n_pairs = m,
-        mean_pmala_minus_admm = mean_finite(delta), paired_se = if (m > 1L) sd(delta) / sqrt(m) else NA_real_)
+      data.frame(method = method, tau = t$tau, b0 = t$b0, metric = k,
+        n_pairs = m, mean_pmala_minus_benchmark = mean_finite(delta),
+        paired_se = if (m > 1L) sd(delta) / sqrt(m) else NA_real_)
     }))
   }))
-  emit(joined, "paired_pmala_admm")
 }
+paired <- do.call(rbind, lapply(benchmark_methods, paired_summary))
+emit(paired, "paired_pmala_benchmarks")
+admm <- paired[paired$method == "ADMM", setdiff(names(paired), "method")]
+names(admm)[names(admm) == "mean_pmala_minus_benchmark"] <- "mean_pmala_minus_admm"
+emit(admm, "paired_pmala_admm")
 if (selection$selected$branch[1L] == "iii") quit(status = 1L)
