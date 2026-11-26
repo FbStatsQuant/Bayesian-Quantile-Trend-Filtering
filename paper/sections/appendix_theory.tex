@@ -218,7 +218,7 @@ $\|\delta\|_\infty\le C_I\{\nn{\delta}+\nn{\delta}^{(2r-2)/(2r-1)}\TV^{(r)}(\del
 \end{lemma}
 
 \begin{proof}
-Let $a=\nn{\delta}$, $T=\TV^{(r)}(\delta)$, $s=|\delta_{i_0}|=\|\delta\|_\infty$, $C_0=r/g_r$. On a window $W\ni i_0$ of $w\ge r$ consecutive indices, Lemma~\ref{pf:lem:coord} applied to $\delta_W$ gives $\delta_W=p+S_wu_W$ with $p$ a polynomial and $\|\delta_W-p\|_\infty\le\varrho_w=w^{r-1}T/\{(r-1)!n^{r-1}\}$. Since $\max_W|p|\le(C_0/w)^{1/2}\|p\|_{\ell_2(W)}$ and $\|p\|_{\ell_2(W)}\le\sqrt na+\sqrt w\varrho_w$,
+Let $a=\nn{\delta}$, $T=\TV^{(r)}(\delta)$, $s=|\delta_{i_0}|=\|\delta\|_\infty$, $C_0=r/g_r$. On a window $W\ni i_0$ of $w\ge r$ consecutive indices, Lemma~\ref{pf:lem:coord} applied to $\delta_W$ gives $\delta_W=p+S_wu_W$ with $p$ a polynomial and $\|\delta_W-p\|_\infty\le\varrho_w=w^{r-1}T/\{(r-1)!n^{r-1}\}$ (if $w=r$, $\delta_W$ is itself the evaluation of a polynomial of degree at most $r-1$, by interpolation at $r$ points, so we take $p=\delta_W$, with $\|\delta_W-p\|_\infty=0\le\varrho_w$). Since $\max_W|p|\le(C_0/w)^{1/2}\|p\|_{\ell_2(W)}$ and $\|p\|_{\ell_2(W)}\le\sqrt na+\sqrt w\varrho_w$,
 $s\le\sqrt{C_0}\,a\sqrt{n/w}+C'T(w/n)^{r-1}$ with $C'=(1+\sqrt{C_0})/(r-1)!$. If $T\le a$ take $w=n$. Otherwise let $x^{*}=(a/T)^{2/(2r-1)}$; if $nx^{*}\ge r$ take $w=\lceil nx^{*}\rceil$, and if $nx^{*}<r$ use $s\le\sqrt na$. The claim holds with $C_I=\sqrt{C_0}+2^{r-1}C'$.
 \end{proof}
 
