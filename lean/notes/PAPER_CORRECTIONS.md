@@ -132,4 +132,4 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
   - (b) is a proof-order gap. Every use in the integral is already in the band, so the bound is unchanged.
   - No constant changes.
 - **Lean:** `BQTF.quad_shift`, in `lean/BQTF/QuadShift.lean` (Sol-W2). It assumes `hϱ : 0 < ϱ` and `hlam : 0 < λ`. It proves the translation bound in probabilities for all t (QuadShift.lean ≈176), and takes the log cost only for |t| ≤ 1/λ (≈258).
-- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. QuadShift was finalized and checked at the merge recorded below: `quad_shift` and `prior_mass` use the standard axioms only. Found by the PrekopaLaplace review and confirmed by the QuadShift review (lean/notes/reviews/QuadShift_2026-11-26.md).
+- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. QuadShift was finalized and checked at merge 1b141e0: `quad_shift` and `prior_mass` use the standard axioms only. Found by the PrekopaLaplace review and confirmed by the QuadShift review (lean/notes/reviews/QuadShift_2026-11-26.md).

@@ -71,4 +71,4 @@ No further mathematical gaps surfaced in the quadratic-shift argument.
 - **(b) Domain of Λ: ACCEPTED as C-10(b), minor.** The band restriction |t| ≤ 1/λ already covers every use in the integral. The first display, however, can take log 0 for large |t|. The fix is a reorder of the existing sentence, and no constant changes.
 - **Minor, SliceBounds duplicates PrekopaLaplace/Slice helpers: DEFERRED** to the polish pass. It is a cleanup only; both copies are proved.
 - **Nit, QuadShift header still says "Classical inputs expected": DEFERRED** to the polish pass.
-- **The redundant `hpos` hypothesis**, which follows from ϱ > 0 and λ > 0 per the reviewer's scratch proof `review_BA_pos`, is a nit. It only weakens nothing: the Lean statement still implies the paper's. Recorded for the polish pass; the frozen statement stays as is.
+- **The redundant `hpos` hypothesis**, which follows from ϱ > 0 and λ > 0 per the reviewer's scratch proof `review_BA_pos`, is a nit. An extra hypothesis that always holds does not weaken the result: the Lean statement still implies the paper's. Recorded for the polish pass; the frozen statement stays as is.
