@@ -11,22 +11,34 @@ The first application is the fenceline monitoring problem for which \citet{brant
 
 We analyze one day of data, June 15, 2018, from sensor \texttt{d} of the two collocated SPods in the EPA Rubbertown data set accompanying \citet{brantley2020baseline}. The day has $86{,}179$ usable 1-Hz readings; the other seconds are absent or, for $30$ consecutive seconds, recorded as not available. The readings are aggregated into 10-second means of the available readings, so that $n = 8{,}640$ ($19$ of the $8{,}640$ blocks, which contain no reading, are linearly interpolated). The aggregation attenuates the strong serial correlation of the 1-Hz noise, which the ALD working likelihood does not model.
 
-We estimate the baseline at the three levels $\tau \in \{0.01, 0.05, 0.10\}$ with $k = 2$. Each level is fitted separately by the individual sampler on the standardized series, with the sampler and settings of Section~\ref{sec:air_simulation}. The series has the structure of that simulation, short one-sided plumes on a slowly varying baseline, and by the argument given there we use the same prior, $\lambda \sim \mathrm{Gamma}(n, 10^{-2})$ with $n = 8{,}640$. At each level we run two chains of $30{,}000$ sweeps with a burn-in of $10{,}000$, pool every $30$th retained draw of both, and report the pointwise posterior median, transformed back to counts. Under this prior the trend mixes slowly (Appendix~\ref{app:pmala:interior}), so the curves are reported as point estimates, without intervals.
+We estimate the baseline at the three levels $\tau \in \{0.01, 0.05, 0.10\}$ with $k = 2$. Each level is fitted separately by the individual sampler on the standardized series, with the sampler and settings of Section~\ref{sec:air_simulation}. The series has the structure of that simulation, short one-sided plumes on a slowly varying baseline, and by the argument given there we use the same prior, $\lambda \sim \mathrm{Gamma}(n, 10^{-2})$ with $n = 8{,}640$. The rate matters little here: over $b_0 \in \{10^{-2}, 10^{-3}, \dots, 10^{-6}\}$ the posterior median of $\lambda$ changes by at most $12\%$, and the fraction of observations below the fitted curve by at most $0.007$. At each level we run two chains of $30{,}000$ sweeps with a burn-in of $10{,}000$, pool every $30$th retained draw of both, and report the pointwise posterior median, transformed back to counts. Under this prior the trend mixes slowly (Appendix~\ref{app:pmala:interior}), so the curves are reported as point estimates, without intervals.
 
 As the frequentist benchmark we use the ADMM solver of the \texttt{detrendr} package of \citet{brantley2020baseline}. Its penalty is selected by extended BIC over the grid $\lambda \in \exp\{-2, \dots, 12\}$. The criterion selects $\lambda = 54.6$ at $\tau = 0.01$ and $\lambda = 1096.6$ at $\tau \in \{0.05, 0.10\}$. Following \citet{brantley2020baseline}, we detect events by a threshold rule on the detrended series $\by - \widehat{\theta}$: a point is classified as signal when it exceeds the empirical 90th, 95th, or 99th percentile of the detrended data. The rule requires no absolute calibration of the counts.
 
 \begin{figure}[tbp]
-\centering
-\includegraphics[width=\textwidth]{figures/spod_pmala_e18}
-\caption{Air-quality data: Bayesian-PMALA fits with $k = 2$ and $\lambda \sim \mathrm{Gamma}(n, 10^{-2})$ on the 10-second means ($n = 8{,}640$) of SPod \texttt{d}, June 15, 2018. Left: detrended series $\by - \widehat{\theta}$, one panel per quantile level, with the 90th (dashed), 95th (solid), and 99th (dotted) empirical percentiles of the detrended data, the thresholds used to classify emission events. Right: baseline trends at $\tau \in \{0.01, 0.05, 0.10\}$, with the observed PID series in gray. Curves are pointwise posterior medians of two pooled chains.}
-\label{fig:spod_pmala}
+	\centering
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/spod_detrended_pmala}
+		\caption{Detrended series $\by - \widehat{\theta}$.}
+		\label{fig:spod_detrended_pmala}
+	\end{subfigure}
+	\hfill
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/spod_quantiles_pmala}
+		\caption{Baseline trends.}
+		\label{fig:spod_quantiles_pmala}
+	\end{subfigure}
+	\caption{Air-quality data: Bayesian-PMALA fits with $k = 2$ and $\lambda \sim \mathrm{Gamma}(n, 10^{-2})$ on the 10-second means ($n = 8{,}640$) of SPod \texttt{d}, June 15, 2018, at $\tau \in \{0.01, 0.05, 0.10\}$. Each level is fitted separately; curves are pointwise posterior medians of two pooled chains, and the gray line in (b) is the observed PID series. Horizontal lines in (a) mark the 90th (dashed), 95th (solid), and 99th (dotted) empirical percentiles of the detrended data, the thresholds used to classify emission events.}
+	\label{fig:spod_pmala}
 \end{figure}
 
-The right panel of Figure~\ref{fig:spod_pmala} shows the three fitted baselines for Bayesian-PMALA; the ADMM fits and the detrended series they produce are in Appendix~\ref{app:spod_admm}. Both methods place most of the large excursion between 04:30 and 06:00 in the baseline, follow the slow decline through the afternoon, and leave the short plume spikes above the fit. The fraction of observations below the fitted curve is $0.009$, $0.059$, and $0.116$ at $\tau = 0.01, 0.05, 0.10$ for Bayesian-PMALA, against $0.000$, $0.043$, and $0.092$ for ADMM.
+The three fitted baselines of Bayesian-PMALA are shown in Figure~\ref{fig:spod_quantiles_pmala}; the ADMM fits and the detrended series they produce are in Appendix~\ref{app:spod_admm}. Both methods place most of the large excursion between 04:30 and 06:00 in the baseline, follow the slow decline through the afternoon, and leave the short plume spikes above the fit. The fraction of observations below the fitted curve is $0.009$, $0.059$, and $0.116$ at $\tau = 0.01, 0.05, 0.10$ for Bayesian-PMALA, against $0.000$, $0.043$, and $0.092$ for ADMM.
 
 The three levels are fitted separately, so the curves are not constrained to be ordered, and they lie close together: the median distance between adjacent curves is about $1.5$ counts. At $1{,}097$ of the $8{,}640$ time points at least one adjacent pair is in the wrong order (the $0.01$ curve is above the $0.05$ curve at $812$ points, and the $0.05$ curve above the $0.10$ curve at $427$), by at most $6.3$ counts. The ADMM curves also cross: extended BIC selects a penalty twenty times smaller at $\tau = 0.01$ than at the other two levels, and the resulting curve bends upward into the plume near 05:00 and crosses the other two. The joint sampler of Section~\ref{subsec:joint}, which excludes crossings, was not run on these data.
 
-The left panels of Figure~\ref{fig:spod_pmala} show the detrended series with the three detection thresholds, and Figure~\ref{fig:spod_detrended_admm} shows the ADMM counterpart. With the $\tau = 0.05$ baseline removed, the 95\% threshold is $74$ counts for Bayesian-PMALA and $92$ for ADMM, whereas the largest plume exceeds $400$ counts. The events of interest are therefore separated from the noise under either baseline.
+The detrended series and the three detection thresholds are shown in Figure~\ref{fig:spod_detrended_pmala}, and their ADMM counterparts in Figure~\ref{fig:spod_detrended_admm}. With the $\tau = 0.05$ baseline removed, the 95\% threshold is $74$ counts for Bayesian-PMALA and $92$ for ADMM, whereas the largest plume exceeds $400$ counts. The events of interest are therefore separated from the noise under either baseline.
 
 Each chain of $30{,}000$ sweeps at $n = 8{,}640$ took between $37$ and $49$ minutes on one core of a Linux compute cluster. The ADMM fit with its grid search took roughly four minutes; it was not timed on the same machine, so the two times are not directly comparable.
 
