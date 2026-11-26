@@ -63,11 +63,17 @@ stopifnot(identical(selected$tau, e18_taus), all(selected$a0 == 500L),
 real_selected <- cell[cell$selected_for_real, ]
 stopifnot(nrow(real_selected) == 3L, setequal(real_selected$tau, e18_taus),
   all(real_selected$b0 == 1e-2))
-if (any(chain$STOP_stall) || any(cell$STOP_rhat))
-  stop("STOP: Stage 2-prime diagnostics require HQ review before export.")
+if (any(chain$STOP_stall)) stop("STOP: a Stage 2-prime chain stalled. See the chain health CSV.")
+decisions <- load_csv(real, "spod_decision_by_tau")
+decisions <- decisions[order(decisions$tau), ]
+stopifnot(identical(decisions$tau, e18_taus), all(decisions$b0 == 1e-2),
+  all(decisions$decision %in% c("REPORT", "HOLD")))
+report_taus <- decisions$tau[decisions$decision == "REPORT"]
 curves <- load_csv(real, "spod_curves")
 stopifnot(nrow(curves) == 8640L, identical(names(curves), c("time", "y", "q01", "q05", "q10",
   "q01_lo", "q01_hi", "q05_lo", "q05_hi", "q10_lo", "q10_hi")))
+report_q <- sprintf("q%02d", round(100 * report_taus))
+curve_columns <- c("time", "y", report_q, unlist(lapply(report_q, paste0, c("_lo", "_hi"))))
 
 fits <- load_csv(sim, "per_fit")
 stopifnot(nrow(fits) == 1500L, all(fits$a0 == 500L), !anyDuplicated(fits[c("tau", "b0", "seed")]))
@@ -131,8 +137,15 @@ warmup <- rbind(warm("Stage 1 prime", fits, setdiff(group, "chain"), !fits$faile
 warmup <- warmup[order(warmup$stage, warmup$tau, -warmup$b0, warmup$chain),
   c("stage", group, setdiff(names(warmup), c("stage", group)))]
 stopifnot(nrow(paper) == 12L, nrow(differences) == 18L, nrow(warmup) == 45L)
+emit(warmup, real, "spod_warmup_counters_by_cell")
 dir.create(out, recursive = TRUE, showWarnings = FALSE)
-emit(paper, out, "paper_air_table")
-emit(differences, out, "paired_pmala_minus_admm")
-emit(warmup, out, "warmup_counters_by_cell")
-emit(curves, out, "spod_curves")
+emit(paper[paper$tau %in% report_taus, ], out, "paper_air_table")
+emit(differences[differences$tau %in% report_taus, ], out, "paired_pmala_minus_admm")
+emit(warmup[warmup$tau %in% report_taus, ], out, "warmup_counters_by_cell")
+emit(curves[curve_columns], out, "spod_curves")
+show_levels <- function(x) if (length(x)) paste(sprintf("%.2f", x), collapse = ", ") else "none"
+scope <- paste0("Writing CSVs and Figure 6 include only REPORT quantiles. REPORT τ = ",
+  show_levels(report_taus), ". HOLD τ = ",
+  show_levels(decisions$tau[decisions$decision == "HOLD"]), " (omitted).")
+message(scope)
+writeLines(c("# Stage 2′ Writing scope", "", scope), file.path(out, "spod_writing_scope.md"))

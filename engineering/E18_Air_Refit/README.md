@@ -219,10 +219,11 @@ strict crossings for each of the three level pairs and the number of
 distinct crossed grid points. Log-λ diagnostics include ESS and
 classic Gelman–Rubin R-hat over the retained thinned chains, early
 and late λ medians, and traces. Flag `STOP_rhat` when log-λ R-hat
-exceeds 1.1 in a gated cell (see the Stage 2′ scope below). A chain with no change in λ or with no change in the
-full θ vector across all retained sweeps is a stall. Flag it in
-the worker log and in chain health. The report saves diagnostics
-and exits with a STOP when either condition holds. Report each
+exceeds 1.1 in a gated cell. Stage 2′ treats that flag as a checkpoint
+and applies the curve agreement checks below. A chain with no change in
+λ or with no change in the full θ vector across all retained sweeps is
+a stall. Flag it in the worker log and in chain health. The report saves
+diagnostics and exits with a STOP on a stall. Report each
 chain's θ ESS, acceptance, guards, and elapsed time. The baseline
 and detrended figures also cover all four constant-rate views and ADMM.
 
@@ -295,7 +296,8 @@ by Stage 1′. Existing `spod_quantiles_*` and `spod_detrended_*` plots
 use these pooled curves. Each `spod_chain_overlay_*` figure overlays
 the two separate chain medians on the observed PID series at the
 selected rate for that level. `spod_pmala_figure6.pdf` places the
-three detrended panels on the left and the fitted curves on the right.
+detrended panels on the left and the fitted curves on the right for the
+REPORT levels.
 
 For every level and rate, `spod_cell_health.csv` reports the median,
 90th percentile and share above 1.1 of pointwise θ R-hat. As in arm
@@ -303,8 +305,8 @@ For every level and rate, `spod_cell_health.csv` reports the median,
 of 333 draws, with no extra burn-in or transform. Summaries use
 finite R-hat values and report the nonfinite count. θ R-hat is
 descriptive. The log-λ R-hat across both chains is reported for every
-rate. The STOP threshold above 1.1 applies only to the reported
-`b0 = 1e-2` fits. The stall checks apply to every chain. The same CSV reports the maximum and RMS
+rate. `STOP_rhat` flags the formal checkpoint above 1.1 at `b0 = 1e-2`.
+The stall checks apply to every chain. The same CSV reports the maximum and RMS
 chain-median gap in PID counts and divided by the IQR of observed
 PID counts. It gives the fraction strictly below each chain median
 and the pooled median, with signed differences from nominal τ.
@@ -326,6 +328,34 @@ no delay. If approved, run the one-fit compute-node preflight first
 and provide the separate ADMM directory as the third reporter argument.
 Onizuka uses the approved original benchmarks throughout.
 
+### Stage 2′ curve agreement (HQ, 2026-11-26)
+
+At each τ for `b0 = 1e-2`, apply these checks even when log-λ R-hat
+is above 1.1. The checkpoint requires reporting the checks and calls
+for no rerun. A stall still blocks the Writing export.
+
+- For each chain, report the mean and 5th–95th percentiles of λ over its
+  666 retained post-burn draws. Standardize each value using the
+  Gamma prior mean `a0 / b0` and SD `sqrt(a0) / b0`, with `a0 = 8640`.
+- Use raw PID counts throughout the curve checks. `T95` is the 95th
+  percentile of `y − pooled median`. Report the RMS chain-median gap
+  in counts, divided by `IQR(y)`, and divided by `T95`. Also report
+  the largest absolute chain-median gap in counts.
+- Calibration is the fraction of observations strictly below the curve.
+  Report it for A, B, and pooled, and give the absolute A/B difference.
+- Each chain detects grid points where its residual is strictly above
+  its own 95th percentile. The Jaccard index divides the size of the
+  intersection of those detection sets by the size of their union.
+  Also report Jaccard with the pooled `T95` applied to both chains.
+  An empty union gives an undefined Jaccard. Quantiles use R type 7.
+
+`report/spod_decision_by_tau.csv` marks a level **REPORT** when all three
+conditions hold. RMS is at most `0.05 × T95`, the calibration difference
+is at most `0.01`, and own-threshold Jaccard is at least `0.90`. All other
+levels are **HOLD**. The run diagnostics retain all levels. Figure 6 and
+the Writing CSVs omit HOLD levels, and `spod_writing_scope.md` lists the
+included and omitted levels.
+
 After collection and reporting, run the Writing export from the repo
 root with the Owls wrapper.
 
@@ -339,14 +369,15 @@ The export writes the Table 2 estimates and SEs, the paired PMALA-minus-ADMM
 differences over common seeds, and the warm-up summary for both prime stages
 under `results_a0_n/`. It also writes `spod_curves.csv`, with 8,640 local
 clock labels, the observed block means in PID counts, and the Figure 6
-pointwise medians at τ = 0.01, 0.05, and 0.10 at `b0 = 1e-2`.
+pointwise medians for the REPORT levels at `b0 = 1e-2`.
 The pointwise 95% limits use type-7 quantiles of the same 1,332 pooled
 draws. Medians and limits are back-transformed using the prepared center
 and scale. The per-cell Stage 2′ diagnostics are in
 `$REAL_RUN/report/spod_diagnostics_by_cell.csv`. Fit core-hours use Slurm
 `TotalCPU` from the collected production array's `slurm_accounting.psv`.
 Report pilot CPU separately. The Writing export requires all 30 chain
-reports and checks `STOP_stall` and `STOP_rhat` before writing the CSVs.
+reports, applies the curve decisions, and checks `STOP_stall` before
+writing the CSVs.
 
 ## Fit reproducibility
 

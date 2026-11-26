@@ -101,10 +101,10 @@ The pilot supplies one chain per quantile, so assess cross-chain
 R-hat when both production chains for a quantile and rate are
 available. Read `log_lambda_rhat` in `spod_cell_health.csv`, which
 `e18_real_report.R` calculates from the retained log-λ draws using
-classic Gelman–Rubin R-hat. For Stage 2′, use `STOP_rhat` from the
-reporter as the R-hat stop flag. The 1.1 threshold applies only to the
-reported cells at `b0 = 1e-2`. Report R-hat at `b0 <= 1e-3` without
-applying the stop threshold. The stall checks apply to every chain.
+classic Gelman–Rubin R-hat. For Stage 2′, `STOP_rhat` above 1.1 at
+`b0 = 1e-2` is a formal checkpoint. Produce `spod_decision_by_tau.csv`
+and use its REPORT levels for Writing. The checkpoint calls for no rerun.
+Report R-hat at `b0 <= 1e-3` descriptively. The stall checks apply to every chain.
 
 For Stage 2′, prioritize the PMALA fit set. Real-data ADMM is
 optional. Proceed with its full array only if a measured one-fit

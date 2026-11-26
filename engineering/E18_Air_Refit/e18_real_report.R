@@ -145,6 +145,41 @@ theta_comparison <- function(draws, medians, tau) {
     fraction_below_minus_tau_pooled = below[3L] - tau)
 }
 
+curve_decision <- function(chains, medians, health) {
+  percentile95 <- function(x) unname(quantile(x, .95, type = 7L))
+  residual_a <- d$block_mean - medians[1L, ]
+  residual_b <- d$block_mean - medians[2L, ]
+  t95 <- percentile95(d$block_mean - medians[3L, ])
+  t95_a <- percentile95(residual_a)
+  t95_b <- percentile95(residual_b)
+  jaccard <- function(a, b) {
+    union_size <- sum(a | b)
+    if (union_size > 0L) sum(a & b) / union_size else NA_real_
+  }
+  own <- jaccard(residual_a > t95_a, residual_b > t95_b)
+  common <- jaccard(residual_a > t95, residual_b > t95)
+  calibration_gap <- abs(health$fraction_below_chain_1 - health$fraction_below_chain_2)
+  report <- isTRUE(health$chain_median_gap_rms_pid <= .05 * t95 &&
+    calibration_gap <= .01 && own >= .90)
+  prior_mean <- health$a0 / health$b0
+  prior_sd <- sqrt(health$a0) / health$b0
+  lambda_stats <- function(chain, label) {
+    lambda <- exp(chain$log_lambda)
+    raw <- c(mean(lambda), quantile(lambda, c(.05, .95), type = 7L, names = FALSE))
+    cols <- paste0("lambda_", label, c("_mean", "_p05", "_p95"))
+    setNames(as.list(c(raw, (raw - prior_mean) / prior_sd)), c(cols, paste0(cols, "_prior_sd")))
+  }
+  data.frame(health[c("tau", "b0", "a0", "log_lambda_rhat", "STOP_rhat", "y_iqr_pid",
+      "chain_median_gap_rms_pid", "chain_median_gap_rms_over_iqr", "chain_median_gap_max_pid",
+      "fraction_below_chain_1", "fraction_below_chain_2", "fraction_below_pooled")],
+    lambda_prior_mean = prior_mean, lambda_prior_sd = prior_sd,
+    lambda_stats(chains[[1L]], "a"), lambda_stats(chains[[2L]], "b"),
+    t95_pid = t95, t95_a_pid = t95_a, t95_b_pid = t95_b,
+    chain_median_gap_rms_over_t95 = if (t95 != 0) health$chain_median_gap_rms_pid / t95 else NA_real_,
+    calibration_gap = calibration_gap, jaccard_own_t95 = own, jaccard_common_t95 = common,
+    decision = if (report) "REPORT" else "HOLD")
+}
+
 record_cell <- function(chains, tau, b0) {
   if (any(vapply(chains, is.null, FALSE))) return(NULL)
   draws <- lapply(chains, `[[`, "theta_thin")
@@ -189,9 +224,11 @@ record_cell <- function(chains, tau, b0) {
   if (!prime) return(list(fit = fit, diagnostics = diagnostics))
   diagnostics$selected_for_real <- selected_for_real
   warm <- e18_warm_summary(setNames(lapply(e18_warm_fields, field), e18_warm_fields))
+  diagnostics <- cbind(diagnostics, theta_comparison(draws, medians, tau), as.data.frame(warm))
   list(fit = fit, chain_medians = medians[1:2, , drop = FALSE],
     limits = if (export_intervals) pointwise[4:5, , drop = FALSE],
-    diagnostics = cbind(diagnostics, theta_comparison(draws, medians, tau), as.data.frame(warm)))
+    diagnostics = diagnostics,
+    decision = if (export_intervals) curve_decision(chains, medians, diagnostics))
 }
 
 pmala <- setNames(lapply(grid_rates, function(b0) {
@@ -212,6 +249,8 @@ selected_cells <- lapply(seq_along(e18_taus), function(i) {
 })
 fits$pmala_selected <- lapply(selected_cells, `[[`, "fit")
 b0_by_view$pmala_selected <- selected$b0
+decisions <- do.call(rbind, lapply(selected_cells, `[[`, "decision"))
+if (!is.null(decisions)) emit(decisions, "spod_decision_by_tau")
 if (with_admm) {
   fits$admm <- lapply(admm$records, function(x)
     if (!is.null(x)) d$center + d$scale * x$est)
@@ -253,13 +292,13 @@ stats <- do.call(rbind, lapply(scored, `[[`, "stats"))
 if (!is.null(stats)) emit(stats, "spod_calibration_thresholds")
 emit(do.call(rbind, lapply(scored, `[[`, "crossing")), "spod_crossings")
 
-draw_fits <- function(name, series) {
+draw_fits <- function(name, series, indices = seq_along(series)) {
   plot(hours, d$block_mean, type = "l", col = "grey62",
-    ylim = range(c(d$block_mean, unlist(series))), xlim = c(0, 24), xaxt = "n",
+    ylim = range(c(d$block_mean, unlist(series[indices]))), xlim = c(0, 24), xaxt = "n",
     xlab = "Hour on June 15", ylab = "PID (counts)")
   axis(1L, at = seq(0, 24, by = 4))
-  for (i in seq_along(series)) lines(hours, series[[i]], col = colors[i], lwd = 2)
-  legend("topright", c("Observed", labels(name)), col = c("grey62", colors), lty = 1, bty = "n")
+  for (i in indices) lines(hours, series[[i]], col = colors[i], lwd = 2)
+  legend("topright", c("Observed", labels(name)[indices]), col = c("grey62", colors[indices]), lty = 1, bty = "n")
 }
 plot_fits <- function(name, series) {
   file <- file.path(out, paste0("spod_quantiles_", name, ".png"))
@@ -268,9 +307,9 @@ plot_fits <- function(name, series) {
   par(mar = c(4, 4.5, 1, 1))
   draw_fits(name, series)
 }
-draw_detrended <- function(name, series) {
+draw_detrended <- function(name, series, indices = seq_along(series)) {
   threshold_lty <- c(2L, 1L, 3L)
-  for (i in seq_along(series)) {
+  for (i in indices) {
     residual <- d$block_mean - series[[i]]
     cuts <- quantile(residual, p, names = FALSE)
     plot(hours, residual, type = "l", col = "grey45", main = labels(name)[i],
@@ -288,14 +327,14 @@ plot_detrended <- function(name, series) {
   par(mfrow = c(3, 1), mar = c(3.5, 4.5, 2, 1))
   draw_detrended(name, series)
 }
-plot_paper <- function(name, series) {
+plot_paper <- function(name, series, indices) {
   pdf(file.path(out, "spod_pmala_figure6.pdf"), width = 12, height = 7)
   on.exit(dev.off())
-  layout(matrix(c(1, 2, 3, 4, 4, 4), nrow = 3L))
+  layout(cbind(seq_along(indices), length(indices) + 1L))
   par(mar = c(3.5, 4.5, 2, 1), cex = .85)
-  draw_detrended(name, series)
+  draw_detrended(name, series, indices)
   par(mar = c(4, 4.5, 2, 1), cex = .85)
-  draw_fits(name, series)
+  draw_fits(name, series, indices)
 }
 plot_chain_overlay <- function(tau, b0, medians) {
   file <- file.path(out, sprintf("spod_chain_overlay_t%02d_r%d.png",
@@ -325,18 +364,22 @@ for (name in names(fits)) {
   if (any(vapply(series, is.null, FALSE))) next
   plot_fits(name, series)
   plot_detrended(name, series)
-  if (prime && name == "pmala_selected") plot_paper(name, series)
   emit(data.frame(seconds_since_midnight = d$offsets, observed = d$block_mean,
     fit_tau01 = series[[1L]], fit_tau05 = series[[2L]], fit_tau10 = series[[3L]]),
     paste0("spod_curves_", name))
 }
 if (with_admm && any(!benchmark$match_to_1_decimal, na.rm = TRUE))
   warning("ADMM selected different lambda values than the paper. See spod_admm_lambda_check.csv.")
-if (length(stall_ids) || (!is.null(cell_diag) && any(cell_diag$STOP_rhat)))
-  stop("STOP: a chain stalled or log-lambda R-hat exceeded 1.1 in a gated cell. See the chain and cell health CSVs.")
+if (length(stall_ids)) stop("STOP: a chain stalled. See the chain health CSV.")
+if (!prime && !is.null(cell_diag) && any(cell_diag$STOP_rhat))
+  stop("STOP: log-lambda R-hat exceeded 1.1. See the cell health CSV.")
 if (nrow(got$issues) || (!prime && nrow(admm$issues))) stop("Incomplete real-data fit set. See issue CSVs.")
 if (selected$branch[1L] == "iii") stop("STOP: Stage 1 did not select a rate triple. Escalate to HQ.")
 if (prime && isTRUE(all(selected$b0 == 1e-2))) {
+  if (any(decisions$STOP_rhat)) message("Stage 2-prime log-lambda R-hat checkpoint. See spod_decision_by_tau.csv.")
+  report_indices <- which(e18_taus %in% decisions$tau[decisions$decision == "REPORT"])
+  if (length(report_indices)) plot_paper("pmala_selected", fits$pmala_selected, report_indices)
+  else unlink(file.path(out, "spod_pmala_figure6.pdf"))
   seconds <- d$offsets
   clock <- sprintf("%02d:%02d:%02d", seconds %/% 3600L, seconds %/% 60L %% 60L, seconds %% 60L)
   curves <- data.frame(time = clock, y = d$block_mean)
