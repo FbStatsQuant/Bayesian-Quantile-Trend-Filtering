@@ -1,0 +1,6 @@
+E14-inner-rerun-20261125 VS runs 1500 draws 666-666 median logλ ESS 102.4 acc 0.49215-0.50945 median sec 153.7 guards 0 
+E14-inner-rerun-20261125 S runs 1500 draws 666-666 median logλ ESS 131.5 acc 0.48570-0.51975 median sec 152.8 guards 0 
+ALL acc 0.48570-0.51975 median sec 153.3 runs 3000 
+E17-interior-20261125 VS runs 1500 draws 666-666 median logλ ESS 85.5 acc 0.41815-0.52700 median sec 148.4 guards 0 
+E17-interior-20261125 S runs 1500 draws 666-666 median logλ ESS 40.4 acc 0.38845-0.53710 median sec 145.4 guards 0 
+ALL acc 0.38845-0.53710 median sec 147.1 runs 3000 
