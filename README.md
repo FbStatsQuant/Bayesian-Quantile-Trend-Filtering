@@ -207,10 +207,13 @@ Rscript method/individual/Individual_Sampler_PMALA_Augmented.R
 ```
 
 This simulates one data set, runs the sampler with the settings block at the top of the file
-(order k = 2, 30,000 sweeps with 10,000 burn-in, [HQ after E-19: default b0]) and writes a
+(order k = 2, penalty prior λ ~ Gamma(1, 10⁻³), 30,000 sweeps with 10,000 burn-in) and writes a
 summary and a plot to `method/individual/results_pmala_aug/`. To change the signal, the noise, the
 sample size or the quantile level, edit the settings block. `Rscript
-method/joint/Joint_Sampler_PMALA_Augmented.R` does the same for several levels at once.
+method/joint/Joint_Sampler_PMALA_Augmented.R` does the same for several levels at once, with
+λ ~ Gamma(1, 10⁻²). Each default matches the paper's runs of that sampler; the paper's scripts set
+their own priors: rates 10⁻³ and 5·10⁻⁴ for the two interior-quantile signals, and
+Gamma(n, 10⁻²) for the air-quality data (Section 4.3).
 [Eng: time for the default runs]
 
 **Redraw the figure above.**
