@@ -101,3 +101,10 @@ The fix is Fable's own text verbatim, apart from that one word change, in one se
 - **F6.** Once thm:joint is inserted, `paper/sections/discussion.tex:8` ("A natural next step is a contraction result for the joint posterior …") becomes false. The roadmap at theory.tex:13, introduction.tex:23/25, discussion.tex:6 and the abstract mention one theorem only.
 - The appendix subsection "Reduction to σ = 1" has no `\label`. The proof cites it by name; a label would allow a `\ref`.
 - **Option (F8).** The simultaneous bound over all levels, for max_j Δ²_n, costs nothing and is proved in the closing paragraph. It could become the theorem's display if Felipe prefers.
+
+## Post-audit fix (2026-11-26, Sol-P2 via the Lean head)
+
+`PROOF.tex` line 60 used C = 2 max_l C^{(l)} + J(5/4 + 64/f̲²). For the per-level statement here that is valid. The paper's Theorem 2 (W-05, 5d5eb81) is the max_j form, and the closing paragraph of this proof gives 2 Σ_l C^{(l)} for it. The paper appendix and Lean J7 already use the sum. The source now uses C = 2 Σ_l C^{(l)} + J(5/4 + 64/f̲²), which serves both forms because Σ ≥ max.
+- The transfer display still ends with "≤ C".
+- No other change.
+- The fix is a one-symbol edit, so I verified it myself and ran no new audit.
