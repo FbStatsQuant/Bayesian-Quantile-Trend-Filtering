@@ -31,7 +31,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Source of the fix:** Theory's T10 proof (`theory/T10_gr_positivity/`, commit 0c9f176). Writing inserted it at commit 906be2b.
 - **Why it was needed:** a proof gap. The constant is used in C_s = 1 + r/g_r and C_0 = r/g_r.
 - **Lean:** `BQTF.gr_pos (r) (hr : 1 ≤ r) : 0 < gr r ∧ gr r ≤ 1`, in `lean/BQTF/Gram.lean`. Here `gr r = ⨅ w ≥ r, quadMin r w`, and `quadMin` is the infimum of `gramQuad` over the ℓ² unit sphere, which is λ_min(G_w). The paper has r = k + 1 ≥ 2, so the Lean hypothesis r ≥ 1 is weaker.
-- **Status:** **in paper (906be2b)**. HQ ruled on 2026-11-25 that no Writing packet is needed. When `Gram` is finalized, the head runs the fidelity check of `gr_pos` against the 906be2b text directly and reports verified or mismatch to HQ. A packet is needed only if they differ, for example in the hypotheses or in the ≤ 1 part.
+- **Status:** **verified** (2026-11-25). No Writing packet was needed (HQ ruling). The Gram Sol review checked `gr_pos` and its definitions against the 906be2b text, and they match: same bounds, no extra hypotheses or constants. Gram finalized and merged at 5913b27.
 
 ## C-02: measurability of the posterior mass is not stated
 
@@ -49,7 +49,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "…so the c-integral is at most ∫exp{−a‖c − Nᵀ(y−Su)‖₂}dc = ∫exp{−a‖c‖₂}dc < ∞, with a = min{τ,1−τ}, a bound that does not depend on u; integrating it against the probability measure Q_λ gives N(ℝⁿ) < ∞. Positivity of the integrand gives N(ℝⁿ) > 0."
 - **Why it was needed:** a wrong proof step, in its wording. The c-integral itself depends on u (Sol reviewer's example: n = 2, r = 1, y = θ* = 0, τ = 1/2, N = (1,1)ᵀ/√2, S = (0,1)ᵀ gives √2(|u|+2)e^{−|u|/2}). Only its upper bound is u-free, and that is what the argument uses.
 - **Lean:** `BQTF.posterior_eq_ratio` (the clause 0 < Nmass univ < ∞), in `lean/BQTF/Coord.lean`.
-- **Status:** **open**. Found in the Coord review on 2026-11-25. The packet goes out when Coord is finalized and checked.
+- **Status:** **sent** (2026-11-25) to Writing and Theory, CC HQ. Coord finalized and checked at merge 5913b27 (`posterior_eq_ratio`: standard axioms only). Found in the Coord review.
 
 ## C-04: Lemma interp uses Lemma coord at window size w = r, where Lemma coord assumes n > r
 
