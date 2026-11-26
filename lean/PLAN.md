@@ -342,3 +342,25 @@ J1, J3 and J4 can start in parallel right after the gate. J6 can be proved again
 3. **Measurability of y ↦ Π_𝒞(U \| y).** As with C-02, the paper takes E_{θ*} Π_𝒞(U \| y) without stating measurability. This will likely be a candidate correction for Theorem 2, and I propose to fold it into the C-02 text.
 4. **Quantifier order for τ.** Confirm that τ may be chosen after (M, C, n₀), given a spacing lower bound, so that the constants depend on the spacing but not on τ otherwise.
 5. **Lemma `cond` positivity.** Π^⊗(𝒞 \| y) > 0 needs n > r (properness via Lemma `coord`) and that 𝒞 contains the nonempty open set of strictly ordered vectors. The theorem only needs n ≥ n₀ > r. Confirm there is no other use of n > r.
+
+### 5.5 Theory's answers (received 2026-11-25): plan CONFIRMED
+
+1. **Statement list and order: confirmed.** No Theorem 1 lemma needs a joint or union-bound version; the levels are combined only in J6. J1 is close to definitional, because eq:joint-fixed is already the ratio of the product measure restricted to 𝒞.
+   - **J4 uses Theorem 1 internals:** the Ω_G tail and part (b) of `localization`, `interp`, and the Ω_E tail from `denominator`.
+   - Head check, 2026-11-25: all three are public `theorem`s in the frozen skeleton. `localization` exposes the explicit tail `r!(e^{−f̲nρ²/16} + e^{−n/8})`, which settles Theory's pre-trigger risk (c). Re-check that they are still public, with unchanged statements, at the trigger.
+   - J6 and J7 produce the max_j / ∃j form (U_M) directly, as in the paper's display.
+2. **General scales: yes.** The rescaled constants are as follows:
+   - `s′_n = C_I{ρ_n + (ρ_n^{2r−2}T′_n)^{1/(2r−1)}}`, with T_n taken at c → σ₀c. It depends on (σ₀c, r).
+   - `η′_n = r!{e^{−σ₀f̲nρ²/16} + e^{−n/8}}`. It depends on (σ₀f̲, r).
+   - `n₂′` depends on (σ₀c, r, L/σ₀, σ₀f̲, σ₀f̄, V̄/σ₀).
+   - In original units, `s_{n,l} = σ_{0l}s′_{n,l}`. This uses the quantile of y/σ₀ being θ*/σ₀, the pushforward under θ ↦ θ/σ₀, and ‖·‖_∞ scaling by σ₀.
+   - `P(Ω_lᶜ) ≤ {5/4 + 64/(σ_{0l}f̲)²} n^{−1/(2r)}`, as in J5.
+3. **Measurability: agreed.** One Tonelli sentence covers both C-02 and Theorem 2: the integrands are jointly continuous in (Θ, y), and the normalizers are measurable and positive for n > r, so y ↦ Π_𝒞(U | y) is a ratio of measurable functions. Fold this into the C-02 text when the Theorem 2 packet goes out. Measurability of Ω_G belongs to Theorem 1, via a countable dense subset.
+4. **τ quantifier order: confirmed.** Spec.lean:160–174 already puts τ after ∃ M C n₀. In Theorem 2, τ enters only through the spacing, and only into n₀. `∀ gmin > 0, ∃ M C n₀, ∀ n ≥ n₀, ∀ τ with spacing ≥ gmin` is faithful, so D6 stands.
+5. **Conditions on n:** none beyond n ≥ n₀ (n > r for Lemma cond). The others, including n ≥ n₂^{(l)}, log n ≥ 1 and n ≥ n₀^{(l)}, are absorbed into n₀.
+   - **Caveat:** s_n is not monotone. State `max_l s_{n,l} ≤ g0/2` and `J·max_l η_{n,l} ≤ 1/2` as eventual conditions (`∀ᶠ n in atTop`), never as checks at a single n.
+
+**Notes for the provers (no statement change):**
+- (a) In J3, derive f̄ ≥ f̲ > 0 from A and B at t = L for n ≥ 1, since Spec does not assume `0 < fu`. Take `g0 = min{L, gmin/f̄}`. Monotonicity of F_i rules out θ*_{j+1} < θ*_j − L, and B handles |d| ≤ L.
+- (b) D7: for J ≤ 1 the spacing condition is vacuous, and J = 0 is vacuous too. Keep the plan as written.
+- THEOREM_INDEX.md: no change needed.
