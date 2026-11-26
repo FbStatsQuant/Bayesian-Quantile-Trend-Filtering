@@ -32,3 +32,12 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Why it was needed:** a proof gap. The constant is used in C_s = 1 + r/g_r and C_0 = r/g_r.
 - **Lean:** `BQTF.gr_pos (r) (hr : 1 ≤ r) : 0 < gr r ∧ gr r ≤ 1`, in `lean/BQTF/Gram.lean`. Here `gr r = ⨅ w ≥ r, quadMin r w`, and `quadMin` is the infimum of `gramQuad` over the ℓ² unit sphere, which is λ_min(G_w). The paper has r = k + 1 ≥ 2, so the Lean hypothesis r ≥ 1 is weaker.
 - **Status:** **in paper (906be2b)**. HQ ruled on 2026-11-25 that no Writing packet is needed. When `Gram` is finalized, the head runs the fidelity check of `gr_pos` against the 906be2b text directly and reports verified or mismatch to HQ. A packet is needed only if they differ, for example in the hypotheses or in the ≤ 1 part.
+
+## C-02: measurability of the posterior mass is not stated
+
+- **Paper label:** appendix, `\subsection{Proof of Theorem~\ref{thm:main}}` (the display bounding E Π_λ(Δ²_n > Mε_n² | y)). The same issue affects the statement of `thm:main`, which takes E_{θ*} of Π_λ(· | y).
+- **Current paper text:** "E Π_λ(Δ_n² > Mε_n² | y) ≤ P(Ω_Eᶜ) + … + E[Π_λ(K_nᶜ | y) 1_{Ω_E∩Ω_G}] + Σ_k E[Π_λ(E_{a_k} | y) 1_{Ω_E∩Ω_ζ}]". The expectation of y ↦ Π_λ(B | y) is taken, but nowhere is it said that this map is measurable.
+- **Correct version:** add one sentence before the display: "For every Borel B the map y ↦ Π_λ(B | y) is Borel measurable: the unnormalized weight exp{−Σρ_τ(y_i−θ_i)/σ − λ‖Dθ‖₁} is jointly measurable in (y, θ), so its integrals over B and over ℝⁿ are measurable in y by Tonelli, and so is their ratio."
+- **Why it was needed:** a missing measurability condition. Without it the expectation is not defined; formally, a lower integral would be bounded. This is the paper-side counterpart of difference D3 in docs/statements.md.
+- **Lean:** the measurability conjunct of `BQTF.MainConclusion`, proved in `BQTF.main_theorem` via the private `measurable_posterior_apply`, in `lean/BQTF/Main.lean`.
+- **Status:** **open**. Main is merged, but it is not finalized and checked: it still depends on sorried modules. The packet goes out once Main's axiom check shows only the 3 standard axioms.
