@@ -131,4 +131,18 @@ told the reset time. Submitted jobs keep running.
 
 ## Run log
 
-(empty; no E-19 compute has run)
+### 2026-11-26 pairing preflight
+
+- Runner commit `1433cc6e5cef68e7cab0894bb17a27b097372517`.
+- All 3,002 entries in the E-14 SHA-256 manifest verified on Owls. All
+  3,000 archived RDS files contain `truth`. Zero contain a stored response
+  vector `y`. Each of the six pilot indices failed the comparator
+  input check before sampling.
+- The assembled Owls snapshot matched the Git blobs at `63f2a56` for
+  `Individual_Sampler_PMALA_Augmented.R`
+  (`c8396881c360f03b61dea7b2bb238813370be1fe`) and
+  `prox_admm_metric.cpp` (`a12026d3e524b58de0aca0139eb7dacc4e3589eb`).
+  NOTS verification is pending.
+- The pairing gate blocked submission. No Slurm job IDs were assigned,
+  and NOTS usage was 0 core-hours. The pilot projection and E-19 verdict
+  are unavailable.
