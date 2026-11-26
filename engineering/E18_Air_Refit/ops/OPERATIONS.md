@@ -10,7 +10,8 @@ CPUs. Slurm's billing TRES can differ. Production arrays use at most
 E-17 locked wrapper with one connection, 15-minute timeout backoff,
 and no SSH from 18:55 to 19:45 CT.
 
-Verify the bundle on both hosts, including its SHA-256 and matching
+Use only the bundle SHA-256 relayed by the Engineering head. Verify it
+on both hosts, including its SHA-256 and matching
 HEADs. The bundled snapshot script must support writing into an
 empty snapshot directory. Work and temporary output live under
 `$HOME/BQTF/tmp/e18-results/` and `$HOME/BQTF/tmp/e18-code-<HEAD>/`.
@@ -45,14 +46,17 @@ It includes the pilot and leaves a separately reported allowance for
 ADMM. The cap is 80 core-hours. Use the bundled starting memory
 allocation for the pilot and measure MaxRSS before setting production
 memory.
-Report the gate and projection for HQ review. Wait for the Engineering
-head's explicit stage-1 production GO before submitting the 1,200
-fits or any necessary ADMM job.
+Send the pilot gate and projection directly to the Engineering head.
+Stop and report if a gate fails or the projection exceeds 80
+core-hours. If both checks pass, the Engineering head can issue the
+stage-1 production GO directly.
 
 ## Stage 2
 
-Use authorized, hash-verified real-data input and one pilot run per
-\(\tau\) with about 45 minutes of computation each.
+Apply the same approval sequence under the 40-core-hour cap. Use
+authorized, hash-verified real-data input and one pilot run per
+\(\tau\) with about 45 minutes of computation each. Production is
+four rates by three quantiles by two chains, for 24 fits.
 The workers must emit completed-sweep counts or equivalent timing so the
 full chain cost can be extrapolated. Record warm and regular sweep times
 separately if the pilot stops before all planned sweeps. Read MaxRSS
@@ -61,8 +65,15 @@ for extra retained posterior draws when the pilot used a shorter chain.
 For sizing context, a dense matrix of 20,000 by 8,640 doubles alone
 uses 1.29 GiB. If all pilots use 45 CPU minutes, 37.75 core-hours remain
 for 24 production fits and the detrendr rerun, or 94.375 minutes per
-fit before detrendr. Report the measured projection and wait for the
-Engineering head's explicit stage-2 production GO.
+fit before detrendr. Send the measured projection to the Engineering
+head. Stop if the sampler stalls at n = 8,640 or continuing would
+require changing the E-14/E-17 algorithm.
+
+The pilot supplies one chain per quantile, so assess cross-chain
+R-hat when both production chains for a quantile and rate are
+available. Read `log_lambda_rhat` in `spod_cell_health.csv`, which
+`e18_real_report.R` calculates from the retained log-λ draws using
+classic Gelman–Rubin R-hat. Stop and report any value above 1.1.
 
 ## Collection
 
