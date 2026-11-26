@@ -14,11 +14,6 @@ private theorem measurable_eval {n : ℕ} (i : Fin n) :
     Measurable (fun v : Fin n → ℝ => v i) :=
   measurable_pi_apply i
 
-private theorem measurable_checkLoss (τ : ℝ) : Measurable (checkLoss τ) := by
-  have h : Measurable (fun u : ℝ => if u < 0 then (1 : ℝ) else 0) :=
-    measurable_const.piecewise measurableSet_Iio measurable_const
-  exact measurable_id.mul (measurable_const.sub h)
-
 private theorem measurable_posterior_apply (k n : ℕ) (τ σ lam : ℝ)
     {B : Set (Fin n → ℝ)} (hB : MeasurableSet B) :
     Measurable (fun y => posterior τ σ lam k n y B) := by

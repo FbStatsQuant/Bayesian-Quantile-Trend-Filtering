@@ -77,3 +77,12 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Why it was needed:** a wrong proof step. The two-sided change bound is not justified as written.
 - **Lean:** `BQTF.concentration`, in `lean/BQTF/Concentration.lean` (Neon-B), using `BQTF.Prob.efronStein_oneSided` in `lean/BQTF/Prob/EfronStein.lean` (Opus-W1).
 - **Status:** **open**. Found by Sol-W1 (Shells work, `notes/logs/solW1_questions.md`) on 2026-11-25 and accepted by the head. The packet goes out when Concentration is finalized and checked.
+
+## C-07: Lemma check(e) proves the second-moment bound only for positive shifts
+
+- **Paper label:** appendix, proof of Lemma `pf:lem:check`(e).
+- **Current paper text:** "(e) $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$." Unlike (d), there is no "similarly for t<0". For t < 0 the displayed representation is false: its right side is ≤ 0, but R_i(t)² > 0 when t < Z_i < 0. The result t³/3 is also negative.
+- **Correct version:** "(e) For $t>0$, $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$; for $t<0$, $R_i(t)^2=\int_t^0 2(s-t)\ind(s<Z_i<0)ds$ and $\tau-F_i(s)\le\fu|s|$ give the same bound $\fu|t|^3/3$."
+- **Why it was needed:** a proof gap. The negative case was missing, and the printed formula is wrong for t < 0. The constants are unchanged.
+- **Lean:** `BQTF.remK_moments`, in `lean/BQTF/CheckLoss.lean`. The negative-shift case uses the weight 2(s−t) on (t,0).
+- **Status:** **open**. Found in the CheckLoss review on 2026-11-25.
