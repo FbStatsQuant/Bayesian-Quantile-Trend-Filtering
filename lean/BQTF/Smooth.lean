@@ -107,27 +107,6 @@ private lemma l2norm_sum_smul_le {ι n : ℕ} (α : Fin ι → ℝ) (v : Fin ι 
         apply Finset.sum_congr rfl; intro j _
         rw [map_smul, norm_smul, Real.norm_eq_abs, norm_toE]
 
-/-- `bfun p t` agrees with the falling binomial polynomial when `t ≥ 0`. -/
-private lemma bfun_eq_desc_eval (p : ℕ) (t : ℤ) (ht : 0 ≤ t) :
-    bfun p t = (∏ k ∈ range p, ((t : ℝ) - (k : ℝ))) / (p.factorial : ℝ) := by
-  rw [bfun]
-  simp only [ht, ↓reduceIte]
-  obtain ⟨m, rfl⟩ := Int.eq_ofNat_of_zero_le ht
-  simp only [Int.cast_natCast, Int.toNat_natCast]
-  have hprod : ∏ k ∈ range p, ((m : ℝ) - (k : ℝ)) = (m.descFactorial p : ℝ) := by
-    induction p with
-    | zero => simp
-    | succ p ih =>
-      rw [Finset.prod_range_succ, ih, Nat.descFactorial_succ]
-      by_cases hmp : p ≤ m
-      · rw [Nat.cast_mul, Nat.cast_sub hmp]; ring
-      · have hlt : m < p := Nat.lt_of_not_ge hmp
-        rw [Nat.descFactorial_eq_zero_iff_lt.mpr hlt]
-        simp
-  rw [hprod, Nat.descFactorial_eq_factorial_mul_choose, Nat.cast_mul]
-  have hfac : (p.factorial : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero p)
-  field_simp [hfac]
-
 /-- `bfun p t ≤ (t.toNat : ℝ)^p` for `0 ≤ t`. -/
 private lemma bfun_le_pow (p : ℕ) (t : ℤ) (ht : 0 ≤ t) :
     bfun p t ≤ (t.toNat : ℝ) ^ p := by
@@ -317,7 +296,6 @@ theorem smoothed_truth (r n : ℕ) (hr : 2 ≤ r) (hn : r < n) (θs : Fin n → 
       have hK2 : l2sq (K j) ≤ ((r : ℝ) / (gr r * Real.sqrt w)) ^ 2 := by
         have h1 := hK_l2 j
         have h2 := pow_le_pow_left₀ (Real.sqrt_nonneg _) h1 2
-        unfold l2norm at h2
         rwa [Real.sq_sqrt (hl2_nn _)] at h2
       calc (l1norm (K j)) ^ 2 ≤ (w : ℝ) * l2sq (K j) := hcs
         _ ≤ (w : ℝ) * ((r : ℝ) / (gr r * Real.sqrt w)) ^ 2 :=
@@ -381,7 +359,7 @@ theorem smoothed_truth (r n : ℕ) (hr : 2 ≤ r) (hn : r < n) (θs : Fin n → 
         simp [F, Polynomial.eval_prod, div_eq_mul_inv]
       rw [hFcalc, hPeval]
       unfold sCol
-      rw [bfun_eq_desc_eval (r - 1) ((i : ℤ) - ((aj j + k : ℕ) : ℤ) - 1) (by omega)]
+      rw [bfun_eq_prod_div_factorial (r - 1) ((i : ℤ) - ((aj j + k : ℕ) : ℤ) - 1) (by omega)]
       push_cast
       rfl
     rw [hsum_K j (fun l => sCol r n l.val i)]

@@ -130,10 +130,6 @@ private lemma prod_inv_eq_inv_prod {J : ℕ} (z : Fin J → ℝ≥0∞)
   | succ J ih =>
     rw [Fin.prod_univ_succ, Fin.prod_univ_succ,
       ih (fun j => z j.succ) (fun j => hz0 j.succ) (fun j => hztop j.succ)]
-    have hne0 : (∏ j : Fin J, z j.succ) ≠ 0 :=
-      Finset.prod_ne_zero_iff.mpr fun j _ => hz0 j.succ
-    have hnetop : (∏ j : Fin J, z j.succ) ≠ ∞ :=
-      ENNReal.prod_ne_top fun j _ => hztop j.succ
     rw [ENNReal.mul_inv (Or.inl (hz0 0)) (Or.inl (hztop 0))]
 
 /-- Density representation of `prodPosterior`:
