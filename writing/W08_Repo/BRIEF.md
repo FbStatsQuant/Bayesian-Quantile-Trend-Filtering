@@ -1,6 +1,6 @@
 # W-08 brief: public-repo arrangement PROPOSAL (Writing dept)
 
-Repo: /home/fb31/Bayesian-Quantile-Trend-Filtering (public on GitHub). Paper: paper/main.tex, paper/sections/*.tex, paper/main.pdf.
+Repo: this repository (local checkout) (public on GitHub). Paper: paper/main.tex, paper/sections/*.tex, paper/main.pdf.
 
 ## Goal (owner's words)
 Propose how to arrange the public repo so that it is "complete, engaging, aesthetic and sells well what we have done".
