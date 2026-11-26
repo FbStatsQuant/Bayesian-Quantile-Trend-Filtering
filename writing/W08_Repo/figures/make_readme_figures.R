@@ -11,7 +11,7 @@
 #   (2) growth : Dutch growth data (fdgs), joint k = 2 fits, boys (girls and both-sex panels are also written)
 #   (3) spod   : SPod air quality, only with --spod <file> (the curves come after the E-18 refit; see spod_panel())
 #
-# Usage (from the repo root, through the cluster wrapper):
+# Usage (from the repo root):
 #   Rscript writing/W08_Repo/figures/make_readme_figures.R --demo
 #   Rscript writing/W08_Repo/figures/make_readme_figures.R --e20 engineering/E20_Showcase/<file>.csv
 # Flags
