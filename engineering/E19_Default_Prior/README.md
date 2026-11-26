@@ -161,3 +161,23 @@ must match both reference SHA-256 digests, calculated over little-endian
 IEEE-754 double bytes of the response and truth. Any mismatch stops the
 run. Each E-19 RDS records the SHA-256 of its regenerated response using
 the same byte encoding. All other preregistered settings and gates apply.
+
+### 2026-11-26 NOTS pairing preflight
+
+- Amendment commit `734795015fc21f0a58674255269e2f8c3915aab4`. The retry
+  used snapshot commit `df8c31c1fbf16a33a4e30cf919f3ff3254f36f4f`,
+  which computes the Git blob hash in R on nodes without Git.
+- The bundle verified on Owls and NOTS, and the snapshot source HEAD
+  matched Owls. The NOTS code copy matched the sampler and kernel blobs
+  listed above and the pinned generator blob. The E-14 archive manifest
+  also verified on NOTS. Owls matched all 24 reference digests.
+- Standalone test `2931381` exited `1:0` before generating data because
+  Git was unavailable on the compute node. Allocation TotalCPU was
+  0.775 s and batch MaxRSS was 70,060 KiB.
+- Standalone retry `2931519` exited `1:0` at the amended pairing gate.
+  On the compute node, 4 of 12 response digests and 5 of 12 truth
+  digests matched, with zero cases matching both. Allocation TotalCPU
+  was 0.935 s and batch MaxRSS was 62,004 KiB.
+- Total usage was 1.710 CPU s (0.000475 core-hours). Both jobs stopped
+  before sampling and produced zero fit files. No pilot or production
+  array was submitted. No pilot projection or E-19 verdict is available.
