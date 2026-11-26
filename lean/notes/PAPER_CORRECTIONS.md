@@ -46,7 +46,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** add one sentence before the display: "For every Borel B the map y ↦ Π_λ(B | y) is Borel measurable: the unnormalized weight exp{−Σρ_τ(y_i−θ_i)/σ − λ‖Dθ‖₁} is jointly measurable in (y, θ), so its integrals over B and over ℝⁿ are measurable in y by Tonelli, and so is their ratio."
 - **Why it was needed:** a missing measurability condition. Without it the expectation is not defined; formally, a lower integral would be bounded. This is the paper-side counterpart of difference D3 in docs/statements.md.
 - **Lean:** the measurability conjunct of `BQTF.MainConclusion`, proved in `BQTF.main_theorem` via the private `measurable_posterior_apply`, in `lean/BQTF/Main.lean`.
-- **Status:** **open**. Main is merged, but it is not finalized and checked: it still depends on sorried modules. The packet goes out once Main's axiom check shows only the 3 standard axioms.
+- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. Main was finalized and checked at merge 4498143: `main_theorem` and `main_theorem_scale` use only propext, Classical.choice and Quot.sound. Found in the Main review.
 
 ## C-03: the finiteness step in Lemma coord(b) says the c-integral is "free of u"
 
@@ -73,7 +73,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "…satisfy A and B with (L/σ₀, σ₀f̲, σ₀f̄) at the target θ*/σ₀, whose total variation is TV^{(r)}(θ*/σ₀) = V*/σ₀ ≤ V̄/σ₀."
 - **Why it was needed:** a wrong statement in a proof step. As written, the inequality fails for σ₀ > 1 when V* = V̄ > 0. The argument needs the bound for the rescaled target.
 - **Lean:** `BQTF.main_theorem_scale`, in `lean/BQTF/Reduction.lean`, with the data rescaling in `lean/BQTF/Scale/Data.lean`.
-- **Status:** **open**. Found in the Reduction review on 2026-11-25. Reduction is merged but depends on `main_theorem`; the packet goes out when the axiom check is clean.
+- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. Reduction was finalized and checked at merge 4498143 (`main_theorem_scale`: standard axioms only). Found in the Reduction review on 2026-11-25.
 
 ## C-06: the variance step in Lemma conc uses a two-sided change bound that only holds one-sided
 
@@ -107,7 +107,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "…and $\int e^{sx}(\lambda/2)e^{-\lambda|x|}dx=(1-s^2/\lambda^2)^{-1}$ for $|s|<\lambda$ (applicable with $s=2t_j$ since $4\|t\|_\infty^2/\lambda^2\le\frac12$ for $n\ge n_3$, shown below), …"
 - **Why it was needed:** a missing condition in a displayed identity, and a proof-order gap. The bound is unchanged.
 - **Lean:** `BQTF.shells`, in `lean/BQTF/Shells.lean` (Sol-W1). It establishes |2t_j| < λ before using the mgf formula, using `lean/BQTF/Asym/Laplace.lean`.
-- **Status:** **open**. Found in the Shells review on 2026-11-25. The packet goes out when Shells is finalized and checked.
+- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. Shells was finalized and checked at merge 4498143 (`shells`: standard axioms only). The Denominator review confirmed the Lean side: |2t_j| < λ at Shells.lean:183, before the mgf at :188. Found in the Shells review on 2026-11-25.
 
 ## C-09: Lemma sb's eigenvalue bound leaves q = 1 and the trace bound unjustified
 
@@ -132,4 +132,4 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
   - (b) is a proof-order gap. Every use in the integral is already in the band, so the bound is unchanged.
   - No constant changes.
 - **Lean:** `BQTF.quad_shift`, in `lean/BQTF/QuadShift.lean` (Sol-W2). It assumes `hϱ : 0 < ϱ` and `hlam : 0 < λ`. It proves the translation bound in probabilities for all t (QuadShift.lean ≈176), and takes the log cost only for |t| ≤ 1/λ (≈258).
-- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. QuadShift was finalized and checked at merge 1b141e0: `quad_shift` and `prior_mass` use the standard axioms only. Found by the PrekopaLaplace review and confirmed by the QuadShift review (lean/notes/reviews/QuadShift_2026-11-26.md).
+- **Status:** **in paper (922fa52)**; **verified** (2026-11-26, Lean head). Writing applied (a) and (b) verbatim, plus Theory's amendment ("since δ_A ≤ λϱ/2"; "On (0,∞), Λ is …"), which matches QuadShift.lean ≈258. Earlier: **sent** (2026-11-26) to Writing and Theory, CC HQ; QuadShift finalized and checked at merge 1b141e0. Found by the PrekopaLaplace review and confirmed by the QuadShift review (lean/notes/reviews/QuadShift_2026-11-26.md).
