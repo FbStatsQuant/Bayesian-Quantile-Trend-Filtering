@@ -120,6 +120,13 @@ replay_e14 <- function(seed) {
 
 jobs <- if (mode == "admm") data.frame(arm = 3L, seed = 1:5) else
   rbind(expand.grid(seed = 1:5, arm = c(2L, 4L, 5L)), data.frame(seed = 1:3, arm = 14L))
+requested <- Sys.getenv("E18_DIAG_TASKS")
+if (nzchar(requested)) {
+  labels <- with(jobs, sprintf("arm%d_s%03d", arm, seed))
+  only <- match(strsplit(requested, ",", fixed = TRUE)[[1L]], labels)
+  stopifnot(!anyNA(only), !anyDuplicated(only))
+  jobs <- jobs[only, ]
+}
 work <- function(i) {
   arm <- jobs$arm[i]
   seed <- jobs$seed[i]
