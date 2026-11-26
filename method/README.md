@@ -12,7 +12,7 @@ The canonical sampler code. One copy; the frozen copies inside `experiments/*/so
 
 ```sh
 cd method/individual && Rscript Individual_Sampler_PMALA_Augmented.R test      # "all tests passed", about 100 s
-cd method/joint      && Rscript Joint_Sampler_PMALA_Augmented.R test_prox      # needs R package clarabel
+cd method/joint      && Rscript Joint_Sampler_PMALA_Augmented.R test_prox      # needs clarabel, about 70 s including compilation
 cd method/joint      && Rscript Joint_Sampler_PMALA_Augmented.R test           # kernel + exactness tests (longer)
 ```
 
@@ -25,6 +25,20 @@ Since E-03 the settings block of `individual/Individual_Sampler_PMALA_Augmented.
 ## Dependencies
 
 R >= 4.4: `Rcpp`, `RcppArmadillo`, `glmgen`, `Matrix`; joint tests also `clarabel`. A C++17 compiler. On Windows the scripts fall back to a mingw `g++` if `Rcpp::sourceCpp` fails.
+
+Install `clarabel` with `install.packages("clarabel")`. The CRAN source package
+declares Cargo, `rustc` >= 1.70.0, and GNU Make. Version 0.11.3 passed the
+joint optimisation-kernel tests with R 4.6.0 and Rust 1.100.0. [CRAN package requirements](https://CRAN.R-project.org/package=clarabel)
+
+To use the checkout's local R library from the repository root, prepend
+`ops/Rlib` to R's existing user-library search path:
+
+```sh
+mkdir -p ops/Rlib
+r_user_libs="$(Rscript -e 'cat(Sys.getenv("R_LIBS_USER"))')"
+export R_LIBS_USER="$PWD/ops/Rlib:$r_user_libs"
+Rscript -e 'install.packages("clarabel", lib = "ops/Rlib", repos = "https://cloud.r-project.org")'
+```
 
 ## Bitwise tests and compiler flags
 Some tests check exact (bitwise) identities, e.g. joint P1 "free box = unbounded kernel" and the J = 1 draw-for-draw check. They pass with the default flags on Owls. On compilers that contract floating-point expressions into FMA instructions by default (seen with GCC 14 on NOTS), P1 differs at 2e-16 and its bitwise assertion fails. That is a rounding difference, not a correctness one. To reproduce the bitwise tests there, build with FMA contraction off, through a user Makevars:
