@@ -57,15 +57,16 @@ pilot checker applies the E-14 interior projection limit of 150
 core-hours and the combined limit of 330 including the pilot. If the gate fails,
 report the cause and stop. Once it passes, submit the first production
 array immediately and the other as soon as it fits. Run production
-arrays in sequence at the agreed throttle to respect both the shared
-CPU split and the 5,000 submitted-task limit. Report each job ID when
+arrays in sequence at the agreed throttle to respect the shared CPU
+split. Once the 5,000 submitted-task limit has room, the extreme array
+can queue with a dependency on the interior array's completion. Report each job ID when
 accepted. If a submission times out, verify whether Slurm accepted it
 before retrying.
 
 ```bash
 bash "$ops/submit.sh" interior full "$throttle" E17-interior-20261125 "$head" "$slurm"
-# After the interior array has finished and the submission slot is available.
-bash "$ops/submit.sh" extreme full "$throttle" E17-extreme-20261125 "$head" "$slurm"
+# Set INTERIOR_JOB_ID to the accepted interior job ID.
+bash "$ops/submit.sh" extreme full "$throttle" E17-extreme-20261125 "$head" "$slurm" "$INTERIOR_JOB_ID"
 ```
 
 ## Collection
