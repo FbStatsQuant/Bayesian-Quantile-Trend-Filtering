@@ -1,11 +1,14 @@
 e18_collect <- function(run, stage, grid, validate) {
   issue <- character(nrow(grid))
+  failure_seconds <- rep(NA_real_, nrow(grid))
   records <- lapply(seq_len(nrow(grid)), function(i) {
     task <- as.list(grid[i, ])
     stem <- file.path(run, stage, task$id)
     tryCatch({
       if (file.exists(paste0(stem, ".fail.rds"))) {
         fail <- readRDS(paste0(stem, ".fail.rds"))
+        if (identical(fail$task, task) && identical(fail$stage, stage) &&
+            length(fail$seconds) == 1L && is.finite(fail$seconds)) failure_seconds[i] <<- fail$seconds
         stop("Failure record: ", fail$error)
       }
       result <- readRDS(paste0(stem, ".rds"))
@@ -18,11 +21,13 @@ e18_collect <- function(run, stage, grid, validate) {
     })
   })
   names(records) <- grid$id
-  list(records = records, issues = data.frame(grid[nzchar(issue), ], detail = issue[nzchar(issue)]))
+  list(records = records, failure_seconds = failure_seconds,
+    issues = data.frame(grid[nzchar(issue), ], detail = issue[nzchar(issue)]))
 }
 
 e18_sampler_diagnostics <- c("ess_log_lambda", "lambda_ess_e14", "ess_theta_median",
-  "ess_theta_p05", "acc", "n_sigma_guard", "n_ipm_fallback", "n_warm_ipm_unconverged", "seconds")
+  "ess_theta_p05", "acc", "n_sigma_guard", "n_sigma_guard_postburn", "n_ipm_fallback",
+  "n_warm_ipm_unconverged", "seconds")
 e18_stat <- function(x, fields) {
   vapply(fields, function(k) {
     stopifnot(length(x[[k]]) == 1L, is.finite(x[[k]]))

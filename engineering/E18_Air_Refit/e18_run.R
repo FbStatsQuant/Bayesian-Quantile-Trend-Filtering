@@ -42,22 +42,28 @@ run_fit <- function() {
   stopifnot(identical(y_sha, audit$y_sha256[task$seed]),
             identical(truth_sha, audit[[q_col]][task$seed]))
   fit <- if (stage == "sim") e18_fit(code, task, d$y, truth)
-    else e18_admm(d$y, task$tau, 500^seq(0, 1.4, length.out = 15L))
+    else if (stage == "admm-sim") e18_admm(d$y, task$tau, 500^seq(0, 1.4, length.out = 15L))
+    else e18_onizuka(code, stage, task, d$y)
   metrics <- e18_metrics(d$y, fit$est, truth, d$s, task$tau, fit$lo, fit$hi)
   c(list(task = task, stage = stage, y_sha = y_sha, truth_sha = truth_sha, metrics = metrics), fit)
 }
+t0 <- proc.time()[["elapsed"]]
 status <- tryCatch({
   result <- run_fit()
   e18_atomic(result, path)
   message(task$id, " completed in ", round(result$seconds, 3), " s",
     if (!is.null(result$acc)) sprintf(" | acceptance %.4f | sigma guards %d",
       result$acc, result$n_sigma_guard))
+  if (isTRUE(result$lambda_stalled) || isTRUE(result$theta_stalled))
+    message(sprintf("STOP | %s stalled after burn-in | lambda=%s theta=%s",
+      task$id, result$lambda_stalled, result$theta_stalled))
   unlink(failure)
   0L
 }, error = function(err) {
   message(task$id, " failed: ", conditionMessage(err))
   e18_atomic(list(task = task, stage = stage,
-    commit = if (stage %in% c("sim", "real")) e18_pin, error = conditionMessage(err)), failure)
+    commit = if (stage %in% c("sim", "real")) e18_pin, error = conditionMessage(err),
+    seconds = proc.time()[["elapsed"]] - t0), failure)
   1L
 })
 quit(status = status)

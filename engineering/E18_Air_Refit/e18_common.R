@@ -10,11 +10,14 @@ e18_thin <- e18_thin[e18_thin > 10000L]
 e18_archive <- file.path("experiments", "air_simulation", "onizuka_laplace_20261023",
   "attempt_20261023T171713_511660", "results.rds")
 e18_archive_sha <- "4e4dd9fccd4bb83df3905cafb1b4260358069b6b5b9d982aa45ec4412397e9ba"
+e18_onizuka_source <- "experiments/extreme_quantiles/packages/Extreme_Onizuka/source/BQTF-function.R"
+e18_onizuka_sha <- "58e073e2da8297ff6bacfcf598252c2a429cbd9e276252b4522f910185633553"
 
 e18_grid <- function(stage) {
   g <- if (stage == "sim") expand.grid(seed = 1:100, tau = e18_taus, b0 = e18_rates)
     else if (stage == "real") expand.grid(seed = 1:2, tau = e18_taus, b0 = e18_rates)
-    else if (stage == "admm-sim") expand.grid(seed = 1:100, tau = e18_taus)
+    else if (stage %in% c("admm-sim", "onizuka-hs", "onizuka-lap"))
+      expand.grid(seed = 1:100, tau = e18_taus)
     else if (stage == "admm-real") data.frame(seed = 1L, tau = e18_taus)
     else stop("Unknown stage: ", stage)
   g$index <- seq_len(nrow(g)) - 1L
@@ -82,6 +85,11 @@ e18_real_input <- function(run) {
   list(data = readRDS(input), sha = sha)
 }
 
+e18_theta_stalled <- function(draws) {
+  for (j in seq_len(ncol(draws))) if (any(draws[, j] != draws[1L, j])) return(FALSE)
+  TRUE
+}
+
 e18_fit <- function(code, task, y, truth = NULL, save_theta = FALSE) {
   stopifnot(requireNamespace("coda", quietly = TRUE))
   original <- new.env(parent = globalenv())
@@ -123,6 +131,9 @@ e18_fit <- function(code, task, y, truth = NULL, save_theta = FALSE) {
     ess_theta_median = median(ess), ess_theta_p05 = unname(quantile(ess, .05)),
     ess_error_sq = if (!is.null(truth)) as.numeric(coda::effectiveSize(rowSums(sweep(th, 2L, truth)^2))),
     acc = fit$acc_post, n_sigma_guard = fit$n_sigma_guard,
+    n_sigma_guard_postburn = sum(fit$sigma_guard[e18_post]),
+    lambda_stalled = if (save_theta) all(fit$lambda[e18_post] == fit$lambda[e18_post[1L]]),
+    theta_stalled = if (save_theta) e18_theta_stalled(fit$theta),
     n_ipm_fallback = fit$n_ipm_fallback,
     n_warm_ipm_unconverged = sum(fit$warm_ipm_unconverged),
     seconds = proc.time()[["elapsed"]] - t0,
@@ -142,4 +153,26 @@ e18_admm <- function(y, tau, grid) {
   list(est = est, lambda_selected = fit$lambda, seconds = proc.time()[["elapsed"]] - t0,
     detrendr = as.character(utils::packageVersion("detrendr")),
     remote_sha = remote_sha)
+}
+
+e18_onizuka <- function(code, stage, task, y) {
+  path <- file.path(code, e18_onizuka_source)
+  stopifnot(e18_sha(path) == e18_onizuka_sha)
+  env <- new.env(parent = globalenv())
+  env$library <- function(package, ...) {
+    pkg <- as.character(substitute(package))
+    if (pkg == "Bessel" && !requireNamespace(pkg, quietly = TRUE)) return(invisible(NULL))
+    suppressPackageStartupMessages(base::library(pkg, character.only = TRUE))
+  }
+  sys.source(path, envir = env)
+  name <- c("onizuka-hs" = "BQTF.MCMC.HS.multi", "onizuka-lap" = "BQTF.MCMC.Lap.multi")[[stage]]
+  set.seed(task$seed + 1000L)
+  t0 <- proc.time()[["elapsed"]]
+  theta <- env[[name]](X = seq_along(y), Y = y, TForder = 2, pp = task$tau,
+    mc = 8000, sparse = FALSE, sig.init = c(1, 1))
+  stopifnot(identical(dim(theta), c(8000L, length(y))), all(is.finite(theta)))
+  theta <- theta[2001:8000, , drop = FALSE]
+  bands <- apply(theta, 2L, quantile, probs = c(.025, .975), type = 7L)
+  list(est = colMeans(theta), lo = bands[1L, ], hi = bands[2L, ], source_sha = e18_onizuka_sha,
+    seconds = proc.time()[["elapsed"]] - t0)
 }

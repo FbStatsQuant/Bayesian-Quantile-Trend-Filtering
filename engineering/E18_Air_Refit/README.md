@@ -20,9 +20,13 @@
 
 Every Stage 1 rate and level uses the exact archived Table 2 observations
 and baseline. [DATA_MATCH.md](DATA_MATCH.md) documents the regeneration
-check and the benchmark's provenance. Published ADMM at 0.05 uses 99
-replications. Its omitted seed is unavailable in the retained summary.
-The old method results are reported on their documented denominators.
+check and the benchmark's provenance. All three archived benchmarks
+failed HQ's reuse standard. Published ADMM at 0.05 uses 99 replications.
+Its omitted seed is unavailable in the retained summary. Use new fits
+for the comparison and retain the published numbers as historical
+reference. Any paired PMALA–ADMM result uses the common successful
+seeds at its level and rate, with a further restriction to defined
+pairs for CAA. Report both methods' sample sizes.
 
 MSE is the mean squared error against the true quantile. CL is mean check
 loss on the observations. CAA averages sensitivity and specificity for
@@ -30,18 +34,52 @@ true signal `s > 0.5` and predicted signal `y - fit > h`, with
 `h ∈ {0.5, 0.75, 1, 1.2}`. Report CAA over seeds with both classes and
 report the denominator. For the archived data, 91 of 100 seeds qualify.
 
-## Preregistered Stage 1 selection
+## Preregistered Stage 1 selection (HQ-approved, Felipe amendment 11-26)
 
-Choose the rate with the smallest arithmetic mean MSE over all 100 seeds
-separately at each level. Report every pairwise rate contrast as the mean
-of the 100 within-seed MSE differences, with paired SE
-`sd(difference) / sqrt(100)`. Also report the best single rate by first
-averaging each seed's MSE equally over the three levels, then averaging
-over seeds. Use those seed-level averages for the common-rate paired SE.
-Break an exact tie in favor of the larger rate. Retain completed fits
-with diagnostic flags and report those flags. Withhold selection if a
-fit fails or is missing. The Engineering head and Felipe choose the rate
-for Stage 2.
+Compute mean MSE and coverage over successful fits and report their
+counts from the 100 planned seeds per cell. A cell is ineligible if
+more than five fits fail or are missing, any σ-guard event is recorded
+after burn-in, or its median post-burn-in acceptance is outside
+[0.4, 0.6]. List every cell and all its eligibility reasons. The pilot
+still requires zero guards over the entire chain.
+
+At each level, find the eligible rate with minimum mean MSE. Use the
+larger rate as the pairing reference if the minimum is tied. For each
+rate form seed-matched differences against the reference and report
+their mean and paired SE, `sd(difference) / sqrt(100)`. With failed fits,
+form differences on the common successful seeds and report their count
+alongside the SE, using the specified denominator of `sqrt(100)`. The
+admissibility gap uses the difference of the two cell means over their
+respective successful seeds. Admit an eligible rate when its gap is at
+most one paired SE. Always admit the eligible reference. Among the
+admissible rates, choose the one whose mean 95% pointwise coverage is
+closest to 0.95, taking the larger rate on a tie.
+
+Select a triple in level order 0.01, 0.05, 0.10. Its spread
+`max(b0) / min(b0)` must be at most 10, so it spans at most two
+adjacent grid values.
+
+1. Among triples admissible at each level, minimize the arithmetic
+   mean of the three absolute coverage errors `abs(coverage - 0.95)`.
+2. If none qualify, consider triples eligible at each level.
+   Minimize the geometric mean of the three ratios of MSE to the
+   minimum eligible MSE at that level.
+3. If there is no eligible triple within the spread limit, record
+   three NA rates and escalate to HQ.
+
+Both rankings break a tie by smallest spread first, then by larger
+rates in lexicographic level order (0.01, 0.05, 0.10).
+
+The review artifact is the production `per_fit.csv`. It contains one
+row per planned fit, including failure and missing flags. Commit the
+CSV after production and keep the RDS files in the run folder.
+`Rscript --vanilla engineering/E18_Air_Refit/e18_select.R PER_FIT_CSV`
+recreates `selection_trace.csv` (cells), `selection_triples.csv`
+(candidate scores, ranks and tie-breaks) and `selected_b0.csv`
+(final triple with the branch) alongside the input using only that
+CSV. The report table marks the independent per-level coverage
+choice and the selected rate at each level. Run the synthetic test on Owls with
+`~/.config/bvs-hq/owls/owls_run -j 1 Rscript --vanilla engineering/E18_Air_Refit/test_e18_select.R`.
 
 ## Stage 1 pilot and accounting
 
@@ -72,10 +110,27 @@ archived inputs. Sol-B handles NOTS deployments. Worker arguments are
 `STAGE RUN_DIR ZERO_BASED_INDEX`. Successful and failed workers record
 their task keys. Use `sim` with indices 0–1199 for production and run
 `e18_stage1.R RUN_DIR` to write per-fit metrics, all 12 cell summaries,
-the published comparison, an explicit issue list, and the paired
-selection tables. If a new ADMM comparison is needed, `admm-sim` with
-indices 0–299 runs the original driver call using detrendr revision
-`17e3e7c`, third differences and the original 15-point eBIC grid.
+the side-by-side comparison, an explicit issue list, and the selection
+trace. Supply separately collected benchmark results with
+`--admm-sim=DIR --onizuka-hs=DIR --onizuka-lap=DIR`. The table includes
+all four rates and all three benchmark rows at each level. Before refits
+are supplied, a benchmark row records its pending status.
+For a terminal Stage 1 production array with failed tasks, Sol-B can
+use `ops/collect.sh --allow-failures RUN_ID EXPECTED_FITS` to collect
+verified available outputs and terminal Slurm accounting. Missing
+task outputs enter the selector as failed rows.
+
+The `admm-sim` stage with indices 0–299 runs the original driver call
+using detrendr revision `17e3e7c`, third differences and the original
+15-point eBIC grid. For Onizuka, `onizuka-hs` and `onizuka-lap` each
+use indices 0–299, the archived sampler source hash, `TForder = 2`,
+`sig.init = c(1, 1)`, `sparse = FALSE`, 8,000 draws and 2,000 burn-in.
+These need the original MASS, GIGrvg, invgamma and MCMCpack packages.
+Historical timings suggest about 1.0 core-hour for ADMM, 0.44 for HS,
+and 60.8 for Laplace on one core per fit. With the 51.3-core-hour PMALA
+proxy, all refits together would exceed the 80-core-hour cap. Bring
+measured timing and the benchmark budget to HQ before submitting a
+benchmark campaign.
 
 ## Stage 2 preparation
 
@@ -126,15 +181,20 @@ rounding and records any discrepancy. The archived paper provides
 no original processed series or preprocessing code to verify its
 handling of the missing seconds.
 
-`e18_real_report.R RUN_DIR [ADMM_RUN_DIR]` reads both result sets, reports issues and
+`e18_real_report.R RUN_DIR SELECTED_B0_CSV [ADMM_RUN_DIR]` reads both result sets, reports issues and
 produces calibration, threshold, pairwise crossing, and chain health
 CSVs. Include `spod_blocks.rds` and `STAGE2_GO.dcf` when collecting the
-PMALA run. The plot fits are pointwise posterior medians from the two
+PMALA run. The selected PMALA plots and diagnostics use each level's
+rate from `selected_b0.csv`. The plot fits are pointwise posterior medians from the two
 pooled 666-draw chains, transformed back to PID counts. The detrended
 series and its type-7 percentile thresholds are in counts. Report
 strict crossings for each of the three level pairs and the number of
 distinct crossed grid points. Log-λ diagnostics include ESS and
 classic Gelman–Rubin R-hat over the retained thinned chains, early
-and late λ medians, and traces. Report each chain's θ ESS, acceptance,
-guards, and elapsed time. The baseline and detrended figures are
-generated for all four rates and ADMM.
+and late λ medians, and traces. Flag `STOP_rhat` when log-λ R-hat
+exceeds 1.1. A chain with no change in λ or with no change in the
+full θ vector across all retained sweeps is a stall. Flag it in
+the worker log and in chain health. The report saves diagnostics
+and exits with a STOP when either condition holds. Report each
+chain's θ ESS, acceptance, guards, and elapsed time. The baseline
+and detrended figures also cover all four constant-rate views and ADMM.

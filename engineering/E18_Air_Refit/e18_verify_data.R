@@ -68,8 +68,16 @@ stopifnot(all(selected$tau == as.numeric(table[, 1L])),
   all(selected$n_seeds == ifelse(selected$tau == .05 & selected$method == "admm", 99L, 100L)))
 for (j in seq_along(metrics)) {
   col <- paste0("mean_", metrics[j])
-  rounded <- formatC(selected[[col]], format = "f", digits = c(4L, 5L, rep(3L, 4))[j])
+  digits <- c(4L, 5L, rep(3L, 4))[j]
+  rounded <- formatC(selected[[col]], format = "f", digits = digits)
   stopifnot(all(rounded == table[, j + 2L]))
+  lap_means <- vapply(e18_taus, function(tau) {
+    d <- pt[pt$tau == tau, ]
+    stopifnot(identical(sort(d$seed), 1:100))
+    mean(d[[metrics[j]]], na.rm = TRUE)
+  }, 0)
+  stopifnot(all(formatC(lap_means, format = "f", digits = digits) ==
+    table[selected$method == "onizuka_lap", j + 2L]))
 }
 stopifnot(sum(audit$n_signal > 0L) == 91L,
   all(selected$n_CAA_defined[selected$method != "admm"] == 91L))
@@ -80,5 +88,6 @@ write.csv(selected[cols], file.path(dest, "published_stage1.csv"), row.names = F
 print(colSums(audit[c("y_exact", "baseline_exact", "signal_exact")]))
 print(vapply(audit[c("y_max_error", "baseline_max_error", "signal_max_error")], max, 0))
 cat("Both drivers agree bitwise on all 100 seeds. Archived Laplace metrics: 300/300 rows.",
+  "\nLaplace per-replication values independently reconstruct all 18 of its printed means.",
   "\nTable 2: 72/72 printed entries match archived summaries.",
   "\nArchive SHA-256:", e18_archive_sha, "\nShared October generator SHA-256:", common_sha, "\n")

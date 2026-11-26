@@ -3,8 +3,9 @@
 set -euo pipefail
 (( $# == 7 || $# == 8 ))
 mode=$1 run_id=$2 head=$3 slurm=$4 array=$5 mem=$6 limit=$7
-case "$mode" in sim-pilot|sim|sim-admm|real-pilot|real|real-admm) ;; *) exit 2 ;; esac
+case "$mode" in sim-pilot|sim|sim-admm|sim-hs|sim-lap|real-pilot|real|real-admm) ;; *) exit 2 ;; esac
 case "$mode" in sim-pilot) stage=sim ;; real-pilot) stage=real ;; sim-admm) stage=admm-sim ;;
+    sim-hs) stage=onizuka-hs ;; sim-lap) stage=onizuka-lap ;;
     real-admm) stage=admm-real ;; *) stage=$mode ;; esac
 stage=${8:-$stage}
 [[ $stage =~ ^[A-Za-z0-9-]+$ ]]
@@ -24,7 +25,7 @@ count=$(awk -F',' '{
     print count
 }' <<<"$array")
 case "$mode:$count" in
-    sim-pilot:6|sim:1200|real-pilot:3|real:24|sim-admm:*|real-admm:*) ;;
+    sim-pilot:6|sim:1200|sim-hs:300|sim-lap:300|real-pilot:3|real:24|sim-admm:*|real-admm:*) ;;
     *) echo "Unexpected task count for $mode: $count" >&2; exit 2 ;;
 esac
 root=$(git -C "$(dirname "$0")" rev-parse --show-toplevel)

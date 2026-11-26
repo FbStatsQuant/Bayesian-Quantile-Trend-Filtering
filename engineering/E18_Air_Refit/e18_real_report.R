@@ -1,11 +1,13 @@
-# Rscript --vanilla e18_real_report.R RUN_DIR [ADMM_RUN_DIR]
+# Rscript --vanilla e18_real_report.R RUN_DIR SELECTED_B0_CSV [ADMM_RUN_DIR]
 args <- commandArgs(trailingOnly = TRUE)
-if (!length(args) %in% 1:2) stop("Usage: e18_real_report.R RUN_DIR [ADMM_RUN_DIR]")
+if (!length(args) %in% 2:3) stop("Usage: e18_real_report.R RUN_DIR SELECTED_B0_CSV [ADMM_RUN_DIR]")
 run <- normalizePath(args[1L])
-admm_run <- if (length(args) == 2L) normalizePath(args[2L]) else run
+admm_run <- if (length(args) == 3L) normalizePath(args[3L]) else run
 code <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))))
 source(file.path(code, "e18_common.R"))
 source(file.path(code, "e18_report_common.R"))
+source(file.path(code, "e18_select.R"))
+selected <- e18_read_selected(args[2L])
 input <- e18_real_input(run)
 d <- input$data
 n <- length(d$standardized)
@@ -13,6 +15,7 @@ stopifnot(n == 8640L, all(is.finite(d$standardized)), all(is.finite(d$block_mean
 out <- file.path(run, "report")
 dir.create(out, showWarnings = FALSE)
 emit <- function(x, file) write.csv(x, file.path(out, paste0(file, ".csv")), row.names = FALSE)
+emit(selected, "spod_selected_b0")
 
 real_grid <- e18_grid("real")
 admm_grid <- e18_grid("admm-real")
@@ -20,7 +23,10 @@ same_input <- function(x) stopifnot(identical(x$input_sha, input$sha))
 check_real <- function(x) {
   same_input(x)
   e18_validate_fit(x, n)
-  stopifnot(identical(dim(x$theta_thin), c(666L, n)), all(is.finite(x$theta_thin)))
+  stopifnot(identical(dim(x$theta_thin), c(666L, n)), all(is.finite(x$theta_thin)),
+    all(vapply(x[c("lambda_stalled", "theta_stalled")],
+      function(v) is.logical(v) && length(v) == 1L && !is.na(v), FALSE)),
+    length(x$lambda_stalled) == 1L, length(x$theta_stalled) == 1L)
 }
 check_admm <- function(x) {
   same_input(x)
@@ -33,12 +39,15 @@ admm <- e18_collect(admm_run, "admm-real", admm_grid, check_admm)
 emit(got$issues, "spod_pmala_issues")
 emit(admm$issues, "spod_admm_issues")
 ok <- Filter(Negate(is.null), got$records)
+stall_ids <- names(Filter(function(x) x$lambda_stalled || x$theta_stalled, ok))
 if (length(ok)) {
   chain_health <- do.call(rbind, lapply(ok, function(x) {
     z <- x$log_lambda
     data.frame(as.data.frame(x$task), as.list(e18_stat(x, e18_sampler_diagnostics)),
       first_half_lambda_median = exp(median(z[seq_len(333L)])),
       second_half_lambda_median = exp(median(z[334:666])),
+      lambda_stalled = x$lambda_stalled, theta_stalled = x$theta_stalled,
+      STOP_stall = x$lambda_stalled || x$theta_stalled,
       gate_pass = x$acc >= .4 & x$acc <= .6 & x$n_sigma_guard == 0L)
   }))
   emit(chain_health, "spod_chain_health")
@@ -88,6 +97,7 @@ record_cell <- function(chains, tau, b0) {
     log_lambda_ess_combined = as.numeric(coda::effectiveSize(traces)),
     lambda_median = exp(median(unlist(lapply(chains, `[[`, "log_lambda")))),
     log_lambda_rhat = diagnostic$rhat, rhat_detail = diagnostic$detail,
+    STOP_rhat = is.finite(diagnostic$rhat) && diagnostic$rhat > 1.1,
     theta_ess_median_chain_1 = field("ess_theta_median")[1L],
     theta_ess_median_chain_2 = field("ess_theta_median")[2L],
     acceptance_chain_1 = field("acc")[1L], acceptance_chain_2 = field("acc")[2L],
@@ -107,9 +117,20 @@ cell_diag <- do.call(rbind, unlist(lapply(pmala, function(cells)
 if (!is.null(cell_diag)) emit(cell_diag, "spod_cell_health")
 
 fits <- lapply(pmala, function(cells) lapply(cells, `[[`, "fit"))
+b0_by_view <- lapply(e18_rates, rep, times = length(e18_taus))
+names(b0_by_view) <- names(fits)
+fits$pmala_selected <- lapply(seq_along(e18_taus), function(i) {
+  if (!is.na(selected$b0[i])) pmala[[match(selected$b0[i], e18_rates)]][[i]]$fit
+})
+b0_by_view$pmala_selected <- selected$b0
 fits$admm <- lapply(admm$records, function(x)
   if (!is.null(x)) d$center + d$scale * x$est)
-labels <- c(sprintf("tau = %.2f", e18_taus))
+b0_by_view$admm <- rep(NA_real_, length(e18_taus))
+labels <- function(name) {
+  b0 <- b0_by_view[[name]]
+  ifelse(is.na(b0), sprintf("tau = %.2f", e18_taus),
+    sprintf("tau = %.2f, b0 = %.0e", e18_taus, b0))
+}
 colors <- c("#0072B2", "#009E73", "#D55E00")
 p <- c(.90, .95, .99)
 hours <- d$offsets / 3600
@@ -118,7 +139,7 @@ assess <- function(name, series) {
   stats <- do.call(rbind, lapply(which(available), function(i) {
     residual <- d$block_mean - series[[i]]
     cuts <- quantile(residual, p, names = FALSE)
-    data.frame(method = name, tau = e18_taus[i],
+    data.frame(method = name, tau = e18_taus[i], b0 = b0_by_view[[name]][i],
       fraction_below = mean(residual < 0), threshold_90 = cuts[1L],
       threshold_95 = cuts[2L], threshold_99 = cuts[3L],
       wall_seconds_admm = if (name == "admm") admm$records[[i]]$seconds else NA_real_)
@@ -130,6 +151,7 @@ assess <- function(name, series) {
   crossing <- do.call(rbind, lapply(seq_along(pairs), function(i) {
     pair <- pairs[[i]]
     data.frame(method = name, tau_lower = e18_taus[pair[1L]], tau_upper = e18_taus[pair[2L]],
+      b0_lower = b0_by_view[[name]][pair[1L]], b0_upper = b0_by_view[[name]][pair[2L]],
       crossed_points = sum(cross_vectors[[i]]), n_points = n)
   }))
   crossing$any_crossing_points <- if (all(available)) sum(Reduce(`|`, cross_vectors)) else NA_integer_
@@ -150,7 +172,7 @@ plot_fits <- function(name, series) {
     xlab = "Hour on June 15", ylab = "PID (counts)")
   axis(1L, at = seq(0, 24, by = 4))
   for (i in seq_along(series)) lines(hours, series[[i]], col = colors[i], lwd = 2)
-  legend("topright", c("Observed", labels), col = c("grey62", colors), lty = 1, bty = "n")
+  legend("topright", c("Observed", labels(name)), col = c("grey62", colors), lty = 1, bty = "n")
 }
 plot_detrended <- function(name, series) {
   file <- file.path(out, paste0("spod_detrended_", name, ".png"))
@@ -160,7 +182,7 @@ plot_detrended <- function(name, series) {
   for (i in seq_along(series)) {
     residual <- d$block_mean - series[[i]]
     cuts <- quantile(residual, p, names = FALSE)
-    plot(hours, residual, type = "l", col = "grey45", main = labels[i],
+    plot(hours, residual, type = "l", col = "grey45", main = labels(name)[i],
       xlim = c(0, 24), xaxt = "n", xlab = "Hour on June 15", ylab = "Detrended PID (counts)")
     axis(1L, at = seq(0, 24, by = 4))
     abline(h = cuts, col = colors, lty = 2:4, lwd = 2)
@@ -177,6 +199,9 @@ for (name in names(fits)) {
     fit_tau01 = series[[1L]], fit_tau05 = series[[2L]], fit_tau10 = series[[3L]]),
     paste0("spod_curves_", name))
 }
-if (nrow(got$issues) || nrow(admm$issues)) stop("Incomplete real-data fit set. See issue CSVs.")
-if (!all(benchmark$match_to_1_decimal))
+if (any(!benchmark$match_to_1_decimal, na.rm = TRUE))
   warning("ADMM selected different lambda values than the paper. See spod_admm_lambda_check.csv.")
+if (length(stall_ids) || (!is.null(cell_diag) && any(cell_diag$STOP_rhat)))
+  stop("STOP: a chain stalled or log-lambda R-hat exceeded 1.1. See the chain and cell health CSVs.")
+if (nrow(got$issues) || nrow(admm$issues)) stop("Incomplete real-data fit set. See issue CSVs.")
+if (selected$branch[1L] == "iii") stop("STOP: Stage 1 did not select a rate triple. Escalate to HQ.")

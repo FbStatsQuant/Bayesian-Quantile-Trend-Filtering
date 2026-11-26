@@ -35,7 +35,7 @@ The check confirms that true signal labels are unchanged by
 regeneration, and independently reproduces MSE, CL and the four CAA
 values for all 300 archived Laplace fits (tolerance 1e-12).
 
-## What this establishes for the benchmarks
+## HQ benchmark reuse audit
 
 The October 23 Laplace archive records the SHA-256
 `b12396de72540d518cf92ed279ae765236774bad349ea1d3086d76efb1ad21ac`
@@ -44,14 +44,29 @@ for `Driver/common_air.R`. The historical
 records the identical generator hash from the October 8 campaign, the
 cross-method data equality check in that campaign's original processing
 step, and the direct equality of `y`, `theta` and `s` to the October
-8 archive at seeds 1–3. The October 8 archive itself and the ADMM
-per-seed mask are unavailable in this checkout. The preserved October
-8 and October 23 summaries reproduce **72 of 72** printed values in
+8 archive at seeds 1–3. The October 8 per-replication archive and the
+ADMM per-seed mask are unavailable in this checkout. The preserved
+October 8 and October 23 summaries reproduce **72 of 72** printed values in
 [Table 2](../../paper/sections/air_simulation.tex), at 4 decimals for
-MSE, 5 for CL, and 3 for CAA. These records support using the published
-ADMM and Onizuka values for the comparison. The full-precision source
-values and SEs are in [published_stage1.csv](published_stage1.csv).
-ADMM at 0.05 retains its published denominator of 99.
+MSE, 5 for CL, and 3 for CAA. The audit also reaggregates the archived
+Laplace per-replication metrics and reproduces **18 of 18** of its
+published means at that precision.
+
+| Method | Exact regeneration on Owls | Reaggregation from original per-replication metrics | HQ reuse verdict |
+|---|---|---|---|
+| ADMM | Fails the exact comparison on the common input | Original archive unavailable. The aggregate summary matches 18/18 values. τ = 0.05 has 99 replications, with 90 defined CAA values and an unknown omitted seed. | Refit with `admm-sim`. |
+| Onizuka HS | Fails the exact comparison on the common input | Original archive unavailable. The aggregate summary matches 18/18 values. | Refit with `onizuka-hs`. |
+| Onizuka Laplace | Fails the exact comparison on its archived input | 300/300 original rows verified, 18/18 reaggregated means match at paper rounding. | Refit with `onizuka-lap`. |
+
+The reference values and SEs are in
+[published_stage1.csv](published_stage1.csv) and are kept separate
+from new benchmark results. All E-18 workers read the same sealed
+Table 2 input archive and verify the observation and truth hashes
+before fitting. The archived Laplace and HS sampler source is
+[BQTF-function.R](../../experiments/extreme_quantiles/packages/Extreme_Onizuka/source/BQTF-function.R).
+Its SHA-256 matches both historical air packages according to the
+build report. The prepared refit stages require timing and budget
+approval from HQ.
 
 ## Reproduce
 

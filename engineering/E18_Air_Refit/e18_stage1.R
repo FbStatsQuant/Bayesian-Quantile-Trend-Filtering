@@ -1,11 +1,21 @@
-# Rscript --vanilla e18_stage1.R RUN_DIR [--pilot]
+# Rscript --vanilla e18_stage1.R RUN_DIR [--pilot | --admm-sim=DIR --onizuka-hs=DIR --onizuka-lap=DIR]
 args <- commandArgs(trailingOnly = TRUE)
-if (!(length(args) == 1L || (length(args) == 2L && args[2L] == "--pilot")))
-  stop("Usage: e18_stage1.R RUN_DIR [--pilot]")
+if (!length(args)) stop("Usage: e18_stage1.R RUN_DIR [--pilot | --METHOD=REFIT_DIR ...]")
 run <- normalizePath(args[1L])
 folder <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))))
 source(file.path(folder, "e18_common.R"))
 source(file.path(folder, "e18_report_common.R"))
+source(file.path(folder, "e18_select.R"))
+benchmark_stages <- c("admm-sim", "onizuka-hs", "onizuka-lap")
+benchmark_methods <- c("ADMM", "Onizuka (HS)", "Onizuka (Laplace)")
+pilot <- identical(args[-1L], "--pilot")
+roots <- setNames(rep(run, length(benchmark_stages)), benchmark_stages)
+if (!pilot && length(args) > 1L) {
+  flags <- args[-1L]
+  stages <- sub("^--([^=]+)=.*$", "\\1", flags)
+  stopifnot(all(stages %in% benchmark_stages), !anyDuplicated(stages))
+  roots[stages] <- vapply(sub("^[^=]+=", "", flags), normalizePath, "", mustWork = TRUE)
+}
 out <- file.path(run, "report")
 dir.create(out, showWarnings = FALSE)
 emit <- function(x, file) write.csv(x, file.path(out, paste0(file, ".csv")), row.names = FALSE)
@@ -20,115 +30,122 @@ check_data <- function(x) {
     all(is.finite(x$metrics[c("MSE", "CL")])),
     all(is.finite(x$metrics[paste0("CAA_", e18_h)]) == (audit$n_signal[x$task$seed] > 0L)))
 }
-pilot <- length(args) == 2L
 grid <- e18_grid("sim")
 if (pilot) grid <- grid[grid$index %in% e18_pilot_indices, ]
 got <- e18_collect(run, "sim", grid, function(x) {
   check_data(x)
   e18_validate_fit(x, 500L, fields)
-  stopifnot(is.finite(x$metrics[["coverage"]]), x$metrics[["coverage"]] %in% (0:500 / 500))
+  stopifnot(x$metrics[["coverage"]] %in% (0:500 / 500),
+    x$n_sigma_guard_postburn >= 0, x$n_sigma_guard_postburn <= x$n_sigma_guard,
+    x$n_sigma_guard <= 30000L)
 })
 emit(got$issues, if (pilot) "pilot_issues" else "issues")
-records <- Filter(Negate(is.null), got$records)
-per_fit <- do.call(rbind, lapply(records, function(x) {
-  as.data.frame(c(x$task, as.list(x$metrics), as.list(e18_stat(x, fields))),
-    check.names = FALSE)
+metric_cols <- c("mse", metrics[-1L], "coverage")
+fit_cols <- c("lambda_ess", "lambda_ess_e14", "theta_ess_median", "theta_ess_p05",
+  "acc_post", "n_sigma_guard", "n_sigma_guard_postburn", "n_ipm_fallback",
+  "n_warm_ipm_unconverged", "seconds", "theta_error_sq_ess")
+per_fit <- do.call(rbind, lapply(seq_len(nrow(grid)), function(i) {
+  x <- got$records[[i]]
+  result <- rep(NA_real_, length(metric_cols) + length(fit_cols))
+  if (is.null(x)) result[match("seconds", c(metric_cols, fit_cols))] <- got$failure_seconds[i]
+  else result <- c(x$metrics, e18_stat(x, fields))
+  row <- grid[i, c("tau", "b0", "seed")]
+  row[c(metric_cols, fit_cols)] <- as.list(result)
+  row$failed <- is.null(x)
+  row$commit <- e18_pin
+  row
 }))
-aggregation <- function(x) {
-  setNames(as.list(c(mean(x), sd(x) / sqrt(length(x)))), c("mean", "se"))
-}
 if (pilot) {
-  if (length(records)) {
-    per_fit$gate_pass <- with(per_fit, acc >= .4 & acc <= .6 & n_sigma_guard == 0L)
-    emit(per_fit, "pilot_metrics")
-    print(per_fit[c("index", "tau", "b0", "acc", "n_sigma_guard", "seconds", "gate_pass")])
-  }
-  stopifnot(nrow(got$issues) == 0L, all(per_fit$gate_pass))
+  per_fit$gate_pass <- with(per_fit, !failed & acc_post >= .4 & acc_post <= .6 & n_sigma_guard == 0L)
+  emit(per_fit, "pilot_metrics")
+  print(per_fit[c("tau", "b0", "acc_post", "n_sigma_guard", "seconds", "gate_pass")])
+  stopifnot(all(per_fit$gate_pass))
   quit(status = 0L)
 }
-if (length(records)) emit(per_fit, "per_fit")
-summ <- function(cell, tau, b0, requested) {
-  row <- data.frame(tau = tau, b0 = b0, n_requested = requested,
-    n_complete = nrow(cell), n_failed_or_missing = requested - nrow(cell))
-  if (!nrow(cell)) return(row)
-  for (k in intersect(c(metrics, "coverage"), names(cell))) {
-    val <- cell[[k]]
-    val <- val[is.finite(val)]
-    for (what in names(aggregation(val))) row[[paste0(what, "_", k)]] <- aggregation(val)[[what]]
-  }
-  row$n_CAA_defined <- sum(!is.na(cell[["CAA_0.5"]]))
-  for (k in intersect(fields, names(cell))) {
-    row[[paste0("median_", k)]] <- median(cell[[k]])
-    row[[paste0("min_", k)]] <- min(cell[[k]])
-  }
-  for (k in intersect(c("n_sigma_guard", "n_ipm_fallback", "n_warm_ipm_unconverged"), names(cell)))
-    row[[k]] <- sum(cell[[k]])
-  if ("acc" %in% names(cell)) {
-    row$max_acc <- max(cell$acc)
-    row$n_acc_outside_gate <- sum(cell$acc < .4 | cell$acc > .6)
-  }
+emit(per_fit, "per_fit")
+selection <- e18_select(per_fit)
+e18_write_selection(selection, out)
+trace <- selection$trace
+
+mean_finite <- function(x) if (any(is.finite(x))) mean(x, na.rm = TRUE) else NA_real_
+median_finite <- function(x) if (any(is.finite(x))) median(x, na.rm = TRUE) else NA_real_
+summarize <- function(d, method, tau, b0, n, status, eligible = NA, chosen = NA, selected = NA) {
+  row <- data.frame(tau = tau, method = method, b0 = b0, n = n,
+    n_CAA_defined = if (is.na(n)) NA_integer_ else sum(is.finite(d[["CAA_0.5"]])),
+    n_failed_or_missing = 100L - n, eligible = eligible,
+    chosen_at_tau = chosen, selected_for_real = selected, status = status)
+  for (k in metric_cols) row[[k]] <- mean_finite(d[[k]])
+  for (k in c("lambda_ess", "theta_ess_median", "theta_ess_p05", "acc_post"))
+    row[[k]] <- median_finite(d[[k]])
   row
 }
-# An empty cell still appears with all counts and blank estimates.
-bind_rows <- function(rows) {
-  cols <- unique(unlist(lapply(rows, names)))
-  do.call(rbind, lapply(rows, function(d) {
-    d[setdiff(cols, names(d))] <- NA_real_
-    d[cols]
-  }))
-}
-cells <- unique(grid[c("tau", "b0")])
-by_cell <- bind_rows(lapply(seq_len(nrow(cells)), function(i) {
-  tau <- cells$tau[i]
-  b0 <- cells$b0[i]
-  cell <- if (is.null(per_fit)) data.frame() else per_fit[per_fit$tau == tau & per_fit$b0 == b0, ]
-  summ(cell, tau, b0, 100L)
+by_cell <- do.call(rbind, lapply(seq_len(nrow(trace)), function(i) {
+  t <- trace[i, ]
+  d <- per_fit[per_fit$tau == t$tau & per_fit$b0 == t$b0 & !per_fit$failed, ]
+  row <- summarize(d, "Bayesian-PMALA", t$tau, t$b0, t$n, t$reason, t$eligible,
+    t$chosen_at_tau, t$selected_for_real)
+  for (k in c("n_sigma_guard", "n_sigma_guard_postburn", "n_ipm_fallback", "n_warm_ipm_unconverged"))
+    row[[k]] <- sum(d[[k]])
+  row$median_theta_error_sq_ess <- median_finite(d$theta_error_sq_ess)
+  row$median_lambda_ess_e14 <- median_finite(d$lambda_ess_e14)
+  row$min_acc <- if (nrow(d)) min(d$acc_post) else NA_real_
+  row$max_acc <- if (nrow(d)) max(d$acc_post) else NA_real_
+  row
 }))
 emit(by_cell, "pmala_cells")
-emit(read.csv(file.path(folder, "published_stage1.csv")), "published_table2")
-if (dir.exists(file.path(run, "admm-sim"))) {
-  admm <- e18_collect(run, "admm-sim", e18_grid("admm-sim"), check_data)
-  emit(admm$issues, "admm_issues")
-  ok <- Filter(Negate(is.null), admm$records)
-  per_admm <- do.call(rbind, lapply(ok, function(x) {
-    as.data.frame(c(x$task, as.list(x$metrics[metrics]),
-      list(lambda = x$lambda_selected, seconds = x$seconds, detrendr_sha = x$remote_sha)),
-      check.names = FALSE)
-  }))
-  if (length(ok)) emit(per_admm, "admm_per_fit")
-  emit(bind_rows(lapply(e18_taus, function(tau) {
-    cell <- if (is.null(per_admm)) data.frame() else per_admm[per_admm$tau == tau, ]
-    summ(cell, tau, NA_real_, 100L)
-  })), "admm_cells")
-}
-if (nrow(got$issues)) {
-  unlink(file.path(out, c("selected_b0.csv", "paired_differences.csv")))
-  stop(nrow(got$issues), " missing or failed fits. Selection withheld.")
-}
 
-# One row per seed, matched across rates and levels.
-mse_at <- function(tau) vapply(e18_rates, function(b0) {
-  x <- per_fit[per_fit$tau == tau & per_fit$b0 == b0, ]
-  stopifnot(nrow(x) == 100L, identical(sort(x$seed), 1:100))
-  x$MSE[match(1:100, x$seed)]
-}, numeric(100L))
-levels <- lapply(e18_taus, mse_at)
-levels[[4L]] <- Reduce("+", levels) / length(e18_taus)
-comparisons <- lapply(seq_along(levels), function(k) {
-  m <- levels[[k]]
-  tau <- c(e18_taus, NA_real_)[k]
-  means <- colMeans(m)
-  best <- which.min(means)
-  pairs <- combn(seq_along(e18_rates), 2L)
-  list(selection = data.frame(tau = tau, b0 = e18_rates[best], mean_MSE = means[best]),
-       pairs = do.call(rbind, lapply(seq_len(ncol(pairs)), function(j) {
-         a <- pairs[1L, j]
-         b <- pairs[2L, j]
-         d <- m[, a] - m[, b]
-         data.frame(tau = tau, b0_a = e18_rates[a], b0_b = e18_rates[b],
-           mean_diff_a_minus_b = mean(d), se = sd(d) / sqrt(length(d)), n_pairs = length(d),
-           includes_selected = best %in% c(a, b))
-       })))
+# The old aggregate values are retained for historical reference. Benchmark
+# rows used for the refit comparison come only from verified E-18 outputs.
+emit(read.csv(file.path(folder, "published_stage1.csv")), "published_table2_reference")
+benchmarks <- lapply(seq_along(benchmark_stages), function(i) {
+  stage <- benchmark_stages[i]
+  method <- benchmark_methods[i]
+  root <- roots[[stage]]
+  available <- dir.exists(file.path(root, stage))
+  results <- if (available) e18_collect(root, stage, e18_grid(stage), function(x) {
+    check_data(x)
+    stopifnot(length(x$est) == 500L, all(is.finite(x$est)))
+    if (stage == "admm-sim") stopifnot(startsWith(x$remote_sha, "17e3e7c"),
+      x$lambda_selected %in% 500^seq(0, 1.4, length.out = 15L))
+    else stopifnot(identical(x$source_sha, e18_onizuka_sha), x$metrics[["coverage"]] %in% (0:500 / 500))
+  })
+  ok <- Filter(Negate(is.null), results$records)
+  fits <- do.call(rbind, lapply(ok, function(x) {
+    row <- data.frame(tau = x$task$tau, seed = x$task$seed, seconds = x$seconds)
+    row[metric_cols] <- as.list(x$metrics)
+    row
+  }))
+  if (available) emit(results$issues, paste0(stage, "_issues"))
+  if (length(ok)) emit(fits, paste0(stage, "_per_fit"))
+  rows <- do.call(rbind, lapply(e18_taus, function(tau) {
+    d <- if (is.null(fits)) data.frame() else fits[fits$tau == tau, ]
+    n <- if (available) nrow(d) else NA_integer_
+    status <- if (!available) "refit pending; archive did not pass reuse audit"
+      else if (n < 100L) "refit incomplete; see issue file" else "complete refit"
+    summarize(d, method, tau, NA_real_, n, status)
+  }))
+  list(rows = rows, fits = fits)
 })
-emit(do.call(rbind, lapply(comparisons, `[[`, "selection")), "selected_b0")
-emit(do.call(rbind, lapply(comparisons, `[[`, "pairs")), "paired_differences")
+columns <- names(benchmarks[[1L]]$rows)
+table <- do.call(rbind, c(list(by_cell[columns]), lapply(benchmarks, `[[`, "rows")))
+emit(table[order(table$tau, match(table$method, c("Bayesian-PMALA", benchmark_methods)), -table$b0), ],
+  "report_table")
+
+if (!is.null(benchmarks[[1L]]$fits)) {
+  # Paired comparisons to ADMM use the intersection of successful seeds.
+  pairs <- merge(per_fit[!per_fit$failed, c("tau", "seed", "b0", metrics[-1L], "mse")],
+    benchmarks[[1L]]$fits, by = c("tau", "seed"), suffixes = c("_pmala", "_admm"))
+  joined <- do.call(rbind, lapply(seq_len(nrow(trace)), function(i) {
+    t <- trace[i, ]
+    d <- pairs[pairs$tau == t$tau & pairs$b0 == t$b0, ]
+    do.call(rbind, lapply(metric_cols[metric_cols != "coverage"], function(k) {
+      delta <- d[[paste0(k, "_pmala")]] - d[[paste0(k, "_admm")]]
+      delta <- delta[is.finite(delta)]
+      m <- length(delta)
+      data.frame(tau = t$tau, b0 = t$b0, metric = k, n_pairs = m,
+        mean_pmala_minus_admm = mean_finite(delta), paired_se = if (m > 1L) sd(delta) / sqrt(m) else NA_real_)
+    }))
+  }))
+  emit(joined, "paired_pmala_admm")
+}
+if (selection$selected$branch[1L] == "iii") quit(status = 1L)
