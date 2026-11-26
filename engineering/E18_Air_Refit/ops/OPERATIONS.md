@@ -1,0 +1,81 @@
+# E-18 NOTS operations
+
+The Engineering head will relay the bundle and its runner contract.
+Prepare locally until then. Use `queue.sh` after NOTS access is
+authorized and before submitting the first job. Compare the shared
+commons occupancy with the SMC agreement and report a change to the
+Engineering head before submission. The queue report labels requested
+CPUs. Slurm's billing TRES can differ. Production arrays use at most
+`%300`, one active E-18 array at a time, on commons. All SSH uses the
+E-17 locked wrapper with one connection, 15-minute timeout backoff,
+and no SSH from 18:55 to 19:45 CT.
+
+Verify the bundle on both hosts, including its SHA-256 and matching
+HEADs. The bundled snapshot script must support writing into an
+empty snapshot directory. Work and temporary output live under
+`$HOME/BQTF/tmp/e18-results/` and `$HOME/BQTF/tmp/e18-code-<HEAD>/`.
+Keep all NOTS outputs outside the directory the PC puller scans.
+The staging wrapper derives `e18_private.slurm` from the verified
+Slurm script with the private run path. Submission passes the worker
+stage and run directory as its two arguments.
+
+```bash
+ops=engineering/E18_Air_Refit/ops
+SLURM_PATH=engineering/E18_Air_Refit/e18_private.slurm
+bash "$ops/stage.sh" "$BUNDLE" "$BUNDLE_SHA256" "$SNAPSHOT_SCRIPT"
+bash "$ops/queue.sh"
+bash "$ops/submit.sh" "$MODE" "$RUN_ID" "$HEAD" "$SLURM_PATH" "$ARRAY" "$MEM" "$TIME"
+bash "$ops/accounting.sh" "$JOB_ID" > "$ACCOUNTING"
+```
+
+Report every accepted job ID immediately. After a submission timeout,
+respect backoff and check for an accepted job before retrying. For an
+authorized cancellation, pass only the explicit Slurm ID to `scancel`.
+
+## Stage 1
+
+Use indices `0,100,200,900,1000,1100`, one per \(\tau\) at each
+of 0.001 and 0.000001, with seed 1.
+Check all six complete with post-burn-in acceptance 0.4–0.6 and zero
+σ-guard events with `Rscript --vanilla "$ops/sim_pilot_gate.R" "$PILOT_DIR"`.
+Run `python3 "$ops/pilot_resources.py" sim "$ACCOUNTING"`
+offline to project Slurm TotalCPU and size the production memory from
+MaxRSS. The projection weights the six extreme-rate pilot cells equally.
+It includes the pilot and leaves a separately reported allowance for
+ADMM. The cap is 80 core-hours. Use the bundled starting memory
+allocation for the pilot and measure MaxRSS before setting production
+memory.
+Report the gate and projection for HQ review. Wait for the Engineering
+head's explicit stage-1 production GO before submitting the 1,200
+fits or any necessary ADMM job.
+
+## Stage 2
+
+Use authorized, hash-verified real-data input and one pilot run per
+\(\tau\) with about 45 minutes of computation each.
+The workers must emit completed-sweep counts or equivalent timing so the
+full chain cost can be extrapolated. Record warm and regular sweep times
+separately if the pilot stops before all planned sweeps. Read MaxRSS
+with `python3 "$ops/pilot_resources.py" real "$ACCOUNTING"`, and account
+for extra retained posterior draws when the pilot used a shorter chain.
+For sizing context, a dense matrix of 20,000 by 8,640 doubles alone
+uses 1.29 GiB. If all pilots use 45 CPU minutes, 37.75 core-hours remain
+for 24 production fits and the detrendr rerun, or 94.375 minutes per
+fit before detrendr. Report the measured projection and wait for the
+Engineering head's explicit stage-2 production GO.
+
+## Collection
+
+After accounting is terminal, run the bundled output checker. Report
+failed tasks, including their retained error messages. Once the expected
+outputs are complete, copy the result folder and any named summaries
+with a SHA-256 manifest verified on both sides.
+
+```bash
+bash "$ops/collect.sh" "$RUN_ID" "$EXPECTED_RDS_COUNT" "$SUMMARY_FILE"
+```
+
+The summary-file argument is optional. For a worker with another output
+format, use `-` for the expected RDS count and verify the artifacts with
+its checker. The Owls destination is `runs/<RUN_ID>/`. NOTS does not use
+the automatic PC pickup.
