@@ -16,6 +16,7 @@ mkdir -p "$TMPDIR" "$R_USER_CACHE_DIR"
 cd "$run/code"
 module purge >/dev/null 2>&1
 module load GCC/14.3.0 R/4.5.2
+case "$stage" in admm-sim|admm-real) module load GLPK/5.0 ;; esac
 export R_LIBS_USER=/home/fb31/R/library
 export OMP_NUM_THREADS=1 OMP_THREAD_LIMIT=1 OPENBLAS_NUM_THREADS=1 GOTO_NUM_THREADS=1
 export FLEXIBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 BLIS_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1
