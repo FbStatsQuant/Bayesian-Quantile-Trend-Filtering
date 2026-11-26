@@ -55,7 +55,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "…so the c-integral is at most ∫exp{−a‖c − Nᵀ(y−Su)‖₂}dc = ∫exp{−a‖c‖₂}dc < ∞, with a = min{τ,1−τ}, a bound that does not depend on u; integrating it against the probability measure Q_λ gives N(ℝⁿ) < ∞. Positivity of the integrand gives N(ℝⁿ) > 0."
 - **Why it was needed:** a wrong proof step, in its wording. The c-integral itself depends on u (Sol reviewer's example: n = 2, r = 1, y = θ* = 0, τ = 1/2, N = (1,1)ᵀ/√2, S = (0,1)ᵀ gives √2(|u|+2)e^{−|u|/2}). Only its upper bound is u-free, and that is what the argument uses.
 - **Lean:** `BQTF.posterior_eq_ratio` (the clause 0 < Nmass univ < ∞), in `lean/BQTF/Coord.lean`.
-- **Status:** **in paper (3f5dff1)**; Theory CONFIRMED (wording only); independent fidelity check running. Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. Coord finalized and checked at merge 5913b27 (`posterior_eq_ratio`: standard axioms only). Found in the Coord review.
+- **Status:** **in paper (3f5dff1)**; **verified** (2026-11-26, lean/notes/reviews/Fidelity_C03_C07_2026-11-25.md). Theory CONFIRMED (wording only). Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. Coord finalized and checked at merge 5913b27 (`posterior_eq_ratio`: standard axioms only). Found in the Coord review.
 
 ## C-04: Lemma interp uses Lemma coord at window size w = r, where Lemma coord assumes n > r
 
@@ -63,8 +63,8 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Current paper text:** "On a window W ∋ i₀ of w ≥ r consecutive indices, Lemma coord applied to δ_W gives δ_W = p + S_w u_W …". But Lemma `pf:lem:coord` begins "Let n > r", and the choice w = ⌈n x*⌉ can equal r.
 - **Correct version:** add "(if w = r, δ_W is itself the evaluation of a polynomial of degree ≤ r−1, by interpolation at r points, so take p = δ_W and ϱ_w = 0)", or require w > r and adjust the case split.
 - **Why it was needed:** a proof gap at a boundary case. The bound survives unchanged.
-- **Lean:** `BQTF.interp`, in `lean/BQTF/Interp.lean` (Neon-A, not proved yet). The Lean proof must handle w = r.
-- **Status:** **open, confirmed by Lean.** It was found by the Coord reviewer while reading the paper. Neon-A's Interp proof (9627577) confirmed it on 2026-11-25. `window_poly_approx` handles w = r separately: there, `polySpace r r = ⊤` because the dimensions match, so δ_W is itself a polynomial and the error is 0. The packet goes out when Interp is finalized and checked.
+- **Lean:** `BQTF.interp`, in `lean/BQTF/Interp.lean` (Neon-A). It handles w = r separately.
+- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. Interp was finalized and checked at merge 058c2ab (`interp`: standard axioms only; SmoothInterp review confirmed C-04). Earlier: open, confirmed by Lean. It was found by the Coord reviewer while reading the paper. Neon-A's Interp proof (9627577) confirmed it on 2026-11-25. `window_poly_approx` handles w = r separately: there, `polySpace r r = ⊤` because the dimensions match, so δ_W is itself a polynomial and the error is 0.
 
 ## C-05: in the reduction to σ = 1, the TV bound refers to the original target
 
@@ -82,7 +82,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** with δ̂ = δ̂(y) the maximizer at the original data, only the positive part satisfies (G_K(y) − G_K(y⁽ⁱ⁾))₊ ≤ |δ̂_i(y)|; the negative part would need the maximizer at y⁽ⁱ⁾. Use the one-sided Efron–Stein inequality Var f(Y) ≤ Σ_i E[(f(Y) − f(Y⁽ⁱ⁾))₊²] (Boucheron–Lugosi–Massart, Thm 3.1 and its corollary). It gives Var G_K ≤ E Σ_i δ̂_i(Y)² ≤ sup_{δ∈K} ‖δ‖₂². The stated bound is unchanged.
 - **Why it was needed:** a wrong proof step. The two-sided change bound is not justified as written.
 - **Lean:** `BQTF.concentration`, in `lean/BQTF/Concentration.lean` (Neon-B), using `BQTF.Prob.efronStein_oneSided` in `lean/BQTF/Prob/EfronStein.lean` (Opus-W1).
-- **Status:** **in paper (58c9a02)**, applied early under the early-fix rule (Theory CONFIRMED; EfronStein merged at aaaedb4; packet passed to Neon-B). The fidelity check against 58c9a02 runs when Concentration is finalized. Found by Sol-W1 (Shells work, `notes/logs/solW1_questions.md`) on 2026-11-25 and accepted by the head.
+- **Status:** **in paper (58c9a02)**, applied early under the early-fix rule (Theory CONFIRMED; EfronStein merged at aaaedb4; packet passed to Neon-B). **verified** (2026-11-26): Concentration was finalized at merge 058c2ab, and its Sol review (lean/notes/reviews/Concentration_2026-11-25.md, § C-06) checked the 58c9a02 text against the Lean proof. Found by Sol-W1 (Shells work, `notes/logs/solW1_questions.md`) on 2026-11-25 and accepted by the head.
 - **Theory verdict (2026-11-25):** **CONFIRMED.** The fix packet went to Writing and to Lean the same day.
   - The paper's step is unjustified as written in both directions.
   - "Var ≤ ‖δ̂‖²" also has a random right-hand side; the right-hand side should be sup_K‖δ‖².
@@ -98,7 +98,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "(e) For $t>0$, $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$; for $t<0$, $R_i(t)^2=\int_t^0 2(s-t)\ind(s<Z_i<0)ds$ and $\tau-F_i(s)\le\fu|s|$ give the same bound $\fu|t|^3/3$."
 - **Why it was needed:** a proof gap. The negative case was missing, and the printed formula is wrong for t < 0. The constants are unchanged.
 - **Lean:** `BQTF.remK_moments`, in `lean/BQTF/CheckLoss.lean`. The negative-shift case uses the weight 2(s−t) on (t,0).
-- **Status:** **in paper (30625fd)**; Theory CONFIRMED (math and text); independent fidelity check running. Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. CheckLoss was finalized and checked at merge 5f8ba95. Found in the CheckLoss review.
+- **Status:** **in paper (30625fd)**; **verified** (2026-11-26, lean/notes/reviews/Fidelity_C03_C07_2026-11-25.md). Theory CONFIRMED (math and text). Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. CheckLoss was finalized and checked at merge 5f8ba95. Found in the CheckLoss review.
 
 ## C-08: the Laplace mgf in the Shells score bound is used without its domain
 
@@ -108,3 +108,12 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Why it was needed:** a missing condition in a displayed identity, and a proof-order gap. The bound is unchanged.
 - **Lean:** `BQTF.shells`, in `lean/BQTF/Shells.lean` (Sol-W1). It establishes |2t_j| < λ before using the mgf formula, using `lean/BQTF/Asym/Laplace.lean`.
 - **Status:** **open**. Found in the Shells review on 2026-11-25. The packet goes out when Shells is finalized and checked.
+
+## C-09: Lemma sb's eigenvalue bound leaves q = 1 and the trace bound unjustified
+
+- **Paper label:** appendix, proof of Lemma `pf:lem:sb`, "Eigenvalues" paragraph (appendix_theory.tex line ≈144).
+- **Current paper text:** "…$\le b_0J^{-(2r-1)}$ with $b_0=\dots$; also $\sum_q\mu_q\le b_0$. Taking $J=\lfloor q/2\rfloor$ and using monotonicity, $\mu_q\le b\,q^{-2r}$ with $b=8\cdot6^{2r-1}c_F^2n^{2r-1}/\lambda^2$." There are two gaps. First, the trace bound $\sum_q\mu_q\le b_0$ is asserted without a reason. Second, at q = 1 the choice J = ⌊q/2⌋ = 0 lies outside the range of Lemma F, which needs J ≥ 1, so the tail bound cannot be used there. That case needs the trace bound, and the text does not say so.
+- **Correct version:** "…; also, since $\|\Pp s_j\|_2\le\|s_j\|_2\le\sqrt n\,n^{r-1}/(r-1)!\le c_F(2n)^{r-1/2}$, $\sum_q\mu_q=\|G\|_F^2=n^{-1}\sum_jV_j\|\Pp s_j\|_2^2\le b_0$ on $\mathcal V$ (using $m\le n$), so $\mu_1\le b_0\le b$. For $q\ge2$ take $J=\lfloor q/2\rfloor$, so $J\ge q/3$ and $q-J\ge q/2$; then $(q-J)\mu_q\le\sum_{i>J}\mu_i\le b_0J^{-(2r-1)}$, giving $\mu_q\le b\,q^{-2r}$ with $b=2\cdot3^{2r-1}b_0=8\cdot6^{2r-1}c_F^2n^{2r-1}/\lambda^2$."
+- **Why it was needed:** a proof gap at a boundary case, plus an unjustified step. The statement, hypotheses and constant b are unchanged; Lean uses b verbatim.
+- **Lean:** `BQTF.small_ball`, in `lean/BQTF/SmallBall.lean` (Neon-A): the trace bound is at SmallBall.lean ≈274, and q = 1 is a separate branch.
+- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. SmallBall was finalized and checked at merge 058c2ab (`small_ball`: standard axioms only). The SmallBall review found it (F2), and the EckartYoung review raised the q = 1 case first.
