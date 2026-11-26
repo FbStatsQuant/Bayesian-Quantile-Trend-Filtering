@@ -82,7 +82,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** with δ̂ = δ̂(y) the maximizer at the original data, only the positive part satisfies (G_K(y) − G_K(y⁽ⁱ⁾))₊ ≤ |δ̂_i(y)|; the negative part would need the maximizer at y⁽ⁱ⁾. Use the one-sided Efron–Stein inequality Var f(Y) ≤ Σ_i E[(f(Y) − f(Y⁽ⁱ⁾))₊²] (Boucheron–Lugosi–Massart, Thm 3.1 and its corollary). It gives Var G_K ≤ E Σ_i δ̂_i(Y)² ≤ sup_{δ∈K} ‖δ‖₂². The stated bound is unchanged.
 - **Why it was needed:** a wrong proof step. The two-sided change bound is not justified as written.
 - **Lean:** `BQTF.concentration`, in `lean/BQTF/Concentration.lean` (Neon-B), using `BQTF.Prob.efronStein_oneSided` in `lean/BQTF/Prob/EfronStein.lean` (Opus-W1).
-- **Status:** **open, with Writing applying it now under the early-fix rule** (Theory CONFIRMED; EfronStein merged at aaaedb4; packet passed to Neon-B). Once Writing commits, this becomes `in paper (<hash>)`; the fidelity check runs when Concentration is finalized. Found by Sol-W1 (Shells work, `notes/logs/solW1_questions.md`) on 2026-11-25 and accepted by the head.
+- **Status:** **in paper (58c9a02)**, applied early under the early-fix rule (Theory CONFIRMED; EfronStein merged at aaaedb4; packet passed to Neon-B). The fidelity check against 58c9a02 runs when Concentration is finalized. Found by Sol-W1 (Shells work, `notes/logs/solW1_questions.md`) on 2026-11-25 and accepted by the head.
 - **Theory verdict (2026-11-25):** **CONFIRMED.** The fix packet went to Writing and to Lean the same day.
   - The paper's step is unjustified as written in both directions.
   - "Var ≤ ‖δ̂‖²" also has a random right-hand side; the right-hand side should be sup_K‖δ‖².
