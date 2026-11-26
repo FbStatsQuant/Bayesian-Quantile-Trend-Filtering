@@ -32,6 +32,11 @@ bash "$ops/accounting.sh" "$JOB_ID" > "$ACCOUNTING"
 Report every accepted job ID immediately. After a submission timeout,
 respect backoff and check for an accepted job before retrying. For an
 authorized cancellation, pass only the explicit Slurm ID to `scancel`.
+Before any production array, including a benchmark, measure at least
+one fit using that array's settings. The compute-node preflight must
+load every runtime library needed by the worker. This includes
+`library(Rglpk)` and `library(detrendr)` for ADMM, with the GLPK module
+loaded for ADMM stages.
 For pilots, report submission-to-start queue wait separately from
 elapsed run time and Slurm TotalCPU. If any E-18 job or array tasks
 remain pending about 60 minutes after submission, run
@@ -40,7 +45,7 @@ reason, and observed position in the commons `squeue` listing. That
 position is a snapshot of the listing. Leave the job queued on
 commons and leave all SMC jobs untouched.
 
-## Stage 1
+## Stage 1 (closed)
 
 Use indices `0,100,200,900,1000,1100`, one per \(\tau\) at each
 of 0.001 and 0.000001, with seed 1.
@@ -53,16 +58,27 @@ It includes the pilot and leaves a separately reported allowance for
 ADMM. The cap is 80 core-hours. Use the bundled starting memory
 allocation for the pilot and measure MaxRSS before setting production
 memory.
-Send the pilot gate and projection directly to the Engineering head.
-Include all pilot CPU and the authorized ADMM/HS budget in the
-80-core-hour check. Stop and report a failed gate or a budget breach.
-With production GO, submit PMALA and the approved ADMM and Onizuka-HS
-refits from the same bundle. Use `E18_AFTER_JOBS` with colon-separated
-Slurm IDs to make each benchmark wait for earlier E-18 arrays to
-succeed and keep the shared running limit at 300. Reuse the sealed
-Laplace archive.
+Stage 1 closed at 77.424 of 80 core-hours. The approved ADMM result
+contains 299 fits. Reuse the sealed Laplace archive. HQ ruled against
+an HS refit, so there are no further HS submissions.
 
-## Stage 2
+## Stage 1′ (held)
+
+Wait for the Engineering head's authorized bundle SHA. This design uses
+`a0 = n = 500`, three quantiles, five rates, and 100 seeds per cell,
+for 1,500 production fits. Use `E18-prime-*` run IDs, with
+`sim-prime-pilot` for the pilot and `sim-prime` for production. Pilot
+indices `0,100,200,1200,1300,1400` select seed 1 at both endpoint rates
+for each quantile.
+
+Use the full pilot completion, sampler provenance, acceptance and
+σ-guard gates. Report queue wait, wall time, TotalCPU, MaxRSS, log-λ
+ESS and θ ESS. Project production using 500 times the mean measured
+CPU per fit at each quantile, summed across quantiles. Add the Stage 1′
+pilot CPU and compare with the fresh 80-core-hour cap. Stop and report
+if a gate fails or the projection exceeds that cap.
+
+## Stage 2 (held)
 
 Apply the same approval sequence under the 40-core-hour cap. Use
 authorized, hash-verified real-data input and one pilot run per
