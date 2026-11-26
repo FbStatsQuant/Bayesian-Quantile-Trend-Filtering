@@ -41,7 +41,7 @@ Conventions:
 1. **History rewrite: yes.** The repository becomes public once the paper is submitted. Engineering owns the rewrite: a plan first, then a freeze window that HQ announces. The scrub of Section 6 applies to all history, not only the tip, with the pattern list agreed with Engineering (INVENTORY is the starting point). The two third-party article texts and the raw SPod files are purged from history in the same pass.
 2. **`literature/Large Prior.pdf`: left untouched.** The owner removes it himself later; the README does not link to it.
 3. **SPod data (HQ, delegated by the owner):** the raw 1-Hz EPA files are not redistributed and are purged from history. The repository ships the derived 10-second series actually used (June 15, sensor d, n = 8,640) as a small CSV, its preparation script, and a `DATA.md` with the original source and how to obtain the raw files; Engineering establishes the source and its terms.
-4. **Still open: the oversized tracked files** (10 files over 5 MB), after E-18. The rewrite plan settles them (Section 5.3).
+4. **Oversized tracked files** (10 files over 5 MB): settled by HQ in Engineering's rewrite plan (Section 5.3); not an owner item.
 
 Also settled by HQ: the b0 text, after the E-19 verdict, together with the code default and the paper's stated default.
 
@@ -987,11 +987,7 @@ Decided on 2026-11-26 and folded into this proposal:
 | b | `literature/Large Prior.pdf` | **Left untouched** (owner); he removes it himself later. No README link to it. | Nothing moves |
 | c | SPod data | **No redistribution of the raw 1-Hz EPA files**, which are purged from history (HQ, delegated by the owner). Ship the derived 10-second series (June 15, sensor d, n = 8,640) as a small CSV, the preparation script, and `DATA.md` with the original source and how to obtain the raw files. | Section 1.8; Section 5.3, H3; Section 9.2 |
 
-Still open:
-
-| # | Decision | What is known | Recommendation |
-|---|---|---|---|
-| d | **Oversized files after E-18.** | 10 tracked files exceed the 5 MB hook limit (Section 5.3, H2 to H4). The raw SPod files among them leave with decision (c). | Engineering proposes in the rewrite plan; the owner approves any that stay. |
+No owner item is left open. The oversized tracked files (10 over 5 MB; Section 5.3, H2 to H4) are settled by HQ in Engineering's rewrite plan; the raw SPod files among them leave with decision (c).
 
 Settled by HQ: the two third-party texts are removed from the tip and purged in the rewrite; M1 and M2 are approved subject to Engineering's sign-off, and the optional moves wait; the b0 text of `method/README.md` and of the README is HQ's, settled after the E-19 verdict together with the code default and the paper's stated default (placeholder `[HQ after E-19: default b0]`); no claim that all tests pass until Engineering resolves F12.
 
