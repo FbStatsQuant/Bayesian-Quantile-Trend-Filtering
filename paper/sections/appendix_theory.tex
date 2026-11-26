@@ -102,7 +102,7 @@ Under Assumptions~\ref{ass:A} and~\ref{ass:B}, for every $i$ and all real $t,t'$
 (a), (c). $\rho_\tau$ is convex and $1$-Lipschitz. For $t>0$ the cases $Z_i<0$, $0\le Z_i<t$, $Z_i\ge t$ give $\ell_i(t)=(1-\tau)t$, $(1-\tau)t-Z_i$, $-\tau t$ and $\zeta_i=\tau-1,\tau,\tau$, so $\ell_i(t)+t\zeta_i=0,\ t-Z_i,\ 0$, and $\ell_i(t)\in[-\tau t,(1-\tau)t]$; $t<0$ is symmetric \citep{knight1998limiting}.
 (b) By B, $F_i$ is continuous at $0$; since $\thetas_i$ is a $\tau$-quantile, $F_i(0)\ge\tau\ge F_i(0-)$, so $F_i(0)=\tau$ and $\pr(\zeta_i=\tau-1)=\tau$ for all $i$.
 (d) $\E\zeta_i=0$, so $m_i=\E R_i$; for $t>0$, $R_i(t)=\int_0^t\ind(0\le Z_i<s)ds$ gives the integral \citep{belloni2011l1}, and similarly for $t<0$. Under A and B, $\fl|s|\le|F_i(s)-\tau|\le\fu|s|$ for $|s|\le L$, with the sign of $s$. For $|t|>L$, (a) gives $m_i(t)\le|t|\le t^2/L$.
-(e) $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$. With $e^{-x}\le1-x+x^2/2$ ($x\ge0$),
+(e) For $t>0$, $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$; for $t<0$, $R_i(t)^2=\int_t^0 2(s-t)\ind(s<Z_i<0)ds$ and $\tau-F_i(s)\le\fu|s|$ give the same bound $\fu|t|^3/3$. With $e^{-x}\le1-x+x^2/2$ ($x\ge0$),
 $\E e^{-2R_i}\le1-2m_i+\tfrac23\fu|t|^3\le1-m_i\le e^{-m_i}$, using $\tfrac23\fu|t|^3\le\tfrac12\fl t^2\le m_i$.
 \end{proof}
 
