@@ -80,7 +80,7 @@ in particular $\nu\{\|\delta\|_2\le\varrho\}\le V_r\varrho^r$ for every constant
 
 \begin{proof}
 (a) $D$ is the $r$-th forward difference. Applying \eqref{pf:eq:pascal} $r$ times to $i\mapsto b_{r-1}(i-j-1)$ gives $\ind(i=j)$, so $DS=I_m$ and $\operatorname{rank}D=m$. $D$ annihilates $\cP$ and $\dim\cP=r=n-m$, so $\ker D=\cP$.
-(b) If $Nc+Su=0$, applying $D$ gives $u=0$, then $c=0$; so the map is bijective, with constant Jacobian, and $e^{-\lambda\|u\|_1}du=(2/\lambda)^md\Ql(u)$. Substitute in \eqref{pf:eq:post} and divide both integrals by $\exp\{-\sum_i\rho_\tau(Z_i)\}$. For finiteness: $\rho_\tau(x)\ge\min\{\tau,1-\tau\}|x|$ and $\|y-Nc-Su\|_1\ge\|c-N^\top(y-Su)\|_2$, so the $c$-integral is finite and free of $u$.
+(b) If $Nc+Su=0$, applying $D$ gives $u=0$, then $c=0$; so the map is bijective, with constant Jacobian, and $e^{-\lambda\|u\|_1}du=(2/\lambda)^md\Ql(u)$. Substitute in \eqref{pf:eq:post} and divide both integrals by $\exp\{-\sum_i\rho_\tau(Z_i)\}$. For finiteness: $\rho_\tau(x)\ge a|x|$ with $a=\min\{\tau,1-\tau\}$, and $\|y-Nc-Su\|_1\ge\|c-N^\top(y-Su)\|_2$, so for each $u$ the integral of $\exp\{-\sum_i\rho_\tau(y_i-\theta_i)\}$ over $c$ is at most $\int\exp\{-a\|c-N^\top(y-Su)\|_2\}dc=\int\exp\{-a\|c\|_2\}dc<\infty$, a bound that does not depend on $u$. Integrating it against the probability measure $\Ql$ and multiplying by $\exp\{\sum_i\rho_\tau(Z_i)\}$ gives $N(\R^n)<\infty$; positivity of the integrand gives $N(\R^n)>0$.
 (c) $\thetas-Su^{*}\in\ker D=\cP$, so $\thetas=Nc^{*}+Su^{*}$, $P\delta=N\{c-\bar c(u)\}$ and $\Pp\delta=\Pp S(u-u^{*})$; \eqref{pf:eq:pyth} is Pythagoras and \eqref{pf:eq:vol} is Fubini.
 \end{proof}
 
