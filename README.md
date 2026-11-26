@@ -41,12 +41,13 @@ bound binds, otherwise banded interior-point steps, each linear in n.
 *Bands between jointly sampled 0.1 and 0.9 quantile curves; both fits are by the joint sampler, and the curves cannot cross. (a) Height of 4,817 Dutch children; the band holds 80.5% of them (nominal 80%). (b) n = 1,000 points simulated from the explicit function f(u) = 2 + sin(4u − 2) + 2·exp(−30(4u − 2)²), with u = i/1000, plus Gaussian errors with standard deviation (1 + u²)/4; the band holds 80.9% of the points (nominal 80%); dotted: f.*
 
 In the peak-detection simulation of Brantley et al. (2020) for air-quality sensors, the MSE for
-the peak-free baseline is [E-18: MSE PMALA, τ = 0.01] for the sampler against
-[E-18: MSE ADMM, τ = 0.01] for ADMM quantile trend filtering at τ = 0.01,
-[E-18: MSE PMALA, τ = 0.05] against [E-18: MSE ADMM, τ = 0.05] at τ = 0.05, and
-[E-18: MSE PMALA, τ = 0.10] against [E-18: MSE ADMM, τ = 0.10] at τ = 0.10; the sampler selects
-no penalty. [E-18: one sentence on which method is ahead at which level.] On one day of fenceline
-sensor readings (n = 8,640), [E-18: one sentence on the fitted baselines].
+the peak-free baseline is 0.0232 for the sampler against 0.0302 for ADMM quantile trend filtering
+at τ = 0.01, 0.0143 against 0.0127 at τ = 0.05, and 0.0128 against 0.0114 at τ = 0.10; the sampler
+learns the penalty instead of selecting it on a grid. The two methods are comparable at all three
+levels: no paired MSE difference is significant at the 5% level, and the check loss and the
+peak-detection accuracy are mixed. On one day of fenceline sensor readings (n = 8,640), the
+sampler's baselines at τ = 0.01, 0.05 and 0.10 run beneath the plumes, with 0.9%, 5.9% and
+11.6% of the readings below them; the three levels are fitted separately.
 
 ## Our work
 
@@ -62,8 +63,8 @@ cluster from frozen packages; each experiment folder ships its summaries. The ta
 | Section 4.1 and Appendix D: simulations at interior levels (Tables 1–2) | [`experiments/interior_quantiles/`](experiments/interior_quantiles) (the individual-sampler package of 2026-10-03) | shipped: `paper_reference/simulations.tex` and `paper_reference/appendix_pmala.tex` in that package. Full run, on a Slurm cluster: `bash submit.sh RUN_NAME` from the package folder | 3,000 cluster tasks |
 | Section 4.1 and Appendix D: joint estimation of extreme upper levels (Tables 3–4), crossing tables | [`experiments/extreme_quantiles/`](experiments/extreme_quantiles), [`experiments/joint_upper_levels/`](experiments/joint_upper_levels) | shipped: `experiments/extreme_quantiles/tables_20261023/mse_consolidated_oct7.csv`, `experiments/extreme_quantiles/tables_20261008/crossings_*.csv`, `experiments/joint_upper_levels/paper_reference/table2_mse.csv`. Full joint run, on a Slurm cluster: `cd experiments/joint_upper_levels && bash submit.sh RUN_NAME` | 300 cluster tasks for the joint run |
 | Section 4.2: cost per sweep (Table 5, Figures 1–2) | [`paper/`](paper) (Table 5) | the paper's cost table is the reference; `experiments/scalability/` is a historical record and does not run | |
-| Section 4.3: air-quality simulation (Table 6) | [`experiments/air_simulation/`](experiments/air_simulation) | [E-18: command] | [E-18] |
-| Section 4.4: air-quality sensor data | [`applications/Air Quality/`](applications/Air%20Quality) | [E-18: command] | [E-18] |
+| Section 4.3: air-quality simulation (Table 6) | [`experiments/air_simulation/`](experiments/air_simulation), [`engineering/E18_Air_Refit/`](engineering/E18_Air_Refit) | shipped: `engineering/E18_Air_Refit/results_a0_n/paper_air_table.csv` and `paired_pmala_minus_admm.csv`. Full refit, on a Slurm cluster: see [`engineering/E18_Air_Refit/README.md`](engineering/E18_Air_Refit/README.md) | 300 cluster fits |
+| Section 4.4: air-quality sensor data | [`applications/Air Quality/`](applications/Air%20Quality), [`engineering/E18_Air_Refit/`](engineering/E18_Air_Refit) | from the repository root: `Rscript paper/figures/make_spod_pmala_figure.R` redraws the figure from the shipped curves (`engineering/E18_Air_Refit/results_a0_n/spod_curves.csv`). The fits ran on a Slurm cluster: see the E-18 README | seconds for the figure; six chains of 37–49 min each for the fits |
 | Section 4.4 and Appendix E: growth centiles | [`applications/Growth/`](applications/Growth) | in `applications/Growth/`: `Rscript Growth_plots_k2.R` redraws the figures of the shipped joint-sampler fit and overwrites `results_joint_k2/figures/growth_joint_*`; `Rscript Growth_Joint_PMALA_k2.R sex=boy out=results_refit/boy` refits the boys into a new folder | [Eng: time]; [Eng: time] |
 | The figure above | [`examples/readme_figures/`](examples/readme_figures) | `Rscript examples/readme_figures/make_readme_figures.R` | under 30 s on one core |
 | The paper | [`paper/`](paper) | read `main.pdf`, or in `paper/`: `latexmk -pdf main.tex` | |

@@ -12,8 +12,7 @@
 # as lines and nothing is shaded between them.
 #
 # Run from the repository root:
-#   ~/.config/bvs-hq/owls/owls_run -j 1 -- Rscript --vanilla \
-#     paper/figures/make_spod_pmala_figure.R
+#   Rscript --vanilla paper/figures/make_spod_pmala_figure.R
 
 suppressPackageStartupMessages(library(ggplot2))
 
