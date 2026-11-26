@@ -1,0 +1,66 @@
+# Table 2 data match
+
+E-18 uses the archived Table 2 inputs for bitwise identity. The
+archive is
+[results.rds](../../experiments/air_simulation/onizuka_laplace_20261023/attempt_20261023T171713_511660/results.rds)
+with SHA-256 `4e4dd9fccd4bb83df3905cafb1b4260358069b6b5b9d982aa45ec4412397e9ba`.
+Its `data[[seed]]` entries hold the 500 observations (`y`), baseline
+(`theta`) and signal (`s`) for each of the 100 seeds.
+
+Both repository drivers' `simulate_air()` functions, sourced by
+extracting their assignments, regenerate bitwise identical values to
+each other on Owls for all 100 seeds. They use the Mersenne-Twister,
+Inversion and Rejection RNG settings and `set.seed(seed)`; the data
+draws are independent of the quantile level. The spline baseline
+uses a Poisson+1 basis dimension and exponential coefficients, and the
+signal is a binomial count of Gaussian peaks. Gaussian noise has
+standard deviation 0.25.
+
+The regenerated and archived arrays agree to numerical precision on
+Owls. The archived run used R 4.5.2 with FlexiBLAS/OpenBLAS. The
+comparison is shown below. E-18 loads the sealed archive directly to
+avoid introducing the observed floating-point differences.
+
+| Field | Seeds bitwise identical to archive | Maximum absolute difference |
+|---|---:|---:|
+| Observations | 0/100 | 1.776357e-15 |
+| Baseline | 0/100 | 1.776357e-15 |
+| Signal | 67/100 | 8.881784e-16 |
+
+[table2_data_sha256.csv](table2_data_sha256.csv) records SHA-256 hashes
+of the archived vectors and all 300 quantile curves, encoded as
+little-endian IEEE-754 doubles. The truth for each level is formed from
+the archived baseline and the paper's `0.25 * qnorm(tau)` offset.
+The check confirms that true signal labels are unchanged by
+regeneration, and independently reproduces MSE, CL and the four CAA
+values for all 300 archived Laplace fits (tolerance 1e-12).
+
+## What this establishes for the benchmarks
+
+The October 23 Laplace archive records the SHA-256
+`b12396de72540d518cf92ed279ae765236774bad349ea1d3086d76efb1ad21ac`
+for `Driver/common_air.R`. The historical
+[build report](../../experiments/air_simulation/onizuka_laplace_20261023/BUILD_REPORT.md)
+records the identical generator hash from the October 8 campaign, the
+cross-method data equality check in that campaign's original processing
+step, and the direct equality of `y`, `theta` and `s` to the October
+8 archive at seeds 1–3. The October 8 archive itself and the ADMM
+per-seed mask are unavailable in this checkout. The preserved October
+8 and October 23 summaries reproduce **72 of 72** printed values in
+[Table 2](../../paper/sections/air_simulation.tex), at 4 decimals for
+MSE, 5 for CL, and 3 for CAA. These records support using the published
+ADMM and Onizuka values for the comparison. The full-precision source
+values and SEs are in [published_stage1.csv](published_stage1.csv).
+ADMM at 0.05 retains its published denominator of 99.
+
+## Reproduce
+
+From the repository root, run
+
+```sh
+~/.config/bvs-hq/owls/owls_run -j 1 Rscript --vanilla engineering/E18_Air_Refit/e18_verify_data.R
+```
+
+This validates the archived file SHA-256, compares both generators to one
+another and to the stored vectors, checks the archived Laplace metrics,
+and rebuilds the two audit CSVs. It runs no sampler.
