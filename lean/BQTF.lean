@@ -23,3 +23,4 @@ import BQTF.Main
 import BQTF.Scale.Posterior
 import BQTF.Scale.Data
 import BQTF.Reduction
+import BQTF.Prob.Contraction
