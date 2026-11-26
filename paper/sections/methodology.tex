@@ -101,7 +101,7 @@ We sample \eqref{eq:posterior} by a Gibbs sampler with four blocks, which we cal
     The scale enters the weights and the effective penalty $\lambda\sigma$ of \eqref{eq:map_qtf}, so it is drawn with the other parameters rather than fixed.
     \item \emph{Step size $\delta$.} The P-MALA step size is updated by a Robbins--Monro recursion toward acceptance rate $0.5$ (Appendix~\ref{app:pmala:adapt}).
 \end{enumerate}
-One run is stated in Algorithm~\ref{alg:pmala}. The point estimate is the posterior mean of $\theta$, and the $2.5\%$ and $97.5\%$ quantiles of the retained draws give pointwise $95\%$ intervals. Initialization, warm-up, and numerical safeguards are given in Appendices~\ref{app:pmala:init}--\ref{app:pmala:safeguards}.
+One run is stated in Algorithm~\ref{alg:pmala}. The point estimate is the posterior mean of $\theta$, and the $2.5\%$ and $97.5\%$ quantiles of the retained draws give pointwise $95\%$ intervals. Initialization, warm-up, and numerical safeguards are given in Appendix~\ref{app:pmala:init}.
 
 \begin{algorithm}[h!]
 \caption{Bayesian-PMALA for a single quantile level $\tau$}
