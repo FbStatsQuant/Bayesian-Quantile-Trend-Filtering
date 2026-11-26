@@ -68,3 +68,12 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Why it was needed:** a wrong statement in a proof step. As written, the inequality fails for σ₀ > 1 when V* = V̄ > 0. The argument needs the bound for the rescaled target.
 - **Lean:** `BQTF.main_theorem_scale`, in `lean/BQTF/Reduction.lean`, with the data rescaling in `lean/BQTF/Scale/Data.lean`.
 - **Status:** **open**. Found in the Reduction review on 2026-11-25. Reduction is merged but depends on `main_theorem`; the packet goes out when the axiom check is clean.
+
+## C-06: the variance step in Lemma conc uses a two-sided change bound that only holds one-sided
+
+- **Paper label:** appendix, proof of Lemma `pf:lem:conc` (variance bound for the supremum G_K, appendix line ≈235).
+- **Current paper text:** the proof bounds the change in G_K when Z_i is replaced by an independent copy by |δ̂_i|, with δ̂ a maximizer, and concludes "Var ≤ ‖δ̂‖²" by Efron–Stein.
+- **Correct version:** with δ̂ = δ̂(y) the maximizer at the original data, only the positive part satisfies (G_K(y) − G_K(y⁽ⁱ⁾))₊ ≤ |δ̂_i(y)|; the negative part would need the maximizer at y⁽ⁱ⁾. Use the one-sided Efron–Stein inequality Var f(Y) ≤ Σ_i E[(f(Y) − f(Y⁽ⁱ⁾))₊²] (Boucheron–Lugosi–Massart, Thm 3.1 and its corollary). It gives Var G_K ≤ E Σ_i δ̂_i(Y)² ≤ sup_{δ∈K} ‖δ‖₂². The stated bound is unchanged.
+- **Why it was needed:** a wrong proof step. The two-sided change bound is not justified as written.
+- **Lean:** `BQTF.concentration`, in `lean/BQTF/Concentration.lean` (Neon-B), using `BQTF.Prob.efronStein_oneSided` in `lean/BQTF/Prob/EfronStein.lean` (Opus-W1).
+- **Status:** **open**. Found by Sol-W1 (Shells work, `notes/logs/solW1_questions.md`) on 2026-11-25 and accepted by the head. The packet goes out when Concentration is finalized and checked.
