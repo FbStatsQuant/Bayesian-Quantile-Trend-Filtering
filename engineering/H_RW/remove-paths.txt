@@ -5,3 +5,6 @@ regex:^(?:Papers|literature)/(?!Large Prior\.pdf$).*\.[pP][dD][fF]$
 regex:^(?:Project_Paper/notes|paper/history)/[^/]+/(?:before|build)/main\.pdf$
 regex:^(?:Simulations/Joint/NOTS|experiments/joint_upper_levels)/runs/[^/]+/metadata/monitor/history\.jsonl$
 regex:(?:^|/)__pycache__/.*\.pyc$
+regex:^(?:engineering|Engineering)/H_RW/(?:BLOB_INVENTORY\.tsv|EXEMPTIONS\.tsv|LOGIN_REMAINING\.tsv|PLAN\.md)$
+regex:^(?:engineering|Engineering)/E03_Repo_Organization/hash_map\.tsv$
+regex:^(?:experiments/interior_quantiles/individual_nots_20261003|Simulations/Individual/NOTS/inner_individual)/(?:S_b0001/deployment/package_20261008\.tar\.gz|deployment/(?:upload_20261003T213406Z/package|validation_1785936)\.tar\.gz)$

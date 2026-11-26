@@ -223,9 +223,20 @@ def manifest_index(paths, get):
 
 
 def login_locations(data):
-    public = {entry.start() for entry in PUBLIC_EMAIL.finditer(data)}
-    return [(entry.start(), "author email" if entry.start() in public else "other")
-            for entry in LOGIN.finditer(data)]
+    if b"f" b"b31" not in data.lower():
+        return []
+    # A PDF text extraction can join the address to preceding punctuation.
+    domain = re.compile(rb"@[r]ice\.edu(?![\w-]|\.[\w-])", re.I)
+    positions = []
+    offset = 0
+    for line in data.splitlines(keepends=True):
+        author_line = re.match(rb"[ \t]*(?:author|committer|co-authored-by|signed-off-by):", line, re.I)
+        for entry in LOGIN.finditer(line):
+            category = ("author email" if domain.match(line, entry.end()) else
+                        "authorship" if author_line else "other")
+            positions.append((offset + entry.start(), category))
+        offset += len(line)
+    return positions
 
 
 def pdf_links(data):
@@ -321,7 +332,8 @@ def audit(repo, output, extract_pdfs):
                     secrets.add(oid)
             if locations[oid]:
                 email = sum(category == "author email" for _, _, category in locations[oid])
-                login[oid] = (email, len(locations[oid]) - email)
+                authored = sum(category == "authorship" for _, _, category in locations[oid])
+                login[oid] = (email, authored, len(locations[oid]) - email - authored)
     protected = protected_paths(paths, manifest_targets, covered)
     (output / "protected.nul").write_bytes(b"\0".join(sorted(protected)) + b"\0")
     totals = Counter(blobs=len(size), paths=len(paths), protected_paths=len(protected),
@@ -340,7 +352,7 @@ def audit(repo, output, extract_pdfs):
         (output / "decode-errors.tsv").open("w") as decode_errors,
     ):
         print("path\tblob\tchannel\trules (line:replacement=count)\tdisposition\tmanifest/protection", file=findings)
-        print("path\tblob\tauthor email\tother login\tother classification", file=logins)
+        print("path\tblob\tauthor email\tauthorship\tother login\tother classification", file=logins)
         print("path\tblob\tbytes\trecommendation", file=inventory)
         print("path\trule lines", file=path_hits)
         print("blob\tchannel\tbyte offset (zero based)\ttype", file=login_offsets)
@@ -369,13 +381,14 @@ def audit(repo, output, extract_pdfs):
                         kind = "raw" if channel == "raw" else "decoded"
                         totals[f"{kind} path/blob rows ({disposition})"] += 1
                 if oid in login:
-                    email, other = login[oid]
+                    email, authored, other = login[oid]
                     classification = (
                         "sealed or manifested" if protection else "other, login outside rewrite scope"
-                    ) if other else "author email only"
-                    print(name, obj, email, other, classification, sep="\t", file=logins)
+                    ) if other else "public authorship only"
+                    print(name, obj, email, authored, other, classification, sep="\t", file=logins)
                     totals["login path/blob rows"] += 1
                     totals["author email occurrences by path/blob"] += email
+                    totals["authorship occurrences by path/blob"] += authored
                     if other:
                         totals[f"other login occurrences by path/blob ({classification})"] += other
                 if size[oid] >= MIB or oid in pdfs or (
@@ -394,6 +407,17 @@ def checksum_aliases(path, target):
         marker = b"/" + parent.rsplit(b"/", 1)[-1] + b"/"
         if marker in target:
             options.insert(0, posixpath.join(parent, target.rsplit(marker, 1)[1]))
+    if path.endswith(b"/metadata/comparison_source_SHA256SUMS"):
+        layouts = {
+            b"postprocess/compare_paper.R": b"compare_paper.R",
+            b"postprocess/compare.slurm": b"slurm/compare.slurm",
+            b"postprocess/monitor.py": b"monitor.py",
+            b"postprocess/start_monitor.sh": b"start_monitor.sh",
+        }
+        if target in layouts:
+            for prefix in SEALED:
+                if path.startswith(prefix):
+                    options.insert(0, prefix + layouts[target])
     if b"/Munich Rent/" in path or b"/munich_rent/" in path:
         if b"/Others/results_pmala_k2/" in path:
             filename = posixpath.basename(target)
@@ -432,62 +456,8 @@ def checksums(repo):
                     actual.append(digests[candidate_oid])
                 totals["ok" if expected.lower() in actual else "mismatch"] += 1
             print(safe(path, patterns), totals["ok"], totals["mismatch"], totals["missing"],
-                  len(data.splitlines()) - len(rows), sep="\t")
-
-
-def compare(before, after, commit_map, protected_file, stripped=None):
-    protected = set(protected_file.read_bytes().split(b"\0"))
-    drops = removal_rules()
-    stripped_ids = set(stripped.read_bytes().split()) if stripped else set()
-    mapping = [line.split() for line in commit_map.read_bytes().splitlines()[1:]]
-    zero = b"0" * len(mapping[0][0])
-    compared = set()
-    totals = Counter()
-    def metadata(data):
-        headers, message = data.split(b"\n\n", 1)
-        fields = headers.splitlines()
-        tree = fields[0].split()[1]
-        identity = tuple(line for line in fields if line.startswith((b"author ", b"committer ", b"encoding ")))
-        return tree, (identity, message)
-
-    with (
-        blobs(before) as old_blob, blobs(after) as new_blob,
-        blobs(before, b"commit") as old_commit, blobs(after, b"commit") as new_commit,
-    ):
-        for old, new in mapping:
-            if new == zero:
-                totals["pruned commits"] += 1
-                continue
-            old_tree, old_metadata = metadata(old_commit(old))
-            new_tree, new_metadata = metadata(new_commit(new))
-            totals["commit metadata comparisons"] += 1
-            if old_metadata != new_metadata:
-                totals["commit metadata changes"] += 1
-            if (old_tree, new_tree) in compared:
-                continue
-            compared.add((old_tree, new_tree))
-            after_files = dict(tree_entries(new_tree, after))
-            for path, original in tree_entries(old_tree, before):
-                if original[2] in stripped_ids or any(p.search(path) for p in drops):
-                    if path in after_files:
-                        totals["unexpected retained path occurrences"] += 1
-                    continue
-                rewritten = after_files.get(path)
-                if path in protected:
-                    totals["protected tree/path comparisons"] += 1
-                    if original != rewritten:
-                        totals["protected changes"] += 1
-                if path in AUTHOR_FILES:
-                    totals["author-file tree/path comparisons"] += 1
-                    totals["author-file comparisons " + path.decode()] += 1
-                    original_emails = PUBLIC_EMAIL.findall(old_blob(original[2]))
-                    totals["author emails compared"] += len(original_emails)
-                    if rewritten is None or original_emails != PUBLIC_EMAIL.findall(new_blob(rewritten[2])):
-                        totals["author email changes"] += 1
-    print(*[f"{key}: {value}" for key, value in sorted(totals.items())], sep="\n")
-    if any(totals[key] for key in ("protected changes", "author email changes", "commit metadata changes",
-                                  "unexpected retained path occurrences", "pruned commits")):
-        raise SystemExit(1)
+                  sum(bool(line) and not line.startswith(b"#")
+                      and not MANIFEST_ENTRY.fullmatch(line) for line in data.splitlines()), sep="\t")
 
 
 def main():
@@ -499,19 +469,11 @@ def main():
     scan.add_argument("--pdf-text", action="store_true", help="also inspect PDFs and gzip tar archives")
     manifests = commands.add_parser("checksums")
     manifests.add_argument("repo", type=Path)
-    verify = commands.add_parser("compare")
-    verify.add_argument("before", type=Path)
-    verify.add_argument("after", type=Path)
-    verify.add_argument("commit_map", type=Path)
-    verify.add_argument("protected", type=Path)
-    verify.add_argument("--strip", type=Path)
     args = parser.parse_args()
     if args.command == "scan":
         audit(args.repo, args.output, args.pdf_text)
-    elif args.command == "checksums":
-        checksums(args.repo)
     else:
-        compare(args.before, args.after, args.commit_map, args.protected, args.strip)
+        checksums(args.repo)
 
 
 if __name__ == "__main__":

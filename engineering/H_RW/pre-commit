@@ -5,7 +5,7 @@ import sys
 
 sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from audit import MIB, SECRET_MARKER, blobs, git, hits, removal_rules, rules, safe
+from audit import MIB, SECRET_MARKER, blobs, git, hits, login_locations, removal_rules, rules, safe
 
 
 def main():
@@ -34,7 +34,7 @@ def main():
             problems = []
             if any(rule.search(filename) for rule in forbidden_paths):
                 problems.append("purged path")
-            if hits(filename, patterns):
+            if hits(filename, patterns) or any(kind == "other" for _, kind in login_locations(filename)):
                 problems.append("private pattern in filename")
             if mode != b"160000":
                 size = int(git("cat-file", "-s", oid.decode(), repo=repo))
@@ -42,7 +42,7 @@ def main():
                     problems.append(f"{size} bytes exceeds 5 MiB")
                 else:
                     body = get(oid)
-                    if hits(body, patterns):
+                    if hits(body, patterns) or any(kind == "other" for _, kind in login_locations(body)):
                         problems.append("private pattern in blob")
                     if SECRET_MARKER.search(body):
                         problems.append("credential marker in blob")
