@@ -166,68 +166,79 @@ theorem ell_props (τ z : ℝ) (hτ : 0 < τ ∧ τ < 1) :
       · exact le_trans (min_le_left _ _) (by linarith)
       · exact le_trans (by linarith) (le_max_left _ _)
 
-/-- Lemma `pf:lem:check`(b): `F(q) = τ`, i.e. `P(Z ≤ 0) = τ`; hence also `P(Z < 0) = τ`, so the
-score `ζ = τ − 1(Z < 0)` has values in `{τ−1, τ}`, mean `0` and variance `τ(1−τ) ≤ 1/4`. -/
-theorem distFn_quantile_eq {μ : Measure ℝ} {τ q L fl fu : ℝ} (h : CoordHyp μ τ q L fl fu) :
+/-- The left-limit step of Lemma `pf:lem:check`(b) under Assumption B alone: if `q` is a
+`τ`-quantile of the probability law `μ` and B holds at `q` with `L > 0`, then `F(q) = τ` and
+`μ(−∞, q) = τ`. No sign condition on `f̄` is needed. -/
+theorem distFn_quantile_eq_of_assB1 {μ : Measure ℝ} [IsProbabilityMeasure μ] {τ q L fu : ℝ}
+    (hL : 0 < L) (hq : IsQuantile μ τ q) (hB : AssB1 μ q L fu) :
     distFn μ q = τ ∧ (μ (Set.Iio q)).toReal = τ := by
-  have := h.prob
-  have hIio : Set.Iio q = ⋃ n : ℕ, Set.Iic (q - L / (n + 1 : ℝ)) := by
+  have hIio : Set.Iio q = ⋃ m : ℕ, Set.Iic (q - L / (m + 1 : ℝ)) := by
     ext x
     simp only [Set.mem_Iio, Set.mem_iUnion, Set.mem_Iic]
     constructor
     · intro hx
       have hpos : 0 < q - x := sub_pos.mpr hx
-      obtain ⟨n, hn⟩ := exists_nat_gt (L / (q - x))
-      refine ⟨n, ?_⟩
-      have hnpos : (0 : ℝ) < (n : ℝ) + 1 := by positivity
-      have hlt : L / (q - x) < (n : ℝ) + 1 := lt_trans hn (by linarith)
-      have hdiv : L / ((n : ℝ) + 1) < q - x := by
-        rw [div_lt_iff₀ hnpos]
+      obtain ⟨m, hm⟩ := exists_nat_gt (L / (q - x))
+      refine ⟨m, ?_⟩
+      have hmpos : (0 : ℝ) < (m : ℝ) + 1 := by positivity
+      have hlt : L / (q - x) < (m : ℝ) + 1 := lt_trans hm (by linarith)
+      have hdiv : L / ((m : ℝ) + 1) < q - x := by
+        rw [div_lt_iff₀ hmpos]
         rw [div_lt_iff₀ hpos] at hlt
         linarith
       linarith
-    · rintro ⟨n, hn⟩
-      have hpos : (0 : ℝ) < L / ((n : ℝ) + 1) := div_pos h.hL (by positivity)
+    · rintro ⟨m, hm⟩
+      have hpos : (0 : ℝ) < L / ((m : ℝ) + 1) := div_pos hL (by positivity)
       linarith
-  have hmono : Monotone (fun n : ℕ => Set.Iic (q - L / (n + 1 : ℝ))) := by
+  have hmono : Monotone (fun m : ℕ => Set.Iic (q - L / (m + 1 : ℝ))) := by
     intro a b hab
     apply Set.Iic_subset_Iic.mpr
     have ha : (0 : ℝ) < (a : ℝ) + 1 := by positivity
     have hb : (a : ℝ) + 1 ≤ (b : ℝ) + 1 := by exact_mod_cast Nat.add_le_add_right hab 1
     have hdiv : L / ((b : ℝ) + 1) ≤ L / ((a : ℝ) + 1) :=
-      div_le_div_of_nonneg_left h.hL.le ha hb
+      div_le_div_of_nonneg_left hL.le ha hb
     linarith
-  have htend1 : Filter.Tendsto (fun n : ℕ => distFn μ (q - L / (n + 1 : ℝ)))
+  have htend1 : Filter.Tendsto (fun m : ℕ => distFn μ (q - L / (m + 1 : ℝ)))
       Filter.atTop (nhds (μ (Set.Iio q)).toReal) := by
     have h1 := MeasureTheory.tendsto_measure_iUnion_atTop (μ := μ) hmono
     rw [← hIio] at h1
     exact (ENNReal.tendsto_toReal (measure_ne_top μ _)).comp h1
-  have htend2 : Filter.Tendsto (fun n : ℕ => distFn μ (q - L / (n + 1 : ℝ)))
+  have htend2 : Filter.Tendsto (fun m : ℕ => distFn μ (q - L / (m + 1 : ℝ)))
       Filter.atTop (nhds (distFn μ q)) := by
     rw [Metric.tendsto_atTop]
     intro ε hε
-    have hfu : 0 < fu := h.hfu
-    obtain ⟨N, hN⟩ := exists_nat_gt (fu * L / ε)
-    refine ⟨N, fun n hn => ?_⟩
+    let C : ℝ := max fu 0
+    obtain ⟨N, hN⟩ := exists_nat_gt (C * L / ε)
+    refine ⟨N, fun m hm => ?_⟩
     rw [Real.dist_eq]
-    have hnpos : (0 : ℝ) < (n : ℝ) + 1 := by positivity
-    have h1le : (1 : ℝ) ≤ (n : ℝ) + 1 := by linarith [Nat.cast_nonneg (α := ℝ) n]
-    have ht_le : |-(L / ((n : ℝ) + 1))| ≤ L := by
-      rw [abs_neg, abs_of_pos (div_pos h.hL hnpos)]
-      exact div_le_self h.hL.le h1le
-    have hB := h.assB (-(L / ((n : ℝ) + 1))) ht_le
-    rw [← sub_eq_add_neg, abs_neg, abs_of_pos (div_pos h.hL hnpos)] at hB
-    have hlt : fu * L / ε < (n : ℝ) + 1 := by
-      have : (N : ℝ) ≤ (n : ℝ) := by exact_mod_cast hn
+    have hmpos : (0 : ℝ) < (m : ℝ) + 1 := by positivity
+    have h1le : (1 : ℝ) ≤ (m : ℝ) + 1 := by linarith [Nat.cast_nonneg (α := ℝ) m]
+    have hstep_pos : 0 < L / ((m : ℝ) + 1) := div_pos hL hmpos
+    have ht_le : |-(L / ((m : ℝ) + 1))| ≤ L := by
+      rw [abs_neg, abs_of_pos hstep_pos]
+      exact div_le_self hL.le h1le
+    have hBm := hB (-(L / ((m : ℝ) + 1))) ht_le
+    rw [← sub_eq_add_neg, abs_neg, abs_of_pos hstep_pos] at hBm
+    have hleC : fu * (L / ((m : ℝ) + 1)) ≤ C * (L / ((m : ℝ) + 1)) :=
+      mul_le_mul_of_nonneg_right (le_max_left fu 0) hstep_pos.le
+    have hlt : C * L / ε < (m : ℝ) + 1 := by
+      have : (N : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
       linarith
-    have hlt2 : fu * (L / ((n : ℝ) + 1)) < ε := by
-      rw [mul_div_assoc', div_lt_iff₀ hnpos]
+    have hlt2 : C * (L / ((m : ℝ) + 1)) < ε := by
+      rw [mul_div_assoc', div_lt_iff₀ hmpos]
       rw [div_lt_iff₀ hε] at hlt
       linarith
-    exact lt_of_le_of_lt hB hlt2
+    exact lt_of_le_of_lt (hBm.trans hleC) hlt2
   have heq : (μ (Set.Iio q)).toReal = distFn μ q := tendsto_nhds_unique htend1 htend2
-  have ⟨hq1, hq2⟩ := h.quantile
+  have ⟨hq1, hq2⟩ := hq
   constructor <;> linarith
+
+/-- Lemma `pf:lem:check`(b): `F(q) = τ`, i.e. `P(Z ≤ 0) = τ`; hence also `P(Z < 0) = τ`, so the
+score `ζ = τ − 1(Z < 0)` has values in `{τ−1, τ}`, mean `0` and variance `τ(1−τ) ≤ 1/4`. -/
+theorem distFn_quantile_eq {μ : Measure ℝ} {τ q L fl fu : ℝ} (h : CoordHyp μ τ q L fl fu) :
+    distFn μ q = τ ∧ (μ (Set.Iio q)).toReal = τ := by
+  have := h.prob
+  exact distFn_quantile_eq_of_assB1 h.hL h.quantile h.assB
 
 lemma integral_scoreZ_eq_zero {μ : Measure ℝ} {τ q L fl fu : ℝ} (h : CoordHyp μ τ q L fl fu) :
     ∫ y, scoreZ τ (y - q) ∂μ = 0 := by

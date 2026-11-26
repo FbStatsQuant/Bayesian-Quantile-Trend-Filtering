@@ -13,18 +13,6 @@ noncomputable section
 
 namespace BQTF
 
-/-- `bfun p t ≤ (t.toNat : ℝ)^p / p!` for `0 ≤ t`. -/
-private lemma bfun_le_pow_div_fact (p : ℕ) (t : ℤ) (ht : 0 ≤ t) :
-    bfun p t ≤ ((t.toNat : ℝ) ^ p) / (p.factorial : ℝ) := by
-  rw [bfun]
-  simp only [ht, ↓reduceIte]
-  have hfac : (0 : ℝ) < p.factorial := Nat.cast_pos.mpr (Nat.factorial_pos p)
-  rw [le_div_iff₀ hfac]
-  have hnat : t.toNat.choose p * p.factorial ≤ t.toNat ^ p := by
-    rw [mul_comm, ← Nat.descFactorial_eq_factorial_mul_choose]
-    exact Nat.descFactorial_le_pow t.toNat p
-  exact_mod_cast hnat
-
 /-- Sup-norm vs `ℓ₂`-norm comparison for polynomials on `w ≥ r ≥ 1` grid points:
 `|p k| ≤ √((r / g_r) / w) * ‖p‖₂`. -/
 private lemma poly_abs_le_sqrt_l2norm (r w : ℕ) (hr : 1 ≤ r) (hw : r ≤ w)
@@ -163,7 +151,7 @@ private lemma window_poly_approx (r n w a0 : ℕ) (hr : 2 ≤ r) (hn : r < n)
       · have hnn : 0 ≤ bfun (r - 1) ((k : ℤ) - (j.val : ℤ) - 1) := by
           unfold bfun; simp only [ht, ↓reduceIte]; positivity
         rw [abs_of_nonneg hnn]
-        refine (bfun_le_pow_div_fact (r - 1) _ ht).trans ?_
+        refine (bfun_le_pow_div_factorial (r - 1) _ ht).trans ?_
         have hle_w : ((k : ℤ) - (j.val : ℤ) - 1).toNat ≤ w := by have := k.isLt; omega
         exact div_le_div_of_nonneg_right
           (pow_le_pow_left₀ (Nat.cast_nonneg _) (by exact_mod_cast hle_w) (r - 1))

@@ -9,11 +9,6 @@ noncomputable section
 
 namespace BQTF
 
-private theorem l2norm_eq_norm_toE {n : ℕ} (v : Fin n → ℝ) : l2norm v = ‖toE n v‖ := by
-  rw [EuclideanSpace.norm_eq, l2norm, l2sq]
-  change Real.sqrt (∑ i, v i ^ 2) = Real.sqrt (∑ i, ‖v i‖ ^ 2)
-  simp only [Real.norm_eq_abs, sq_abs]
-
 private theorem l2sq_nonneg {n : ℕ} (v : Fin n → ℝ) : 0 ≤ l2sq v :=
   Finset.sum_nonneg fun i _ => sq_nonneg (v i)
 
@@ -29,7 +24,7 @@ theorem empNorm_Pperp_le (r n : ℕ) (v : Fin n → ℝ) :
   have h : toE n (Pperp r n v) = Vᗮ.starProjection (toE n v) := by
     rw [Submodule.starProjection_orthogonal]
     simp [Pperp, Pproj, orthProj, V]
-  rw [empNorm_eq_div, empNorm_eq_div, l2norm_eq_norm_toE, l2norm_eq_norm_toE, h]
+  rw [empNorm_eq_div, empNorm_eq_div, PL.l2norm_eq_norm_toE, PL.l2norm_eq_norm_toE, h]
   exact div_le_div_of_nonneg_right (Vᗮ.norm_starProjection_apply_le _) (Real.sqrt_nonneg _)
 
 private theorem empNorm_le_of_abs_le {n : ℕ} (hn : 0 < n) {v : Fin n → ℝ} {B : ℝ}
@@ -48,7 +43,7 @@ private theorem empNorm_le_of_abs_le {n : ℕ} (hn : 0 < n) {v : Fin n → ℝ} 
 
 private theorem scaled_l2norm_eq_empNorm (n : ℕ) (v : Fin n → ℝ) :
     l2norm (((n : ℝ) ^ (-(1 / 2 : ℝ))) • v) = empNorm v := by
-  rw [empNorm_eq_div, l2norm_eq_norm_toE, l2norm_eq_norm_toE, map_smul, norm_smul,
+  rw [empNorm_eq_div, PL.l2norm_eq_norm_toE, PL.l2norm_eq_norm_toE, map_smul, norm_smul,
     Real.norm_eq_abs, Real.rpow_neg (Nat.cast_nonneg n), ← Real.sqrt_eq_rpow,
     abs_of_nonneg (inv_nonneg.mpr (Real.sqrt_nonneg _)), div_eq_inv_mul]
 

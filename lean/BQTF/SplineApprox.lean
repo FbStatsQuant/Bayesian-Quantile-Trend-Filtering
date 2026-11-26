@@ -100,35 +100,7 @@ private lemma eval_fallBinomPoly (p : ℕ) (P : Polynomial ℝ) (x : ℝ) :
 private lemma eval_fallBinomPoly_eq_bfun (p : ℕ) (P : Polynomial ℝ) (x : ℝ) (t : ℤ)
     (ht : 0 ≤ t) (heval : P.eval x = (t : ℝ)) :
     (fallBinomPoly p P).eval x = bfun p t := by
-  rw [eval_fallBinomPoly, heval, bfun]
-  simp only [ht, ↓reduceIte]
-  obtain ⟨m, rfl⟩ := Int.eq_ofNat_of_zero_le ht
-  simp only [Int.cast_natCast, Int.toNat_natCast]
-  have hprod : ∏ k ∈ range p, ((m : ℝ) - (k : ℝ)) = (m.descFactorial p : ℝ) := by
-    induction p with
-    | zero => simp
-    | succ p ih =>
-      rw [Finset.prod_range_succ, ih, Nat.descFactorial_succ]
-      by_cases hmp : p ≤ m
-      · rw [Nat.cast_mul, Nat.cast_sub hmp]; ring
-      · have hlt : m < p := Nat.lt_of_not_ge hmp
-        rw [Nat.descFactorial_eq_zero_iff_lt.mpr hlt]
-        simp
-  rw [hprod, Nat.descFactorial_eq_factorial_mul_choose, Nat.cast_mul]
-  have hfac : (p.factorial : ℝ) ≠ 0 := Nat.cast_ne_zero.mpr (Nat.factorial_ne_zero p)
-  field_simp [hfac]
-
-/-- `bfun p t ≤ (t.toNat : ℝ)^p / p!` for `0 ≤ t`. -/
-private lemma bfun_le_pow_div_factorial (p : ℕ) (t : ℤ) (ht : 0 ≤ t) :
-    bfun p t ≤ ((t.toNat : ℝ) ^ p) / (p.factorial : ℝ) := by
-  rw [bfun]
-  simp only [ht, ↓reduceIte]
-  have hfac : (0 : ℝ) < p.factorial := Nat.cast_pos.mpr (Nat.factorial_pos p)
-  rw [le_div_iff₀ hfac]
-  have hnat : t.toNat.choose p * p.factorial ≤ t.toNat ^ p := by
-    rw [mul_comm, ← Nat.descFactorial_eq_factorial_mul_choose]
-    exact Nat.descFactorial_le_pow t.toNat p
-  exact_mod_cast hnat
+  rw [eval_fallBinomPoly, heval, bfun_eq_prod_div_factorial p t ht]
 
 /-- Degree of `fallBinomPoly p P` is at most `p` whenever `P.degree ≤ 1`. -/
 private lemma degree_fallBinomPoly_le (p : ℕ) (P : Polynomial ℝ) (hP : P.degree ≤ 1) :

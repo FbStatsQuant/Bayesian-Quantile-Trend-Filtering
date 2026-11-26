@@ -167,18 +167,9 @@ private lemma integral_pi_eval_prob {n : ℕ} (μ : Fin n → Measure ℝ)
 private lemma measurable_finset_sup' {α β : Type*} [MeasurableSpace α]
     (T : Finset β) (hT : T.Nonempty) {f : β → α → ℝ} (hf : ∀ t ∈ T, Measurable (f t)) :
     Measurable (fun x => T.sup' hT fun t => f t x) := by
-  classical
-  induction hT using Finset.Nonempty.cons_induction with
-  | singleton a =>
-    simpa using hf a (Finset.mem_singleton_self a)
-  | cons a s ha hs ih =>
-    have hrew : (fun x => (s.cons a ha).sup' (Finset.cons_nonempty ha) fun t => f t x) =
-        fun x => max (f a x) (s.sup' hs fun t => f t x) := by
-      ext x
-      rw [Finset.sup'_cons]
-    rw [hrew]
-    exact (hf a (Finset.mem_cons_self a s)).max
-      (ih fun t ht => hf t (Finset.mem_cons_of_mem ht))
+  have h : (fun x => T.sup' hT fun t => f t x) = T.sup' hT f :=
+    funext fun x => (Finset.sup'_apply hT f x).symm
+  exact h ▸ Finset.measurable_sup' hT hf
 
 /-- **Symmetrization for finite empirical processes (absolute-value form; vdV–W Lemma 2.3.6).**
 For independent coordinates `y_i ∼ μ_i`, a finite nonempty index set `T`, and uniformly bounded

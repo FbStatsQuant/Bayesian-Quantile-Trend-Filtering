@@ -45,70 +45,6 @@ theorem fl_le_fu_of_dataHyp {k n : ℕ} (hn : 1 ≤ n) {τ : ℝ} {μ : Fin n �
   rw [abs_of_pos hL] at hA hB
   nlinarith
 
-private lemma distFn_eq_of_assB1 {ν : Measure ℝ} [IsProbabilityMeasure ν] {τ q L fu : ℝ}
-    (hL : 0 < L) (hq : IsQuantile ν τ q) (hB : AssB1 ν q L fu) :
-    distFn ν q = τ := by
-  have hIio : Set.Iio q = ⋃ m : ℕ, Set.Iic (q - L / (m + 1 : ℝ)) := by
-    ext x
-    simp only [Set.mem_Iio, Set.mem_iUnion, Set.mem_Iic]
-    constructor
-    · intro hx
-      have hpos : 0 < q - x := sub_pos.mpr hx
-      obtain ⟨m, hm⟩ := exists_nat_gt (L / (q - x))
-      refine ⟨m, ?_⟩
-      have hmpos : (0 : ℝ) < (m : ℝ) + 1 := by positivity
-      have hlt : L / (q - x) < (m : ℝ) + 1 := lt_trans hm (by linarith)
-      have hdiv : L / ((m : ℝ) + 1) < q - x := by
-        rw [div_lt_iff₀ hmpos]
-        rw [div_lt_iff₀ hpos] at hlt
-        linarith
-      linarith
-    · rintro ⟨m, hm⟩
-      have hpos : (0 : ℝ) < L / ((m : ℝ) + 1) := div_pos hL (by positivity)
-      linarith
-  have hmono : Monotone (fun m : ℕ => Set.Iic (q - L / (m + 1 : ℝ))) := by
-    intro a b hab
-    apply Set.Iic_subset_Iic.mpr
-    have ha : (0 : ℝ) < (a : ℝ) + 1 := by positivity
-    have hb : (a : ℝ) + 1 ≤ (b : ℝ) + 1 := by exact_mod_cast Nat.add_le_add_right hab 1
-    have hdiv : L / ((b : ℝ) + 1) ≤ L / ((a : ℝ) + 1) :=
-      div_le_div_of_nonneg_left hL.le ha hb
-    linarith
-  have htend1 : Filter.Tendsto (fun m : ℕ => distFn ν (q - L / (m + 1 : ℝ)))
-      Filter.atTop (nhds (ν (Set.Iio q)).toReal) := by
-    have h1 := MeasureTheory.tendsto_measure_iUnion_atTop (μ := ν) hmono
-    rw [← hIio] at h1
-    exact (ENNReal.tendsto_toReal (measure_ne_top ν _)).comp h1
-  have htend2 : Filter.Tendsto (fun m : ℕ => distFn ν (q - L / (m + 1 : ℝ)))
-      Filter.atTop (nhds (distFn ν q)) := by
-    rw [Metric.tendsto_atTop]
-    intro ε hε
-    let C : ℝ := max fu 0
-    obtain ⟨N, hN⟩ := exists_nat_gt (C * L / ε)
-    refine ⟨N, fun m hm => ?_⟩
-    rw [Real.dist_eq]
-    have hmpos : (0 : ℝ) < (m : ℝ) + 1 := by positivity
-    have h1le : (1 : ℝ) ≤ (m : ℝ) + 1 := by linarith [Nat.cast_nonneg (α := ℝ) m]
-    have hstep_pos : 0 < L / ((m : ℝ) + 1) := div_pos hL hmpos
-    have ht_le : |-(L / ((m : ℝ) + 1))| ≤ L := by
-      rw [abs_neg, abs_of_pos hstep_pos]
-      exact div_le_self hL.le h1le
-    have hBm := hB (-(L / ((m : ℝ) + 1))) ht_le
-    rw [← sub_eq_add_neg, abs_neg, abs_of_pos hstep_pos] at hBm
-    have hleC : fu * (L / ((m : ℝ) + 1)) ≤ C * (L / ((m : ℝ) + 1)) :=
-      mul_le_mul_of_nonneg_right (le_max_left fu 0) hstep_pos.le
-    have hlt : C * L / ε < (m : ℝ) + 1 := by
-      have : (N : ℝ) ≤ (m : ℝ) := by exact_mod_cast hm
-      linarith
-    have hlt2 : C * (L / ((m : ℝ) + 1)) < ε := by
-      rw [mul_div_assoc', div_lt_iff₀ hmpos]
-      rw [div_lt_iff₀ hε] at hlt
-      linarith
-    exact lt_of_le_of_lt (hBm.trans hleC) hlt2
-  have heq : (ν (Set.Iio q)).toReal = distFn ν q := tendsto_nhds_unique htend1 htend2
-  have ⟨hq1, hq2⟩ := hq
-  linarith
-
 /-- Lemma `pf:lem:gap`, one coordinate: if `q₁` is a `τ₁`-quantile and `q₂` a `τ₂`-quantile of
 the probability law `ν`, `τ₁ < τ₂`, and Assumption B holds at `q₁` with `(L, f̄)`, then
 `q₂ − q₁ ≥ min{L, (τ₂ − τ₁)/f̄}`. -/
@@ -116,7 +52,7 @@ theorem quantile_gap {ν : Measure ℝ} [IsProbabilityMeasure ν] {τ₁ τ₂ q
     (hL : 0 < L) (hτ : τ₁ < τ₂) (h₁ : IsQuantile ν τ₁ q₁) (h₂ : IsQuantile ν τ₂ q₂)
     (hB : AssB1 ν q₁ L fu) :
     q₁ + min L ((τ₂ - τ₁) / fu) ≤ q₂ := by
-  have hF₁ : distFn ν q₁ = τ₁ := distFn_eq_of_assB1 hL h₁ hB
+  have hF₁ : distFn ν q₁ = τ₁ := (distFn_quantile_eq_of_assB1 hL h₁ hB).1
   have hF₂ : τ₂ ≤ distFn ν q₂ := h₂.2
   have hFlt : distFn ν q₁ < distFn ν q₂ := by linarith
   have hqlt : q₁ < q₂ := by

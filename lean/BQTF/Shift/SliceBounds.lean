@@ -12,26 +12,20 @@ theorem continuous_l2norm {n : ℕ} : Continuous (l2norm : (Fin n → ℝ) → �
   unfold l2norm l2sq
   fun_prop
 
-theorem l2norm_toE {n : ℕ} (v : Fin n → ℝ) : l2norm v = ‖toE n v‖ := by
-  rw [l2norm, ← Real.sqrt_sq (norm_nonneg (toE n v)), EuclideanSpace.real_norm_sq_eq]
-  rfl
-
 theorem l2norm_add_le {n : ℕ} (u v : Fin n → ℝ) :
-    l2norm (u + v) ≤ l2norm u + l2norm v := by
-  simp only [l2norm_toE, map_add]
-  exact norm_add_le _ _
+    l2norm (u + v) ≤ l2norm u + l2norm v :=
+  PL.l2norm_add_le u v
 
 theorem l2norm_smul_real {n : ℕ} (c : ℝ) (v : Fin n → ℝ) :
-    l2norm (c • v) = |c| * l2norm v := by
-  simp [l2norm_toE, norm_smul, Real.norm_eq_abs]
+    l2norm (c • v) = |c| * l2norm v :=
+  PL.l2norm_smul c v
 
 theorem l2norm_neg_eq {n : ℕ} (v : Fin n → ℝ) : l2norm (-v) = l2norm v := by
-  simp [l2norm_toE]
+  simpa using PL.l2norm_smul (-1) v
 
 theorem measurableSet_laplaceSlice {p d : ℕ} (A : (Fin d → ℝ) →ₗ[ℝ] (Fin p → ℝ))
     (b : Fin p → ℝ) (s : ℝ) : MeasurableSet {x | l2norm (A x + b) ≤ s} :=
-  (isClosed_le (continuous_l2norm.comp
-    (A.continuous_of_finiteDimensional.add continuous_const)) continuous_const).measurableSet
+  PL.measurableSet_slice A b s
 
 theorem laplaceSlice_mono_radius {p d : ℕ} (A : (Fin d → ℝ) →ₗ[ℝ] (Fin p → ℝ))
     (lam : ℝ) (b : Fin p → ℝ) : Monotone (laplaceSlice A lam b) :=
