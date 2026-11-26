@@ -161,7 +161,11 @@ It remains to show $f_j(0)\le c_K\lambda$. Let $j'$ be a neighbor of $j$, $A_{-j
 $\Ql(B)=\int(\lambda/2)e^{-\lambda|t|}g(t)dt\ge g(0)(1-e^{-2})/(2+K)$. Hence $f_j(0)=(\lambda/2)g(0)/\Ql(B)\le c_K\lambda$.
 \end{proof}
 
-For $w\ge r$ let $G_w=w^{-1}\sum_{k=0}^{w-1}\mathbf b(k/w)\mathbf b(k/w)^\top$, $\mathbf b(x)=(1,x,\dots,x^{r-1})^\top$, and $g_r=\inf_{w\ge r}\lambda_{\min}(G_w)\in(0,1]$ (a constant depending only on $r$), and $C_s=1+r/g_r$.
+For $w\ge r$ let
+\[
+G_w=\frac1w\sum_{k=0}^{w-1}\mathbf b(k/w)\mathbf b(k/w)^\top,\qquad \mathbf b(x)=(1,x,\dots,x^{r-1})^\top,\qquad g_r=\inf_{w\ge r}\lambda_{\min}(G_w),
+\]
+and $C_s=1+r/g_r$. The constant $g_r$ depends only on $r$ and lies in $(0,1]$. Indeed, $g_r\le(G_w)_{11}=1$. For $v\ne0$, $v^\top G_wv=w^{-1}\sum_kp(k/w)^2$ with $p=v^\top\mathbf b$ a nonzero polynomial of degree at most $r-1$, which cannot vanish at the $w\ge r$ points $k/w$, so every $G_w$ is positive definite; by the same argument, so is $H=\int_0^1\mathbf b(x)\mathbf b(x)^\top dx$. The entries of $G_w$ are left Riemann sums of the nondecreasing functions $x^{a}$, $0\le a\le 2r-2$, on $[0,1]$, so every entry of $H-G_w$ lies in $[0,1/w]$, the Frobenius norm of $H-G_w$ is at most $r/w$, and $\lambda_{\min}(G_w)\ge\lambda_{\min}(H)-r/w$. Hence $\lambda_{\min}(G_w)\ge\lambda_{\min}(H)/2$ for $w\ge2r/\lambda_{\min}(H)$, and the finitely many remaining $w$ give positive values.
 
 \begin{lemma}[smoothed truth]\label{pf:lem:smooth}
 For every integer $r\le w\le m$ there is $u_w\in\R^m$ with $\|u_w\|_2\le C_sV^{*}/(n^{r-1}\sqrt w)$ and $\nn{S(u^{*}-u_w)}\le C_sV^{*}(w/n)^{r-1/2}$.
