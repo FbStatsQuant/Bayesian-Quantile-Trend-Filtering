@@ -27,6 +27,13 @@ import BQTF.Scale.Posterior
 import BQTF.Scale.Data
 import BQTF.Reduction
 import BQTF.Prob.Contraction
+import BQTF.Joint.Product
+import BQTF.Joint.Conditioning
+import BQTF.Joint.Gap
+import BQTF.Joint.SupNorm
+import BQTF.Joint.SupNormScale
+import BQTF.Joint.Transfer
+import BQTF.Joint.Main
 import BQTF.Prob.EfronStein
 import BQTF.Lin.EckartYoung
 import BQTF.Prob.Symmetrization

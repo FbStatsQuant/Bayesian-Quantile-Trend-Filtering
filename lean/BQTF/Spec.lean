@@ -15,6 +15,13 @@ The joint (non-crossing) posterior is defined here as well, so that the statemen
 Theorem `thm:joint` can be added later without moving definitions; that statement is not part
 of the current audit.
 
+Added on the Theorem 2 skeleton branch (draft, pending the Astra statement audit; see
+`docs/statements.md` §3 and differences D5–D9):
+
+* `JointStatement`      — Theorem `thm:joint` at `σ_1 = ⋯ = σ_J = 1`;
+* `JointStatementScale` — Theorem `thm:joint` at fixed scales `σ_j = σ_{0j} > 0`
+                          (last sentence of the theorem).
+
 Everything is stated on vectors `Fin n → ℝ` (the trend at the `n` design indices).
 
 Lean conventions to keep in mind (see `docs/statements.md`):
@@ -172,5 +179,63 @@ def MainStatementScale : Prop :=
       ∀ n, n₀ ≤ n → ∀ (τ : ℝ), 0 < τ → τ < 1 →
         ∀ (μ : Fin n → Measure ℝ) (θs : Fin n → ℝ), DataHyp k n τ μ θs L fl fu Vb →
           MainConclusion k n τ σ₀ (lamSeq c k n) μ θs M C
+
+/-! ## Theorem `thm:joint` (Theorem 2; skeleton draft, pending the Astra statement audit)
+
+Levels are indexed by `Fin J` (`0, …, J−1`; the paper uses `1, …, J`). A joint trend is
+`Θ : Fin J → Fin n → ℝ` with `Θ j = θ_j`, so `Θ j i = θ_{ij}` (as in `orderSet`). -/
+
+/-- The level grid: `τ_0, …, τ_{J−1} ∈ (0,1)`, strictly increasing, with every consecutive
+spacing at least `gmin`, i.e. `min_{j<J}(τ_{j+1} − τ_j) ≥ gmin` (docs D6).
+`strictMono` is implied by `spacing` when `gmin > 0`; it is listed for readability only. -/
+structure LevelGrid (J : ℕ) (τ : Fin J → ℝ) (gmin : ℝ) : Prop where
+  mem : ∀ j, 0 < τ j ∧ τ j < 1
+  strictMono : StrictMono τ
+  spacing : ∀ (j : ℕ) (h : j + 1 < J), τ ⟨j, by omega⟩ + gmin ≤ τ ⟨j + 1, h⟩
+
+/-- The event `U_M = {Θ : ∃ j, Δ²_n(θ_j − θ*_j) > M n^{−(2k+1)/(2k+2)}}`. For `J ≥ 1` this is
+the paper's `{Θ : max_j Δ²_n(θ_j − θ*_j) > M n^{−(2k+1)/(2k+2)}}` (docs D9). Level by level it
+is `⋃_j {Θ : Θ j ∈ farSet k (θ*_j) M}`. -/
+def jointFarSet {J n : ℕ} (k : ℕ) (θs : Fin J → Fin n → ℝ) (M : ℝ) :
+    Set (Fin J → Fin n → ℝ) :=
+  {Θ | ∃ j, M * rate k n < lossΔ (Θ j - θs j)}
+
+/-- The conclusion of Theorem `thm:joint` at one `n`: `y ↦ Π_𝒞(U_M ∣ y)` is measurable (docs D8)
+and `E_{θ*} Π_𝒞(U_M ∣ y) ≤ C n^{−1/(2k+2)}`, where `E_{θ*}` is the expectation under the
+product law `⊗_i μ_i` of `y` and `Π_𝒞 = jointPosterior` (eq. `joint-fixed`). -/
+def JointConclusion {J : ℕ} (k n : ℕ) (τ σ lam : Fin J → ℝ) (μ : Fin n → Measure ℝ)
+    (θs : Fin J → Fin n → ℝ) (M C : ℝ) : Prop :=
+  Measurable (fun y => jointPosterior τ σ lam k n y (jointFarSet k θs M)) ∧
+  ∫⁻ y, jointPosterior τ σ lam k n y (jointFarSet k θs M) ∂(Measure.pi μ)
+    ≤ ENNReal.ofReal (C * massRate k n)
+
+/-- **Theorem `thm:joint`** (`σ_1 = ⋯ = σ_J = 1`). For every order `k ≥ 1`, every number of
+levels `J` (docs D7), constants `c_j > 0`, `L > 0`, `f̲ > 0`, `f̄`, `V̄`, and every spacing lower
+bound `gmin > 0` (docs D6), there are constants `M, C > 0` and `n₀ > 0` such that for every
+`n ≥ n₀`, every level grid `τ` with spacing `≥ gmin`, every law `⊗_i μ_i` of `y` and every
+`θ* = (θ*_j)_j` satisfying `DataHyp` at every level `τ_j` (same `L, f̲, f̄, V̄`), the joint posterior
+with `σ_j = 1` and `λ_j = c_j n^{(2k+1)/2}` satisfies `JointConclusion`.
+
+The constants are chosen before `n`, `τ`, the law and `θ*`: this is the paper's "depending only
+on `c_1, …, c_J, k, L, f̲, f̄, V̄, J` and the smallest spacing" and "uniform over all laws". -/
+def JointStatement : Prop :=
+  ∀ (k : ℕ), 1 ≤ k → ∀ (J : ℕ) (c : Fin J → ℝ), (∀ j, 0 < c j) →
+    ∀ (L fl fu Vb : ℝ), 0 < L → 0 < fl → ∀ (gmin : ℝ), 0 < gmin →
+      ∃ (M C : ℝ) (n₀ : ℕ), 0 < M ∧ 0 < C ∧ 0 < n₀ ∧
+        ∀ n, n₀ ≤ n → ∀ (τ : Fin J → ℝ), LevelGrid J τ gmin →
+          ∀ (μ : Fin n → Measure ℝ) (θs : Fin J → Fin n → ℝ),
+            (∀ j, DataHyp k n (τ j) μ (θs j) L fl fu Vb) →
+            JointConclusion k n τ (fun _ => 1) (fun j => lamSeq (c j) k n) μ θs M C
+
+/-- **Theorem `thm:joint`, general scales.** The same with any fixed scales `σ_j = σ_{0j} > 0`;
+the constants may also depend on `σ_{01}, …, σ_{0J}`. -/
+def JointStatementScale : Prop :=
+  ∀ (k : ℕ), 1 ≤ k → ∀ (J : ℕ) (σ₀ c : Fin J → ℝ), (∀ j, 0 < σ₀ j) → (∀ j, 0 < c j) →
+    ∀ (L fl fu Vb : ℝ), 0 < L → 0 < fl → ∀ (gmin : ℝ), 0 < gmin →
+      ∃ (M C : ℝ) (n₀ : ℕ), 0 < M ∧ 0 < C ∧ 0 < n₀ ∧
+        ∀ n, n₀ ≤ n → ∀ (τ : Fin J → ℝ), LevelGrid J τ gmin →
+          ∀ (μ : Fin n → Measure ℝ) (θs : Fin J → Fin n → ℝ),
+            (∀ j, DataHyp k n (τ j) μ (θs j) L fl fu Vb) →
+            JointConclusion k n τ σ₀ (fun j => lamSeq (c j) k n) μ θs M C
 
 end BQTF
