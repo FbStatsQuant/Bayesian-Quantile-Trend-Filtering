@@ -9,7 +9,43 @@
 
 Throughout: noise (A1); (A2) is the local margin with constants (L, f, f̄); (A3) is TV⁽³⁾(θ\*) ≤ V. "Learned σ" means σ ~ IG(a, b) with the penalty free of σ.
 
-## Main results
+## Results in the current paper (updated 2026-11-25)
+
+These are the statements the paper now carries. Under the owner's policy of 2026-11-25, this section is kept in step with every Lean correction packet that changes a statement. Notation is the paper's: r = k+1, Δ²_n, λ_TV = λ/n^k.
+
+### Theorem 1 (`thm:main`): one level, fixed λ and σ
+- **Files:** `T07_Bayes_Thm3/T07c_proof.tex`, which is the paper's `appendix_theory.tex` proof. **Audit:** `T07_Bayes_Thm3/AUDIT.md`.
+- **Hypotheses:**
+  - A and B with constants (L, f̲, f̄), and V* ≤ V̄;
+  - k ≥ 1;
+  - σ = 1, or any fixed σ₀;
+  - λ = c n^{(2k+1)/2}, that is, λ_TV = c n^{1/2}.
+- **Conclusion:** E Π(Δ²_n > M n^{−(2k+1)/(2k+2)} | y) ≤ C n^{−1/(2k+2)} for n ≥ n₀.
+  - Constants depend only on (c, k, L, f̲, f̄, V̄), plus σ₀.
+  - The bound is uniform over the class.
+  - It is an upper bound only.
+- **Status:** AUDITED. Lean formalization in progress (`lean/`, Lean department).
+
+### Theorem 2 (`thm:joint`): J fixed levels, non-crossing posterior, simultaneous
+- **Files:** `T09_Joint_Theorem/STATEMENT.tex`, `PROOF.tex` and `AUDIT.md`. The paper text is Writing's W-05 (5d5eb81), signed off by Theory.
+- **Hypotheses:**
+  - those of Theorem 1 at every level, with common (L, f̲, f̄) and V̄;
+  - λ_j = c_j n^{(2k+1)/2};
+  - σ_j = 1, or any fixed σ_{0j};
+  - fixed, distinct levels.
+- **Conclusion:** E Π_C(max_j Δ²_n(θ_j − θ*_j) > M n^{−(2k+1)/(2k+2)} | y) ≤ C n^{−1/(2k+2)}.
+  - Constants depend on (c_1, …, c_J, k, L, f̲, f̄, V̄, J) and the minimum level spacing; the spacing enters n₀ only.
+  - No new assumption: B separates the true curves by min{L, spacing/f̄}.
+- **Status:** AUDITED (fresh Fable and Astra, three rounds, clean).
+
+### Appendix constant g_r > 0 (T-10; Lean correction C-01)
+- **Files:** `T10_gr_positivity/NOTE.md`. In the paper since Writing's 906be2b.
+- **Statement:** g_r = inf_{w≥r} λ_min(G_w) ∈ (0, 1], depending only on r. It is used in Lemmas `pf:lem:smooth` and `pf:lem:interp`.
+- **Status:** PROVED. The Theory head checked it; the Lean target is `BQTF.gr_pos`.
+
+## Earlier program (2026-11-23; NOT in the current paper)
+
+The entries below record the learned-σ and learned-λ program and older drafts. They are kept for reference. The paper does not state them: the owner's scope rules of 11-24 and 11-25 limit the paper to fixed λ and σ, upper bounds only.
 
 ### C1: localization at any fixed σ
 - **File:** `T06_Alignment/C1_any_sigma.md`. **Audit:** Astra (findings applied).
