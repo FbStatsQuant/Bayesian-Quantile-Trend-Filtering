@@ -55,7 +55,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "…so the c-integral is at most ∫exp{−a‖c − Nᵀ(y−Su)‖₂}dc = ∫exp{−a‖c‖₂}dc < ∞, with a = min{τ,1−τ}, a bound that does not depend on u; integrating it against the probability measure Q_λ gives N(ℝⁿ) < ∞. Positivity of the integrand gives N(ℝⁿ) > 0."
 - **Why it was needed:** a wrong proof step, in its wording. The c-integral itself depends on u (Sol reviewer's example: n = 2, r = 1, y = θ* = 0, τ = 1/2, N = (1,1)ᵀ/√2, S = (0,1)ᵀ gives √2(|u|+2)e^{−|u|/2}). Only its upper bound is u-free, and that is what the argument uses.
 - **Lean:** `BQTF.posterior_eq_ratio` (the clause 0 < Nmass univ < ∞), in `lean/BQTF/Coord.lean`.
-- **Status:** **sent** (2026-11-25) to Writing and Theory, CC HQ. Coord finalized and checked at merge 5913b27 (`posterior_eq_ratio`: standard axioms only). Found in the Coord review.
+- **Status:** **in paper (3f5dff1)**; fidelity check running. Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. Coord finalized and checked at merge 5913b27 (`posterior_eq_ratio`: standard axioms only). Found in the Coord review.
 
 ## C-04: Lemma interp uses Lemma coord at window size w = r, where Lemma coord assumes n > r
 
@@ -98,7 +98,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "(e) For $t>0$, $R_i(t)^2=\int_0^t2(t-s)\ind(0\le Z_i<s)ds$ gives $\E R_i^2\le\fu\int_0^t2(t-s)s\,ds=\fu t^3/3$; for $t<0$, $R_i(t)^2=\int_t^0 2(s-t)\ind(s<Z_i<0)ds$ and $\tau-F_i(s)\le\fu|s|$ give the same bound $\fu|t|^3/3$."
 - **Why it was needed:** a proof gap. The negative case was missing, and the printed formula is wrong for t < 0. The constants are unchanged.
 - **Lean:** `BQTF.remK_moments`, in `lean/BQTF/CheckLoss.lean`. The negative-shift case uses the weight 2(s−t) on (t,0).
-- **Status:** **sent** (2026-11-25) to Writing and Theory, CC HQ. CheckLoss was finalized and checked at merge 5f8ba95. Found in the CheckLoss review.
+- **Status:** **in paper (30625fd)**; fidelity check running. Earlier: **sent** (2026-11-25) to Writing and Theory, CC HQ. CheckLoss was finalized and checked at merge 5f8ba95. Found in the CheckLoss review.
 
 ## C-08: the Laplace mgf in the Shells score bound is used without its domain
 
