@@ -19,13 +19,14 @@ sampler_files=(
 )
 e14=engineering/E14_Inner_Rerun
 e19=engineering/E19_Default_Prior
+reference="$e19/preflight/reference_owls.rds"
 original=experiments/interior_quantiles/individual_nots_20261003/source
 data_revision=01526e1
 generator_blob=b2023dc92bb6d3a51136a6013fd63d7b6d6ee7d9
 data_files=("$e14/e14_data.R" "$e14/DATA_MATCH.md" "$original/Individual_Sampler_PMALA_Augmented.R")
 git archive "$sampler" "${sampler_files[@]}" | tar -xf - -C "$snapshot"
 git archive "$data_revision" "${data_files[@]}" | tar -xf - -C "$snapshot"
-git archive "$engineering" "$e14/e14_run.R" "$e19/e19_run.R" "$e19/e19.slurm" |
+git archive "$engineering" "$e14/e14_run.R" "$e19/e19_run.R" "$e19/e19.slurm" "$reference" |
     tar -xf - -C "$snapshot"
 
 for file in "${sampler_files[@]}"; do
@@ -39,6 +40,8 @@ for file in "${data_files[@]}"; do
     [[ "$actual" == "$(git rev-parse "$data_revision:$file")" ]]
     printf '%s  %s\n' "$actual" "$file"
 done
+printf '%s  %s\n' 6a2972c8fcc9cd3a70148fa1037972ef6dde349e63539713e630fb7f4715359d \
+    "$snapshot/$reference" | sha256sum -c
 printf 'Sampler-Commit: %s\nEngineering-Commit: %s\nGenerator-Blob: %s\n' \
     "$sampler" "$engineering" "$generator_blob" \
     > "$snapshot/run_manifest.dcf"
