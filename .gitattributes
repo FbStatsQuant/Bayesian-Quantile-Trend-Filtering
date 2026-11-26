@@ -35,3 +35,9 @@ SHA256SUMS*   -text
 *.gz   binary
 *.tar  binary
 *.tgz  binary
+
+# Sealed packages: store and check out bytes exactly as sealed (W-08 F8, HQ 2026-11-26).
+# These lines come last so they override the per-extension eol=lf rules above.
+experiments/interior_quantiles/individual_nots_20261003/** -text -eol
+experiments/joint_upper_levels/** -text -eol
+engineering/E07_Tuning_Free/joint_gibbs/validate/inputs/** -text -eol
