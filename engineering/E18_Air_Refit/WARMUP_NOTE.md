@@ -14,6 +14,7 @@ box bounds.
 
 All 1,200 E-18 fits and all three E-14 Owls replays recorded 200
 IPM fallbacks and 200 nonconvergences. The warm-up did not certify
-the conditional mode. The sampling phase inherited the approximate
-warm iterates from the data-based initialization. The warm-up is
+the conditional mode. In the traced fit, the final warm iterate
+was 0.121 RMS units from the data-based start, whose range spanned
+2.73 units. The warm-up is
 part of the published algorithm and the sampler has not been patched.
