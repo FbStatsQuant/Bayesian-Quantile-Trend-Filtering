@@ -5,6 +5,7 @@ run <- normalizePath(args[1L])
 prime <- startsWith(basename(run), "E18-prime-")
 stage_pmala <- if (prime) "real-prime" else "real"
 admm_run <- if (length(args) == 3L) normalizePath(args[3L]) else run
+with_admm <- !prime || length(args) == 3L
 code <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))))
 source(file.path(code, "e18_common.R"))
 source(file.path(code, "e18_report_common.R"))
@@ -40,9 +41,11 @@ check_admm <- function(x) {
     length(x$est) == n, all(is.finite(x$est)))
 }
 got <- e18_collect(run, stage_pmala, real_grid, check_real)
-admm <- e18_collect(admm_run, "admm-real", admm_grid, check_admm)
 emit(got$issues, "spod_pmala_issues")
-emit(admm$issues, "spod_admm_issues")
+if (with_admm) {
+  admm <- e18_collect(admm_run, "admm-real", admm_grid, check_admm)
+  emit(admm$issues, "spod_admm_issues")
+}
 ok <- Filter(Negate(is.null), got$records)
 stall_ids <- names(Filter(function(x) x$lambda_stalled || x$theta_stalled, ok))
 if (length(ok)) {
@@ -78,12 +81,13 @@ if (length(ok)) {
   }
   invisible(lapply(grid_rates, plot_trace))
 }
-expected <- exp(c(4, 7, 7))
-benchmark <- data.frame(tau = e18_taus, paper_lambda = expected,
-  refit_lambda = vapply(admm$records, function(x) if (is.null(x)) NA_real_ else x$lambda_selected, 0))
-benchmark$match_to_1_decimal <- ifelse(is.na(benchmark$refit_lambda), NA,
-  sprintf("%.1f", benchmark$paper_lambda) == sprintf("%.1f", benchmark$refit_lambda))
-emit(benchmark, "spod_admm_lambda_check")
+if (with_admm) {
+  benchmark <- data.frame(tau = e18_taus, paper_lambda = exp(c(4, 7, 7)),
+    refit_lambda = vapply(admm$records, function(x) if (is.null(x)) NA_real_ else x$lambda_selected, 0))
+  benchmark$match_to_1_decimal <- ifelse(is.na(benchmark$refit_lambda), NA,
+    sprintf("%.1f", benchmark$paper_lambda) == sprintf("%.1f", benchmark$refit_lambda))
+  emit(benchmark, "spod_admm_lambda_check")
+}
 
 record_cell <- function(chains, tau, b0) {
   if (any(vapply(chains, is.null, FALSE))) return(NULL)
@@ -128,9 +132,11 @@ fits$pmala_selected <- lapply(seq_along(e18_taus), function(i) {
   if (!is.na(selected$b0[i])) pmala[[match(selected$b0[i], grid_rates)]][[i]]$fit
 })
 b0_by_view$pmala_selected <- selected$b0
-fits$admm <- lapply(admm$records, function(x)
-  if (!is.null(x)) d$center + d$scale * x$est)
-b0_by_view$admm <- rep(NA_real_, length(e18_taus))
+if (with_admm) {
+  fits$admm <- lapply(admm$records, function(x)
+    if (!is.null(x)) d$center + d$scale * x$est)
+  b0_by_view$admm <- rep(NA_real_, length(e18_taus))
+}
 labels <- function(name) {
   b0 <- b0_by_view[[name]]
   ifelse(is.na(b0), sprintf("tau = %.2f", e18_taus),
@@ -204,9 +210,9 @@ for (name in names(fits)) {
     fit_tau01 = series[[1L]], fit_tau05 = series[[2L]], fit_tau10 = series[[3L]]),
     paste0("spod_curves_", name))
 }
-if (any(!benchmark$match_to_1_decimal, na.rm = TRUE))
+if (with_admm && any(!benchmark$match_to_1_decimal, na.rm = TRUE))
   warning("ADMM selected different lambda values than the paper. See spod_admm_lambda_check.csv.")
 if (length(stall_ids) || (!is.null(cell_diag) && any(cell_diag$STOP_rhat)))
   stop("STOP: a chain stalled or log-lambda R-hat exceeded 1.1. See the chain and cell health CSVs.")
-if (nrow(got$issues) || nrow(admm$issues)) stop("Incomplete real-data fit set. See issue CSVs.")
+if (nrow(got$issues) || (!prime && nrow(admm$issues))) stop("Incomplete real-data fit set. See issue CSVs.")
 if (selected$branch[1L] == "iii") stop("STOP: Stage 1 did not select a rate triple. Escalate to HQ.")

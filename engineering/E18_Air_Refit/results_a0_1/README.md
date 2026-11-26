@@ -2,8 +2,8 @@
 
 `a0 = 1, not adopted; sensitivity`.
 
-These PMALA-only CSVs are copied byte for byte from
-`runs/E18-sim-20261126/report/`. The original run remains in place.
-The selection artifacts record how the preregistered rule evaluated
-this sensitivity grid. The benchmark comparison is pending the
-completed ADMM and HS report.
+The original `runs/E18-sim-20261126/` remains in place. The selection and
+PMALA cell CSVs preserve the sensitivity evaluation. The rebuilt per-fit
+CSV adds the explicit `a0` column. The comparison uses 299 verified ADMM
+refits, the 300 sealed Laplace fits and the published HS aggregates.
+ADMM's τ = .05, seed 62 timeout is recorded in `discarded_reps.csv`.

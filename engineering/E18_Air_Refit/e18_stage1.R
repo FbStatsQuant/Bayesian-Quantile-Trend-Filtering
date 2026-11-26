@@ -1,4 +1,4 @@
-# Rscript --vanilla e18_stage1.R RUN_DIR [--pilot | --admm-sim=DIR --onizuka-hs=DIR]
+# Rscript --vanilla e18_stage1.R RUN_DIR [--pilot | --admm-sim=DIR]
 args <- commandArgs(trailingOnly = TRUE)
 if (!length(args)) stop("Usage: e18_stage1.R RUN_DIR [--pilot | --METHOD=REFIT_DIR ...]")
 run <- normalizePath(args[1L])
@@ -8,7 +8,7 @@ folder <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs
 source(file.path(folder, "e18_common.R"))
 source(file.path(folder, "e18_report_common.R"))
 source(file.path(folder, "e18_select.R"))
-benchmark_stages <- c("admm-sim", "onizuka-hs")
+benchmark_stages <- "admm-sim"
 benchmark_methods <- c("ADMM", "Onizuka (HS)", "Onizuka (Laplace)")
 pilot <- identical(args[-1L], "--pilot")
 roots <- setNames(rep(run, length(benchmark_stages)), benchmark_stages)
@@ -121,7 +121,8 @@ by_cell <- do.call(rbind, lapply(seq_len(nrow(trace)), function(i) {
 emit(by_cell, "pmala_cells")
 
 # Published aggregates are historical reference. Comparisons use per-seed data.
-emit(read.csv(file.path(folder, "published_stage1.csv")), "published_table2_reference")
+published <- read.csv(file.path(folder, "published_stage1.csv"))
+emit(published, "published_table2_reference")
 benchmark_rows <- function(fits, method, available, source) {
   do.call(rbind, lapply(e18_taus, function(tau) {
     d <- if (is.null(fits)) data.frame() else fits[fits$tau == tau, ]
@@ -139,9 +140,8 @@ benchmarks <- setNames(lapply(seq_along(benchmark_stages), function(i) {
   results <- if (available) e18_collect(root, stage, e18_grid(stage), function(x) {
     check_data(x)
     stopifnot(length(x$est) == 500L, all(is.finite(x$est)))
-    if (stage == "admm-sim") stopifnot(startsWith(x$remote_sha, "17e3e7c"),
+    stopifnot(startsWith(x$remote_sha, "17e3e7c"),
       x$lambda_selected %in% 500^seq(0, 1.4, length.out = 15L))
-    else stopifnot(identical(x$source_sha, e18_onizuka_sha), x$metrics[["coverage"]] %in% (0:500 / 500))
   })
   ok <- Filter(Negate(is.null), results$records)
   fits <- do.call(rbind, lapply(ok, function(x) {
@@ -152,8 +152,19 @@ benchmarks <- setNames(lapply(seq_along(benchmark_stages), function(i) {
   }))
   issues <- data.frame(method = character(), tau = numeric(), seed = integer(), reason = character())
   if (available) {
-    emit(results$issues, paste0(stage, "_issues"))
     missing <- results$issues
+    accounting <- file.path(root, c("slurm_accounting.psv", "E18_ACCOUNTING.psv"))
+    accounting <- accounting[file.exists(accounting)]
+    if (length(accounting)) {
+      state <- read.table(accounting[1L], sep = "|", quote = "", comment.char = "",
+        colClasses = "character", fill = TRUE)[, 1:2]
+      arrays <- state[grepl("^[0-9]+_[0-9]+$", state[[1L]]), ]
+      index <- as.integer(sub("^[0-9]+_", "", arrays[[1L]]))
+      stopifnot(!anyDuplicated(index))
+      timeout <- arrays[[2L]][match(missing$index, index)] %in% "TIMEOUT"
+      missing$detail[timeout & missing$detail == "Missing worker result"] <- "Slurm timeout"
+    }
+    emit(missing, paste0(stage, "_issues"))
     issues <- data.frame(method = rep(method, nrow(missing)), tau = missing$tau,
       seed = missing$seed, reason = missing$detail)
   }
@@ -177,6 +188,15 @@ laplace_method <- benchmark_methods[3L]
 benchmarks[[laplace_method]] <- list(
   rows = benchmark_rows(laplace_fits, laplace_method, TRUE, "sealed Table 2 archive"),
   fits = laplace_fits)
+hs <- published[published$method == "onizuka_hs", ]
+stopifnot(identical(hs$tau, e18_taus), all(hs$n_seeds == 100L))
+hs_note <- "from the original run; per-replication values not retained, so no paired comparison"
+benchmarks[["Onizuka (HS)"]] <- list(rows = do.call(rbind, lapply(seq_len(nrow(hs)), function(i) {
+  row <- summarize(data.frame(), "Onizuka (HS)", hs$tau[i], NA_real_, hs$n_seeds[i], hs_note)
+  row[metric_cols[metric_cols != "coverage"]] <- hs[i, paste0("mean_", metrics)]
+  row$n_CAA_defined <- hs$n_CAA_defined[i]
+  row
+})))
 
 columns <- names(benchmarks[[1L]]$rows)
 table <- do.call(rbind, c(list(by_cell[columns]), lapply(benchmarks, `[[`, "rows")))
@@ -205,7 +225,7 @@ paired_summary <- function(method) {
     }))
   }))
 }
-paired <- do.call(rbind, lapply(benchmark_methods, paired_summary))
+paired <- do.call(rbind, lapply(c("ADMM", laplace_method), paired_summary))
 emit(paired, "paired_pmala_benchmarks")
 admm <- paired[paired$method == "ADMM", setdiff(names(paired), "method")]
 names(admm)[names(admm) == "mean_pmala_minus_benchmark"] <- "mean_pmala_minus_admm"

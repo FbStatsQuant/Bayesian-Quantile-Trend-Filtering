@@ -63,8 +63,8 @@ published means at that precision.
 
 | Method | Exact regeneration on Owls | Reaggregation from original per-replication metrics | HQ reuse verdict |
 |---|---|---|---|
-| ADMM | Fails the exact comparison on the common input | Original archive unavailable. The aggregate summary matches 18/18 values. τ = 0.05 has 99 replications, with 90 defined CAA values and an unknown omitted seed. | Approved to refit with `admm-sim`. |
-| Onizuka HS | Fails the exact comparison on the common input | Original archive unavailable. The aggregate summary matches 18/18 values. | Approved to refit with `onizuka-hs`. |
+| ADMM | Fails the exact comparison on the common input | Original archive unavailable. Its summary matches 18/18 values. | HQ accepted 299 sealed-data refits. τ = 0.05, seed 62 timed out in the refit. |
+| Onizuka HS | Identical sealed input provenance from the shared October generator and cross-method audit | The archived aggregate summary matches 18/18 printed values. | From the original run; per-replication values not retained, so no paired comparison. |
 | Onizuka Laplace | Regeneration differs by at most 1.8e-15 | 300/300 original rows verified, 18/18 reaggregated means match at paper rounding. | **REUSE (HQ ruling 11-26)** |
 
 The archived Laplace fits ran on the sealed Table 2 data. The audit
@@ -82,8 +82,9 @@ Table 2 input archive and verify the observation and truth hashes
 before fitting. The archived Laplace and HS sampler source is
 [BQTF-function.R](../../experiments/extreme_quantiles/packages/Extreme_Onizuka/source/BQTF-function.R).
 Its SHA-256 matches both historical air packages according to the
-build report. HQ approved the ADMM and HS refits using the sealed
-inputs and the published driver settings.
+build report. The E-18 ADMM refit uses the sealed inputs and the
+published driver settings. HQ approved the HS aggregates from
+`published_stage1.csv` and closed the refit.
 
 ## Reproduce
 

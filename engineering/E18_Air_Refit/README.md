@@ -21,12 +21,10 @@
 Every Stage 1 rate and level uses the exact archived Table 2 observations
 and baseline. [DATA_MATCH.md](DATA_MATCH.md) documents the regeneration
 check and the benchmark's provenance. HQ approved reusing the sealed
-Onizuka Laplace records and refitting ADMM and Onizuka HS. Published
-ADMM at 0.05 uses 99 replications, and the retained summary omits the
-discarded seed's identity. Report the observed sample size for each
-E-18 method and level. Each paired comparison uses the common
-successful seeds at its level and rate, restricted to defined pairs
-for CAA.
+Onizuka Laplace records, the 299-fit ADMM refit, and the published
+Onizuka HS aggregates. ADMM timed out at τ = 0.05, seed 62. Report
+each method's sample size. Paired ADMM and Laplace comparisons use
+common successful seeds and defined pairs for CAA.
 
 MSE is the mean squared error against the true quantile. CL is mean check
 loss on the observations. CAA averages sensitivity and specificity for
@@ -83,6 +81,8 @@ choice and the selected rate at each level. Run the synthetic test on Owls with
 
 ## Stage 1 pilot and accounting
 
+Stage 1 (`a0 = 1`) is closed at 77.4 of 80 core-hours.
+
 Six full-length fits, all on data seed 1 and MCMC seed 1001. Slurm array
 indices are `0,100,200,900,1000,1100`. The first three are at 1e-3 and the
 last three at 1e-6, in level order 0.01, 0.05, 0.10 within each rate.
@@ -112,10 +112,12 @@ their task keys. Use `sim` with indices 0–1199 for production and run
 `e18_stage1.R RUN_DIR` to write per-fit metrics, all 12 cell summaries,
 the side-by-side comparison, an explicit issue list, and the selection
 trace. Supply separately collected benchmark results with
-`--admm-sim=DIR --onizuka-hs=DIR`. The table includes all four rates and
+`--admm-sim=DIR`. The table includes all four rates and
 all three benchmarks at each level. It reads Laplace per-replication
 metrics from the sealed archive. When an approved refit has yet to be
-supplied, its row records its pending status. The report writes
+supplied, its row records its pending status. The HS row is from the
+original run; per-replication values not retained, so no paired comparison.
+The report writes
 `paired_pmala_benchmarks.csv` with seed-matched differences and
 `discarded_reps.csv` with the method, level, seed, and recorded reason
 for each excluded benchmark replication in the supplied runs.
@@ -140,14 +142,15 @@ or unusable outputs, and adds no convergence-based discard rule.
 [Pinned grid search](https://github.com/halleybrantley/detrendr/blob/17e3e7c/R/get_trend_BIC.R),
 [pinned solver wrappers](https://github.com/halleybrantley/detrendr/blob/17e3e7c/R/solve_functions.R).
 
-The `onizuka-hs` stage also uses indices 0–299 and the archived sampler
-source hash. It calls `BQTF.MCMC.HS.multi` with `X = 1:500`,
-`TForder = 2`, `sig.init = c(1, 1)`, `sparse = FALSE`, and seed
-`1000 + seed`. It uses 8,000 draws, discards the first 2,000, and
-reports the posterior mean and pointwise quantiles. It needs the
-original MASS, GIGrvg, invgamma and MCMCpack packages. The approved
-refits add an estimated 1.0 core-hour for ADMM and 0.44 for HS based
-on historical one-core timings. Laplace has no new fit cost.
+The former estimate of 0.44 core-hours for an HS refit is invalid.
+The array used 23.6 core-hours in about five minutes and completed
+zero fits. HQ selected the published HS aggregates.
+
+Before production, every array, including benchmark arrays, must
+complete a measured one-fit pilot on a compute node. The pilot must
+load every runtime library, including GLPK for ADMM, and record
+CPU, elapsed wall time, and peak RSS. Run the full six-fit PMALA
+pilot gates as specified for the simulation designs.
 
 ## Stage 2 preparation
 
@@ -251,9 +254,38 @@ guard gates apply. Record measured Slurm TotalCPU and MaxRSS. Run
 `ops/pilot_resources.py sim-prime ACCOUNTING_FILE` to project the total
 as `sum(pilot CPU seconds) / 3600 + 1500 * mean(pilot CPU seconds) / 3600`.
 The dedicated 80-core-hour cap includes this pilot and is separate from
-the 53 core-hours used by Stage 1. If the projection exceeds 80, stop
+the closed Stage 1 budget. If the projection exceeds 80, stop
 and report it to HQ. Keep all five rates and 100 replications per cell.
 
 Stage 2′ has a separate 40-core-hour cap for its 30 runs, including its
 pilot and associated work. It keeps the same authorization and real-data
 diagnostic gates as Stage 2.
+
+Stage 2′ PMALA reports have no ADMM dependency. Keep the existing ADMM
+figure unless an independent `admm-real` refit takes minutes and adds
+no delay. If approved, run the one-fit compute-node preflight first
+and provide the separate ADMM directory as the third reporter argument.
+Onizuka uses the approved original benchmarks throughout.
+
+## E-19 (planned, conditional; HQ 2026-11-26)
+
+If E-18 settles on an `(a0, b0)` pair for the air data, E-19 will test
+that same pair on the §4.1 interior VS and S baselines with the E-14
+design. Compare paired runs on `(signal, noise, tau, seed)`. If the
+setting performs well, it becomes the paper's default. Otherwise the
+paper keeps separate settings and explains why. HQ will set acceptance
+criteria before any E-19 fit. The E-18 export keeps explicit `a0` and
+`b0` columns.
+
+| E-18 `per_fit.csv` | E-14 `runs/E14-inner-rerun-20261125/e14_summary.csv` | Definition or source |
+|---|---|---|
+| `tau`, `seed`, `commit` | Same names | Pair E-19 with E-14 using these design keys plus `signal` and `noise`. Record the sampler commit for provenance. |
+| `a0`, `b0` | E-14 run configuration | Original E-14 uses `a0 = 1`, `b0 = 1e-3` for VS and `5e-4` for S. |
+| `mse` | `MSE` | Mean squared difference of posterior mean and true quantile. |
+| `coverage` | `coverage` | Derived from each E-14 RDS and materialized in this collected CSV. Both use coverage of the true quantile by the inclusive type-7 2.5% and 97.5% pointwise limits over all retained draws. |
+| `acc_post` | `acc_post` | Mean acceptance after burn-in. |
+| `lambda_ess` | Recompute from per-fit RDS | coda ESS of log λ on the 666 retained entries of the every-30th-sweep trace. The E-14 RDS field named `lambda_ess` itself uses untransformed λ and all retained draws, matching E-18's separate `lambda_ess_e14`. |
+| `theta_ess_median`, `theta_ess_p05` | Unavailable | E-14 has no θ ESS field. |
+| `n_sigma_guard_postburn`, `n_sigma_guard` | `n_sigma_guard` | E-14 records the full count only. The pinned guard fires during burn-in, so the post-burn count is zero by construction in both designs. |
+| `n_ipm_fallback`, `n_warm_ipm_unconverged` | `n_ipm_fallback` | E-14 records the fallback count. The warm-IPM nonconvergence count is unavailable in the E-14 export. |
+| `seconds` | `seconds` | E-14 stores sampler elapsed time. E-18's CSV includes fit summaries in elapsed time. Use the E-18 RDS field `sampler_seconds` for like-for-like timing. |
