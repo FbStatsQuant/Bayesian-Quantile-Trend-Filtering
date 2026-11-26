@@ -3,16 +3,17 @@ import BQTF.CheckLoss
 /-!
 # Separation of the true curves (appendix, Lemma `pf:lem:gap`)
 
-Owner: TBD (assigned at the Theorem 2 trigger).
+Owner: Neon-B.
 
 Under Assumption B at neighbouring levels, the true curves are at least
 `g₀ = min{L, gmin/f̄}` apart at every index, where `gmin` is a lower bound on the spacing
-(docs D6; the paper uses the smallest spacing itself, which gives a larger `g₀`).
+(docs D6; the paper uses the smallest spacing itself, which gives a `g₀` at least as large, with
+equality when `gmin` is the smallest spacing).
 
 Spec does not assume `0 < f̄`. Following PLAN §5.5 note (a), `f̄ ≥ f̲ > 0` is derived from
 Assumptions A and B (`fl_le_fu_of_dataHyp`), not added as a hypothesis. The one-coordinate core
-`quantile_gap` needs no sign condition on `f̄` at all (if `f̄ ≤ 0`, B forces `F` to be flat near
-`q₁`, so `q₂ − q₁ > L`).
+`quantile_gap` needs no sign condition on `f̄` at all (B at `t = L > 0` already forces `f̄ ≥ 0`; if
+`f̄ = 0`, B forces `F` to be flat near `q₁`, so `q₂ − q₁ > L`).
 
 Nonvacuity: all `μ_i` uniform on `[0,1]`, `θ*_{ij} = τ_j` (constant curves, `TV = 0 ≤ V̄ = 0`),
 `τ = (1/4, 3/4)`, `gmin = 1/2`, `f̲ = f̄ = 1`, `L = 1/4`: `DataHyp` holds at both levels for every
@@ -80,20 +81,22 @@ theorem quantile_gap {ν : Measure ℝ} [IsProbabilityMeasure ν] {τ₁ τ₂ q
     dsimp [d] at hmin
     linarith
 
-/-- Lemma `pf:lem:gap`: under `DataHyp` at every level of a grid with spacing `≥ gmin`,
-`θ*_{i,j+1} − θ*_{ij} ≥ g₀ = min{L, gmin/f̄}` for all `n`, all `i` and all consecutive levels. -/
-theorem level_gap {k n J : ℕ} {τ : Fin J → ℝ} {gmin : ℝ} (hτ : LevelGrid J τ gmin)
-    {μ : Fin n → Measure ℝ} {θs : Fin J → Fin n → ℝ} {L fl fu Vb : ℝ} (hL : 0 < L)
-    (hfl : 0 < fl) (h : ∀ j, DataHyp k n (τ j) μ (θs j) L fl fu Vb)
+/-- Lemma `pf:lem:gap` on a level grid under Assumption B alone (no Assumption A, no TV bound):
+if every `μ_i` is a probability law, `θ*_{ij}` is a `τ_j`-quantile of `μ_i` at every level `j`,
+Assumption B holds at every level with constants `(L, f̄)`, `L > 0` and `f̄ > 0`, then
+`θ*_{i,j+1} − θ*_{ij} ≥ g₀ = min{L, gmin/f̄}` for all `i` and all consecutive levels. With `gmin`
+the smallest spacing, this is the paper's bound. -/
+theorem level_gap_of_assB {n J : ℕ} {τ : Fin J → ℝ} {gmin : ℝ} (hτ : LevelGrid J τ gmin)
+    {μ : Fin n → Measure ℝ} (hprob : ∀ i, IsProbabilityMeasure (μ i))
+    {θs : Fin J → Fin n → ℝ} {L fu : ℝ} (hL : 0 < L) (hfu : 0 < fu)
+    (hq : ∀ j i, IsQuantile (μ i) (τ j) (θs j i)) (hB : ∀ j, AssumptionB μ (θs j) L fu)
     (i : Fin n) (j : ℕ) (hj : j + 1 < J) :
     θs ⟨j, by omega⟩ i + gapConst L gmin fu ≤ θs ⟨j + 1, hj⟩ i := by
   let j₀ : Fin J := ⟨j, by omega⟩
   let j₁ : Fin J := ⟨j + 1, hj⟩
-  have hn : 1 ≤ n := by have := i.isLt; omega
-  have hfu : 0 < fu := lt_of_lt_of_le hfl (fl_le_fu_of_dataHyp hn hL (h j₀))
-  have : IsProbabilityMeasure (μ i) := (h j₀).prob i
+  have : IsProbabilityMeasure (μ i) := hprob i
   have hlt : τ j₀ < τ j₁ := hτ.strictMono (show j₀ < j₁ by simp [j₀, j₁, Fin.lt_def])
-  have hgap := quantile_gap hL hlt ((h j₀).quantile i) ((h j₁).quantile i) ((h j₀).assB i)
+  have hgap := quantile_gap hL hlt (hq j₀ i) (hq j₁ i) (hB j₀ i)
   have hsp : gmin ≤ τ j₁ - τ j₀ := by
     have := hτ.spacing j hj
     dsimp [j₀, j₁]
@@ -102,5 +105,18 @@ theorem level_gap {k n J : ℕ} {τ : Fin J → ℝ} {gmin : ℝ} (hτ : LevelGr
   have hmin : gapConst L gmin fu ≤ min L ((τ j₁ - τ j₀) / fu) := min_le_min_left L hdiv
   dsimp [j₀, j₁] at hgap hmin ⊢
   linarith
+
+/-- Lemma `pf:lem:gap`: under `DataHyp` at every level of a grid with spacing `≥ gmin`,
+`θ*_{i,j+1} − θ*_{ij} ≥ g₀ = min{L, gmin/f̄}` for all `n`, all `i` and all consecutive levels. -/
+theorem level_gap {k n J : ℕ} {τ : Fin J → ℝ} {gmin : ℝ} (hτ : LevelGrid J τ gmin)
+    {μ : Fin n → Measure ℝ} {θs : Fin J → Fin n → ℝ} {L fl fu Vb : ℝ} (hL : 0 < L)
+    (hfl : 0 < fl) (h : ∀ j, DataHyp k n (τ j) μ (θs j) L fl fu Vb)
+    (i : Fin n) (j : ℕ) (hj : j + 1 < J) :
+    θs ⟨j, by omega⟩ i + gapConst L gmin fu ≤ θs ⟨j + 1, hj⟩ i := by
+  let j₀ : Fin J := ⟨j, by omega⟩
+  have hn : 1 ≤ n := by have := i.isLt; omega
+  have hfu : 0 < fu := lt_of_lt_of_le hfl (fl_le_fu_of_dataHyp hn hL (h j₀))
+  exact level_gap_of_assB hτ (h j₀).prob hL hfu (fun j => (h j).quantile) (fun j => (h j).assB)
+    i j hj
 
 end BQTF

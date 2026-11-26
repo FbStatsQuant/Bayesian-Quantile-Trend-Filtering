@@ -4,7 +4,7 @@ import BQTF.Asym.Rates
 /-!
 # Supremum-norm concentration (appendix, Lemma `pf:lem:sup`)
 
-Owner: TBD (assigned at the Theorem 2 trigger).
+Owner: Neon-B.
 
 One level, `σ = 1`, in the setting of Theorem `thm:main`:
 `s_n = C_I{ρ_n + (ρ_n^{2r−2} T_n)^{1/(2r−1)}}` and `η_n = r!{e^{−f̲ n ρ_n²/16} + e^{−n/8}}`, with
@@ -167,32 +167,30 @@ theorem eventually_etaSeq_le (k : ℕ) (fl : ℝ) (hfl : 0 < fl) (e : ℝ) (he :
     ∀ᶠ n in atTop, etaSeq k fl n ≤ e :=
   (etaSeq_tendsto k fl hfl).eventually (eventually_le_nhds he)
 
-/-- Lemma `pf:lem:sup` (`σ = 1`). There is `C_I > 0` depending only on `k` (from `interp`) such
-that for all constants `c, L, f̲ > 0`, `f̄`, `V̄` there is `n₂ > k + 1` with: for every `n ≥ n₂`,
-every `τ ∈ (0,1)` and every law and target satisfying `DataHyp`, some event `Ω` (in the proof,
-`Ω_E ∩ Ω_G`) satisfies
+/-- Lemma `pf:lem:sup` (`σ = 1`) on the paper's event `Ω_E ∩ Ω_G`. As `supNorm_concentration`,
+but with the event exhibited: there is `C_I > 0` (from `interp`) such that for all constants
+`c, L, f̲ > 0`, `f̄`, `V̄` there are `C_E > 0` (from `denominator`) and `n₂ > k + 1` with: for every
+`n ≥ n₂`, every `τ ∈ (0,1)` and every law and target satisfying `DataHyp`, the event
+`Ω = OmegaG k n c τ f̲ μ θ* ∩ OmegaE k n τ λ θ* C_E` (`λ = c n^{(2k+1)/2}`; the localization
+event of `localization` and the denominator event of `denominator`) satisfies
 * `Π_λ(θ : ‖θ − θ*‖_∞ > s_n ∣ y) ≤ η_n` for every `y ∈ Ω`, and
 * `P(Ωᶜ) ≤ (5/4 + 64/f̲²) n^{−1/(2r)}`.
-`‖·‖_∞ > s` is written coordinatewise as `∃ i, s < |θ_i − θ*_i|`.
-
-This is the existential consequence of Lemma `pf:lem:sup`. The proof can exhibit
-`Ω_E ∩ Ω_G`. Callers receive an existential witness. (So neither the bound on the paper's
-particular event nor the identity of `C_I` with a separately chosen `interp` witness can be
-recovered from this statement alone; J5–J7 need only the existential version.) -/
-theorem supNorm_concentration (k : ℕ) (hk : 1 ≤ k) :
+`‖·‖_∞ > s` is written coordinatewise as `∃ i, s < |θ_i − θ*_i|`. -/
+theorem supNorm_concentration_events (k : ℕ) (hk : 1 ≤ k) :
     ∃ CI : ℝ, 0 < CI ∧ ∀ (c L fl fu Vb : ℝ), 0 < c → 0 < L → 0 < fl →
-      ∃ n₂ : ℕ, k + 1 < n₂ ∧ ∀ n, n₂ ≤ n → ∀ τ : ℝ, 0 < τ → τ < 1 →
+      ∃ (CE : ℝ) (n₂ : ℕ), 0 < CE ∧ k + 1 < n₂ ∧ ∀ n, n₂ ≤ n → ∀ τ : ℝ, 0 < τ → τ < 1 →
         ∀ (μ : Fin n → Measure ℝ) (θs : Fin n → ℝ), DataHyp k n τ μ θs L fl fu Vb →
-          ∃ Ω : Set (Fin n → ℝ),
-            (∀ y ∈ Ω, posterior τ 1 (lamSeq c k n) k n y
+          (∀ y ∈ OmegaG k n c τ fl μ θs ∩ OmegaE k n τ (lamSeq c k n) θs CE,
+              posterior τ 1 (lamSeq c k n) k n y
                 {θ | ∃ i, supRad CI k c n < |θ i - θs i|} ≤ ENNReal.ofReal (etaSeq k fl n)) ∧
-            Measure.pi μ Ωᶜ ≤ ENNReal.ofReal ((5 / 4 + 64 / fl ^ 2) * massRate k n) := by
+          Measure.pi μ (OmegaG k n c τ fl μ θs ∩ OmegaE k n τ (lamSeq c k n) θs CE)ᶜ ≤
+            ENNReal.ofReal ((5 / 4 + 64 / fl ^ 2) * massRate k n) := by
   obtain ⟨CI, hCI, hInterp⟩ := interp (k + 1) (by omega)
   refine ⟨CI, hCI, fun c L fl fu Vb hc hL hfl => ?_⟩
-  obtain ⟨CE, n₁, _, hn₁, hdenom⟩ := denominator k hk c L fl fu Vb hc hL hfl
+  obtain ⟨CE, n₁, hCE, hn₁, hdenom⟩ := denominator k hk c L fl fu Vb hc hL hfl
   obtain ⟨n₂', _, hloc⟩ := localization k hk c L fl fu Vb hc hL hfl CE
   obtain ⟨nLog, hnLog⟩ := Asym.eventually_log_ge_one
-  refine ⟨max n₁ (max n₂' nLog), hn₁.trans_le (le_max_left _ _), ?_⟩
+  refine ⟨CE, max n₁ (max n₂' nLog), hCE, hn₁.trans_le (le_max_left _ _), ?_⟩
   intro n hn τ hτ₀ hτ₁ μ θs hdata
   have hn1 : n₁ ≤ n := (le_max_left _ _).trans hn
   have hn2 : n₂' ≤ n := ((le_max_left _ _).trans (le_max_right _ _)).trans hn
@@ -201,7 +199,7 @@ theorem supNorm_concentration (k : ℕ) (hk : 1 ≤ k) :
   have hn0 : 0 < n := by omega
   have hE := hdenom n hn1 τ hτ₀ hτ₁ μ θs hdata
   obtain ⟨_, hG, hpost_Kn⟩ := hloc n hn2 τ hτ₀ hτ₁ μ θs hdata
-  refine ⟨OmegaG k n c τ fl μ θs ∩ OmegaE k n τ (lamSeq c k n) θs CE, ?_, ?_⟩
+  refine ⟨?_, ?_⟩
   · intro y hy
     have hsub : {θ : Fin n → ℝ | ∃ i, supRad CI k c n < |θ i - θs i|} ⊆
         {θ : Fin n → ℝ | θ - θs ∉ Kn k n c} := by
@@ -295,5 +293,32 @@ theorem supNorm_concentration (k : ℕ) (hk : 1 ≤ k) :
             field_simp [hfl2, hx]
             ring
           linarith
+
+
+/-- Lemma `pf:lem:sup` (`σ = 1`). There is `C_I > 0` depending only on `k` (from `interp`) such
+that for all constants `c, L, f̲ > 0`, `f̄`, `V̄` there is `n₂ > k + 1` with: for every `n ≥ n₂`,
+every `τ ∈ (0,1)` and every law and target satisfying `DataHyp`, some event `Ω` (in the proof,
+`Ω_E ∩ Ω_G`) satisfies
+* `Π_λ(θ : ‖θ − θ*‖_∞ > s_n ∣ y) ≤ η_n` for every `y ∈ Ω`, and
+* `P(Ωᶜ) ≤ (5/4 + 64/f̲²) n^{−1/(2r)}`.
+`‖·‖_∞ > s` is written coordinatewise as `∃ i, s < |θ_i − θ*_i|`.
+
+This is the existential consequence of Lemma `pf:lem:sup`. The proof can exhibit
+`Ω_E ∩ Ω_G`. Callers receive an existential witness. (So neither the bound on the paper's
+particular event nor the identity of `C_I` with a separately chosen `interp` witness can be
+recovered from this statement alone; J5–J7 need only the existential version.) -/
+theorem supNorm_concentration (k : ℕ) (hk : 1 ≤ k) :
+    ∃ CI : ℝ, 0 < CI ∧ ∀ (c L fl fu Vb : ℝ), 0 < c → 0 < L → 0 < fl →
+      ∃ n₂ : ℕ, k + 1 < n₂ ∧ ∀ n, n₂ ≤ n → ∀ τ : ℝ, 0 < τ → τ < 1 →
+        ∀ (μ : Fin n → Measure ℝ) (θs : Fin n → ℝ), DataHyp k n τ μ θs L fl fu Vb →
+          ∃ Ω : Set (Fin n → ℝ),
+            (∀ y ∈ Ω, posterior τ 1 (lamSeq c k n) k n y
+                {θ | ∃ i, supRad CI k c n < |θ i - θs i|} ≤ ENNReal.ofReal (etaSeq k fl n)) ∧
+            Measure.pi μ Ωᶜ ≤ ENNReal.ofReal ((5 / 4 + 64 / fl ^ 2) * massRate k n) := by
+  obtain ⟨CI, hCI, h⟩ := supNorm_concentration_events k hk
+  refine ⟨CI, hCI, fun c L fl fu Vb hc hL hfl => ?_⟩
+  obtain ⟨CE, n₂, -, hn₂, h'⟩ := h c L fl fu Vb hc hL hfl
+  exact ⟨n₂, hn₂, fun n hn τ hτ₀ hτ₁ μ θs hdata =>
+    ⟨_, (h' n hn τ hτ₀ hτ₁ μ θs hdata).1, (h' n hn τ hτ₀ hτ₁ μ θs hdata).2⟩⟩
 
 end BQTF
