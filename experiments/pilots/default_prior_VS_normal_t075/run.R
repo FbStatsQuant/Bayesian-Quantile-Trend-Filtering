@@ -24,7 +24,7 @@ fit <- gibbs_pmala_aug(dat$y, tau, order, a0, b0, a_sigma, b_sigma,
                        adapt_target, adapt_gain, adapt_kappa, delta_bounds, tf_control,
                        metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
                        mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = warm_sweeps, gamma_warm = gamma_warm,
-                       K = K_theta, asis = asis_lambda, tol = admm_tol, lamjump = lamjump, lamjump_s = lamjump_s,
+                       K = K_theta, asis = asis_lambda, tol = admm_tol,
                        prior_scale = prior_scale, cmap = FALSE, kappa = kappa_metric, adapt_all = adapt_all)
 saveRDS(list(fit = fit, dat = dat), file.path(tempdir(), "fit.rds"))
 

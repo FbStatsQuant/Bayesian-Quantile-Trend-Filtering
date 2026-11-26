@@ -1,10 +1,12 @@
 # lambda-mixing variant runner (HQ, 2026-11-25). Same data and settings as ../default_prior_VS_normal_t075/run.R
 # (VS, Normal, tau 0.75, n 500, seed 1, order 2, lambda ~ Gamma(1, 1e-5), sigma ~ IG(0.1, 0.1)), with overrides.
 # Usage (repo root): owls_run -j 1 -- Rscript experiments/pilots/lambda_mixing/run_variant.R <name> [key=value ...]
-#   keys: any setting of the canonical settings block (lamjump, K_theta, asis_lambda, gibbs_iter, gibbs_burn, lambda_init, ...)
+#   keys: any setting of the canonical settings block (K_theta, asis_lambda, gibbs_iter, gibbs_burn, lambda_init, ...)
 #   plus chain_seed (RNG seed of the chain; the data seed stays 1).
 suppressPackageStartupMessages(library(coda))
 args <- commandArgs(trailingOnly = TRUE); name <- args[1]; kv <- args[-1]
+if (any(sub("=.*", "", kv) %in% c("lamjump", "lamjump_s")))
+  stop("The lambda jump was removed from the individual sampler.")
 src  <- "method/individual/Individual_Sampler_PMALA_Augmented.R"
 lines <- readLines(src); main_at <- grep("^# ---- Main", lines)[1]
 setwd(dirname(src)); eval(parse(text = lines[seq_len(main_at - 1)]), envir = globalenv()); setwd("../..")
@@ -28,7 +30,7 @@ fit <- gibbs_pmala_aug(dat$y, tau, order, a0, b0, a_sigma, b_sigma,
                        adapt_target, adapt_gain, adapt_kappa, delta_bounds, tf_control,
                        metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
                        mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = warm_sweeps, gamma_warm = gamma_warm,
-                       K = K_theta, asis = asis_lambda, tol = admm_tol, lamjump = lamjump, lamjump_s = lamjump_s,
+                       K = K_theta, asis = asis_lambda, tol = admm_tol,
                        prior_scale = prior_scale, cmap = FALSE, kappa = kappa_metric, adapt_all = adapt_all, verbose = FALSE)
 post <- (gibbs_burn + 1):gibbs_iter
 lam <- fit$lambda[post]; sig <- fit$sigma[post]; TH <- fit$theta
@@ -41,7 +43,7 @@ res <- data.frame(name = name, overrides = paste(kv, collapse = " "), sweeps = g
                   lam_ess_per_min = round(effectiveSize(lam) / mins, 2),
                   th_ess_median = round(median(ess_th)), th_ess_min = round(min(ess_th)),
                   th_ess_med_per_min = round(median(ess_th) / mins, 1),
-                  sig_ess = round(effectiveSize(sig)), acc_lamjump = fit$acc_lamjump)
+                  sig_ess = round(effectiveSize(sig)))
 print(t(res))
 write.csv(res, file.path(out_dir, paste0(name, ".csv")), row.names = FALSE)
 saveRDS(list(lambda = fit$lambda, sigma = fit$sigma, theta_mid = TH[, c(50, 150, 250, 350, 450)], est = est, lo = lo, hi = hi),

@@ -11,7 +11,7 @@ The canonical sampler code. One copy; the frozen copies inside `experiments/*/so
 ## Run and test
 
 ```sh
-cd method/individual && Rscript Individual_Sampler_PMALA_Augmented.R test      # "all tests passed", about 100 s
+cd method/individual && Rscript Individual_Sampler_PMALA_Augmented.R test      # "all tests passed", about 5 min 19 s including compilation
 cd method/joint      && Rscript Joint_Sampler_PMALA_Augmented.R test_prox      # needs clarabel, about 70 s including compilation
 cd method/joint      && Rscript Joint_Sampler_PMALA_Augmented.R test           # kernel + exactness tests (longer)
 ```
@@ -20,7 +20,7 @@ Run with no argument, each script fits one simulated data set with the settings 
 
 ## Defaults = paper defaults
 
-Since E-03 the settings block of `individual/Individual_Sampler_PMALA_Augmented.R` equals the production configuration of the interior-quantile campaign: order 2 (k = 2, third differences), b0 = 0.01, ASIS on, target acceptance 0.50, 30,000 sweeps with 10,000 burn-in, seed 1, tau 0.5. The sampler body is unchanged.
+Since E-03 the settings block of `individual/Individual_Sampler_PMALA_Augmented.R` equals the production configuration of the interior-quantile campaign: order 2 (k = 2, third differences), b0 = 0.01, ASIS on, target acceptance 0.50, 30,000 sweeps with 10,000 burn-in, seed 1, tau 0.5.
 
 ## Dependencies
 

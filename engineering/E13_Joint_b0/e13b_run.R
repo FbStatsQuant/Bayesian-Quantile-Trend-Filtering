@@ -111,7 +111,7 @@ run_ind <- function(tk, iter, burn) {
   fit <- tryCatch(gibbs_pmala_aug(dat$y, tk$tau, 2L, 1, tk$b0, 0.1, 0.1, iter, burn, delta_init, lambda_init, adapt_target, adapt_gain,
                                   adapt_kappa, delta_bounds, tf_control, metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
                                   mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = warm_sweeps, gamma_warm = gamma_warm,
-                                  K = K_theta, asis = TRUE, tol = admm_tol, lamjump = lamjump, lamjump_s = lamjump_s, prior_scale = prior_scale,
+                                  K = K_theta, asis = TRUE, tol = admm_tol, prior_scale = prior_scale,
                                   cmap = FALSE, kappa = kappa_metric, adapt_all = adapt_all, asis_q = tk$variant, block = block_theta,
                                   block_mode = block_mode, verbose = FALSE),
                   error = function(e) e)

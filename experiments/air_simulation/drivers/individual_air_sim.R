@@ -52,8 +52,6 @@ gamma_warm   <- 1e4
 admm_iter    <- 150L
 admm_tol     <- 0
 K_theta      <- 1L
-lamjump      <- FALSE
-lamjump_s    <- 0.3
 asis_lambda  <- FALSE
 admm_rho     <- NULL
 
@@ -134,7 +132,7 @@ for (j in seq_along(taus)) {
                              adapt_target, adapt_gain, adapt_kappa, delta_bounds, smp$tf_control,
                              metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
                              mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = warm_sweeps, gamma_warm = gamma_warm,
-                             K = K_theta, asis = asis_lambda, tol = admm_tol, lamjump = lamjump, lamjump_s = lamjump_s,
+                             K = K_theta, asis = asis_lambda, tol = admm_tol,
                              prior_scale = prior_scale, cmap = FALSE, kappa = kappa_metric, adapt_all = adapt_all)
 
   truth <- dat$theta + sd_eps * qnorm(tau)                      # theta_tau: tau-quantile of y - s

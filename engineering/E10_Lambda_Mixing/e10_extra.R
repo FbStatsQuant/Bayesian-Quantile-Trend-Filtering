@@ -41,7 +41,7 @@ fit <- gibbs_pmala_aug(dat$y, tk$tau, order, a0, b0, a_sigma, b_sigma,
                        adapt_target, adapt_gain, adapt_kappa, delta_bounds, tf_control,
                        metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
                        mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = warm_sweeps, gamma_warm = gamma_warm,
-                       K = K_theta, asis = TRUE, tol = admm_tol, lamjump = FALSE, prior_scale = "none", cmap = FALSE,
+                       K = K_theta, asis = TRUE, tol = admm_tol, prior_scale = "none", cmap = FALSE,
                        kappa = kappa_metric, adapt_all = adapt_all, asis_q = tk$variant, verbose = FALSE)
 post <- (gibbs_burn + 1):gibbs_iter; TH <- fit$theta; H <- nrow(TH) %/% 2
 est <- colMeans(TH); lo <- apply(TH, 2, quantile, .025); hi <- apply(TH, 2, quantile, .975)

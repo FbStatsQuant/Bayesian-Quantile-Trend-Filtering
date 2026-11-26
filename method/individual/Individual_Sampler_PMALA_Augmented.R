@@ -74,7 +74,7 @@ load_prox_cpp <- function(src) {
 # Adopted defaults (2026-09-25, 30 cells x seed 1, adoption rule: not worse on MSE in any cell beyond seed noise, better on the
 # target efficiency metric): ASIS lambda step ON (lambda-ESS per hour 87 vs 50, half-chain lambda drift 0.10 vs 0.26, MSE geometric
 # mean ratio 0.96); early exit OFF (no wall-time gain at a 150-iteration budget); K = 1 (K = 3, 5 raise theta-ESS 3-4x but cost
-# 3.6-6x); joint lambda jump OFF (lambda-ESS per hour 28-39, below ASIS).  See variant_adoption_summary.csv.
+# 3.6-6x).  See variant_adoption_summary.csv.
 seed        <- 1
 n           <- 500L
 tau         <- 0.5
@@ -109,11 +109,6 @@ gamma_warm   <- 1e4        # warm_sweeps sweeps, conjugate draws for the rest; t
 admm_iter    <- 150L       # ADMM iteration budget inside T(x)
 admm_tol     <- 0          # residual-based early exit (relative primal and dual residuals); 0 = always run the full budget
 K_theta      <- 1L         # P-MALA moves on theta per Gibbs sweep (all at the same z, lambda, sigma)
-lamjump      <- FALSE      # joint (lambda, theta) Metropolis move once per sweep: lambda' = lambda exp(s xi), theta* = T_{lambda'}(theta) + noise
-                           # in the lambda' metric; exact MH on the joint conditional of (theta, lambda) | z, sigma.  The prox at lambda'
-                           # re-shrinks the roughness of theta to the lambda' scale, so lambda can jump while theta follows (the conjugate
-                           # and ASIS draws only move lambda by a few % per sweep because ||D theta||_1 ~ m/lambda is locked to lambda).
-lamjump_s    <- 0.3        # initial log-scale step of the lambda jump; Robbins-Monro adapted to acceptance 0.25
 asis_lambda  <- TRUE       # ancillary-sufficient interweaving for lambda: after the conjugate draw, redraw lambda holding
                            # u~ = lambda * D theta and the polynomial part of theta fixed (theta rescales with lambda);
                            # 1-d slice sampler on log lambda, target p(lambda) * L(theta(lambda)).  Valid Gibbs variant (Yu & Meng 2011).
@@ -304,30 +299,6 @@ pmala_step <- function(theta, y, z, lambda, sigma, delta, cst, order, metric = "
        log_alpha = min(0, log_alpha))
 }
 
-# Joint (lambda, theta) move.  Proposal: eta' = log lambda + s xi_0;  theta* ~ N(T_{lambda'}(theta), delta P_{lambda'}^{-1}) with
-# T_{lambda'} the prox of U_{lambda'} in the P_{lambda'} metric.  Reverse: lambda' -> lambda, theta* -> theta with T_lambda, P_lambda.
-# log alpha = [log pi(theta*, lambda') - log pi(theta, lambda)] + [log q(theta, lambda | theta*, lambda') - log q(theta*, lambda' | theta, lambda)],
-# log pi(theta, lambda | z, sigma) = -U_lambda(theta) + (a0 - 1 + m) log lambda - b0 lambda,   U_lambda = sum a (theta - r)^2 / 2 + lambda ||D theta||_1,
-# log q(theta* | .) = -||theta* - T||_P^2 / (2 delta) + (1/2) log det P (+ const), log q(lambda' | lambda) in lambda-space carries 1/lambda'.
-lamjump_step <- function(theta, lambda, a, r, a0, b0, m, delta, s, order, kappa, rho = NULL, iters = 150L, tol = 0) {
-  gamma <- delta / 2; n <- length(theta)
-  lam1 <- lambda * exp(s * rnorm(1))
-  M0 <- metric_dc("curv", a, lambda, 0, kappa); M1 <- metric_dc("curv", a, lam1, 0, kappa)
-  rho0 <- if (is.null(rho)) 0.1 * (mean(M0$d) + M0$c) / gamma else rho
-  rho1 <- if (is.null(rho)) 0.1 * (mean(M1$d) + M1$c) / gamma else rho
-  p1   <- prox_admm_metric(theta, a, r, lam1, gamma, M1$d, M1$c, order, rho1, iters, tol)          # T_{lambda'}(theta)
-  prop <- p1 + sqrt(delta) * minv_sqrt_noise(rnorm(n), M1$d, M1$c, order)
-  p0   <- prox_admm_metric(prop, a, r, lambda, gamma, M0$d, M0$c, order, rho0, iters, tol)         # T_lambda(theta*)
-  lpi1 <- -U_cond(prop, a, r, lam1, order) + (a0 - 1 + m) * log(lam1) - b0 * lam1
-  lpi0 <- -U_cond(theta, a, r, lambda, order) + (a0 - 1 + m) * log(lambda) - b0 * lambda
-  lq_fwd <- -mnorm2(prop - p1, M1$d, M1$c, order) / (2 * delta) + 0.5 * metric_logdet(M1$d, M1$c, order) - log(lam1)
-  lq_rev <- -mnorm2(theta - p0, M0$d, M0$c, order) / (2 * delta) + 0.5 * metric_logdet(M0$d, M0$c, order) - log(lambda)
-  log_alpha <- (lpi1 - lpi0) + (lq_rev - lq_fwd)
-  if (!is.finite(log_alpha)) log_alpha <- -Inf
-  accept <- log(runif(1)) < log_alpha
-  list(theta = if (accept) prop else theta, lambda = if (accept) lam1 else lambda, accept = accept, log_alpha = min(0, log_alpha))
-}
-
 # ASIS (ancillary-sufficient interweaving) step for lambda, generalised (E-10).  Sufficient parameterisation: lambda | theta ~ Gamma
 # (conjugate, Block 3).  Interweaving move: hold p = P theta fixed, where P is the projection onto a fixed q-dimensional subspace S
 # (q = k + 1: the polynomial null space of D, the original move; q > k + 1: cubic B-splines, which contain those polynomials), and
@@ -441,9 +412,8 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
                             control, metric = "curv", c_fixed = 0, rho = NULL, iters = 200L,
                             mh = TRUE, adapt = TRUE, init = "y", warm = 0L, gamma_warm = 1e3,
                             prior_scale = "sigma", cmap = FALSE, kappa = 1, adapt_all = TRUE, K = 1L, asis = FALSE,
-                            tol = 0, lamjump = FALSE, lamjump_s = 0.3, asis_q = "auto", block = 0L, block_mode = "mala",
+                            tol = 0, asis_q = "auto", block = 0L, block_mode = "mala",
                             verbose = TRUE, warm_lam = warm_lambda, guard = sigma_guard) {
-  s_lj <- lamjump_s; acc_lj <- numeric(gibbs_iter)
   q_grid <- asis_q_grid(length(y), order, asis_q)
   Ps <- if (asis || block > 0L) lapply(q_grid, function(q) asis_projector(length(y), q, order)) else NULL   # built once; cycled one per sweep
   s_blk <- rep(1, length(q_grid)); acc_blk <- rep(NA_real_, gibbs_iter)        # block move: scale per q (adapted in burn-in), acceptance
@@ -521,12 +491,6 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
       as_ <- asis_step(theta, lambda, a_, r_, a0, b0, Ps[[(it - 1L) %% length(Ps) + 1L]], order); lambda <- as_$lambda; theta <- as_$theta
       SD <- sum(abs(Dtheta(theta, order)))
     }
-    if (lamjump && it > max(warm, hold) && !ps) {                                           # Block 3c: joint (lambda, theta) jump
-      a_ <- 1 / (cst$t2 * sigma * z); r_ <- y - cst$psi * z
-      lj <- lamjump_step(theta, lambda, a_, r_, a0, b0, m, delta, s_lj, order, kappa, rho, iters, tol)
-      theta <- lj$theta; lambda <- lj$lambda; acc_lj[it] <- lj$accept; SD <- sum(abs(Dtheta(theta, order)))
-      if (adapt) { s_lj <- exp(log(s_lj) + adapt_gain * it^(-adapt_kappa) * (exp(lj$log_alpha) - 0.25)); s_lj <- min(max(s_lj, 1e-3), 3) }
-    }
     sigma  <- draw_sigma(y, theta, z, cst, a_sigma, b_sigma,                    # Block 4
                          lambda_SD = if (ps) lambda * SD else 0, m = if (ps) m else 0)
     if (it <= gibbs_burn && is.finite(guard) && is.finite(sigma) && sigma > guard * sigma0) {   # E-13a: burn-in sigma-runaway guard
@@ -550,7 +514,7 @@ gibbs_pmala_aug <- function(y, tau, order, a0, b0, a_sigma, b_sigma,
   list(theta = theta_s, theta_cmap = if (cmap) cmap_sum / keep else NULL,
        lambda = lambda_s, sigma = sigma_s, delta = delta_s, acc = acc_s, SD = SD_s,
        acc_post = mean(acc_s[(gibbs_burn + 1):gibbs_iter]), delta_final = delta,
-       acc_lamjump = if (lamjump) mean(acc_lj[(gibbs_burn + 1):gibbs_iter]) else NA, s_lamjump = s_lj, asis_q_grid = if (asis) q_grid else NULL,
+       asis_q_grid = if (asis) q_grid else NULL,
        acc_block = acc_blk, acc_block_post = if (block > 0L) mean(acc_blk[(gibbs_burn + 1):gibbs_iter]) else NA, s_block = s_blk,
        final = list(theta = theta, z = z, sigma = sigma, lambda = lambda), seconds = proc.time()[["elapsed"]] - t0,
        warm_fallback = warm_fb, warm_ipm_unconverged = warm_ipm_bad, sigma_guard = guard_s, sigma0 = sigma0, lambda_hold_until = hold,
@@ -745,21 +709,6 @@ run_tests <- function() {
                 cs$mode, if (cs$wrong) "WRONG" else "correct", accb / M3, ess_is, zm, zs, max(abs(s1 / s_ex - 1))))
     if (!cs$wrong) stopifnot(max(zm, zs) < 4) else stopifnot(max(zm, zs) > 8)
   }
-
-  cat("== test 7: joint (lambda, theta) jump move + conjugate lambda draw vs the same grid reference ==\n")
-  th <- r; lam <- 2; S <- matrix(NA, M2, nn); L <- numeric(M2); accj <- 0
-  for (i in seq_len(M2)) {
-    st <- pmala_step(th, yy, zz, lam, sg, 1.0, cst, ord, "curv", 0, iters = 300L, kappa = 3); th <- st$theta
-    lam <- rgamma(1, a0_ + mm, b0_ + sum(abs(diff(th))))
-    lj <- lamjump_step(th, lam, a, r, a0_, b0_, mm, 1.0, 0.5, ord, 3, iters = 300L); th <- lj$theta; lam <- lj$lambda; accj <- accj + lj$accept
-    S[i, ] <- th; L[i] <- lam
-  }
-  S1 <- S[-(1:5000), ]; L1 <- L[-(1:5000)]
-  m1 <- colMeans(S1); se1 <- apply(S1, 2, bm_se); s1 <- apply(S1, 2, sd)
-  se_s1 <- apply(S1, 2, function(v) bm_se((v - mean(v))^2)) / (2 * s1)
-  cat(sprintf("   jump acc %.2f | max |mean z| = %.2f | max |sd z| = %.2f | E lambda: chain %.3f (se %.3f) vs exact %.3f\n",
-              accj / M2, max(abs(m1 - m_ex) / se1), max(abs(s1 - s_ex) / se_s1), mean(L1), bm_se(L1), lam_ex))
-  stopifnot(max(abs(m1 - m_ex) / se1) < 4, max(abs(s1 - s_ex) / se_s1) < 4, abs(mean(L1) - lam_ex) / bm_se(L1) < 4)
   cat("all tests passed\n")
 }
 
@@ -775,7 +724,7 @@ fit <- gibbs_pmala_aug(dat$y, tau, order, a0, b0, a_sigma, b_sigma,
                        adapt_target, adapt_gain, adapt_kappa, delta_bounds, tf_control,
                        metric = metric, c_fixed = c_metric, rho = admm_rho, iters = admm_iter,
                        mh = mh_correct, adapt = adapt_delta, init = theta_init, warm = warm_sweeps, gamma_warm = gamma_warm,
-                       K = K_theta, asis = asis_lambda, tol = admm_tol, lamjump = lamjump, lamjump_s = lamjump_s,
+                       K = K_theta, asis = asis_lambda, tol = admm_tol,
                        prior_scale = prior_scale, cmap = FALSE, kappa = kappa_metric, adapt_all = adapt_all, asis_q = asis_q, block = block_theta, block_mode = block_mode)
 
 est  <- colMeans(fit$theta)
