@@ -83,11 +83,11 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Why it was needed:** a wrong proof step. The two-sided change bound is not justified as written.
 - **Lean:** `BQTF.concentration`, in `lean/BQTF/Concentration.lean` (Neon-B), using `BQTF.Prob.efronStein_oneSided` in `lean/BQTF/Prob/EfronStein.lean` (Opus-W1).
 - **Status:** **open, with Writing applying it now under the early-fix rule** (Theory CONFIRMED; EfronStein merged at aaaedb4; packet passed to Neon-B). Once Writing commits, this becomes `in paper (<hash>)`; the fidelity check runs when Concentration is finalized. Found by Sol-W1 (Shells work, `notes/logs/solW1_questions.md`) on 2026-11-25 and accepted by the head.
-- **Theory verdict (2026-11-25):** **CONFIRMED.**
+- **Theory verdict (2026-11-25):** **CONFIRMED.** The fix packet went to Writing and to Lean the same day.
   - The paper's step is unjustified as written in both directions.
   - "Var ≤ ‖δ̂‖²" also has a random right-hand side; the right-hand side should be sup_K‖δ‖².
   - The one-sided fix is correct, and the constant stays 1. For each (y, Z′), a maximizer works for all i at once, so no measurable selection is needed. G_K is bounded, so Efron–Stein applies.
-  - The fix restores the argument Theory audited (theory/T07_Bayes_Thm3/T07c_proof.tex:496); the condensed proof dropped the "₊".
+  - The fix restores the argument Theory audited (theory/T07_Bayes_Thm3/T07c_proof.tex:496, commit fae4124, AUDIT.md alongside); the condensed proof dropped the "₊".
   - Only the proof sentence at appendix_theory.tex:235 changes. The statement of Lemma conc, its user Prop. local (line 260), the Var(L̄) step in Lemma denom (line 198) and THEOREM_INDEX.md are all unchanged.
   - **Replacement sentence (Theory):** "For the variance, let $G_K^{(i)}$ be the value of $G_K$ when $Z_i$ is replaced by an independent copy, and let $\hat\delta\in K$ attain the supremum defining $G_K$. Since $\ell_i(\hat\delta_i)$ takes values in an interval of length $|\hat\delta_i|$ (Lemma~\ref{pf:lem:check}(a)), $(G_K-G_K^{(i)})_+\le|\hat\delta_i|$, and the Efron--Stein inequality in its one-sided form \citep[Theorem~3.1]{boucheron2013concentration} gives $\mathrm{Var}(G_K)\le\sum_i\E(G_K-G_K^{(i)})_+^2\le\sup_K\|\delta\|_2^2$."
 
