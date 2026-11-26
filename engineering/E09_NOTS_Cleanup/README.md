@@ -38,14 +38,14 @@ Nothing else qualified. Every other large item is the single version in use: the
 
 Finished runs were sealed on NOTS on 11-24 so that the next 19:00 PC pull takes them. They are deleted on NOTS from Owls only after a signed receipt and the 2-day grace period.
 
-| Run | Files | Size | Manifest SHA-256 |
-|---|---|---|---|
-| E05-pmala-fix-20261122 | 5 | 56 KB | `827c28f6…` |
-| E07-tuningfree-20261123 | 2,862 | 48 MB | `e77f45b0…` |
-| E06-ratevalid-20261122 | 8,457 | 138 MB | `a331891e…` |
-| E02-rates-20261122 | 10,545 | 2.42 GB | `a2e5b0ac…` |
+| Run | Files | Size | Manifest SHA-256 | Receipt (PC-verified, CT) |
+|---|---|---|---|---|
+| E05-pmala-fix-20261122 | 5 | 56 KB | `827c28f6…` | `ledger/receipts/E05-pmala-fix-20261122.json`, 11-25 20:29:11 |
+| E07-tuningfree-20261123 | 2,862 | 48 MB | `e77f45b0…` | `ledger/receipts/E07-tuningfree-20261123.json`, 11-25 20:57:55 |
+| E06-ratevalid-20261122 | 8,457 | 138 MB | `a331891e…` | `ledger/receipts/E06-ratevalid-20261122.json`, 11-25 20:49:47 |
+| E02-rates-20261122 | 10,545 | 2.42 GB | `a2e5b0ac…` | `ledger/receipts/E02-rates-20261122.json`, 11-25 20:29:09 |
 
-The E-02 seal outlived the ssh shim's 300 s control-lane limit: the shim killed the connection, but the sealer kept running on NOTS and wrote its manifest at 17:16. The run was checked afterwards: 10,545 manifest lines for 10,545 files, and no file is newer than the manifest. Receipt ids will be added after the 11-25 19:00 pull. The 11-24 pull failed on a puller bug, since fixed (see the E-01 changelog).
+The E-02 seal outlived the ssh shim's 300 s control-lane limit: the shim killed the connection, but the sealer kept running on NOTS and wrote its manifest at 17:16. The run was checked afterwards: 10,545 manifest lines for 10,545 files, and no file is newer than the manifest. All four receipts arrived in the 11-25 manual re-pull (19:54 CT, one sftp session) and were recorded on Owls at 21:31 CT; each signature verified against the pinned PC key. The 11-23/24/25 scheduled pulls had failed on puller bugs, fixed on 11-25 (sftp output buffering on Windows; see the E-01 changelog). NOTS deletion follows the 2-day grace period.
 
 ## After (17:35 CT)
 
