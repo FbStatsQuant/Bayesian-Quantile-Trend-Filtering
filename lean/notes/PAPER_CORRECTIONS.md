@@ -64,7 +64,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** add "(if w = r, δ_W is itself the evaluation of a polynomial of degree ≤ r−1, by interpolation at r points, so take p = δ_W and ϱ_w = 0)", or require w > r and adjust the case split.
 - **Why it was needed:** a proof gap at a boundary case. The bound survives unchanged.
 - **Lean:** `BQTF.interp`, in `lean/BQTF/Interp.lean` (Neon-A). It handles w = r separately.
-- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. Interp was finalized and checked at merge 058c2ab (`interp`: standard axioms only; SmoothInterp review confirmed C-04). Earlier: open, confirmed by Lean. It was found by the Coord reviewer while reading the paper. Neon-A's Interp proof (9627577) confirmed it on 2026-11-25. `window_poly_approx` handles w = r separately: there, `polySpace r r = ⊤` because the dimensions match, so δ_W is itself a polynomial and the error is 0.
+- **Status:** **in paper (c5db4c2)**; **verified** (2026-11-26, Lean head: the w = r clause matches `BQTF.interp`'s polynomial case; Theory CONFIRMED, Vandermonde). Earlier: **sent** (2026-11-26) to Writing and Theory, CC HQ. Interp was finalized and checked at merge 058c2ab (`interp`: standard axioms only; SmoothInterp review confirmed C-04). Earlier: open, confirmed by Lean. It was found by the Coord reviewer while reading the paper. Neon-A's Interp proof (9627577) confirmed it on 2026-11-25. `window_poly_approx` handles w = r separately: there, `polySpace r r = ⊤` because the dimensions match, so δ_W is itself a polynomial and the error is 0.
 
 ## C-05: in the reduction to σ = 1, the TV bound refers to the original target
 
@@ -116,7 +116,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** "…; also, since $\|\Pp s_j\|_2\le\|s_j\|_2\le\sqrt n\,n^{r-1}/(r-1)!\le c_F(2n)^{r-1/2}$, $\sum_q\mu_q=\|G\|_F^2=n^{-1}\sum_jV_j\|\Pp s_j\|_2^2\le b_0$ on $\mathcal V$ (using $m\le n$), so $\mu_1\le b_0\le b$. For $q\ge2$ take $J=\lfloor q/2\rfloor$, so $J\ge q/3$ and $q-J\ge q/2$; then $(q-J)\mu_q\le\sum_{i>J}\mu_i\le b_0J^{-(2r-1)}$, giving $\mu_q\le b\,q^{-2r}$ with $b=2\cdot3^{2r-1}b_0=8\cdot6^{2r-1}c_F^2n^{2r-1}/\lambda^2$."
 - **Why it was needed:** a proof gap at a boundary case, plus an unjustified step. The statement, hypotheses and constant b are unchanged; Lean uses b verbatim.
 - **Lean:** `BQTF.small_ball`, in `lean/BQTF/SmallBall.lean` (Neon-A): the trace bound is at SmallBall.lean ≈274, and q = 1 is a separate branch.
-- **Status:** **sent** (2026-11-26) to Writing and Theory, CC HQ. SmallBall was finalized and checked at merge 058c2ab (`small_ball`: standard axioms only). The SmallBall review found it (F2), and the EckartYoung review raised the q = 1 case first.
+- **Status:** **in paper (0aa30fc)**; **verified** (2026-11-26, Lean head: verbatim. Theory CONFIRMED and re-derived b = 2·3^{2r−1}b₀. Theory's optional q > m clause is covered in Lean by the types: `small_ball` ranges over q : Fin (n − r) and the tail needs J ≤ m). Earlier: **sent** (2026-11-26) to Writing and Theory, CC HQ. SmallBall was finalized and checked at merge 058c2ab (`small_ball`: standard axioms only). The SmallBall review found it (F2), and the EckartYoung review raised the q = 1 case first.
 
 ## C-10: the quad-shift lemma omits ϱ > 0 and takes a log before restricting |t|
 
