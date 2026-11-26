@@ -51,7 +51,9 @@ sensor readings (n = 8,640), [E-18: one sentence on the fitted baselines].
 ## Our work
 
 The samplers and the proofs run on a laptop. The simulation campaigns ran on a Slurm
-cluster from frozen packages; each experiment folder ships its summaries.
+cluster from frozen packages; each experiment folder ships its summaries. The task runners under
+`engineering/` are records of the runs they made; to rerun one, see
+[`engineering/README.md`](engineering/README.md#rerunning-older-experiments-after-f12).
 
 | In the paper | Folder | How to run | Time |
 |---|---|---|---|
@@ -59,7 +61,7 @@ cluster from frozen packages; each experiment folder ships its summaries.
 | Section 3 and Appendix A: Theorems 1 and 2 | [`lean/`](lean) | in `lean/`: `lake exe cache get`, `lake build`, `lake env lean AxiomCheck.lean` | about 15–20 min on 3 cores, with the prebuilt Mathlib |
 | Section 4.1 and Appendix D: simulations at interior levels (Tables 1–2) | [`experiments/interior_quantiles/`](experiments/interior_quantiles) (the individual-sampler package of 2026-10-03) | shipped: `paper_reference/simulations.tex` and `paper_reference/appendix_pmala.tex` in that package. Full run, on a Slurm cluster: `bash submit.sh RUN_NAME` from the package folder | 3,000 cluster tasks |
 | Section 4.1 and Appendix D: joint estimation of extreme upper levels (Tables 3–4), crossing tables | [`experiments/extreme_quantiles/`](experiments/extreme_quantiles), [`experiments/joint_upper_levels/`](experiments/joint_upper_levels) | shipped: `experiments/extreme_quantiles/tables_20261023/mse_consolidated_oct7.csv`, `experiments/extreme_quantiles/tables_20261008/crossings_*.csv`, `experiments/joint_upper_levels/paper_reference/table2_mse.csv`. Full joint run, on a Slurm cluster: `cd experiments/joint_upper_levels && bash submit.sh RUN_NAME` | 300 cluster tasks for the joint run |
-| Section 4.2: cost per sweep (Table 5, Figures 1–2) | [`experiments/scalability/`](experiments/scalability) | historical record, not runnable: see the folder's README; the paper's cost table is the reference | |
+| Section 4.2: cost per sweep (Table 5, Figures 1–2) | [`paper/`](paper) (Table 5) | the paper's cost table is the reference; `experiments/scalability/` is a historical record and does not run | |
 | Section 4.3: air-quality simulation (Table 6) | [`experiments/air_simulation/`](experiments/air_simulation) | [E-18: command] | [E-18] |
 | Section 4.4: air-quality sensor data | [`applications/Air Quality/`](applications/Air%20Quality) | [E-18: command] | [E-18] |
 | Section 4.4 and Appendix E: growth centiles | [`applications/Growth/`](applications/Growth) | in `applications/Growth/`: `Rscript Growth_plots_k2.R` redraws the figures of the shipped joint-sampler fit and overwrites `results_joint_k2/figures/growth_joint_*`; `Rscript Growth_Joint_PMALA_k2.R sex=boy out=results_refit/boy` refits the boys into a new folder | [Eng: time]; [Eng: time] |
