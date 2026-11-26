@@ -109,7 +109,7 @@ One run is stated in Algorithm~\ref{alg:pmala}. The point estimate is the poster
 \begin{algorithmic}[1]
 \Require Data $\by$, level $\tau$, order $k$, hyperparameters $a_0, b_0, a_\sigma, b_\sigma$, metric scale $\kappa$, sweeps $T_{\mathrm{gibbs}}$, burn-in $T_{\mathrm{burn}}$.
 \State Initialize $\theta^{(0)} = \by$ and $(z^{(0)}, \lambda^{(0)}, \sigma^{(0)}, \delta^{(0)})$ \Comment{Appendix~\ref{app:pmala:init}}
-\For{$t = 1, \ldots, T_{\mathrm{gibbs}}$}
+\For{$t = 1, \ldots, T_{\mathrm{gibbs}}$} \Comment{first $H$ sweeps: warm-up step (Appendix~\ref{app:pmala:init})}
     \State Form $w_i, r_i$ from \eqref{eq:weights} and $M = W + \kappa\lambda^2 D^\top D/2$; set $\gamma = \delta/2$
     \State Compute $T(\theta)$; draw $\theta^\star = T(\theta) + \sqrt{\delta}\,L^{-\top}\xi$; compute $T(\theta^\star)$ \Comment{Appendix~\ref{app:pmala:admm}}
     \State Accept $\theta^\star$ with probability $\min(1,\alpha)$, $\alpha$ from \eqref{eq:pmala_accept}
