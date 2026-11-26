@@ -36,14 +36,14 @@ Conventions:
 | Optional, waiting | 2 | `experiments/pilots/` to `archive/pilots/` after E-19; `paper/history/` to `archive/paper/history/` at paper freeze. Not approved yet. |
 | Department folders | 0 | |
 
-**Open decisions for the owner** (details in Section 9)
+**Owner and HQ decisions, folded in (2026-11-26; details in Section 9.1)**
 
-1. Rewrite the git history after the scrub, or leave it? HQ ruling: no rewrite now, and HQ holds pushes until the owner decides. The purge from history of the two third-party article texts (removed from the tip at `e24bbd9`) is part of this decision.
-2. Does `literature/Large Prior.pdf` stay public?
-3. The raw SPod data: what are its redistribution terms?
-4. The oversized tracked files (10 files over 5 MB), after E-18.
+1. **History rewrite: yes.** The repository becomes public once the paper is submitted. Engineering owns the rewrite: a plan first, then a freeze window that HQ announces. The scrub of Section 6 applies to all history, not only the tip, with the pattern list agreed with Engineering (INVENTORY is the starting point). The two third-party article texts and the raw SPod files are purged from history in the same pass.
+2. **`literature/Large Prior.pdf`: left untouched.** The owner removes it himself later; the README does not link to it.
+3. **SPod data (HQ, delegated by the owner):** the raw 1-Hz EPA files are not redistributed and are purged from history. The repository ships the derived 10-second series actually used (June 15, sensor d, n = 8,640) as a small CSV, its preparation script, and a `DATA.md` with the original source and how to obtain the raw files; Engineering establishes the source and its terms.
+4. **Still open: the oversized tracked files** (10 files over 5 MB), after E-18. The rewrite plan settles them (Section 5.3).
 
-Not on the owner's list any more: the two third-party texts at the tip (removed), and the default prior rate b0 in the text, which HQ settles after the E-19 verdict together with the code default and the paper's stated default.
+Also settled by HQ: the b0 text, after the E-19 verdict, together with the code default and the paper's stated default.
 
 **What blocks publication**
 
@@ -309,8 +309,11 @@ They are not needed to use the method or to reproduce the paper.
 - **Growth.** `applications/Growth/data/fdgs.csv` is the Fifth Dutch Growth Study sample
   (Schönbeck et al., 2013) as distributed with the R package `mice` (van Buuren and
   Groothuis-Oudshoorn, 2011), exported from version 3.19.0. [Eng: licence of the package data]
-- **Air quality.** One day of SPod fenceline sensor readings from the EPA Rubbertown data set that
-  accompanies Brantley et al. (2020). [owner: source, terms, and whether the raw files are shipped]
+- **Air quality.** The 10-second series used in the paper (sensor d, June 15, n = 8,640), derived
+  from the SPod fenceline sensor readings of the EPA data set that accompanies Brantley et al. (2020),
+  is shipped as a small CSV in [`applications/Air Quality/`](applications/Air%20Quality) with the
+  script that prepares it. The raw 1-Hz files are not redistributed: `DATA.md` in that folder gives
+  the original source and how to obtain them. [Eng: source, terms, file names]
 
 ## Citation and license
 
@@ -479,7 +482,7 @@ Three blockers, each checked:
 |---|---|---|
 | `examples/README.md` | What the folder is; one line per subfolder | Writing drafts, Engineering checks |
 | `examples/readme_figures/reference_outputs/*` | The E-20 curve file and its summary, the published PNGs | Curves: Engineering. Images: Writing. |
-| `engineering/README.md` | The working rules now on the front page: commit with explicit paths, the size hook, task IDs, what the git-ignored folders are. No cluster path, no account name. | Engineering |
+| `engineering/README.md` | The working rules now on the front page: commit with explicit paths, the size hook, task IDs, what the git-ignored folders are, and the rule "No absolute paths" (Section 6.3, item 8). No cluster path, no account name. | Engineering |
 | `theory/README.md`, `writing/README.md` | Three lines each: what the folder is, that it is a working record, where the final statements live (`paper/`, `lean/`) | Theory, Writing |
 | READMEs for `experiments/interior_quantiles/`, `experiments/extreme_quantiles/`, `experiments/scalability/`, `experiments/air_simulation/`, `applications/Growth/`, `applications/Air Quality/` | These folders are linked from the "Our work" table and have no README today. Each gets: the paper items it feeds, the working directory, the commands, the shipped summaries by path. | Engineering, with Writing for the wording |
 
@@ -582,7 +585,7 @@ The hits fall into three classes. **To edit**: live files. **Historical records*
 |---|---|---|---|
 | H1 | 4 tracked `.pyc` files | `experiments/interior_quantiles/individual_***_20261003/__pycache__/*.cpython-312.pyc`. `.gitignore` already excludes the pattern. No checksum file lists them. | DONE: untracked at `17b2176` |
 | H2 | Tracked monitor log under an ignored path | `experiments/joint_upper_levels/runs/VS_upper6_100seeds_Rdefaults_b001_20261002/metadata/monitor/history.jsonl`, 10.3 MB. `.gitignore:40` ignores the pattern and `experiments/README.md:30` says the file is kept elsewhere. | Untrack, or correct the README; Engineering decides |
-| H3 | `01b_heavy_rm.sh` was never applied | The seven SPod CSVs (134 MB) and the Munich draws under `Others/` (115 MB; since M1 at `archive/munich_rent/code/Others/`) are still tracked, while `applications/Air Quality/DATA.md` and the current README say they were removed. E-18 reads one of the SPod files (`S08_2018-06-15.csv`). The script names the Munich draws by their old path (`:19`), so it cannot be applied as written. | After E-18, Engineering decides. The data question in Section 9 comes first. |
+| H3 | `01b_heavy_rm.sh` was never applied | The seven SPod CSVs (134 MB) and the Munich draws under `Others/` (115 MB; since M1 at `archive/munich_rent/code/Others/`) are still tracked, while `applications/Air Quality/DATA.md` and the current README say they were removed. E-18 reads one of the SPod files (`S08_2018-06-15.csv`). The script names the Munich draws by their old path (`:19`), so it cannot be applied as written. | After E-18, Engineering decides. The SPod part is decided (Section 9.1): the raw 1-Hz files leave the tip and are purged from history in the rewrite, and the derived 10-second CSV, its preparation script and `DATA.md` take their place. The Munich draws are settled in the rewrite plan. |
 | H4 | 10 files exceed the 5 MB hook limit | The seven SPod CSVs, two Munich `all_quantile_fits.rds` (23.0 and 11.9 MB) and the monitor log of H2. The hook's allowlist is empty. | Follows H2 and H3 |
 | H5 | Paths cited as code spans | Nothing in the current root README is a link. | The new README uses links |
 
@@ -629,11 +632,12 @@ Secrets: the inventory's pattern search for keys, tokens, passwords, private-key
 5. **The paper is not touched.** The authors' addresses on the title page of `paper/main.tex` are normal for a manuscript and stay.
 6. **The W-08 files are in scope.** INVENTORY excluded `writing/W08_Repo/` because the drafts quote the patterns. At the first version six tracked files there carried them (the brief, three drafts, and the figure script and its README, which name the lab's job wrapper); the review file added since is scanned too. They are public and need the same scrub, and the public copies of M2 are written without the wrapper lines.
 
-The scrub cleans the current files only. Every string stays reachable in older commits unless the history is rewritten. HQ ruling: no history rewrite now; HQ holds pushes until the owner decides (Section 9).
+7. **All history, not only the tip (owner decision, 2026-11-26).** The repository becomes public once the paper is submitted, so the scrub covers every commit. Engineering owns the rewrite: a written plan first (tool, pattern list, file purges, hash map), then a freeze window that HQ announces, during which no department commits. The pattern list is agreed between Engineering and Writing, starting from INVENTORY's classes (home paths, cluster project paths, login id, group id, allocation name, cluster and lab host names, university domain outside the title-page addresses, third-party addresses, IPv4, Windows user paths). The same pass purges the two third-party article texts and the raw SPod files. Because every commit hash changes, the plan includes a map from old to new hashes for the hashes quoted in `lean/notes/`, `PAPER_CORRECTIONS.md`, run ledgers and this proposal. The access-controlled originals of item 2 are kept before the rewrite runs.
+8. **No reintroduction.** The working rules in `engineering/README.md` (Section 3.4) get one rule: "No absolute paths. Write paths relative to the repository root, or use `$HOME` or an environment variable; never a home directory, a cluster project path, a host name or an account name." The README, the folder READMEs and every new document follow it, and Engineering adds a pre-commit check for the agreed patterns.
 
 ### 6.4 Third-party article texts
 
-`paper/history/simulation_revision_20260914/Brantley_2020.txt` and `Onizuka_2023.txt`, extracted texts of two published articles, were removed from the tip at `e24bbd9` (HQ ruling; nothing referenced them). `paper/history/` has 261 tracked files since. Both texts, and the three authors' addresses in the first, remain in the history; purging them is part of the owner's decision on the history rewrite.
+`paper/history/simulation_revision_20260914/Brantley_2020.txt` and `Onizuka_2023.txt`, extracted texts of two published articles, were removed from the tip at `e24bbd9` (HQ ruling; nothing referenced them). `paper/history/` has 261 tracked files since. Both texts, and the three authors' addresses in the first, are purged from history in the rewrite (owner decision, Section 9.1).
 
 ---
 
@@ -975,14 +979,21 @@ the build-time line is filled in.
 
 ### 9.1 For the owner
 
+Decided on 2026-11-26 and folded into this proposal:
+
+| # | Item | Decision | Where it lands |
+|---|---|---|---|
+| a | Rewrite the git history? | **Yes** (owner): "it will be public once paper is submitted so take care of it." Engineering owns it: plan first, then a freeze window announced by HQ. | Section 6.3, items 7 and 8; Section 9.2 |
+| b | `literature/Large Prior.pdf` | **Left untouched** (owner); he removes it himself later. No README link to it. | Nothing moves |
+| c | SPod data | **No redistribution of the raw 1-Hz EPA files**, which are purged from history (HQ, delegated by the owner). Ship the derived 10-second series (June 15, sensor d, n = 8,640) as a small CSV, the preparation script, and `DATA.md` with the original source and how to obtain the raw files. | Section 1.8; Section 5.3, H3; Section 9.2 |
+
+Still open:
+
 | # | Decision | What is known | Recommendation |
 |---|---|---|---|
-| a | **Rewrite the git history?** | HQ ruling: no rewrite now, and HQ holds pushes until the owner decides. The scrub cleans the current files; old commits keep every path, host name and address, and the two third-party article texts removed from the tip at `e24bbd9`. A rewrite changes every commit hash (the hashes quoted in `lean/notes/`, in `PAPER_CORRECTIONS.md` and in run ledgers would need a map), forces every clone to be made again, and does not reach forks or caches made before it. The path strings are low-sensitivity identifiers, not credentials. | Not for the paths alone. The third-party texts and, depending on (c), the raw sensor data are the reasons that could justify it. |
-| b | **Does `literature/Large Prior.pdf` stay public?** | The only PDF tracked under `literature/` (1.3 MB), kept by an explicit exception in `.gitignore`. It is the manuscript of another paper, which has its own public repository with its own PDF. | Replace it by a link to that repository in the reading list. |
-| c | **SPod raw data: redistribution terms.** | Seven files, 134 MB, tracked. `applications/Air Quality/DATA.md` has "Source: TODO" and says the files were removed from git; they were not. The README's Data section cannot be written until the source and its redistribution terms are known. | The owner supplies source and terms. If redistribution is not clearly allowed, ship a download note and checksums instead of the files, after E-18. |
-| d | **Oversized files after E-18.** | 10 tracked files exceed the 5 MB hook limit (Section 5.3, H2 to H4). | Engineering proposes; the owner approves any that stay. |
+| d | **Oversized files after E-18.** | 10 tracked files exceed the 5 MB hook limit (Section 5.3, H2 to H4). The raw SPod files among them leave with decision (c). | Engineering proposes in the rewrite plan; the owner approves any that stay. |
 
-Settled by HQ, and so not on this list: no history rewrite now; the two third-party texts are removed from the tip; M1 and M2 are approved subject to Engineering's sign-off, and the optional moves wait; the b0 text of `method/README.md` and of the README is HQ's, settled after the E-19 verdict together with the code default and the paper's stated default (placeholder `[HQ after E-19: default b0]`); no claim that all tests pass until Engineering resolves F12.
+Settled by HQ: the two third-party texts are removed from the tip and purged in the rewrite; M1 and M2 are approved subject to Engineering's sign-off, and the optional moves wait; the b0 text of `method/README.md` and of the README is HQ's, settled after the E-19 verdict together with the code default and the paper's stated default (placeholder `[HQ after E-19: default b0]`); no claim that all tests pass until Engineering resolves F12.
 
 Smaller choices, with a default taken in this proposal that the owner can overturn: the H1 is the short heading "Bayesian Joint Quantile Trend Filtering" (the alternative is the full paper title); the authors' addresses stay on the paper's title page; the working records stay public and are listed last.
 
@@ -994,7 +1005,9 @@ Smaller choices, with a default taken in this proposal that the owner can overtu
 4. The fixes F1 to F12 of Section 4.3. F1 to F3 decide whether the scalability row gets a command. F12 and one complete joint test run with `clarabel` decide whether the test instructions go public, and no text claims that all tests pass before that. The `glmgen` install line (F5) is part of the publication gate.
 5. The hygiene items H1 to H4 (Section 5.3).
 6. The scrub (Section 6): the script, the substitution log, the regenerated manifests, and for each old manifest the conditional treatment of Section 6.3, item 2 (kept as `*.orig` if it is clean; otherwise an access-controlled original plus a public masked provenance record), and the note.
-7. `engineering/README.md` with the working rules that leave the front page.
+7. `engineering/README.md` with the working rules that leave the front page, including "No absolute paths", and a pre-commit check for the agreed patterns.
+11. The history rewrite (Section 6.3, item 7): the plan with the pattern list agreed with Writing, the purge list (the two third-party texts, the raw SPod files, oversized files as decided), the old-to-new hash map, and the freeze window through HQ.
+12. SPod data: the derived 10-second CSV (June 15, sensor d, n = 8,640), its preparation script, and `DATA.md` with the original source, its terms and how to obtain the raw files; then the raw 1-Hz files leave the tip.
 8. Third-party code (review pending): verify the provenance and the notice obligations of every copied or adapted third-party file in `method/admm_qtf/`, in the Onizuka add-on under `experiments/air_simulation/` and in the Onizuka packages under `experiments/extreme_quantiles/`; and supply the licence line for the growth data.
 9. Measured times for every `[Eng: time]` cell, each from a complete, successful run.
 10. The six folder READMEs of Section 3.4, and the old-manifest procedure of Section 6.3, item 2, agreed with the owner.
@@ -1014,7 +1027,7 @@ The Lean section is fact-checked (Section 8); its closing note says it is signed
 
 ### 9.4 Order of work
 
-1. Now: Engineering's sign-off of M1 (run at `0aa2bac`) and the H3 decision for the Munich draws that moved with it; H1; `engineering/README.md`; the scrub of docs and of `lean/notes/`. Pushes are held by HQ until the owner rules on the history.
+1. Now: Engineering's sign-off of M1 (run at `0aa2bac`) and the H3 decision for the Munich draws that moved with it; H1; `engineering/README.md`; the scrub of docs and of `lean/notes/`. Engineering writes the history-rewrite plan; HQ announces the freeze window, and the rewrite runs after the tip scrub, before the repository goes public.
 2. When E-20 delivers: the hero figure, M2, `examples/`, then the check of the README targets from the root.
 3. When E-18 and its paper update land: the air-quality cells, the SPod figure with its acceptance check, the data decision.
 4. Engineering resolves F12 and supplies the `glmgen` install line and the measured times.
@@ -1102,4 +1115,11 @@ The re-check (`RECHECK_SOL.md`, FAIL: of the 14 findings 9 resolved, 5 partial; 
 - **N5.** The Engineering handoff refers to the conditional old-manifest procedure of Section 6.3, item 2.
 - **N6.** The computing paragraph says the timings are medians and adds k = 2.
 - **N7.** "`--demo` alone does not call the SPod panel".
+
+## Owner and HQ decisions folded in (2026-11-26, after the re-check)
+
+- History rewrite: yes; the scrub of Section 6 covers all history; Engineering plans it and HQ announces the freeze (Sections 0, 6.3 items 7–8, 9.1, 9.2 items 11, 9.4).
+- "No absolute paths" rule in `engineering/README.md`, with a pre-commit check (Sections 3.4, 6.3 item 8, 9.2 item 7).
+- `literature/Large Prior.pdf` left untouched; no README link (Sections 0, 9.1).
+- SPod: no raw 1-Hz files; ship the derived 10-second CSV, the preparation script and `DATA.md`; raw files purged from history (Sections 0, 1.8, 5.3 H3, 9.1, 9.2 item 12).
 
