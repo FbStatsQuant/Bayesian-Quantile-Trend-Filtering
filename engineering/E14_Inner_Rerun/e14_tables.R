@@ -257,10 +257,12 @@ e14_build_tables <- function(results_dir, output_dir, valid_csv, published_csv, 
     }
     writeLines(table$block, file.path(output_dir, paste0(id, ".tex")))
   }
-  used <- reps$kept & !missing & !failed
-  lambda_ess <- vapply(fits[used], `[[`, numeric(1L), "lambda_ess")
-  names(lambda_ess) <- reps$signal[used]
-  e14_write_mse(mse_markdown, comparison, health, lambda_ess, attempts, notes)
+  if (!is.null(mse_markdown)) {
+    used <- reps$kept & !missing & !failed
+    lambda_ess <- vapply(fits[used], `[[`, numeric(1L), "lambda_ess")
+    names(lambda_ess) <- reps$signal[used]
+    e14_write_mse(mse_markdown, comparison, health, lambda_ess, attempts, notes)
+  }
   invisible(TRUE)
 }
 

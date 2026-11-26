@@ -45,7 +45,7 @@ e15_read_paper <- function(root) {
   list(tables = tables, values = do.call(rbind, values))
 }
 
-e15_build_tables <- function(run_dir, output_root, root, seeds = 1:100) {
+e15_build_tables <- function(run_dir, output_root, root, seeds = 1:100, write_reports = TRUE) {
   paper <- e15_read_paper(root)
   published <- subset(paper$values, method == "Bayesian-PMALA")
   rownames(published) <- NULL
@@ -163,6 +163,7 @@ e15_build_tables <- function(run_dir, output_root, root, seeds = 1:100) {
     writeLines(table$block, file.path(out, paste0(id, ".tex")))
   }
 
+  if (!write_reports) return(invisible(TRUE))
   noise_labels <- c(Normal = "Gaussian", Beta = "Beta", Mixed = "Mixed normal")
   blocks <- lapply(c("VS", "S"), function(signal) {
     d <- comparison[comparison$signal == signal & comparison$metric == "mse", ]

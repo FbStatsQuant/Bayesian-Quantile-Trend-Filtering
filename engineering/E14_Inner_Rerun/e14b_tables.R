@@ -47,7 +47,9 @@ e14b_claim_values <- function(values) {
   )
 }
 
-e14b_write_claims <- function(path, published, current, comparison) {
+e14b_write_claims <- function(path, published, current, comparison,
+    rate = "1e-3", note = "HQ review only. The prior-rate decision remains open.",
+    comparison_label = "Recomputed with E-14b") {
   k <- function(d) paste(d$signal, d$noise, d$tau, d$metric)
   new <- current
   target <- new$method == "Bayesian-PMALA"
@@ -67,10 +69,10 @@ e14b_write_claims <- function(path, published, current, comparison) {
     "S MAD versus Onizuka",
     "S MCIW versus Onizuka"
   )
-  writeLines(c("# Interior-quantile claims with b0 = 1e-3", "",
-    "HQ review only. The prior-rate decision remains open.", "",
+  writeLines(c(paste("# Interior-quantile claims with b0 =", rate), "",
+    note, "",
     "The archived baseline predates E-14. The current-paper column uses the tables supplied to this build. Ratios use the displayed six-decimal MSEs. Signed percentages compare PMALA with the smaller Onizuka MSE in each cell.", "",
-    "| Claim | Pre-E-14 published | Current paper | Recomputed with E-14b |",
+    paste0("| Claim | Pre-E-14 published | Current paper | ", comparison_label, " |"),
     "| --- | --- | --- | --- |",
     sprintf("| %s | %s | %s | %s |", claims, e14b_claim_values(published),
       e14b_claim_values(current), e14b_claim_values(new))), path)

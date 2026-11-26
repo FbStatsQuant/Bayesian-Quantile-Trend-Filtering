@@ -37,7 +37,7 @@ e15_counter <- function(fit, name, trace) {
   NA_integer_
 }
 
-e15_fit <- function(task, code, smoke) {
+e15_fit <- function(task, code, smoke, b0 = 1e-3) {
   e15_load_sampler(code)
 
   data_file <- file.path(code, "engineering", "E15_Extreme_Individual", "e15_data.R")
@@ -51,7 +51,6 @@ e15_fit <- function(task, code, smoke) {
 
   sweeps <- if (smoke) 300L else 30000L
   burn <- if (smoke) 220L else 10000L
-  b0 <- 1e-3
   chain_seed <- 10001L + task$index
   RNGkind("Mersenne-Twister", "Inversion", "Rejection")
   set.seed(chain_seed)

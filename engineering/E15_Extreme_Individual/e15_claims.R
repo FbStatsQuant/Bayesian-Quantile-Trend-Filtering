@@ -89,7 +89,8 @@ e15_claim_values <- function(paper, comparison = NULL) {
   )
 }
 
-e15_write_claims <- function(path, paper, comparison = NULL) {
+e15_write_claims <- function(path, paper, comparison = NULL,
+    note = "HQ review only. The prior-rate decision remains open.") {
   claims <- c(
     "VS Gaussian/mixed normal from τ = 0.93, joint MSE strictly smallest",
     "VS Gaussian/mixed normal from τ = 0.93, nearest competitor MSE divided by joint MSE as τ increases",
@@ -114,7 +115,7 @@ e15_write_claims <- function(path, paper, comparison = NULL) {
   new <- if (is.null(comparison)) "Pending production build" else e15_claim_values(paper, comparison)
   stopifnot(length(old) == length(claims))
   writeLines(c("# Extreme-upper-quantile manuscript claims", "",
-    "HQ review only. The prior-rate decision remains open.", "",
+    note, "",
     "Rankings and ties use the four displayed MSE decimals. The advantage is measured relative to the smallest competing MSE in the same cell. Crossing summaries use the displayed two decimals.", "",
     "| Claim | Published | Recomputed |", "| --- | --- | --- |",
     sprintf("| %s | %s | %s |", claims, old, new), "",
