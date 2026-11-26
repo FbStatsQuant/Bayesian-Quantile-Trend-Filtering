@@ -2,6 +2,8 @@
 
 BQTF Lean Department, 2026-11-25.
 
+**Outcome (2026-11-26): both theorems are proved.** Theorem 1 was completed at merge 4498143 and Theorem 2 at merge d0366d5. `main_theorem`, `main_theorem_scale`, `joint_theorem` and `joint_theorem_scale` depend only on propext, Classical.choice and Quot.sound (`AxiomCheck.lean`). The rest of this file is the plan as it was followed, kept for the record.
+
 **Status:** GO received on 2026-11-25, and Gemini Neon is connected. **Theorem 1 comes first.** Theorem 2 starts only when Theorem 1 is done, or when Felipe says so. Step 2 below is therefore postponed until after step 3.
 
 ## Goal
@@ -253,7 +255,7 @@ Each row is an explicit, documented hypothesis until it is proved. It also appea
 
 | Input | Where it enters | Status |
 |---|---|---|
-| (none yet) | | |
+| (none) | | Final: no classical input was ever left as a hypothesis. Efron–Stein (one-sided), Eckart–Young and Prékopa–Leindler are proved (`Prob/EfronStein`, `Lin/EckartYoung`, `Shift/PrekopaLaplace`). |
 
 ## 5. Theorem 2 module map (draft, 2026-11-25; planning only)
 

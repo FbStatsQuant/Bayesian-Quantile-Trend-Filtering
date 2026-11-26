@@ -2,9 +2,7 @@
 
 This page reads the formal statements in plain mathematics, so you can check them against the paper without reading Lean. The statements live in [`BQTF/Spec.lean`](../BQTF/Spec.lean).
 
-**Current scope:** Theorem 1 (`thm:main`). The statement passed the Astra fidelity audit on 2026-11-25 (`notes/audits/spec_thm1_astra_r1.md`, PASS WITH FIXES); the four documentation fixes are applied. The joint posterior is already defined in `Spec.lean`, but the statement of Theorem 2 (`thm:joint`) comes later.
-
-**Theorem 2 skeleton branch (2026-11-25):** a draft of the Theorem 2 statement is in §3 below (`JointStatement`, `JointStatementScale`), with differences D6–D9 in §4. It has **not** been audited yet; the Astra statement audit comes first.
+**Scope:** Theorem 1 (`thm:main`) and Theorem 2 (`thm:joint`), both fully proved (2026-11-26). The Theorem 1 statement passed the Astra fidelity audit on 2026-11-25 (`notes/audits/spec_thm1_astra_r1.md`, PASS WITH FIXES; the four documentation fixes are applied). The Theorem 2 statements (§3, `JointStatement`, `JointStatementScale`) passed the Astra audit on 2026-11-25 (`notes/reviews/Thm2Skeleton_Astra_2026-11-25.md`, STATEMENTS APPROVED; its documentation fixes are applied).
 
 The source is the paper at commit e36c20d or later:
 - `paper/sections/theory.tex`, Section "Posterior contraction";
@@ -76,7 +74,7 @@ and the posterior with σ = 1 and λ = c n^{(2k+1)/2}. Then:
 - **τ.** The paper's list of dependencies does not include τ, so τ is also chosen after the constants.
 - **f̄ and V̄** range over all reals. For n ≥ 1 the hypotheses force f̄ ≥ f̲ > 0 (apply A and B at one coordinate), and they always force V̄ ≥ 0. So no extra restriction is needed: an infeasible choice only gives an empty class.
 
-## 3. Theorem 2 (draft, pending the Astra statement audit)
+## 3. Theorem 2
 
 Source: `thm:joint` (`paper/sections/theory.tex`, eq. `joint-fixed`), with 𝒞 from eq. `joint_order` (`paper/sections/methodology.tex`). Lean indexes levels from 0 to J−1; the paper indexes them from 1 to J.
 
@@ -118,15 +116,15 @@ Let the joint posterior have σ_j = 1 and λ_j = c_j n^{(2k+1)/2}. Then:
 
 ## 4. Differences from the paper
 
-These are the differences so far, each with its direction. "Safe" means that the Lean statement implies the paper's.
+These are all the differences, each with its direction. "Safe" means that the Lean statement implies the paper's.
 
 | # | Difference | Direction |
 |---|---|---|
 | D1 | A and B are stated coordinatewise, not with δ ∈ ℝⁿ. | Equivalent. |
 | D2 | θ* is any τ-quantile, not "the" τ-quantile. | Equivalent under A and B (uniqueness; see Section 1). |
 | D3 | Measurability of y ↦ Π(B \| y) is part of the conclusion. | Safe. Without it, Mathlib's `∫⁻` would only bound a lower integral. |
-| D4 | The posterior is written with its normalizing integral Z in `ℝ≥0∞`. If Z were 0 or ∞, the totalized definition would give the zero measure. Properness, 0 < Z < ∞, is a lemma still to be proved (`posterior_isProbability`), not an assumption. It holds for every n ≥ 1, τ ∈ (0,1), σ > 0 and λ ≥ 0: the weight is positive and continuous, and it is at most ∏_i exp(−a\|y_i − θ_i\|) with a = min(τ,1−τ)/σ. | Equivalent once the lemma is proved. |
-| D5 | (Joint posterior, for later.) The per-level normalizers are cancelled in the definition. | Equivalent when each normalizer is in (0, ∞). By D4, this holds for n ≥ 1 when every level has τ_j ∈ (0,1), σ_j > 0 and λ_j ≥ 0. To be stated as a lemma. Stated (Theorem 2 skeleton branch) as `jointPosterior_eq_cond` in `BQTF/Joint/Product.lean`, as Π_𝒞(B \| y) = Π^⊗(B ∩ 𝒞 \| y)/Π^⊗(𝒞 \| y) for measurable B and n ≥ 1. Proved (J1, Neon-A; reviewed 2026-11-26). |
+| D4 | The posterior is written with its normalizing integral Z in `ℝ≥0∞`. If Z were 0 or ∞, the totalized definition would give the zero measure. Properness, 0 < Z < ∞, is proved as a lemma (`posterior_isProbability`, `BQTF/Coord.lean`), not assumed. It holds for every n ≥ 1, τ ∈ (0,1), σ > 0 and λ ≥ 0: the weight is positive and continuous, and it is at most ∏_i exp(−a\|y_i − θ_i\|) with a = min(τ,1−τ)/σ. | Equivalent (the lemma is proved). |
+| D5 | (Joint posterior.) The per-level normalizers are cancelled in the definition. | Equivalent when each normalizer is in (0, ∞). By D4, this holds for n ≥ 1 when every level has τ_j ∈ (0,1), σ_j > 0 and λ_j ≥ 0. Stated as `jointPosterior_eq_cond` in `BQTF/Joint/Product.lean`, as Π_𝒞(B \| y) = Π^⊗(B ∩ 𝒞 \| y)/Π^⊗(𝒞 \| y) for measurable B and n ≥ 1. Proved (J1, Neon-A; reviewed 2026-11-26). |
 | D6 | (Theorem 2.) "Constants depending on the smallest spacing" is encoded as a lower bound gmin > 0 on the consecutive spacings, quantified before ∃ M C n₀. τ is quantified after them. `LevelGrid` also lists "τ strictly increasing", which the spacing bound already implies. | Safe. Apply the statement with gmin = min_j(τ_{j+1} − τ_j). |
 | D7 | (Theorem 2.) J ranges over all of ℕ. J = 0 is vacuous (U_M = ∅). For J = 1 the spacing condition is empty and 𝒞 is everything, so the statement is Theorem 1. | Safe. It contains the paper's cases J ≥ 2. |
 | D8 | (Theorem 2.) Measurability of y ↦ Π_𝒞(U_M \| y) is part of the conclusion, as in D3. | Safe. |
