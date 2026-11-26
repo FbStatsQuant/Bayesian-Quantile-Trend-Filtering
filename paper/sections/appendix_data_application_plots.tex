@@ -15,17 +15,17 @@ Figure~\ref{fig:spod_admm} shows the ADMM benchmark fits \citep{brantley2020base
 	\centering
 	\begin{subfigure}[b]{0.48\textwidth}
 		\centering
-		\includegraphics[width=\textwidth]{figures/spod_quantiles_admm}
-		\caption{Baseline trends ($\tau \in \{0.01, 0.05, 0.1\}$).}
-	\end{subfigure}
-	\hfill
-	\begin{subfigure}[b]{0.48\textwidth}
-		\centering
 		\includegraphics[width=\textwidth]{figures/spod_detrended_admm}
 		\caption{Detrended series $\by - \widehat{\theta}$.}
 		\label{fig:spod_detrended_admm}
 	\end{subfigure}
-	\caption{Air-quality data: ADMM benchmark fits on the 10-second means ($n = 8{,}640$) of SPod \texttt{d}, June 15, 2018 ($\lambda = 54.6$ at $\tau = 0.01$; $\lambda = 1096.6$ at $\tau \in \{0.05, 0.1\}$). Horizontal lines in (b) mark the 90th (dashed), 95th (solid), and 99th (dotted) empirical percentiles.}
+	\hfill
+	\begin{subfigure}[b]{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/spod_quantiles_admm}
+		\caption{Baseline trends.}
+	\end{subfigure}
+	\caption{Air-quality data: ADMM benchmark fits on the 10-second means ($n = 8{,}640$) of SPod \texttt{d}, June 15, 2018 ($\lambda = 54.6$ at $\tau = 0.01$; $\lambda = 1096.6$ at $\tau \in \{0.05, 0.1\}$). Horizontal lines in (a) mark the 90th (dashed), 95th (solid), and 99th (dotted) empirical percentiles.}
 	\label{fig:spod_admm}
 \end{figure}
 
