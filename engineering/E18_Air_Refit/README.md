@@ -76,3 +76,65 @@ the published comparison, an explicit issue list, and the paired
 selection tables. If a new ADMM comparison is needed, `admm-sim` with
 indices 0–299 runs the original driver call using detrendr revision
 `17e3e7c`, third differences and the original 15-point eBIC grid.
+
+## Stage 2 preparation
+
+Stage 2 awaits the Engineering head's GO. Prepare the input after GO
+using `e18_prepare_spod.R OUTPUT_RDS` from the repo root. On Owls invoke
+R through `~/.config/bvs-hq/owls/owls_run -j 1`. Copy the same prepared
+`spod_blocks.rds` to each authorized NOTS run directory. Prepare a
+`STAGE2_GO.dcf` per authorized run with fields `Run` (the run directory's
+basename) and `Input-SHA256` (the prepared file SHA-256).
+
+Source is [S08_2018-06-15.csv](../../applications/Air%20Quality/S08_2018-06-15.csv),
+sensor `d PID (counts)`. Treat the timestamps as local clock labels.
+The source has 86,213 records, four of which belong to June 16. The
+86,209 in-day records have distinct seconds and finite readings.
+Form clock-aligned 10-second blocks for June 15, from 00:00:00 through
+23:59:59. Average the available readings in each of the 8,624
+nonempty blocks. Six of those blocks have fewer than ten readings.
+Linearly interpolate the 16 empty block means between their neighboring
+nonempty block means. Keep the number of readings and interpolation
+flag for each block. Center all 8,640 block means by their arithmetic
+mean and scale by their sample SD. The manuscript states that the
+series was standardized. The original generator is unavailable.
+
+Use the same individual sampler controls as Stage 1, at n = 8,640.
+The two independent chain seeds are 1001 and 1002 for each level and
+rate. The stage `real` uses indices 0–23. The real pilot uses indices
+`0,2,4`, chain 1 at 1e-3 for all three levels, with the fixed algorithm
+and planned run length. If authorized with an approximately 45-minute
+wall allocation, any timed-out pilot remains incomplete and its
+500-sweep progress logs give an initial CPU projection. Record the
+timeout, last completed sweep, Slurm TotalCPU and MaxRSS. Report
+stalls, low acceptance, and log-λ drift to the Engineering head.
+Changing the sampler controls requires the Engineering head's approval
+before a run.
+
+The paper reports 44–53 minutes per fit for 6,000 sweeps of the old
+sampler. At that per-sweep speed, 24 fits of 30,000 sweeps would cost
+88–106 core-hours before pilots and ADMM. A retained θ matrix alone
+requires about 1.29 GiB at the new run length. After three 45-CPU-minute
+pilots the 40-core-hour cap leaves under 94.4 CPU minutes per full fit
+before ADMM. Base the production decision on measured pilot timing
+and memory, and the remaining budget.
+
+Stage `admm-real` uses indices 0–2 on the same processed series.
+It calls detrendr revision `17e3e7c` with eBIC on `exp(-2:12)`. The
+report compares selected λ to 54.6, 1096.6 and 1096.6 at the paper's
+rounding and records any discrepancy. The archived paper provides
+no original processed series or preprocessing code to verify its
+handling of the missing seconds.
+
+`e18_real_report.R RUN_DIR [ADMM_RUN_DIR]` reads both result sets, reports issues and
+produces calibration, threshold, pairwise crossing, and chain health
+CSVs. Include `spod_blocks.rds` and `STAGE2_GO.dcf` when collecting the
+PMALA run. The plot fits are pointwise posterior medians from the two
+pooled 666-draw chains, transformed back to PID counts. The detrended
+series and its type-7 percentile thresholds are in counts. Report
+strict crossings for each of the three level pairs and the number of
+distinct crossed grid points. Log-λ diagnostics include ESS and
+classic Gelman–Rubin R-hat over the retained thinned chains, early
+and late λ medians, and traces. Report each chain's θ ESS, acceptance,
+guards, and elapsed time. The baseline and detrended figures are
+generated for all four rates and ADMM.

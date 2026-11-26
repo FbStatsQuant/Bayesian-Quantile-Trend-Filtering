@@ -83,6 +83,7 @@ e18_real_input <- function(run) {
 }
 
 e18_fit <- function(code, task, y, truth = NULL, save_theta = FALSE) {
+  stopifnot(requireNamespace("coda", quietly = TRUE))
   original <- new.env(parent = globalenv())
   sys.source(file.path(code, "engineering", "E14_Inner_Rerun", "e14_run.R"), envir = original)
   original$e14_load_sampler(code)
@@ -107,10 +108,10 @@ e18_fit <- function(code, task, y, truth = NULL, save_theta = FALSE) {
   stopifnot(nrow(fit$theta) == length(e18_post), ncol(fit$theta) == length(y),
     all(is.finite(fit$theta)), length(e18_thin) == 666L,
     length(fit$lambda) == 30000L, length(fit$sigma) == 30000L,
+    identical(as.integer(fit$asis_q_grid), c(10L, 20L, 40L)), fit$lambda_hold_until == 200L,
     all(is.finite(fit$lambda) & fit$lambda > 0),
     all(is.finite(fit$sigma) & fit$sigma > 0))
   th <- fit$theta[e18_thin - 10000L, , drop = FALSE]
-  stopifnot(requireNamespace("coda", quietly = TRUE))
   ess <- coda::effectiveSize(th)
   log_lambda <- log(fit$lambda[e18_thin])
   bands <- if (!is.null(truth)) apply(fit$theta, 2L, quantile, probs = c(.025, .975), type = 7L)
@@ -122,7 +123,9 @@ e18_fit <- function(code, task, y, truth = NULL, save_theta = FALSE) {
     ess_theta_median = median(ess), ess_theta_p05 = unname(quantile(ess, .05)),
     ess_error_sq = if (!is.null(truth)) as.numeric(coda::effectiveSize(rowSums(sweep(th, 2L, truth)^2))),
     acc = fit$acc_post, n_sigma_guard = fit$n_sigma_guard,
-    n_ipm_fallback = fit$n_ipm_fallback, seconds = proc.time()[["elapsed"]] - t0,
+    n_ipm_fallback = fit$n_ipm_fallback,
+    n_warm_ipm_unconverged = sum(fit$warm_ipm_unconverged),
+    seconds = proc.time()[["elapsed"]] - t0,
     sampler_seconds = fit$seconds, commit = e18_pin)
 }
 

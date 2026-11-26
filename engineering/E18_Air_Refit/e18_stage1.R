@@ -3,7 +3,7 @@ args <- commandArgs(trailingOnly = TRUE)
 if (!(length(args) == 1L || (length(args) == 2L && args[2L] == "--pilot")))
   stop("Usage: e18_stage1.R RUN_DIR [--pilot]")
 run <- normalizePath(args[1L])
-folder <- file.path(run, "code", "engineering", "E18_Air_Refit")
+folder <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(), value = TRUE))))
 source(file.path(folder, "e18_common.R"))
 source(file.path(folder, "e18_report_common.R"))
 out <- file.path(run, "report")
@@ -61,7 +61,8 @@ summ <- function(cell, tau, b0, requested) {
     row[[paste0("median_", k)]] <- median(cell[[k]])
     row[[paste0("min_", k)]] <- min(cell[[k]])
   }
-  for (k in intersect(c("n_sigma_guard", "n_ipm_fallback"), names(cell))) row[[k]] <- sum(cell[[k]])
+  for (k in intersect(c("n_sigma_guard", "n_ipm_fallback", "n_warm_ipm_unconverged"), names(cell)))
+    row[[k]] <- sum(cell[[k]])
   if ("acc" %in% names(cell)) {
     row$max_acc <- max(cell$acc)
     row$n_acc_outside_gate <- sum(cell$acc < .4 | cell$acc > .6)
@@ -100,7 +101,10 @@ if (dir.exists(file.path(run, "admm-sim"))) {
     summ(cell, tau, NA_real_, 100L)
   })), "admm_cells")
 }
-if (nrow(got$issues)) stop(nrow(got$issues), " missing or failed fits. Selection withheld.")
+if (nrow(got$issues)) {
+  unlink(file.path(out, c("selected_b0.csv", "paired_differences.csv")))
+  stop(nrow(got$issues), " missing or failed fits. Selection withheld.")
+}
 
 # One row per seed, matched across rates and levels.
 mse_at <- function(tau) vapply(e18_rates, function(b0) {

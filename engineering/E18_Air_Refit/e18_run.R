@@ -11,12 +11,12 @@ grid <- e18_grid(stage)
 index <- suppressWarnings(as.integer(args[3L]))
 stopifnot(grepl("^[0-9]+$", args[3L]), index %in% grid$index)
 task <- as.list(grid[index + 1L, ])
+is_real <- stage %in% c("real", "admm-real")
+if (is_real) input <- e18_real_input(run)
 out <- file.path(run, stage)
 dir.create(out, showWarnings = FALSE)
 path <- file.path(out, paste0(task$id, ".rds"))
 failure <- file.path(out, paste0(task$id, ".fail.rds"))
-is_real <- stage %in% c("real", "admm-real")
-if (is_real) input <- e18_real_input(run)
 if (file.exists(path)) {
   old <- readRDS(path)
   stopifnot(identical(old$task, task), identical(old$stage, stage))
@@ -35,11 +35,16 @@ run_fit <- function() {
   d <- e18_table2_archive(code)$data[[task$seed]]
   stopifnot(all(lengths(d[c("y", "theta", "s")]) == 500L))
   truth <- d$theta + .25 * qnorm(task$tau)
+  y_sha <- e18_vector_sha(d$y)
+  truth_sha <- e18_vector_sha(truth)
+  audit <- read.csv(file.path(code, "engineering", "E18_Air_Refit", "table2_data_sha256.csv"))
+  q_col <- sprintf("q%02d_sha256", round(100 * task$tau))
+  stopifnot(identical(y_sha, audit$y_sha256[task$seed]),
+            identical(truth_sha, audit[[q_col]][task$seed]))
   fit <- if (stage == "sim") e18_fit(code, task, d$y, truth)
     else e18_admm(d$y, task$tau, 500^seq(0, 1.4, length.out = 15L))
   metrics <- e18_metrics(d$y, fit$est, truth, d$s, task$tau, fit$lo, fit$hi)
-  c(list(task = task, stage = stage, y_sha = e18_vector_sha(d$y),
-    truth_sha = e18_vector_sha(truth), metrics = metrics), fit)
+  c(list(task = task, stage = stage, y_sha = y_sha, truth_sha = truth_sha, metrics = metrics), fit)
 }
 status <- tryCatch({
   result <- run_fit()
@@ -51,7 +56,8 @@ status <- tryCatch({
   0L
 }, error = function(err) {
   message(task$id, " failed: ", conditionMessage(err))
-  e18_atomic(list(task = task, stage = stage, error = conditionMessage(err)), failure)
+  e18_atomic(list(task = task, stage = stage,
+    commit = if (stage %in% c("sim", "real")) e18_pin, error = conditionMessage(err)), failure)
   1L
 })
 quit(status = status)

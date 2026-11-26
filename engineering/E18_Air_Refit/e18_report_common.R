@@ -22,7 +22,7 @@ e18_collect <- function(run, stage, grid, validate) {
 }
 
 e18_sampler_diagnostics <- c("ess_log_lambda", "lambda_ess_e14", "ess_theta_median",
-  "ess_theta_p05", "acc", "n_sigma_guard", "n_ipm_fallback", "seconds")
+  "ess_theta_p05", "acc", "n_sigma_guard", "n_ipm_fallback", "n_warm_ipm_unconverged", "seconds")
 e18_stat <- function(x, fields) {
   vapply(fields, function(k) {
     stopifnot(length(x[[k]]) == 1L, is.finite(x[[k]]))
