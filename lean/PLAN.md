@@ -227,8 +227,8 @@ The maximum effort for every agent is "high". Fable is not on this team.
 
 **Assignment of Theorem 1** (final; launched 2026-11-25 on the skeleton at aa70682, one worktree per prover):
 - **Neon-A:** `Falling`, `Coord`, `Gram` (g_r > 0, by Theory's T10 proof), `SplineApprox`, `Smooth`, `Interp`, `SmallBall`, plus helper files under `BQTF/Lin/`.
-- **Neon-B:** `CheckLoss`, `Score`, `Concentration`, `Width`, `QuadShift`, `Denominator`, `Localization`, `Shells`, plus helper files under `BQTF/Prob/`.
-- **Sol-W1** (gpt-6.2-sol, high; HQ authorization of 2026-11-25): `Main`, plus helpers under `BQTF/Asym/`. It proves the assembly against the frozen statements, as an early test that the interfaces suffice.
+- **Neon-B:** `CheckLoss`, `Score`, `Concentration`, `Width`, `QuadShift`, plus helper files under `BQTF/Prob/`. On 2026-11-25, `Denominator`, `Localization` and `Shells` moved to Sol-W1 because Neon-B was overloaded; Neon-B was told first.
+- **Sol-W1** (gpt-6.2-sol, high; HQ authorization of 2026-11-25): `Main`, plus helpers under `BQTF/Asym/`. It proves the assembly against the frozen statements, as an early test that the interfaces suffice. `Main` was proved on 2026-11-25 (8b10d87, now under Sol review). Since 2026-11-25 Sol-W1 also owns `Shells`, `Localization` and `Denominator`, on branch `t3/sol-w1-assembly`.
 - **Sol-W2** (gpt-6.2-sol, high): `Reduction`, then `PriorMass`, plus helpers under `BQTF/Scale/` and `BQTF/Prior/`.
 - The head proves no lemmas. A file never has two owners at once.
 
