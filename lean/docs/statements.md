@@ -2,7 +2,7 @@
 
 This page reads the formal statements in plain mathematics, so you can check them against the paper without reading Lean. The statements live in [`BQTF/Spec.lean`](../BQTF/Spec.lean).
 
-**Current scope:** Theorem 1 (`thm:main`). The joint posterior is already defined in `Spec.lean`, but the statement of Theorem 2 (`thm:joint`) comes later.
+**Current scope:** Theorem 1 (`thm:main`). The statement passed the Astra fidelity audit on 2026-11-25 (`notes/audits/spec_thm1_astra_r1.md`, PASS WITH FIXES); the four documentation fixes are applied. The joint posterior is already defined in `Spec.lean`, but the statement of Theorem 2 (`thm:joint`) comes later.
 
 The source is the paper at commit e36c20d or later:
 - `paper/sections/theory.tex`, Section "Posterior contraction";
@@ -45,7 +45,12 @@ The constant factors cancel in the ratio. The data are **not** assumed to follow
 
 The paper states A and B with a vector δ, ‖δ‖_∞ ≤ L, "for all i". The condition at coordinate i involves only δ_i, so the two forms are equivalent.
 
-Under A, the τ-quantile is unique, because F_i strictly increases through θ*_i. So "θ*_i is a τ-quantile" is the same as the paper's "θ*_i denotes the τ-quantile".
+Under A and B together, the τ-quantile is unique:
+- B excludes an atom at θ*_i, so F_i(θ*_i) = τ.
+- A then gives F_i(θ*_i − s) < τ < F_i(θ*_i + s) for 0 < s ≤ L.
+- By monotonicity, every other point fails to be a τ-quantile.
+
+So "θ*_i is a τ-quantile" is the same as the paper's "θ*_i denotes the τ-quantile". A alone would not be enough: an atom at θ*_i can leave a whole interval of quantiles.
 
 ## 2. Theorem 1
 
@@ -67,7 +72,7 @@ and the posterior with σ = 1 and λ = c n^{(2k+1)/2}. Then:
 - **"Constants depending only on c, k, L, f̲, f̄, V̄."** M, C and n₀ are chosen after these six constants and before everything else.
 - **"Uniform over all laws."** M, C and n₀ are chosen before n, the law and θ*.
 - **τ.** The paper's list of dependencies does not include τ, so τ is also chosen after the constants.
-- **f̄ and V̄** range over all reals. The hypotheses force f̄ ≥ f̲ > 0 and V̄ ≥ 0, so no extra restriction is needed.
+- **f̄ and V̄** range over all reals. For n ≥ 1 the hypotheses force f̄ ≥ f̲ > 0 (apply A and B at one coordinate), and they always force V̄ ≥ 0. So no extra restriction is needed: an infeasible choice only gives an empty class.
 
 ## 3. Differences from the paper
 
@@ -76,7 +81,7 @@ These are the differences so far, each with its direction. "Safe" means that the
 | # | Difference | Direction |
 |---|---|---|
 | D1 | A and B are stated coordinatewise, not with δ ∈ ℝⁿ. | Equivalent. |
-| D2 | θ* is any τ-quantile, not "the" τ-quantile. | Equivalent under A (uniqueness). |
+| D2 | θ* is any τ-quantile, not "the" τ-quantile. | Equivalent under A and B (uniqueness; see Section 1). |
 | D3 | Measurability of y ↦ Π(B \| y) is part of the conclusion. | Safe. Without it, Mathlib's `∫⁻` would only bound a lower integral. |
-| D4 | The posterior is written with its normalizing integral in `ℝ≥0∞`. Its properness (a finite, positive normalizer) is a lemma to be proved for n > k+1, not an assumption. | Equivalent. |
-| D5 | (Joint posterior, for later.) The per-level normalizers are cancelled in the definition. | Equivalent when each normalizer is in (0, ∞), which is true for n > k+1. To be stated as a lemma. |
+| D4 | The posterior is written with its normalizing integral Z in `ℝ≥0∞`. If Z were 0 or ∞, the totalized definition would give the zero measure. Properness, 0 < Z < ∞, is a lemma still to be proved (`posterior_isProbability`), not an assumption. It holds for every n ≥ 1, τ ∈ (0,1), σ > 0 and λ ≥ 0: the weight is positive and continuous, and it is at most ∏_i exp(−a\|y_i − θ_i\|) with a = min(τ,1−τ)/σ. | Equivalent once the lemma is proved. |
+| D5 | (Joint posterior, for later.) The per-level normalizers are cancelled in the definition. | Equivalent when each normalizer is in (0, ∞). By D4, this holds for n ≥ 1 when every level has τ_j ∈ (0,1), σ_j > 0 and λ_j ≥ 0. To be stated as a lemma. |

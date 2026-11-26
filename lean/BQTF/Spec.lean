@@ -81,8 +81,9 @@ def jointWeight {J : ℕ} (τ σ lam : Fin J → ℝ) (k n : ℕ) (y : Fin n →
 
 /-- The joint posterior (eq. `joint-fixed`) written with the per-level normalizing constants
 cancelled: `Π_𝒞(B ∣ y) = ∫_{B ∩ 𝒞} ∏_j w_j(θ_j) dΘ / ∫_𝒞 ∏_j w_j(θ_j) dΘ`.
-(When every per-level normalizer is in `(0, ∞)`, which holds for `n > k+1`, this equals the
-paper's ratio of integrals of `∏_j Π_j(dθ_j ∣ y)`; that equality is a lemma, not a definition.) -/
+(When every per-level normalizer is in `(0, ∞)` — which holds for `n ≥ 1` whenever each level
+has `τ_j ∈ (0,1)`, `σ_j > 0` and `λ_j ≥ 0` — this equals the paper's ratio of integrals of
+`∏_j Π_j(dθ_j ∣ y)`; that equality is a lemma, not a definition.) -/
 def jointPosterior {J : ℕ} (τ σ lam : Fin J → ℝ) (k n : ℕ) (y : Fin n → ℝ) :
     Measure (Fin J → Fin n → ℝ) :=
   (∫⁻ Θ in orderSet J n, jointWeight τ σ lam k n y Θ)⁻¹ •
@@ -93,8 +94,9 @@ def jointPosterior {J : ℕ} (τ σ lam : Fin J → ℝ) (k n : ℕ) (y : Fin n 
 /-- The distribution function `F(t) = μ(−∞, t]` of a measure on `ℝ`, as a real number. -/
 def distFn (μ : Measure ℝ) (t : ℝ) : ℝ := (μ (Set.Iic t)).toReal
 
-/-- `q` is a `τ`-quantile of `μ`: `μ(−∞, q) ≤ τ ≤ μ(−∞, q]`. Under Assumption A this
-determines `q` uniquely (the distribution function is strictly increasing near `q`). -/
+/-- `q` is a `τ`-quantile of `μ`: `μ(−∞, q) ≤ τ ≤ μ(−∞, q]`. Under Assumptions A and B
+together this determines `q` uniquely: B excludes an atom at `q`, so `F(q) = τ`, and A then gives
+`F(q − s) < τ < F(q + s)` for `0 < s ≤ L`, which by monotonicity excludes every other quantile. -/
 def IsQuantile (μ : Measure ℝ) (τ q : ℝ) : Prop :=
   (μ (Set.Iio q)).toReal ≤ τ ∧ τ ≤ distFn μ q
 
