@@ -7,11 +7,13 @@ noncomputable section
 
 namespace BQTF
 
+/-- The one-dimensional Rademacher law `(δ_{−1} + δ_1)/2` is a probability measure. -/
 instance rademacher1_probability : IsProbabilityMeasure rademacher1 := by
   constructor
   simp [rademacher1, smul_eq_mul]
   rw [← mul_two, ENNReal.inv_mul_cancel (by norm_num) (by simp)]
 
+/-- The `n`-fold product Rademacher law is a probability measure. -/
 instance rademacher_probability (n : ℕ) : IsProbabilityMeasure (rademacher n) := by
   unfold rademacher
   infer_instance
@@ -121,11 +123,13 @@ private theorem univ_nonempty_of_pos {m : ℕ} (hm : 0 < m) : (univ : Finset (Fi
 def rademacherMax {m n : ℕ} (hm : 0 < m) (v : Fin m → Fin n → ℝ) (ξ : Fin n → ℝ) : ℝ :=
   Finset.univ.sup' (univ_nonempty_of_pos hm) (fun j => |dot ξ (v j)|)
 
+/-- Each column term is at most the maximum: `|⟨ξ, v_j⟩| ≤ rademacherMax hm v ξ`. -/
 theorem le_rademacherMax {m n : ℕ} (hm : 0 < m) (v : Fin m → Fin n → ℝ) (ξ : Fin n → ℝ)
     (j : Fin m) : |dot ξ (v j)| ≤ rademacherMax hm v ξ := by
   unfold rademacherMax
   exact Finset.le_sup' (fun j => |dot ξ (v j)|) (Finset.mem_univ j)
 
+/-- `ξ ↦ max_j |⟨ξ, v_j⟩|` is continuous. -/
 theorem continuous_rademacherMax {m n : ℕ} (hm : 0 < m) (v : Fin m → Fin n → ℝ) :
     Continuous (rademacherMax hm v) := by
   exact Continuous.finset_sup'_apply (univ_nonempty_of_pos hm) (by unfold dot; fun_prop)

@@ -8,8 +8,10 @@ import BQTF.Shift.ScalarBounds
 Owner: Neon-B. A general matrix `A` with columns `a_1, …, a_m` (`m ≥ 2`),
 `B_ϱ = {u : ‖A u‖₂ ≤ ϱ}`, `φ(ϱ) = −log Q_λ(B_ϱ)`, `δ_A = max_{j<m} ‖a_{j+1} − a_j‖₂`.
 
-Classical inputs expected (see PLAN.md tracker): Prékopa (marginals of log-concave densities are
-log-concave) and Borell (`s ↦ log Q{‖A v‖ ≤ s}` is concave).
+The classical inputs, Prékopa (marginals of log-concave densities are log-concave) and Borell
+(`s ↦ log Q{‖A v‖ ≤ s}` is concave), are proved in `Shift/PrekopaLaplace` as `prekopa_laplace`
+(joint log-concavity of `(b, s) ↦ Q_λ{x : ‖A x + b‖₂ ≤ s}` for `s > 0`). They enter here through
+`Shift/SliceBounds` (`laplaceSlice_le_center`, `laplaceSlice_center_log_loss`).
 -/
 
 open MeasureTheory Matrix Set Finset

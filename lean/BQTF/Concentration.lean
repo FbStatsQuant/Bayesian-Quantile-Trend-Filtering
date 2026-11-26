@@ -7,9 +7,10 @@ import BQTF.Prob.EfronStein
 /-!
 # Concentration of the empirical check-loss process (appendix, Lemma `pf:lem:conc`)
 
-Owner: Neon-B. Classical inputs expected (see PLAN.md tracker): symmetrization (absolute-value
-form, van der Vaart and Wellner Lemma 2.3.6), the contraction principle (absolute-value form,
-Ledoux and Talagrand Theorem 4.12), and the Efron–Stein inequality.
+Owner: Neon-B. The classical inputs are proved in the `Prob/` helper modules: symmetrization
+(absolute-value form, van der Vaart and Wellner Lemma 2.3.6; `Prob/Symmetrization`), the
+contraction principle (absolute-value form, Ledoux and Talagrand Theorem 4.12;
+`Prob/Contraction`), and the Efron–Stein inequality (`Prob/EfronStein`).
 -/
 
 open MeasureTheory ProbabilityTheory Finset

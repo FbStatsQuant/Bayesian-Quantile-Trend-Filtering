@@ -4,8 +4,9 @@ import Mathlib
 # Eckart–Young–Mirsky lower bound (Frobenius form)
 
 For linear maps `T H : E →ₗ[ℝ] F` between finite-dimensional real inner product spaces with
-`rank H ≤ J`, the Frobenius norm `‖T - H‖_F²` (computed in any orthonormal basis of `E`) is at
-least the tail `∑_{q ≥ J} σ_q(T)²` of the squared singular values of `T`.
+`rank H ≤ J`, the squared Frobenius norm `‖T - H‖_F²` (computed in any orthonormal basis of `E`)
+is at least the tail `∑_{q ≥ J} σ_q(T)²` of the squared singular values of `T`, with zero-based
+indices `σ_0(T) ≥ σ_1(T) ≥ ⋯`.
 
 Proof: let `K = ker H`, `(u_k)` an orthonormal basis of `K` and `(v_q)` the eigenbasis of `T†T`.
 * `∑_k ‖T u_k‖² = ∑_k ‖(T - H) u_k‖² ≤ ‖T - H‖_F²` (Bessel, after passing to the adjoint);

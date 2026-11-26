@@ -4,7 +4,7 @@ import BQTF.Scale.Data
 /-!
 # Supremum-norm concentration at a general scale (proof of `thm:joint`, "General scales")
 
-Owner: TBD (assigned at the Theorem 2 trigger).
+Owner: Sol-P1.
 
 Lemma `pf:lem:sup` at scale `σ₀ > 0`, via the reduction of Appendix `pf:sec:reduction`
 (`posterior_map_inv_smul`, `DataHyp.scale`): the law of `θ/σ₀` under `Π(· ∣ y)` is the `σ = 1`

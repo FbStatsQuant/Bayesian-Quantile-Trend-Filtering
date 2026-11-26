@@ -10,9 +10,10 @@ Owner: Neon-A. `A = n^{−1/2} P^⊥ S`, `B_ϱ = {u : ‖A u‖₂ ≤ ϱ}`, `φ
 The lemma is stated as a lower bound on `Q_λ(B_ϱ)` (equivalent to the paper's upper bound on
 `φ`, and meaningful also when `Q_λ(B_ϱ) = 0` would make `log` degenerate).
 
-Classical inputs expected (see PLAN.md tracker): the Gaussian scale mixture of the Laplace law,
-the Eckart–Young / Ky Fan tail bound, rotation invariance of the standard Gaussian, and
-`P(|γ| ≤ t) ≥ 0.48 min{t, 1}`.
+The classical inputs are proved in the `Lin/` helper modules: the Gaussian scale mixture of the
+Laplace law (`Lin/LaplaceMixture`), the Eckart–Young / Ky Fan tail bound (`Lin/EckartYoung`),
+rotation invariance of the standard Gaussian and `P(|γ| ≤ t) ≥ 0.48 min{t, 1}`
+(`Lin/GaussianSmallBall`).
 -/
 
 open MeasureTheory ProbabilityTheory Finset

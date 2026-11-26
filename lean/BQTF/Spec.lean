@@ -9,18 +9,17 @@ proofs `paper/sections/appendix_theory.tex`):
 
 * `MainStatement`       — Theorem `thm:main` at `σ = 1`;
 * `MainStatementScale`  — Theorem `thm:main` at a fixed scale `σ = σ₀ > 0`
-                          (last sentence of the theorem).
-
-The joint (non-crossing) posterior is defined here as well, so that the statement of
-Theorem `thm:joint` can be added later without moving definitions; that statement is not part
-of the current audit.
-
-Added on the Theorem 2 skeleton branch (draft, pending the Astra statement audit; see
-`docs/statements.md` §3 and differences D5–D9):
-
+                          (last sentence of the theorem);
 * `JointStatement`      — Theorem `thm:joint` at `σ_1 = ⋯ = σ_J = 1`;
 * `JointStatementScale` — Theorem `thm:joint` at fixed scales `σ_j = σ_{0j} > 0`
                           (last sentence of the theorem).
+
+All four are proved (`main_theorem`, `main_theorem_scale`, `joint_theorem`,
+`joint_theorem_scale`; checked in `AxiomCheck.lean`). Theorem `thm:joint` is stated with the
+joint (non-crossing) posterior defined here: the ordering set `orderSet` (`𝒞`), the product
+density `jointWeight`, and `jointPosterior` (the product density restricted to `𝒞` and
+normalized), together with `LevelGrid`, `jointFarSet` and `JointConclusion`
+(see `docs/statements.md` §3 and differences D5–D9).
 
 Everything is stated on vectors `Fin n → ℝ` (the trend at the `n` design indices).
 

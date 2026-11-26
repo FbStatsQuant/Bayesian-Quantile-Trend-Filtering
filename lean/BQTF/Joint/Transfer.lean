@@ -5,11 +5,11 @@ import BQTF.Joint.SupNormScale
 /-!
 # The constraint and the transfer (proof of `thm:joint`, "The constraint" and "Transfer")
 
-Owner: TBD (assigned at the Theorem 2 trigger).
+Owner: Neon-C.
 
 Statements, all at general scales `σ_j > 0` (the `σ = 1` case is `σ = fun _ => 1`):
 * `mem_orderSet_of_near` — if `‖θ_l − θ*_l‖_∞ ≤ g₀/2` for every `l`, then `Θ ∈ 𝒞`;
-* `prodPosterior_compl_orderSet_le` — on the good event, `Π^⊗(𝒞ᶜ ∣ y) ≤ Σ_l η_l`
+* `prodPosterior_compl_orderSet_le` — on the good event, `Π^⊗(𝒞ᶜ ∣ y) ≤ Σ_l ofReal η_l`
   (`≤ J η_n ≤ 1/2` in the paper);
 * `jointPosterior_jointFarSet_le` — if `Π^⊗(𝒞ᶜ ∣ y) ≤ 1/2` then
   `Π_𝒞(U ∣ y) ≤ 2 Σ_j Π_j(A_j ∣ y)`;
@@ -63,7 +63,8 @@ theorem mem_orderSet_of_near {k n J : ℕ} {τ : Fin J → ℝ} {gmin : ℝ} (h�
   exact hstep j₂.val j₂.isLt hle
 
 /-- "The constraint", union bound: if `s_l ≤ g₀/2` and
-`Π_l(‖θ − θ*_l‖_∞ > s_l ∣ y) ≤ η_l` for every level `l`, then `Π^⊗(𝒞ᶜ ∣ y) ≤ Σ_l η_l`. -/
+`Π_l(‖θ − θ*_l‖_∞ > s_l ∣ y) ≤ ofReal η_l` for every level `l`, then
+`Π^⊗(𝒞ᶜ ∣ y) ≤ Σ_l ofReal η_l`. -/
 theorem prodPosterior_compl_orderSet_le {k n J : ℕ} (hn : 1 ≤ n) {τ : Fin J → ℝ} {gmin : ℝ}
     (hτ : LevelGrid J τ gmin) (σ lam : Fin J → ℝ) (hσ : ∀ j, 0 < σ j)
     (hlam : ∀ j, 0 ≤ lam j) {μ : Fin n → Measure ℝ} {θs : Fin J → Fin n → ℝ}

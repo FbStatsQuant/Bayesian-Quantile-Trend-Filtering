@@ -5,7 +5,7 @@ import BQTF.Reduction
 /-!
 # Theorem `thm:joint` (Theorem 2)
 
-Owner: TBD (assigned at the Theorem 2 trigger).
+Owner: Sol-P2.
 
 `joint_theorem : JointStatement` (`σ_j = 1`) and `joint_theorem_scale : JointStatementScale`.
 Planned constant choice (proof of `thm:joint` and "General scales"), with `M^{(l)}, C^{(l)}, n_0^{(l)}`

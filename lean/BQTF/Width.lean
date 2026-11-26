@@ -4,7 +4,8 @@ import BQTF.Shift.Rademacher
 /-!
 # Width of `K(ρ, T)` (appendix, Lemma `pf:lem:width`)
 
-Owner: Neon-B. Classical input expected: `E max` of `2m` sub-Gaussian variables.
+Owner: Neon-B. The classical input, `E max` of `2m` sub-Gaussian variables, is proved in
+`Shift/Rademacher` (`integral_rademacherMax_le`).
 -/
 
 open MeasureTheory Finset

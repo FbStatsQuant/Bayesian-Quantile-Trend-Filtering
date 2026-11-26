@@ -36,7 +36,8 @@ lemma measurableSet_slice {p d : ℕ} (A : (Fin d → ℝ) →ₗ[ℝ] (Fin p �
     (s : ℝ) : MeasurableSet {x : Fin d → ℝ | l2norm (A x + b) ≤ s} :=
   measurableSet_le (continuous_l2norm_affine A b).measurable measurable_const
 
-/-- Joint convexity of `(x, b, s) ↦ [‖A x + b‖₂ ≤ s]`. -/
+/-- The feasible set of triples `(x, b, s)` with `‖A x + b‖₂ ≤ s` is convex: the `(1 − t, t)`
+combination of two feasible triples is feasible. -/
 lemma slice_convex {p d : ℕ} (A : (Fin d → ℝ) →ₗ[ℝ] (Fin p → ℝ)) {t : ℝ} (ht0 : 0 ≤ t)
     (ht1 : t ≤ 1) {b₀ b₁ : Fin p → ℝ} {s₀ s₁ : ℝ} {x y : Fin d → ℝ}
     (hx : l2norm (A x + b₀) ≤ s₀) (hy : l2norm (A y + b₁) ≤ s₁) :
