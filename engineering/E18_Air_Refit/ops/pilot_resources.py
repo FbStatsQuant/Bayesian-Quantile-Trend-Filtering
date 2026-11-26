@@ -2,6 +2,7 @@
 import argparse
 import math
 import re
+from datetime import datetime
 from pathlib import Path
 
 
@@ -28,16 +29,16 @@ def main():
     allocations, batches = {}, {}
     for line in args.accounting.read_text().splitlines():
         fields = line.split("|")
-        if len(fields) != 7:
+        if len(fields) not in (7, 11):
             continue
-        job, state, cpu, elapsed, rss, _, exit_code = fields
+        job, state, cpu, elapsed, rss, _, exit_code = fields[:7]
         match = re.fullmatch(r"(\d+_\d+)([.]batch)?", job)
         if match is None:
             continue
         rows = batches if match[2] else allocations
         if match[1] in rows:
             raise SystemExit(f"Duplicate accounting record for {job}")
-        rows[match[1]] = (state, cpu, elapsed, rss, exit_code)
+        rows[match[1]] = (state, cpu, elapsed, rss, exit_code, fields[7:])
 
     expected = 6 if args.mode == "sim" else 3
     if len(allocations) != expected or allocations.keys() != batches.keys():
@@ -51,6 +52,12 @@ def main():
     peak = max(rss_mib(row[3]) for row in batches.values())
     memory = math.ceil(max(1.5 * peak, peak + 256) / 128) * 128
     pilot_hours = sum(seconds) / 3600
+    if all(row[5] for row in allocations.values()):
+        print("Task | Submit-to-start queue seconds | Run wall seconds | CPU seconds")
+        for task, row in allocations.items():
+            submit, _, start, _ = row[5]
+            queued = (datetime.fromisoformat(start) - datetime.fromisoformat(submit)).total_seconds()
+            print(f"{task} | {queued:.0f} | {int(row[2])} | {cpu_seconds(row[1]):.3f}")
     print(f"Pilot CPU: {pilot_hours:.6f} core-hours")
     print(f"Peak MaxRSS: {peak:.1f} MiB; rounded request with headroom: {memory}M")
     if args.mode == "sim":

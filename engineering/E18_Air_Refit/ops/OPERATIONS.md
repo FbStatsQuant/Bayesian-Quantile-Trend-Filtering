@@ -32,6 +32,13 @@ bash "$ops/accounting.sh" "$JOB_ID" > "$ACCOUNTING"
 Report every accepted job ID immediately. After a submission timeout,
 respect backoff and check for an accepted job before retrying. For an
 authorized cancellation, pass only the explicit Slurm ID to `scancel`.
+For pilots, report submission-to-start queue wait separately from
+elapsed run time and Slurm TotalCPU. If any E-18 job or array tasks
+remain pending about 60 minutes after submission, run
+`bash "$ops/pending.sh" "$JOB_ID"` and immediately report the job ID,
+reason, and observed position in the commons `squeue` listing. That
+position is a snapshot of the listing. Leave the job queued on
+commons and leave all SMC jobs untouched.
 
 ## Stage 1
 
