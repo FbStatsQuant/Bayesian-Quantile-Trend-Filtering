@@ -325,3 +325,7 @@ A second CLI test used 3,000 synthetic RDS files with the checked-in
 all-seeds manifest. Each of the 30 cells used 100 fits. All six LaTeX
 fragments preserved the original layout and competitor rows, and the
 old-vs-new ratios and health counts matched the fixture values.
+
+## Note added 2026-11-26 (E-19 preflight)
+
+The bit-for-bit matches above were measured on Owls. The same generator and seeds on NOTS compute nodes give some vectors that differ in the last bits: the CPUs' math libraries round differently (`qbeta`, `uniroot`, `log`/`exp`). The archived E-14 truth was generated on NOTS. It is bit-identical to the Owls regeneration in 1,000 of the 3,000 tasks. The other 2,000 differ by at most 8.9e-16 in absolute value: 0% of the Beta tasks match, 20% of the Mixed and 80% of the Normal. The evidence is in [truth_owls_vs_e14.csv](../E19_Default_Prior/preflight/truth_owls_vs_e14.csv). These differences are numerical, not statistical.
