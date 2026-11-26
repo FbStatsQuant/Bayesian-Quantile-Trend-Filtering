@@ -58,7 +58,7 @@ At that point the head sends that module's entries to Writing and Theory (CC HQ)
 - **Correct version:** add "(if w = r, δ_W is itself the evaluation of a polynomial of degree ≤ r−1, by interpolation at r points, so take p = δ_W and ϱ_w = 0)", or require w > r and adjust the case split.
 - **Why it was needed:** a proof gap at a boundary case. The bound survives unchanged.
 - **Lean:** `BQTF.interp`, in `lean/BQTF/Interp.lean` (Neon-A, not proved yet). The Lean proof must handle w = r.
-- **Status:** **open**. It was found by the Coord reviewer while reading the paper, not yet confirmed by a Lean proof. It is confirmed or withdrawn when Interp is formalized.
+- **Status:** **open, confirmed by Lean.** It was found by the Coord reviewer while reading the paper. Neon-A's Interp proof (9627577) confirmed it on 2026-11-25. `window_poly_approx` handles w = r separately: there, `polySpace r r = ⊤` because the dimensions match, so δ_W is itself a polynomial and the error is 0. The packet goes out when Interp is finalized and checked.
 
 ## C-05: in the reduction to σ = 1, the TV bound refers to the original target
 
