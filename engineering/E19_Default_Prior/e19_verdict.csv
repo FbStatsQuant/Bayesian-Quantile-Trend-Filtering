@@ -1,0 +1,3 @@
+"signal","geometric_mean_mse_ratio","n_significantly_worse","median_coverage_e14","median_coverage_e19","pass_ratio","pass_cells","coverage_threshold","pass_coverage","verdict"
+"VS",8.85949850604087,15,0.87348,0.53614,FALSE,FALSE,0.82348,FALSE,"FAIL"
+"S",0.78449446053251,0,0.88444,0.71394,TRUE,TRUE,0.83444,FALSE,"FAIL"
