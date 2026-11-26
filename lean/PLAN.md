@@ -337,6 +337,7 @@ J1, J3 and J4 can start in parallel right after the gate. J6 can be proved again
 - **Neon-B:** J3 `Gap` + J4 `SupNorm`. Neon-B did `CheckLoss`, which J3 reuses.
 - **Sol-W2:** J5 `SupNormScale` + the scale half of J7, reusing its own `Scale/`.
 - **Sol-W1:** J6 `Transfer` + J7 `Main`, the assembly against frozen interfaces, as for Theorem 1.
+- **Early start (2026-11-26).** Astra approved the J0–J7 statements on the skeleton at e5b1792 (see lean/notes/reviews/Thm2Skeleton_Astra_2026-11-25.md), and they are frozen as of that approval. Proof work therefore began on prover branches before the Theorem 2 trigger. Neon-A owns Joint/Product and Joint/Conditioning. Neon-B owns Joint/Gap, and gets Joint/SupNorm once CP-Opus5's docstring fixes land. Sol-W1 and Sol-W2 take J6/J7 and J5 after their Theorem 1 merges. The skeleton itself is merged to main only at the trigger.
 - **Opus worker:** reserve.
 
 **Estimate:** about 1–1.5 weeks after the trigger, with 4 provers. The gate (Astra plus head rulings) takes about half a day.
