@@ -232,7 +232,7 @@ $\E G_K\le4\E\sup_K\langle\xi,\delta\rangle$ and $\mathrm{Var}(G_K)\le\sup_K\|\d
 \end{lemma}
 
 \begin{proof}
-Symmetrization for independent processes, in absolute-value form \citep[Lemma~2.3.6]{vandervaart1996weak}, gives $\E G_K\le2\E\sup_K|\sum_i\xi_i\ell_i(\delta_i)|$; the $\ell_i$ are contractions vanishing at $0$, so the contraction principle in absolute-value form \citep[Theorem~4.12]{ledoux1991probability} and the symmetry of $K$ give the factor $4$. For the variance, replacing $Z_i$ by an independent copy changes $G_K$ by at most $|\hat\delta_i|$, with $\hat\delta$ a maximizer (Lemma~\ref{pf:lem:check}(a)); the Efron--Stein inequality \citep{efron1981jackknife}; \citealp[Theorem~3.1]{boucheron2013concentration} gives $\mathrm{Var}(G_K)\le\|\hat\delta\|_2^2$.
+Symmetrization for independent processes, in absolute-value form \citep[Lemma~2.3.6]{vandervaart1996weak}, gives $\E G_K\le2\E\sup_K|\sum_i\xi_i\ell_i(\delta_i)|$; the $\ell_i$ are contractions vanishing at $0$, so the contraction principle in absolute-value form \citep[Theorem~4.12]{ledoux1991probability} and the symmetry of $K$ give the factor $4$. For the variance, let $G_K^{(i)}$ be the value of $G_K$ when $Z_i$ is replaced by an independent copy, and let $\hat\delta\in K$ attain the supremum defining $G_K$. Since $\ell_i(\hat\delta_i)$ takes values in an interval of length $|\hat\delta_i|$ (Lemma~\ref{pf:lem:check}(a)), $(G_K-G_K^{(i)})_+\le|\hat\delta_i|$, and the Efron--Stein inequality \citep{efron1981jackknife} in its one-sided form \citep[Theorem~3.1]{boucheron2013concentration} gives $\mathrm{Var}(G_K)\le\sum_i\E(G_K-G_K^{(i)})_+^2\le\sup_K\|\delta\|_2^2$.
 \end{proof}
 
 Let
