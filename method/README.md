@@ -20,7 +20,9 @@ Run with no argument, each script fits one simulated data set with the settings 
 
 ## Defaults = paper defaults
 
-Since E-03 the settings block of `individual/Individual_Sampler_PMALA_Augmented.R` equals the production configuration of the interior-quantile campaign: order 2 (k = 2, third differences), b0 = 0.01, ASIS on, target acceptance 0.50, 30,000 sweeps with 10,000 burn-in, seed 1, tau 0.5.
+The settings block of `individual/Individual_Sampler_PMALA_Augmented.R` uses order 2 (k = 2, third differences), the λ prior Gamma(a0 = 1, b0 = 1e-3), ASIS on, target acceptance 0.50, 30,000 sweeps with 10,000 burn-in, seed 1 and tau 0.5. The settings block of `joint/Joint_Sampler_PMALA_Augmented.R` uses Gamma(a0 = 1, b0 = 1e-2).
+
+The paper uses b0 = 1e-3 for the VS signal and 5e-4 for the S signal in the interior simulations, b0 = 1e-2 (VS) and 1e-3 (S) in the extreme-quantile runs, and Gamma(n, 1e-2) in the air-quality exercises. Each runner pins its own value, so no paper result depends on these defaults.
 
 ## Dependencies
 

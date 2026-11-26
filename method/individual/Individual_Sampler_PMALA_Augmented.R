@@ -84,7 +84,7 @@ order       <- 2L          # k: piecewise quadratic; D = 3rd differences
 prior_scale <- "none"      # "none": Laplace prior exp(-lambda ||D theta||_1) (the paper's prior) | "sigma": Park-Casella scale sigma/lambda.
                            # "sigma" gives the same MSE but has a runaway mode (lambda enters sigma's rate and sigma enters lambda's:
                            # sigma -> 1e5, lambda -> (a0+m)/b0, theta detaches from the data; seen in 1 of 60 cell-runs), so "none" is the default.
-a0 <- 1;  b0 <- 1e-5      # Gamma prior on lambda (E-08, Felipe 2026-11-23): Gamma(1, 1e-5), rate b0 << ||D theta||_1 of any fit so lambda is data-driven
+a0 <- 1;  b0 <- 1e-3      # Gamma prior on lambda: Gamma(1, 1e-3), the VS value of the paper's interior campaign (HQ 2026-11-26). Paper runners pass their own a0 and b0.
 a_sigma <- 0.1; b_sigma <- 0.1     # IG prior on sigma (paper value; 0.01/0.01 gives identical results at n = 500)
 gibbs_iter  <- 30000      # lambda equilibrates slowly for smooth truths (see notes); 30k/10k is the pilot setting
 gibbs_burn  <- 10000

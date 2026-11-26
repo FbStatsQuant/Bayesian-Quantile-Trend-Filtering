@@ -107,7 +107,7 @@ n           <- 500L
 baseline_id <- "VS"
 noise_id    <- "Normal"
 order       <- 2L          # k: piecewise quadratic; D = 3rd differences
-a0 <- 1;  b0 <- 1e-5       # Gamma prior on lambda (value of the current individual script; E-08)
+a0 <- 1;  b0 <- 1e-2       # Gamma prior on lambda: Gamma(1, 1e-2), the VS value of the paper's joint extreme-quantile runs (HQ 2026-11-26). Paper runners pass their own a0 and b0.
 a_sigma <- 0.1; b_sigma <- 0.1
 gibbs_iter  <- 30000
 gibbs_burn  <- 10000
