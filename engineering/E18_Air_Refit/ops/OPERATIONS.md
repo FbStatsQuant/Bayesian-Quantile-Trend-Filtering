@@ -54,9 +54,13 @@ ADMM. The cap is 80 core-hours. Use the bundled starting memory
 allocation for the pilot and measure MaxRSS before setting production
 memory.
 Send the pilot gate and projection directly to the Engineering head.
-Stop and report if a gate fails or the projection exceeds 80
-core-hours. If both checks pass, the Engineering head can issue the
-stage-1 production GO directly.
+Include all pilot CPU and the authorized ADMM/HS budget in the
+80-core-hour check. Stop and report a failed gate or a budget breach.
+With production GO, submit PMALA and the approved ADMM and Onizuka-HS
+refits from the same bundle. Use `E18_AFTER_JOBS` with colon-separated
+Slurm IDs to make each benchmark wait for earlier E-18 arrays to
+succeed and keep the shared running limit at 300. Reuse the sealed
+Laplace archive.
 
 ## Stage 2
 
