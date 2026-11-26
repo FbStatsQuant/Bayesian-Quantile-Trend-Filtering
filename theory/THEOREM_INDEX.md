@@ -24,7 +24,7 @@ These are the statements the paper now carries. Under the owner's policy of 2026
   - Constants depend only on (c, k, L, f̲, f̄, V̄), plus σ₀.
   - The bound is uniform over the class.
   - It is an upper bound only.
-- **Status:** AUDITED. Lean formalization in progress (`lean/`, Lean department).
+- **Status:** AUDITED. **Formally verified in Lean** (merge 4498143, 2026-11-26): `main_theorem` and `main_theorem_scale` use only the standard axioms. The paper proof was corrected per Lean packets C-01 to C-10; every one was confirmed by Theory, and none changed a statement or a constant.
 
 ### Theorem 2 (`thm:joint`): J fixed levels, non-crossing posterior, simultaneous
 - **Files:** `T09_Joint_Theorem/STATEMENT.tex`, `PROOF.tex` and `AUDIT.md`. The paper text is Writing's W-05 (5d5eb81), signed off by Theory.
