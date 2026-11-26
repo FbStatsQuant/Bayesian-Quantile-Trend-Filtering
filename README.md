@@ -286,9 +286,15 @@ They are not needed to use the method or to reproduce the paper.
   585–604: readings of low-cost SPod sensors, which record every second at the perimeter of
   industrial facilities to detect emissions of volatile organic compounds, provided to those
   authors by the U.S. Environmental Protection Agency. The repository ships the derived 10-second
-  series used in the paper (June 15, sensor d, n = 8,640) as a small CSV in
-  [`applications/Air Quality/`](applications/Air%20Quality), with the script that prepares it and
-  a `DATA.md`. The raw 1-Hz files are not redistributed. [Eng: file names]
+  series used in the paper (June 15, sensor d, n = 8,640) as a small CSV,
+  `applications/Air Quality/spod_s08_d_2018-06-15_10s.csv`, with one row per 10-second block
+  (columns `offset_seconds`, `n_readings`, `imputed`, `pid_block_mean_counts`,
+  `pid_standardized`) and a `DATA.md` next to it. The raw 1-Hz files are not redistributed, so the
+  scripts that made the CSV document the steps but cannot be rerun from this repository:
+  [`engineering/E18_Air_Refit/e18_prepare_spod.R`](engineering/E18_Air_Refit/e18_prepare_spod.R)
+  forms the 10-second blocks (it drops 30 readings recorded as "N/A" and fills the 19 empty blocks
+  by interpolation), and [`engineering/H_RW/export_spod.R`](engineering/H_RW/export_spod.R) writes
+  the CSV.
 
 ## Citation and license
 
