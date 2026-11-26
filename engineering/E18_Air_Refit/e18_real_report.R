@@ -247,11 +247,7 @@ stats <- do.call(rbind, lapply(scored, `[[`, "stats"))
 if (!is.null(stats)) emit(stats, "spod_calibration_thresholds")
 emit(do.call(rbind, lapply(scored, `[[`, "crossing")), "spod_crossings")
 
-plot_fits <- function(name, series) {
-  file <- file.path(out, paste0("spod_quantiles_", name, ".png"))
-  png(file, 1440, 780, res = 144)
-  on.exit(dev.off())
-  par(mar = c(4, 4.5, 1, 1))
+draw_fits <- function(name, series) {
   plot(hours, d$block_mean, type = "l", col = "grey62",
     ylim = range(c(d$block_mean, unlist(series))), xlim = c(0, 24), xaxt = "n",
     xlab = "Hour on June 15", ylab = "PID (counts)")
@@ -259,21 +255,41 @@ plot_fits <- function(name, series) {
   for (i in seq_along(series)) lines(hours, series[[i]], col = colors[i], lwd = 2)
   legend("topright", c("Observed", labels(name)), col = c("grey62", colors), lty = 1, bty = "n")
 }
-plot_detrended <- function(name, series) {
-  file <- file.path(out, paste0("spod_detrended_", name, ".png"))
-  png(file, 1440, 1200, res = 144)
+plot_fits <- function(name, series) {
+  file <- file.path(out, paste0("spod_quantiles_", name, ".png"))
+  png(file, 1440, 780, res = 144)
   on.exit(dev.off())
-  par(mfrow = c(3, 1), mar = c(3.5, 4.5, 2, 1))
+  par(mar = c(4, 4.5, 1, 1))
+  draw_fits(name, series)
+}
+draw_detrended <- function(name, series) {
+  threshold_lty <- c(2L, 1L, 3L)
   for (i in seq_along(series)) {
     residual <- d$block_mean - series[[i]]
     cuts <- quantile(residual, p, names = FALSE)
     plot(hours, residual, type = "l", col = "grey45", main = labels(name)[i],
       xlim = c(0, 24), xaxt = "n", xlab = "Hour on June 15", ylab = "Detrended PID (counts)")
     axis(1L, at = seq(0, 24, by = 4))
-    abline(h = cuts, col = colors, lty = 2:4, lwd = 2)
+    abline(h = cuts, col = colors, lty = threshold_lty, lwd = 2)
     legend("topright", c("90th percentile", "95th percentile", "99th percentile"),
-      col = colors, lty = 2:4, bty = "n")
+      col = colors, lty = threshold_lty, bty = "n")
   }
+}
+plot_detrended <- function(name, series) {
+  file <- file.path(out, paste0("spod_detrended_", name, ".png"))
+  png(file, 1440, 1200, res = 144)
+  on.exit(dev.off())
+  par(mfrow = c(3, 1), mar = c(3.5, 4.5, 2, 1))
+  draw_detrended(name, series)
+}
+plot_paper <- function(name, series) {
+  pdf(file.path(out, "spod_pmala_figure6.pdf"), width = 12, height = 7)
+  on.exit(dev.off())
+  layout(matrix(c(1, 2, 3, 4, 4, 4), nrow = 3L))
+  par(mar = c(3.5, 4.5, 2, 1), cex = .85)
+  draw_detrended(name, series)
+  par(mar = c(4, 4.5, 2, 1), cex = .85)
+  draw_fits(name, series)
 }
 plot_chain_overlay <- function(tau, b0, medians) {
   file <- file.path(out, sprintf("spod_chain_overlay_t%02d_r%d.png",
@@ -303,6 +319,7 @@ for (name in names(fits)) {
   if (any(vapply(series, is.null, FALSE))) next
   plot_fits(name, series)
   plot_detrended(name, series)
+  if (prime && name == "pmala_selected") plot_paper(name, series)
   emit(data.frame(seconds_since_midnight = d$offsets, observed = d$block_mean,
     fit_tau01 = series[[1L]], fit_tau05 = series[[2L]], fit_tau10 = series[[3L]]),
     paste0("spod_curves_", name))

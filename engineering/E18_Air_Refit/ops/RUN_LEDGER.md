@@ -39,4 +39,4 @@ the original failed ADMM job, the HS attempt, the ADMM preflight, and the
 ADMM replacement. The completed ADMM fits were verified on NOTS and
 Owls against a manifest with SHA-256
 `488a9fa864c64e677a01ee9380e809e18c8ea092075d155d6e43351db6d580f1`.
-The Stage 1 comparison includes those 299 fits. Stage 2 remains on hold.
+The Stage 1 comparison includes those 299 fits.

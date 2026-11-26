@@ -21,6 +21,16 @@ The data match across old and new fits. The MCMC streams differ.
 [Old chain seeding](../../experiments/interior_quantiles/individual_nots_20261003/VS_b0001/worker.R#L37) ·
 [E-14 worker](e14_run.R#L45)
 
+## Fit reproducibility
+
+Bitwise replay of fitted chains is limited to the same CPU or node
+family with the same software and settings. Across node families,
+individual fits can differ by Monte Carlo-sized amounts. In NOTS
+replay job `2921171` under R 4.5.2, VS Mixed at τ = 0.25, seed 1
+(index 1100), was identical. S Beta at τ = 0.50, seed 1 (index 2200),
+changed in MSE from 0.000318 to 0.000385. S Gaussian at τ = 0.75,
+seed 1 (index 1800), changed from 0.00222 to 0.00204.
+
 From the repository root, build the six LaTeX fragments, comparison CSV,
 and health report in `engineering/E14_Inner_Rerun/out/`. The MSE comparison
 for the owner is written to `engineering/E14_Inner_Rerun/old_vs_new_mse.md`.

@@ -154,8 +154,9 @@ pilot gates as specified for the simulation designs.
 
 ## Stage 2 preparation
 
-Stage 2 awaits the Engineering head's GO. Prepare the input after GO
-using `e18_prepare_spod.R OUTPUT_RDS` from the repo root. On Owls invoke
+HQ approved Stage 2′ on 2026-11-26 after confirming the Stage 1′
+triple `(1e-2, 1e-2, 1e-2)`. Prepare the input using
+`e18_prepare_spod.R OUTPUT_RDS` from the repo root. On Owls invoke
 R through `~/.config/bvs-hq/owls/owls_run -j 1`. Copy the same prepared
 `spod_blocks.rds` to each authorized NOTS run directory. Prepare a
 `STAGE2_GO.dcf` per authorized run with fields `Run` (the run directory's
@@ -164,15 +165,21 @@ basename) and `Input-SHA256` (the prepared file SHA-256).
 Source is [S08_2018-06-15.csv](../../applications/Air%20Quality/S08_2018-06-15.csv),
 sensor `d PID (counts)`. Treat the timestamps as local clock labels.
 The source has 86,213 records, four of which belong to June 16. The
-86,209 in-day records have distinct seconds and finite readings.
+86,209 in-day records have distinct seconds. Drop the 30 literal `N/A`
+readings from 13:01:48 to 13:02:17, leaving 86,179 numeric readings.
 Form clock-aligned 10-second blocks for June 15, from 00:00:00 through
-23:59:59. Average the available readings in each of the 8,624
+23:59:59. Average the available readings in each of the 8,621
 nonempty blocks. Six of those blocks have fewer than ten readings.
-Linearly interpolate the 16 empty block means between their neighboring
+Linearly interpolate the 19 empty block means between their neighboring
 nonempty block means. Keep the number of readings and interpolation
 flag for each block. Center all 8,640 block means by their arithmetic
 mean and scale by their sample SD. The manuscript states that the
 series was standardized. The original generator is unavailable.
+The three newly empty blocks start at 13:01:40, 13:01:50, and 13:02:00.
+The prepared-input SHA-256 is
+`7034864ae177b222d19d2df68347d1112f5491703fbeb5636adff05a07b76261`.
+Input correction approved by the Engineering head 2026-11-26 (`35cc297`),
+with the worker unchanged (`9730ff1`).
 
 Use the same individual sampler controls as Stage 1, at n = 8,640.
 The two independent chain seeds are 1001 and 1002 for each level and
@@ -287,7 +294,8 @@ of the two pooled, equally sized thinned chains at the rate chosen
 by Stage 1′. Existing `spod_quantiles_*` and `spod_detrended_*` plots
 use these pooled curves. Each `spod_chain_overlay_*` figure overlays
 the two separate chain medians on the observed PID series at the
-selected rate for that level.
+selected rate for that level. `spod_pmala_figure6.pdf` places the
+three detrended panels on the left and the fitted curves on the right.
 
 For every level and rate, `spod_cell_health.csv` reports the median,
 90th percentile and share above 1.1 of pointwise θ R-hat. As in arm
@@ -317,6 +325,33 @@ figure unless an independent `admm-real` refit takes minutes and adds
 no delay. If approved, run the one-fit compute-node preflight first
 and provide the separate ADMM directory as the third reporter argument.
 Onizuka uses the approved original benchmarks throughout.
+
+After collection and reporting, run the Writing export from the repo
+root with the Owls wrapper.
+
+```bash
+~/.config/bvs-hq/owls/owls_run -j 1 Rscript --vanilla \
+  engineering/E18_Air_Refit/e18_paper_air.R \
+  runs/E18-prime-sim-20261126/report "$REAL_RUN"
+```
+
+The export writes the Table 2 estimates and SEs, the paired PMALA-minus-ADMM
+differences over common seeds, and the warm-up summary for both prime stages
+under `results_a0_n/`. The per-cell Stage 2′ diagnostics are in
+`$REAL_RUN/report/spod_diagnostics_by_cell.csv`. Fit core-hours use Slurm
+`TotalCPU` from the collected production array's `slurm_accounting.psv`.
+Report pilot CPU separately. The Writing export requires all 30 chain
+reports and checks `STOP_stall` and `STOP_rhat` before writing the three CSVs.
+
+## Fit reproducibility
+
+Bitwise replay of fitted chains is limited to the same CPU or node
+family with the same software and settings. Across node families,
+individual fits can differ by Monte Carlo-sized amounts. In NOTS
+E-14 replay job `2921171` under R 4.5.2, VS Mixed at τ = 0.25, seed 1
+(index 1100), was identical. S Beta at τ = 0.50, seed 1 (index 2200),
+changed in MSE from 0.000318 to 0.000385. S Gaussian at τ = 0.75,
+seed 1 (index 1800), changed from 0.00222 to 0.00204.
 
 ## E-19 (planned, conditional; HQ 2026-11-26)
 

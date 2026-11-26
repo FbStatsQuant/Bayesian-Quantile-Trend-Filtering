@@ -54,6 +54,10 @@ curve_metrics <- function(est, lo, hi, truth) c(
 
 ## Snapshot and Slurm
 
+Use the same CPU or node family for exact fit replays. See the
+[replay results](README.md#fit-reproducibility) for the observed
+cross-family MSE changes under R 4.5.2.
+
 The approved sampler commit is `63f2a56205b8d2ec311565db8c98874cd96754b2`.
 Transfer the code by Git bundle between submissions. Verify the bundle in
 the source repo and on NOTS, then compare the resulting NOTS checkout's

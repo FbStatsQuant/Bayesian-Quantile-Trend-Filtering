@@ -113,6 +113,10 @@ Otherwise skip the ADMM refit.
 
 ## Collection
 
+Use the same CPU or node family for exact fit replays. See the
+[replay results](../README.md#fit-reproducibility) for the observed
+cross-family MSE changes under R 4.5.2.
+
 After accounting is terminal, run the bundled output checker. Report
 failed tasks, including their retained error messages. Once the expected
 outputs are complete, copy the result folder and any named summaries
@@ -121,6 +125,10 @@ with a SHA-256 manifest verified on both sides.
 ```bash
 bash "$ops/collect.sh" "$RUN_ID" "$EXPECTED_RDS_COUNT" "$SUMMARY_FILE"
 ```
+
+For Stage 2′, collect `spod_blocks.rds`, `STAGE2_GO.dcf`, and the
+production array accounting in `slurm_accounting.psv`. Retain separate
+pilot accounting for the total CPU charge.
 
 The summary-file argument is optional. For a worker with another output
 format, use `-` for the expected RDS count and verify the artifacts with
