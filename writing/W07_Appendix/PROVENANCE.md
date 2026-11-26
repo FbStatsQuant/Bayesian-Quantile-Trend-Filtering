@@ -13,11 +13,11 @@ Short names:
 | Extreme individual, τ 0.90 and 0.93 | Oct-21 run with the same sampler and kernel hashes (run tag _10k3k_). **Its config record is missing**, so nothing more is inferred | MAN:1100/1152; E15 PROVENANCE |
 | Extreme joint, §4.2 | Oct-7 run (VS and S), the table source (DEPLOYMENT_NOTES.md:13). b0 = 0.01 VS, 0.001 S. 30000/10000 sweeps. asis = TRUE. Target 0.5. Increment form. No git hash; file hashes at MAN:3929–3930 | EQ/Extreme_Joint_Sampler/config.R:12,16; EQ/Extreme_Joint_Sampler/source/Joint/prox_box_metric.cpp:23,273 |
 | Extreme joint, Oct-2 run | VS only, b0 = 0.01, same code and data. **Not the table source** | experiments/joint_upper_levels/README.md |
-| Growth, §4.4.2 and App E.2 | **UNKNOWN.** The generator of growth_pmala_* is not in the repo. The only record is a joint run (applications/Growth/Growth_Joint_PMALA_k2.R), which is not the paper's figure. **TBC (Felipe)** | none |
-| Scalability, §4.2 | **UNKNOWN.** The files cited in scalability.tex:6–11 do not exist; experiments/scalability/ is a different benchmark. **TBC (Felipe)** | none |
+| Growth, §4.4.2 and App E.2 | **Felipe 11-26: no refit and no script hunt.** C.6 shows only what §4.4.2 states (independent levels, Gamma(1,√G), 6000/1000); every other column gets an em dash. Nothing is taken from the joint Growth run | none |
+| Scalability, §4.2 | **Felipe 11-26: no re-timing.** C.6 shows only what scalability.tex states; every other column gets an em dash. Nothing is taken from experiments/scalability/ | none |
 | Air simulation (§4.3) and SPod (§4.4.1, App E.1) | being refit in E-18. **TBC** | engineering E-18 |
 
 ## Main-text alignment edits (HQ ruling 3)
 - simulations.tex:19: "All other results in the paper use the sampler as described in Section 2 and Appendix C" is false: the extreme individual runs used target 0.55, no interweaving, and 10000/3000 sweeps. It is replaced by a pointer to the C.6 settings table at integration.
 - No other main-text statement of the extreme-run priors or sweeps exists (checked by grep, 2026-11-26).
-- data_application.tex:49 (Growth) is **not touched** until Felipe answers.
+- data_application.tex (Growth) and scalability.tex stay as they are, apart from any pointer fixes (Felipe 11-26).
