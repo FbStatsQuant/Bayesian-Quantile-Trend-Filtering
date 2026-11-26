@@ -26,3 +26,5 @@ import BQTF.Reduction
 import BQTF.Prob.Contraction
 import BQTF.Prob.EfronStein
 import BQTF.Lin.EckartYoung
+import BQTF.Prob.Symmetrization
+import BQTF.Shift.PrekopaLaplace
