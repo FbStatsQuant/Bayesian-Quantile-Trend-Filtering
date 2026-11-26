@@ -1,0 +1,225 @@
+diff --git a/paper/sections/abstract.tex b/paper/sections/abstract.tex
+index 8fcdad4..6972fc0 100644
+--- a/paper/sections/abstract.tex
++++ b/paper/sections/abstract.tex
+@@ -1,5 +1,5 @@
+ % !TeX root = ../main.tex
+-Quantile trend filtering estimates a conditional quantile along an ordered domain by combining the check loss with an $\ell_1$ penalty on the differences of order $k+1$ of the trend. The penalty must be selected, and the result is a point estimate. We propose a Bayesian counterpart: an asymmetric Laplace working likelihood and a Laplace prior on the differences, with priors on the penalty and the likelihood scale. The trend is updated by a proximal Metropolis-adjusted Langevin step whose proximal map is a weighted trend filtering problem, and the cost per sweep is linear in the sample size $n$. A joint sampler for several quantile levels produces draws that never cross. We establish that, for a fixed scale and a fixed penalty of order $n^{(2k+1)/2}$, the posterior contracts around the true quantiles at the rate $n^{-(2k+1)/(2k+2)}$, and the same rate holds at every level of the joint posterior; the data need not follow the working likelihood. In simulations at levels from $0.05$ to $0.95$, the mean squared error of the sampler is within a factor of $1.22$ of that of a horseshoe Gibbs sampler on a signal with varying smoothness; on a smooth signal, the optimization-based estimator has the smallest error. Applications to air-quality sensor data and to growth charts illustrate the method.
++Quantile trend filtering estimates a conditional quantile along an ordered domain by combining the check loss with an $\ell_1$ penalty on the differences of order $k+1$ of the trend. The penalty must be selected, and the result is a point estimate. We propose a Bayesian counterpart: an asymmetric Laplace working likelihood and a Laplace prior on the differences, with priors on the penalty and the likelihood scale. The trend is updated by a proximal Metropolis-adjusted Langevin step whose proximal map is a weighted trend filtering problem, and the cost per sweep is linear in the sample size $n$. A joint sampler for several quantile levels produces draws that never cross. We establish that, for a fixed scale and a fixed penalty of order $n^{(2k+1)/2}$, the posterior contracts around the true quantiles at the rate $n^{-(2k+1)/(2k+2)}$, and the same rate holds at every level of the joint posterior; the data need not follow the working likelihood. In simulations at levels from $0.05$ to $0.95$, the mean squared error of the sampler is within a factor of $1.37$ of that of a horseshoe Gibbs sampler on a signal with varying smoothness; on a smooth signal, the optimization-based estimator has the smallest error. Applications to air-quality sensor data and to growth charts illustrate the method.
+ 
+ % Abstract before the W-04 rewrite (2026-11-24), kept for reference:
+ % Quantile trend filtering combines the check loss with an $\ell_1$ penalty on discrete differences of the trend. We develop Bayesian-PMALA, a posterior sampler for quantile trend filtering that learns the regularization strength and the likelihood scale jointly with the trend. Augmenting the asymmetric Laplace likelihood with its normal--exponential representation makes the likelihood Gaussian in the trend. Under a global Laplace prior on trend differences, the whole negative log-conditional of the trend is then a weighted quadratic plus an $\ell_1$ difference penalty. The trend can therefore be updated by an exact proximal Metropolis-adjusted Langevin (P-MALA) step. The Moreau--Yosida envelope is built on the entire conditional posterior, through a weighted trend filtering problem, rather than on a smoothed check loss, and the Metropolis--Hastings correction uses the exact density. The latent variables, the penalty and the scale have conjugate updates. Every linear system is banded, and the proximal map is computed by ADMM with a factorization shared by the forward and reverse maps, so the work per sweep grows linearly with the sample size for a fixed inner iteration budget. For several quantile levels, a joint version samples each trend between its neighbours. Only the proximal map changes, becoming a box-constrained problem solved with banded interior-point steps, and no retained draw crosses.
+diff --git a/paper/sections/appendix_pmala.tex b/paper/sections/appendix_pmala.tex
+index 299e186..62963df 100644
+--- a/paper/sections/appendix_pmala.tex
++++ b/paper/sections/appendix_pmala.tex
+@@ -188,7 +188,7 @@ The coefficient of $\eta$ combines the power $a_0-1+m$ of $\lambda'$ in the prio
+ 
+ \paragraph{Curvature-matched metric.} With $M = \mathbf{I}_n$ the noise in \eqref{eq:pmala_proposal} is white, and its $(k+1)$-th differences have standard deviation of order $\sqrt{\delta}$ in each of the $m$ coordinates, each charged by the penalty at rate $\lambda$. For the posterior values of $\lambda$ at $n = 500$ this increases $U$ by far more than the Metropolis--Hastings ratio can absorb: on a pilot configuration (VS signal, Gaussian noise, $\tau = 0.5$) the acceptance rate was zero for every step size tried down to $\delta = 10^{-5}$. The metric \eqref{eq:metric} scales the noise in the rough directions by $1/\lambda$. Values of $\kappa$ between $3$ and $10$ raised the adapted step size three- to tenfold relative to $\kappa = 1$ at the same acceptance rate and increased the effective sample size of $\theta$ several-fold; the default is $\kappa = 3$.
+ 
+-\paragraph{Rate of the Gamma prior.} Because the posterior draws of the trend satisfy $\norm{D\theta}_1 \approx m/\lambda$ (Appendix~\ref{app:pmala:asis}), the data determine the level of $\lambda$ only weakly, and the prior rate $b_0$ must be small relative to $\norm{D\theta}_1$ for the data to determine $\lambda$. A unit rate is far from weak on this scale: $\mathrm{Gamma}(1,1)$ gives $P(\lambda > 100) = e^{-100}$, whereas $\mathrm{Gamma}(1, 10^{-2})$ gives $P(\lambda > 100) = e^{-1} \approx 0.37$. Under $\mathrm{Gamma}(1,1)$ the chain settled at $\lambda$ between $50$ and $75$ on the pilot configuration and returned undersmoothed trends. We therefore use $b_0 = 10^{-2}$. A sensitivity run with $b_0 = 10^{-4}$ on all $30$ configurations with $10$ replications each was not uniformly better: on the smooth signal the geometric-mean MSE ratio to the default was $0.86$, with $7$ of $15$ configurations significantly lower and none higher, but the median coverage of the $95\%$ intervals fell from $0.91$ to $0.84$; on the varying-smoothness signal the ratio was $1.01$, with $1$ configuration significantly lower and $2$ higher. The default therefore remains $b_0 = 10^{-2}$. The interior-quantile simulations of Section~\ref{sec:sim:individual} use the smaller rates $b_0 = 10^{-3}$ for the varying-smoothness signal and $b_0 = 5\times10^{-4}$ for the smooth signal. A Laplace prior scaled by $\sigma$ \citep{park2008bayesian}, under which the penalty enters as $\lambda/\sigma$, is not used: in one configuration $\lambda$ and $\sigma$ escalated together to very large values for a long stretch of the chain, a mode the unscaled prior \eqref{eq:prior_theta} does not exhibit.
++\paragraph{Rate of the Gamma prior.} Because the posterior draws of the trend satisfy $\norm{D\theta}_1 \approx m/\lambda$ (Appendix~\ref{app:pmala:asis}), the data determine the level of $\lambda$ only weakly, and the prior rate $b_0$ must be small relative to $\norm{D\theta}_1$ for the data to determine $\lambda$. A unit rate is far from weak on this scale: $\mathrm{Gamma}(1,1)$ gives $P(\lambda > 100) = e^{-100}$, whereas $\mathrm{Gamma}(1, 10^{-2})$ gives $P(\lambda > 100) = e^{-1} \approx 0.37$. Under $\mathrm{Gamma}(1,1)$ the chain settled at $\lambda$ between $50$ and $75$ on the pilot configuration and returned undersmoothed trends. We therefore use $b_0 = 10^{-2}$. A sensitivity run with $b_0 = 10^{-4}$ on all $30$ configurations with $10$ replications each was not uniformly better: on the smooth signal the geometric-mean MSE ratio to the default was $0.86$, with $7$ of $15$ configurations significantly lower and none higher, but the median coverage of the $95\%$ intervals fell from $0.91$ to $0.84$; on the varying-smoothness signal the ratio was $1.01$, with $1$ configuration significantly lower and $2$ higher. The default therefore remains $b_0 = 10^{-2}$. The interior-quantile simulations of Section~\ref{sec:sim:individual} use the smaller rate $b_0 = 10^{-5}$ for both signals. A Laplace prior scaled by $\sigma$ \citep{park2008bayesian}, under which the penalty enters as $\lambda/\sigma$, is not used: in one configuration $\lambda$ and $\sigma$ escalated together to very large values for a long stretch of the chain, a mode the unscaled prior \eqref{eq:prior_theta} does not exhibit.
+ 
+ \paragraph{Prior on the likelihood scale.} The inverse-Gamma parameters enter \eqref{eq:sigmaupdate} next to $3n/2$ and a sum over $n$ observations, so $a_\sigma = b_\sigma = 0.1$ carries negligible information while keeping the prior proper and away from the improper limit $a_\sigma, b_\sigma \to 0$.
+ 
+diff --git a/paper/sections/appendix_simulations.tex b/paper/sections/appendix_simulations.tex
+index a73971f..11acb67 100644
+--- a/paper/sections/appendix_simulations.tex
++++ b/paper/sections/appendix_simulations.tex
+@@ -24,21 +24,21 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.012702 & 0.020517 & 0.030557 & 0.040591 & 0.066465 \\
+ Onizuka (Horseshoe) & 0.011300 & 0.018849 & 0.028763 & 0.038443 & 0.062328 \\
+-Bayesian-PMALA & 0.012705 & 0.020700 & 0.030584 & 0.040697 & 0.069261 \\
++Bayesian-PMALA & 0.012590 & 0.020623 & 0.030606 & 0.040617 & 0.068982 \\
+ ADMM & 0.027314 & 0.029267 & 0.044214 & 0.052848 & 0.076817 \\
+ \midrule
+ Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.215556 & 0.139979 & 0.128822 & 0.138850 & 0.215747 \\
+ Onizuka (Horseshoe) & 0.212371 & 0.140284 & 0.129614 & 0.141514 & 0.218726 \\
+-Bayesian-PMALA & 0.216900 & 0.139086 & 0.126371 & 0.137381 & 0.209422 \\
++Bayesian-PMALA & 0.217127 & 0.147141 & 0.132533 & 0.141386 & 0.208296 \\
+ ADMM & 0.218535 & 0.183889 & 0.169139 & 0.157936 & 0.201602 \\
+ \midrule
+ Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.109980 & 0.070160 & 0.063856 & 0.067192 & 0.103017 \\
+ Onizuka (Horseshoe) & 0.106356 & 0.068189 & 0.061950 & 0.065668 & 0.101007 \\
+-Bayesian-PMALA & 0.106680 & 0.069284 & 0.063495 & 0.067010 & 0.104355 \\
++Bayesian-PMALA & 0.105817 & 0.069279 & 0.063614 & 0.067438 & 0.103270 \\
+ ADMM & 0.141630 & 0.087809 & 0.085612 & 0.081531 & 0.107235 \\
+ \bottomrule
+ \end{tabular}
+@@ -55,19 +55,19 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.072159 & 0.100837 & 0.132473 & 0.158571 & 0.168685 \\
+ Onizuka (Horseshoe) & 0.067523 & 0.100344 & 0.134284 & 0.161300 & 0.166118 \\
+-Bayesian-PMALA & 0.063096 & 0.097263 & 0.128918 & 0.154285 & 0.159541 \\
++Bayesian-PMALA & 0.062711 & 0.096471 & 0.127957 & 0.152728 & 0.158274 \\
+ \midrule
+ Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.557248 & 0.564334 & 0.569489 & 0.565218 & 0.559566 \\
+ Onizuka (Horseshoe) & 0.578243 & 0.613924 & 0.620905 & 0.624492 & 0.599896 \\
+-Bayesian-PMALA & 0.533499 & 0.515367 & 0.511419 & 0.516501 & 0.527685 \\
++Bayesian-PMALA & 0.499105 & 0.484379 & 0.492290 & 0.496473 & 0.512013 \\
+ \midrule
+ Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.289501 & 0.286599 & 0.285566 & 0.284948 & 0.280193 \\
+ Onizuka (Horseshoe) & 0.296111 & 0.301798 & 0.301683 & 0.301976 & 0.290053 \\
+-Bayesian-PMALA & 0.271823 & 0.273381 & 0.273393 & 0.275158 & 0.268848 \\
++Bayesian-PMALA & 0.267486 & 0.270448 & 0.270158 & 0.271706 & 0.267083 \\
+ \bottomrule
+ \end{tabular}
+ \end{table}
+@@ -88,21 +88,21 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.009000 & 0.017595 & 0.027191 & 0.035333 & 0.056189 \\
+ Onizuka (Horseshoe) & 0.009166 & 0.016903 & 0.026235 & 0.034349 & 0.056422 \\
+-Bayesian-PMALA & 0.008059 & 0.014843 & 0.022516 & 0.028817 & 0.054178 \\
++Bayesian-PMALA & 0.008288 & 0.014355 & 0.021352 & 0.027361 & 0.048646 \\
+ ADMM & 0.007408 & 0.013056 & 0.019253 & 0.024246 & 0.039323 \\
+ \midrule
+ Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.209230 & 0.128588 & 0.117542 & 0.129947 & 0.200719 \\
+ Onizuka (Horseshoe) & 0.212951 & 0.128772 & 0.116773 & 0.130281 & 0.208177 \\
+-Bayesian-PMALA & 0.175310 & 0.101395 & 0.087401 & 0.099587 & 0.165263 \\
++Bayesian-PMALA & 0.155023 & 0.096710 & 0.083893 & 0.092152 & 0.142751 \\
+ ADMM & 0.134511 & 0.082435 & 0.071963 & 0.081493 & 0.118870 \\
+ \midrule
+ Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.093516 & 0.062130 & 0.057391 & 0.060291 & 0.091704 \\
+ Onizuka (Horseshoe) & 0.096546 & 0.061044 & 0.055676 & 0.059026 & 0.092177 \\
+-Bayesian-PMALA & 0.082926 & 0.049742 & 0.045036 & 0.048328 & 0.080376 \\
++Bayesian-PMALA & 0.072841 & 0.046102 & 0.042259 & 0.045504 & 0.068050 \\
+ ADMM & 0.060896 & 0.042695 & 0.037518 & 0.040551 & 0.057551 \\
+ \bottomrule
+ \end{tabular}
+@@ -119,19 +119,19 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.051618 & 0.086614 & 0.118115 & 0.140828 & 0.144257 \\
+ Onizuka (Horseshoe) & 0.055748 & 0.087738 & 0.119125 & 0.144581 & 0.152374 \\
+-Bayesian-PMALA & 0.035714 & 0.065104 & 0.089491 & 0.108993 & 0.124185 \\
++Bayesian-PMALA & 0.013671 & 0.026210 & 0.037424 & 0.047107 & 0.082849 \\
+ \midrule
+ Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.530973 & 0.541054 & 0.546983 & 0.542001 & 0.528167 \\
+ Onizuka (Horseshoe) & 0.572392 & 0.581571 & 0.576684 & 0.582025 & 0.573076 \\
+-Bayesian-PMALA & 0.436860 & 0.405506 & 0.400563 & 0.403851 & 0.429195 \\
++Bayesian-PMALA & 0.270319 & 0.175904 & 0.174998 & 0.181937 & 0.256014 \\
+ \midrule
+ Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.250570 & 0.262358 & 0.265880 & 0.262720 & 0.248729 \\
+ Onizuka (Horseshoe) & 0.274999 & 0.276615 & 0.274603 & 0.273819 & 0.269150 \\
+-Bayesian-PMALA & 0.214741 & 0.199880 & 0.198983 & 0.198874 & 0.210358 \\
++Bayesian-PMALA & 0.124708 & 0.086414 & 0.083894 & 0.083484 & 0.112204 \\
+ \bottomrule
+ \end{tabular}
+ \end{table}
+diff --git a/paper/sections/discussion.tex b/paper/sections/discussion.tex
+index 3a04fc9..e73bd52 100644
+--- a/paper/sections/discussion.tex
++++ b/paper/sections/discussion.tex
+@@ -5,7 +5,7 @@
+ 
+ This paper proposes a Bayesian counterpart of the ADMM quantile trend filtering estimator: an asymmetric Laplace working likelihood, combined with a Laplace prior on the differences of the trend and with priors on the penalty and the likelihood scale. A Gibbs sampler updates the trend by a P-MALA step on its whole conditional, whose proximal map is a weighted trend filtering problem, and the cost per sweep grows linearly with $n$. For several quantile levels, a joint sampler restricts each trend to lie between the trends at the adjacent levels, and its draws never cross. Theorem~\ref{thm:main} shows that, for a fixed scale and a fixed penalty of order $n^{(2k+1)/2}$, the posterior contracts around the true quantiles at the rate $n^{-(2k+1)/(2k+2)}$. The result holds under two conditions on the distribution functions of the data near the quantile, and the data need not follow the working likelihood. Theorem~\ref{thm:joint} extends the rate to every level of the joint posterior under the ordering constraint, with no further assumption.
+ 
+-The numerical results illustrate the two samplers. At quantile levels from $0.05$ to $0.95$, the mean squared error of Bayesian-PMALA is within a factor of $1.22$ of that of the horseshoe sampler of \citet{onizuka2024fast} on the signal with varying smoothness, and the ADMM estimator of \citet{brantley2020baseline} has the smallest error in every configuration on the smooth signal. At extreme upper quantiles the fits of the joint sampler never cross. In the peak-detection design, the mean squared error of Bayesian-PMALA at $\tau = 0.05$ and $0.10$ is at most $0.0138$, against at most $0.0127$ for ADMM and at least $0.065$ for the horseshoe and Laplace samplers. In the timing experiment, a sweep of the implementation of \citet{onizuka2024fast} takes about $25$ times as long as a sweep of Bayesian-PMALA at $n=250$ and about $7\,000$ times as long at $n=4000$. In the two data applications, Bayesian-PMALA estimates the baseline of an air-quality series with $n = 8{,}640$ observations and the growth centiles of Dutch children. Both contraction results hold for a fixed penalty and a fixed scale. A natural next step is a contraction result for the posterior in which $\lambda$ and $\sigma$ have the priors used by the samplers.
++The numerical results illustrate the two samplers. At quantile levels from $0.05$ to $0.95$, the mean squared error of Bayesian-PMALA is within a factor of $1.37$ of that of the horseshoe sampler of \citet{onizuka2024fast} on the signal with varying smoothness, and the ADMM estimator of \citet{brantley2020baseline} has the smallest error in every configuration on the smooth signal. At extreme upper quantiles the fits of the joint sampler never cross. In the peak-detection design, the mean squared error of Bayesian-PMALA at $\tau = 0.05$ and $0.10$ is at most $0.0138$, against at most $0.0127$ for ADMM and at least $0.065$ for the horseshoe and Laplace samplers. In the timing experiment, a sweep of the implementation of \citet{onizuka2024fast} takes about $25$ times as long as a sweep of Bayesian-PMALA at $n=250$ and about $7\,000$ times as long at $n=4000$. In the two data applications, Bayesian-PMALA estimates the baseline of an air-quality series with $n = 8{,}640$ observations and the growth centiles of Dutch children. Both contraction results hold for a fixed penalty and a fixed scale. A natural next step is a contraction result for the posterior in which $\lambda$ and $\sigma$ have the priors used by the samplers.
+ 
+ % ----------------------------------------------------------------------------
+ % PARKED (W-04, 2026-11-24): the Discussion before the rewrite. The Conclusions above replace it.
+diff --git a/paper/sections/introduction.tex b/paper/sections/introduction.tex
+index 69dc977..e77fff6 100644
+--- a/paper/sections/introduction.tex
++++ b/paper/sections/introduction.tex
+@@ -20,7 +20,7 @@ Bayesian methods instead place a prior on the differences and replace the check
+ 
+ Proximal Markov chain Monte Carlo is designed for nonsmooth posteriors. The proximal Metropolis-adjusted Langevin algorithm (P-MALA) of \citet{pereyra2016proximal} proposes a Langevin step on the Moreau--Yosida envelope of the negative log-density, whose gradient is a proximal map, and corrects with the exact density; see also \citet{durmus2018efficient} and \citet{heng2023bayesian}. In quantile trend filtering, however, the likelihood is nonsmooth as well as the prior: the check loss combined with the difference penalty has no routinely computable proximal map, and smoothing the check loss changes the target.
+ 
+-This article develops a Bayesian counterpart of the ADMM quantile trend filtering estimator in which the penalty and the likelihood scale are estimated with the trend. We take an asymmetric Laplace working likelihood with scale $\sigma$ and a Laplace prior on the differences with penalty $\lambda$, and we place priors on $\lambda$ and $\sigma$. At fixed $(\lambda, \sigma)$, the conditional posterior mode is the solution of \eqref{eq:intro_qtf} with $\lambda$ replaced by the effective penalty $\lambda\sigma$. The contributions are threefold. First, we give a Gibbs sampler for a single quantile level, which we call Bayesian-PMALA. Under the normal--exponential representation of the asymmetric Laplace distribution \citep{kozumi2011gibbs}, the negative log full conditional of the trend is a weighted quadratic plus the $\ell_1$ difference penalty. Its proximal map is a weighted trend filtering problem, so P-MALA applies to the whole conditional without smoothing, and the cost per sweep grows linearly with $n$. Second, for several quantile levels we give a joint sampler whose draws never cross: each trend is drawn from its single-level conditional, restricted to lie between the trends at the adjacent levels. Third, we establish posterior contraction for fixed $\lambda$ and $\sigma$. With $\lambda$ of order $n^{(2k+1)/2}$, the posterior contracts around the true quantiles at the rate $n^{-(2k+1)/(2k+2)}$, and the same rate holds at every level of the joint posterior under the ordering constraint. The data are not assumed to follow the asymmetric Laplace distribution; the result requires two conditions on their distribution functions near the quantile, adapted from \citet{madrid2022risk}, and no moment condition. In simulations at quantile levels from $0.05$ to $0.95$, the mean squared error of Bayesian-PMALA is within a factor of $1.22$ of that of the horseshoe sampler on a signal with varying smoothness, and ADMM has the smallest error on a smooth signal.
++This article develops a Bayesian counterpart of the ADMM quantile trend filtering estimator in which the penalty and the likelihood scale are estimated with the trend. We take an asymmetric Laplace working likelihood with scale $\sigma$ and a Laplace prior on the differences with penalty $\lambda$, and we place priors on $\lambda$ and $\sigma$. At fixed $(\lambda, \sigma)$, the conditional posterior mode is the solution of \eqref{eq:intro_qtf} with $\lambda$ replaced by the effective penalty $\lambda\sigma$. The contributions are threefold. First, we give a Gibbs sampler for a single quantile level, which we call Bayesian-PMALA. Under the normal--exponential representation of the asymmetric Laplace distribution \citep{kozumi2011gibbs}, the negative log full conditional of the trend is a weighted quadratic plus the $\ell_1$ difference penalty. Its proximal map is a weighted trend filtering problem, so P-MALA applies to the whole conditional without smoothing, and the cost per sweep grows linearly with $n$. Second, for several quantile levels we give a joint sampler whose draws never cross: each trend is drawn from its single-level conditional, restricted to lie between the trends at the adjacent levels. Third, we establish posterior contraction for fixed $\lambda$ and $\sigma$. With $\lambda$ of order $n^{(2k+1)/2}$, the posterior contracts around the true quantiles at the rate $n^{-(2k+1)/(2k+2)}$, and the same rate holds at every level of the joint posterior under the ordering constraint. The data are not assumed to follow the asymmetric Laplace distribution; the result requires two conditions on their distribution functions near the quantile, adapted from \citet{madrid2022risk}, and no moment condition. In simulations at quantile levels from $0.05$ to $0.95$, the mean squared error of Bayesian-PMALA is within a factor of $1.37$ of that of the horseshoe sampler on a signal with varying smoothness, and ADMM has the smallest error on a smooth signal.
+ 
+ Section~\ref{sec:methodology} presents the model and the two samplers; computational details are in Appendix~\ref{app:pmala}. Section~\ref{sec:theory} states the assumptions and the contraction theorems for one level and for several ordered levels; the proofs are in Appendix~\ref{app:proofs}, and Appendix~\ref{app:assumptions} analyzes the assumptions. Section~\ref{sec:numerical} reports simulations and two data applications, and Section~\ref{sec:discussion} concludes.
+ 
+diff --git a/paper/sections/simulations.tex b/paper/sections/simulations.tex
+index 2ffd2ab..82f282f 100644
+--- a/paper/sections/simulations.tex
++++ b/paper/sections/simulations.tex
+@@ -16,11 +16,11 @@ The errors follow the three noise families of \citet{onizuka2024fast}. The first
+ \subsubsection{Interior quantiles}
+ \label{sec:sim:individual}
+ 
+-The competitors are the Laplace and horseshoe Gibbs samplers of \citet{onizuka2024fast} and the ADMM estimator of \citet{brantley2020baseline}. The levels are $\tau=0.05$, $0.25$, $0.50$, $0.75$, and $0.95$, and all methods are fitted to the same data in each replication. Bayesian-PMALA uses $\sigma\sim\mathrm{IG}(0.1,0.1)$, $\lambda\sim\mathrm{Gamma}(1,10^{-3})$ for the VS signal and $\lambda\sim\mathrm{Gamma}(1,5\times10^{-4})$ for the S signal, and one chain of $30000$ sweeps per fit, of which the first $10000$ are discarded. For these interior levels the sampler of Section~\ref{subsec:individual} is run with three updates, stated in Appendix~\ref{app:pmala:interior}: the chain starts from a running-median fit of the data rather than from $\by$, $\lambda$ is held at its initial value during the warm-up, and the interweaving step keeps a spline component of the trend fixed, rather than only its polynomial component, while it rescales the remainder. All other results in the paper use the sampler as described in Section~\ref{sec:methodology} and Appendix~\ref{app:pmala}. The samplers of \citet{onizuka2024fast} use $8000$ sweeps with $2000$ burn-in and an $\mathrm{IG}(1,1)$ prior on $\sigma^2$. The Bayesian point estimates are posterior means. ADMM selects $\lambda$ by extended BIC over a $25$-point logarithmic grid, and a replication is discarded when any candidate on the grid fails to converge.
++The competitors are the Laplace and horseshoe Gibbs samplers of \citet{onizuka2024fast} and the ADMM estimator of \citet{brantley2020baseline}. The levels are $\tau=0.05$, $0.25$, $0.50$, $0.75$, and $0.95$, and all methods are fitted to the same data in each replication. Bayesian-PMALA uses $\sigma\sim\mathrm{IG}(0.1,0.1)$, $\lambda\sim\mathrm{Gamma}(1,10^{-5})$ for both signals, and one chain of $30000$ sweeps per fit, of which the first $10000$ are discarded. For these interior levels the sampler of Section~\ref{subsec:individual} is run with three updates, stated in Appendix~\ref{app:pmala:interior}: the chain starts from a running-median fit of the data rather than from $\by$, $\lambda$ is held at its initial value during the warm-up, and the interweaving step keeps a spline component of the trend fixed, rather than only its polynomial component, while it rescales the remainder. All other results in the paper use the sampler as described in Section~\ref{sec:methodology} and Appendix~\ref{app:pmala}. The samplers of \citet{onizuka2024fast} use $8000$ sweeps with $2000$ burn-in and an $\mathrm{IG}(1,1)$ prior on $\sigma^2$. The Bayesian point estimates are posterior means. ADMM selects $\lambda$ by extended BIC over a $25$-point logarithmic grid, and a replication is discarded when any candidate on the grid fails to converge.
+ 
+ For each fit we compute $\mathrm{MSE}=n^{-1}\sum_i(\widehat\theta_{\tau,i}-Q_\tau(u_i))^2$, $\mathrm{MAD}=n^{-1}\sum_i|\widehat\theta_{\tau,i}-Q_\tau(u_i)|$, and, for the samplers, the mean width MCIW of the pointwise $95\%$ intervals. All three are averaged over valid replications.
+ 
+-\label{sec:sim:ind:vs}Table~\ref{tab:vs_int_mse} reports the MSE for the VS signal; MAD and MCIW are in Appendix~\ref{app:sim:individual:vs}. In every configuration the MSE values of the three Bayesian samplers are within a factor of $1.22$ of one another, and the horseshoe has the smallest at all five levels under Beta noise. A single global penalty therefore gives nearly the same error as local shrinkage on this signal. ADMM has the largest MSE in $14$ of the $15$ configurations; the exception is mixed-normal noise at $\tau=0.95$. This is consistent with extended BIC selecting a penalty too large for the localized bump, whereas the samplers estimate a smaller one.
++\label{sec:sim:ind:vs}Table~\ref{tab:vs_int_mse} reports the MSE for the VS signal; MAD and MCIW are in Appendix~\ref{app:sim:individual:vs}. In every configuration the MSE values of the three Bayesian samplers are within a factor of $1.37$ of one another, and the horseshoe has the smallest at all five levels under Beta noise. The largest differences are under mixed-normal noise at $\tau=0.25$, $0.50$, and $0.75$, where Bayesian-PMALA has the largest MSE of the three samplers, by $7\%$ to $37\%$ relative to the better of the other two. In the other configurations the three are within a factor of $1.21$ of one another, so there a single global penalty gives nearly the same error as local shrinkage. ADMM has the largest MSE in $14$ of the $15$ configurations; the exception is mixed-normal noise at $\tau=0.95$. This is consistent with extended BIC selecting a penalty too large for the localized bump, whereas the samplers estimate a smaller one.
+ 
+ \begin{table}[!htbp]
+ \centering
+@@ -33,27 +33,27 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.000513 & 0.001024 & 0.001942 & 0.002994 & 0.007269 \\
+ Onizuka (Horseshoe) & 0.000512 & 0.000943 & 0.001802 & 0.002778 & 0.006493 \\
+-Bayesian-PMALA & 0.000547 & 0.001048 & 0.001937 & 0.003022 & 0.007913 \\
++Bayesian-PMALA & 0.000535 & 0.001030 & 0.001937 & 0.002985 & 0.007852 \\
+ ADMM & 0.008055 & 0.004120 & 0.006632 & 0.007613 & 0.014649 \\
+ \midrule
+ Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.075391 & 0.031684 & 0.027303 & 0.031800 & 0.077075 \\
+ Onizuka (Horseshoe) & 0.073529 & 0.031743 & 0.028090 & 0.033608 & 0.079668 \\
+-Bayesian-PMALA & 0.076616 & 0.033198 & 0.026759 & 0.030907 & 0.071427 \\
++Bayesian-PMALA & 0.080651 & 0.043272 & 0.031674 & 0.034072 & 0.071081 \\
+ ADMM & 0.096462 & 0.092891 & 0.071678 & 0.049944 & 0.068415 \\
+ \midrule
+ Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.020916 & 0.008284 & 0.006932 & 0.007558 & 0.018128 \\
+ Onizuka (Horseshoe) & 0.019990 & 0.008067 & 0.006651 & 0.007358 & 0.017762 \\
+-Bayesian-PMALA & 0.019209 & 0.007958 & 0.006811 & 0.007528 & 0.018597 \\
++Bayesian-PMALA & 0.019014 & 0.008034 & 0.006860 & 0.007577 & 0.018204 \\
+ ADMM & 0.088108 & 0.025091 & 0.020181 & 0.014800 & 0.022334 \\
+ \bottomrule
+ \end{tabular}
+ \end{table}
+ 
+-\label{sec:sim:ind:smooth}Table~\ref{tab:s_int_mse} reports the MSE for the S signal; MAD and MCIW are in Appendix~\ref{app:sim:individual:smooth}. ADMM has the smallest MSE in every configuration; the MSE of Bayesian-PMALA is between $1.3$ and $2.0$ times as large. This is the smooth-baseline setting for which ADMM was developed. Bayesian-PMALA has a smaller MSE than both samplers of \citet{onizuka2024fast} in every configuration. Relative to the better of the two, its MSE is $25\%$ to $43\%$ lower at $\tau=0.25$, $0.50$, and $0.75$, and $4\%$ to $33\%$ lower at $\tau=0.05$ and $0.95$. This signal has no localized feature to which local shrinkage scales could adapt.
++\label{sec:sim:ind:smooth}Table~\ref{tab:s_int_mse} reports the MSE for the S signal; MAD and MCIW are in Appendix~\ref{app:sim:individual:smooth}. ADMM has the smallest MSE in every configuration; the MSE of Bayesian-PMALA is between $1.2$ and $1.6$ times as large. This is the smooth-baseline setting for which ADMM was developed. Bayesian-PMALA has a smaller MSE than both samplers of \citet{onizuka2024fast} in every configuration. Relative to the better of the two, its MSE is $34\%$ to $49\%$ lower at $\tau=0.25$, $0.50$, and $0.75$, and $20\%$ to $50\%$ lower at $\tau=0.05$ and $0.95$. This signal has no localized feature to which local shrinkage scales could adapt.
+ 
+ \begin{table}[!htbp]
+ \centering
+@@ -66,21 +66,21 @@ Beta & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.000295 & 0.000794 & 0.001592 & 0.002311 & 0.005225 \\
+ Onizuka (Horseshoe) & 0.000423 & 0.000812 & 0.001554 & 0.002270 & 0.005342 \\
+-Bayesian-PMALA & 0.000235 & 0.000592 & 0.001142 & 0.001536 & 0.004993 \\
++Bayesian-PMALA & 0.000235 & 0.000526 & 0.000945 & 0.001401 & 0.004036 \\
+ ADMM & 0.000183 & 0.000425 & 0.000789 & 0.001078 & 0.002464 \\
+ \midrule
+ Mixed normal & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.071456 & 0.026312 & 0.021974 & 0.027079 & 0.067077 \\
+ Onizuka (Horseshoe) & 0.074248 & 0.026449 & 0.021783 & 0.027401 & 0.072335 \\
+-Bayesian-PMALA & 0.050918 & 0.016844 & 0.012309 & 0.015983 & 0.044910 \\
++Bayesian-PMALA & 0.039799 & 0.015385 & 0.011599 & 0.013687 & 0.033650 \\
+ ADMM & 0.030277 & 0.010993 & 0.008228 & 0.010769 & 0.023342 \\
+ \midrule
+ Gaussian & $0.05$ & $0.25$ & $0.50$ & $0.75$ & $0.95$ \\
+ \midrule
+ Onizuka (Laplace) & 0.014933 & 0.006463 & 0.005581 & 0.006136 & 0.014457 \\
+ Onizuka (Horseshoe) & 0.016242 & 0.006414 & 0.005364 & 0.006003 & 0.014982 \\
+-Bayesian-PMALA & 0.012051 & 0.004259 & 0.003436 & 0.003974 & 0.011448 \\
++Bayesian-PMALA & 0.009676 & 0.003685 & 0.003083 & 0.003607 & 0.008623 \\
+ ADMM & 0.006561 & 0.003129 & 0.002456 & 0.002843 & 0.005929 \\
+ \bottomrule
+ \end{tabular}
