@@ -1,9 +1,8 @@
 % !TeX root = ../main.tex
-\providecommand{\tbc}[1]{\textcolor{red}{[TBC: #1]}}
 \section{Additional simulation results}
 \label{app:simulation_results}
 
-This appendix supplements Section~\ref{sec:simulations} ($n=500$, $k=2$): Appendix~\ref{app:sim:individual} reports interior-quantile MAD and MCIW for Section~\ref{sec:sim:individual}, and Appendix~\ref{app:sim:joint_extreme} reports extreme-quantile crossing counts for Section~\ref{sec:sim:extreme}. All entries are averages over valid replications.
+This appendix supplements Section~\ref{sec:simulations} ($n=500$, $k=2$): Appendix~\ref{app:sim:individual} reports interior-quantile MAD and MCIW for Section~\ref{sec:sim:individual}, Appendix~\ref{app:sim:joint_extreme} reports extreme-quantile crossing counts for Section~\ref{sec:sim:extreme}, and Appendix~\ref{app:sim:air} reports paired comparisons for the air-quality simulation of Section~\ref{sec:air_simulation}. All entries are averages over valid replications.
 
 \subsection{Interior quantiles}
 \label{app:sim:individual}
@@ -147,5 +146,25 @@ ADMM & 71.90 & 138.34 & 158.39 & 91.95 & 135.39 & 189.78 & 188.03 & 177.24 \\
 \end{table}
 
 \subsection{Air-quality simulation}
+\label{app:sim:air}
 
-\tbc{E-18: air-quality simulation material (\S\ref{sec:air_simulation}, Table~\ref{tab:air_n500}), if any}
+Table~\ref{tab:air_paired} compares Bayesian-PMALA and ADMM replication by replication in the design of Section~\ref{sec:air_simulation}. The differences in MSE are within two standard errors of zero at every level. At $\tau = 0.05$ and $0.10$ Bayesian-PMALA has the smaller check loss and ADMM the higher CAA at the thresholds $h \ge 0.75$; at $\tau = 0.01$ Bayesian-PMALA has the larger check loss and the higher CAA at $h = 0.5$ and $0.75$.
+
+\begin{table}[tbp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{2.5pt}
+\caption{Simulated air-quality data: mean difference, Bayesian-PMALA minus ADMM, of each metric of Table~\ref{tab:air_n500} over the replications common to both methods, with its paired standard error in parentheses. There are $100$ pairs for MSE and CL and $91$ for CAA, except at $\tau = 0.05$, where there are $99$ and $90$.}
+\label{tab:air_paired}
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+ & & & \multicolumn{4}{c}{CAA at threshold $h$} \\
+\cmidrule(l){4-7}
+$\tau$ & MSE & CL & $0.5$ & $0.75$ & $1$ & $1.2$ \\
+\midrule
+0.01 & $-$0.0070 (0.0041) & 0.00021 (0.00007) & 0.025 (0.005) & 0.022 (0.008) & $-$0.005 (0.009) & $-$0.015 (0.009) \\
+0.05 & 0.0015 (0.0014) & $-$0.00055 (0.00014) & 0.000 (0.003) & $-$0.017 (0.005) & $-$0.025 (0.006) & $-$0.022 (0.005) \\
+0.10 & 0.0014 (0.0012) & $-$0.00096 (0.00021) & $-$0.004 (0.003) & $-$0.022 (0.004) & $-$0.027 (0.005) & $-$0.022 (0.004) \\
+\bottomrule
+\end{tabular}
+\end{table}
