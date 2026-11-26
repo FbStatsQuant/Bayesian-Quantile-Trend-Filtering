@@ -15,7 +15,7 @@ Convention: each experiment has a `results/` (or `summary/`) folder with small s
 | Tables `tab:vs_ext_upper_cross_nb`, `tab:s_ext_upper_cross_nb`, `tab:vs_ext_upper_cross_all`, `tab:s_ext_upper_cross_all` (crossings) | `appendix_simulations.tex` | `extreme_quantiles/tables_20261008/crossings_*.csv/.tex` |
 | Six-level joint run (0.90 to 0.99, 100 seeds) | text and tables of `simulations.tex` | `joint_upper_levels/runs/VS_upper6_100seeds_Rdefaults_b001_20261002/` (`summary/`, `analysis/`, `paper_reference/table2_mse.csv`); package files in `joint_upper_levels/`; notes `paper/history/joint_extreme_results_20261002/` |
 | Table `tab:air_n500` (air simulation, n = 500) | `air_simulation.tex` | `air_simulation/drivers/{individual_air_sim.R, admm_air_sim.R}`; Onizuka-Laplace add-on `air_simulation/onizuka_laplace_20261023/` (`attempt_*/summary.csv`, `per_task_metrics.csv`, `tables/`; code in `package_stage/`; build record `BUILD_REPORT.md`); notes `paper/history/air_*` |
-| Table `tab:cost_scaling`, Figures `fig:cost_scaling`, `fig:cost_breakdown` (`scal_time.pdf`, `scal_breakdown.pdf`) | `scalability.tex` | `scalability/` (`timings.csv`, `table_cost_scaling_body.tex`, `make_cost_figure.py`, `benchmark_existing.R`). The TeX comment `% Evidence:` now points here. Generators of `scal_*.pdf` are not in the repo (open item) |
+| Table `tab:cost_scaling`, Figures `fig:cost_scaling`, `fig:cost_breakdown` (`scal_time.pdf`, `scal_breakdown.pdf`) | `scalability.tex` | [Historical benchmark record](scalability/README.md). The [paper's cost table](../paper/sections/scalability.tex) is authoritative. Generators of `scal_*.pdf` are not in the repo (open item) |
 | Table `tab:pmala_variants` | `appendix_pmala.tex` | `interior_quantiles/individual_nots_20261003/paper_reference/appendix_pmala.tex` (and the 2026-09 variant study in `paper/history/`) |
 | Figures `growth_pmala_*`, `growth_lms_*` | `data_application.tex`, appendix | data and fits in `applications/Growth/` (the `growth_joint_*` figures there are the generated ones; the `growth_pmala_*`/`growth_lms_*` generators are missing) |
 | Figures `spod_*`, `nile_*` | `data_application.tex`, appendix | no generator or Nile data in the repo; see `applications/README.md` |
@@ -29,5 +29,5 @@ Convention: each experiment has a `results/` (or `summary/`) folder with small s
 | `extreme_quantiles/` | four NOTS packages (`packages/`), three table folders, `DEPLOYMENT_NOTES.md` (issues log), `tables_20261023/gen_tex.R` |
 | `joint_upper_levels/` | joint six-level package and run `VS_upper6_100seeds_Rdefaults_b001_20261002`; the 10.8 MB monitor log is on the PC (`MONITOR_LOG_POINTER.md`) |
 | `air_simulation/` | Brantley-style air-quality simulation: drivers, Onizuka-Laplace add-on |
-| `scalability/` | time-per-sweep benchmark (from `paper/history/complexity_analysis`); `figures_unused/` |
+| [`scalability/`](scalability/README.md) | historical time-per-sweep benchmark and unused figures |
 | `pilots/` | small local pilot runs (n = 500, seed 1) |
