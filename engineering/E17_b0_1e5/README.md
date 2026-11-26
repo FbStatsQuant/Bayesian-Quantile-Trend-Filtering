@@ -98,16 +98,24 @@ places. These are padded in Markdown, and that same printed value
 is the ratio denominator.
 
 Reports land under `out/interior/` and `out/extreme/` only after
-both grids pass. Each has `old_vs_new_mse.md`, the detailed
-comparison, `recomputed_claims.md`, and LaTeX fragments under
-`out/`. The templates carry through the published competitor and
-joint rows, including the extreme crossing tables. The crossing
-comparison records the neighboring and all-level average counts at
-0.96–0.99. Only the four posterior means from the same data seed
-enter each count, using the original strict-inversion convention.
+both grids pass. The interior report includes `old_vs_new_mse.md`,
+the detailed comparison, `recomputed_claims.md`, and six LaTeX
+fragments with the published competitor rows. HQ holds those artifacts
+for release.
 
-`health_by_tau.csv` summarizes each design, signal, τ, and prior
-rate over the 300 noise/seed fits. The λ ESS values use
+The extreme report is for comparison only. It includes `old_vs_new_mse.md`
+and CSV comparisons for MSE, crossings, and λ ESS. It shows E-17 relative
+to both published values and E-15. The Markdown emphasizes every τ = 0.99
+row, and all three extreme CSVs mark those rows with
+`is_extreme_tau_099`. The crossing comparison records neighboring
+and all-level average counts at 0.96–0.99. Only the four posterior
+means from the same data seed enter each count, using the original
+strict-inversion convention. Extreme LaTeX and manuscript claims are
+disabled pending the owner's decision.
+
+`health_by_tau.csv` summarizes each interior signal, τ, and prior rate
+over the 300 noise/seed fits. `extreme/lambda_ess_by_tau.csv` summarizes
+the corresponding extreme ESS. The λ ESS values use
 `coda::effectiveSize` on all 20,000 post-burn-in λ draws, matching
 the earlier engineering reports. λ medians are medians of per-fit
 means from the same every-30-sweeps posterior trace in each cohort.
@@ -115,7 +123,9 @@ This common trace summary also covers E-14 VS, whose compact
 outputs predate the full-trace λ mean field.
 
 The full-size fixture exercised both builders with 6,600 synthetic
-E-17 fits and their 6,600 archived references. It verified all 12
-fragments, both claims and MSE reports, zero crossings for the tied
-fixture curves, and the expected ESS and λ medians. A separate pilot
-fixture checked the seed grid and rejection above the shared cap.
+E-17 fits and their 6,600 archived references. The synthetic curves
+tested ties in crossing counts and supported known ESS and λ medians.
+The scope check verified six interior LaTeX fragments, the interior
+claims, all extreme τ = 0.99 flags, and comparison-only extreme outputs.
+A separate pilot fixture checked the seed grid and rejection above the
+shared cap.

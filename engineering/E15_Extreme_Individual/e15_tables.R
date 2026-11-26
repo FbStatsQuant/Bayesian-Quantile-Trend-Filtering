@@ -45,7 +45,8 @@ e15_read_paper <- function(root) {
   list(tables = tables, values = do.call(rbind, values))
 }
 
-e15_build_tables <- function(run_dir, output_root, root, seeds = 1:100, write_reports = TRUE) {
+e15_build_tables <- function(run_dir, output_root, root, seeds = 1:100, write_reports = TRUE,
+    write_latex = TRUE) {
   paper <- e15_read_paper(root)
   published <- subset(paper$values, method == "Bayesian-PMALA")
   rownames(published) <- NULL
@@ -151,7 +152,7 @@ e15_build_tables <- function(run_dir, output_root, root, seeds = 1:100, write_re
     data.frame(d[factors], metric, old = as.numeric(d$value), new = d[[metric]])
   }))
   write.csv(comparison, file.path(out, "old_vs_new.csv"), row.names = FALSE)
-  for (id in names(paper$tables)) {
+  for (id in if (write_latex) names(paper$tables) else character()) {
     table <- paper$tables[[id]]
     for (j in seq_along(table$rows)) {
       d <- comparison[comparison$signal == table$signal & comparison$noise == table$noises[j] &
