@@ -54,9 +54,17 @@ published means at that precision.
 
 | Method | Exact regeneration on Owls | Reaggregation from original per-replication metrics | HQ reuse verdict |
 |---|---|---|---|
-| ADMM | Fails the exact comparison on the common input | Original archive unavailable. The aggregate summary matches 18/18 values. τ = 0.05 has 99 replications, with 90 defined CAA values and an unknown omitted seed. | Refit with `admm-sim`. |
-| Onizuka HS | Fails the exact comparison on the common input | Original archive unavailable. The aggregate summary matches 18/18 values. | Refit with `onizuka-hs`. |
-| Onizuka Laplace | Fails the exact comparison on its archived input | 300/300 original rows verified, 18/18 reaggregated means match at paper rounding. | Refit with `onizuka-lap`. |
+| ADMM | Fails the exact comparison on the common input | Original archive unavailable. The aggregate summary matches 18/18 values. τ = 0.05 has 99 replications, with 90 defined CAA values and an unknown omitted seed. | Approved to refit with `admm-sim`. |
+| Onizuka HS | Fails the exact comparison on the common input | Original archive unavailable. The aggregate summary matches 18/18 values. | Approved to refit with `onizuka-hs`. |
+| Onizuka Laplace | Regeneration differs by at most 1.8e-15 | 300/300 original rows verified, 18/18 reaggregated means match at paper rounding. | **REUSE (HQ ruling 11-26)** |
+
+The archived Laplace fits ran on the sealed Table 2 data. The audit
+verified the archive and vector hashes, checked all 300 per-replication
+records, and reproduced all 18 published means at the printed precision.
+HQ accepted the regeneration difference as BLAS roundoff. All E-18
+fits read the sealed vectors, so that difference cannot affect this
+comparison. Stage 1 reads the archived Laplace records directly for
+both the table and the paired comparisons.
 
 The reference values and SEs are in
 [published_stage1.csv](published_stage1.csv) and are kept separate
@@ -65,8 +73,8 @@ Table 2 input archive and verify the observation and truth hashes
 before fitting. The archived Laplace and HS sampler source is
 [BQTF-function.R](../../experiments/extreme_quantiles/packages/Extreme_Onizuka/source/BQTF-function.R).
 Its SHA-256 matches both historical air packages according to the
-build report. The prepared refit stages require timing and budget
-approval from HQ.
+build report. HQ approved the ADMM and HS refits using the sealed
+inputs and the published driver settings.
 
 ## Reproduce
 

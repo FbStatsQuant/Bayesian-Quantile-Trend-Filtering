@@ -20,13 +20,13 @@
 
 Every Stage 1 rate and level uses the exact archived Table 2 observations
 and baseline. [DATA_MATCH.md](DATA_MATCH.md) documents the regeneration
-check and the benchmark's provenance. All three archived benchmarks
-failed HQ's reuse standard. Published ADMM at 0.05 uses 99 replications.
-Its omitted seed is unavailable in the retained summary. Use new fits
-for the comparison and retain the published numbers as historical
-reference. Any paired PMALA–ADMM result uses the common successful
-seeds at its level and rate, with a further restriction to defined
-pairs for CAA. Report both methods' sample sizes.
+check and the benchmark's provenance. HQ approved reusing the sealed
+Onizuka Laplace records and refitting ADMM and Onizuka HS. Published
+ADMM at 0.05 uses 99 replications, and the retained summary omits the
+discarded seed's identity. Report the observed sample size for each
+E-18 method and level. Each paired comparison uses the common
+successful seeds at its level and rate, restricted to defined pairs
+for CAA.
 
 MSE is the mean squared error against the true quantile. CL is mean check
 loss on the observations. CAA averages sensitivity and specificity for
@@ -112,25 +112,38 @@ their task keys. Use `sim` with indices 0–1199 for production and run
 `e18_stage1.R RUN_DIR` to write per-fit metrics, all 12 cell summaries,
 the side-by-side comparison, an explicit issue list, and the selection
 trace. Supply separately collected benchmark results with
-`--admm-sim=DIR --onizuka-hs=DIR --onizuka-lap=DIR`. The table includes
-all four rates and all three benchmark rows at each level. Before refits
-are supplied, a benchmark row records its pending status.
+`--admm-sim=DIR --onizuka-hs=DIR`. The table includes all four rates and
+all three benchmarks at each level. It reads Laplace per-replication
+metrics from the sealed archive. When an approved refit has yet to be
+supplied, its row records its pending status. The report writes
+`paired_pmala_benchmarks.csv` with seed-matched differences and
+`discarded_reps.csv` with the method, level, seed, and recorded reason
+for each excluded benchmark replication in the supplied runs.
 For a terminal Stage 1 production array with failed tasks, Sol-B can
 use `ops/collect.sh --allow-failures RUN_ID EXPECTED_FITS` to collect
 verified available outputs and terminal Slurm accounting. Missing
 task outputs enter the selector as failed rows.
 
-The `admm-sim` stage with indices 0–299 runs the original driver call
-using detrendr revision `17e3e7c`, third differences and the original
-15-point eBIC grid. For Onizuka, `onizuka-hs` and `onizuka-lap` each
-use indices 0–299, the archived sampler source hash, `TForder = 2`,
-`sig.init = c(1, 1)`, `sparse = FALSE`, 8,000 draws and 2,000 burn-in.
-These need the original MASS, GIGrvg, invgamma and MCMCpack packages.
-Historical timings suggest about 1.0 core-hour for ADMM, 0.44 for HS,
-and 60.8 for Laplace on one core per fit. With the 51.3-core-hour PMALA
-proxy, all refits together would exceed the 80-core-hour cap. Bring
-measured timing and the benchmark budget to HQ before submitting a
-benchmark campaign.
+The `admm-sim` stage uses indices 0–299 and runs
+`detrendr::get_trend_BIC` separately for each level and seed. The
+[air driver](../../experiments/air_simulation/drivers/admm_air_sim.R)
+uses detrendr revision `17e3e7c`, third differences, eBIC with
+`gamma = 1` and `df_tol = 1e-9`, and the 15-point grid
+`500^seq(0, 1.4, length.out = 15)`. It leaves solver selection and
+failure handling to detrendr. The pinned package does not return a
+per-candidate convergence flag. E-18 records failed calls and missing
+or unusable outputs, and adds no convergence-based discard rule.
+[Pinned grid search](https://github.com/halleybrantley/detrendr/blob/17e3e7c/R/get_trend_BIC.R),
+[pinned solver wrappers](https://github.com/halleybrantley/detrendr/blob/17e3e7c/R/solve_functions.R).
+
+The `onizuka-hs` stage also uses indices 0–299 and the archived sampler
+source hash. It calls `BQTF.MCMC.HS.multi` with `X = 1:500`,
+`TForder = 2`, `sig.init = c(1, 1)`, `sparse = FALSE`, and seed
+`1000 + seed`. It uses 8,000 draws, discards the first 2,000, and
+reports the posterior mean and pointwise quantiles. It needs the
+original MASS, GIGrvg, invgamma and MCMCpack packages. The approved
+refits add an estimated 1.0 core-hour for ADMM and 0.44 for HS based
+on historical one-core timings. Laplace has no new fit cost.
 
 ## Stage 2 preparation
 
