@@ -23,7 +23,7 @@ Both contraction theorems of the paper are proved in [Lean 4](https://lean-lang.
 
 | Paper | In plain words | Lean statement | Proved by |
 |---|---|---|---|
-| Theorem 1, σ = 1 | For independent data whose distribution functions grow at least and at most linearly near the τ-quantile (Assumptions A and B), a trend of bounded variation and a penalty λ = c·n^((2k+1)/2), the expected posterior mass of the trends whose loss Δ²ₙ exceeds M·n^(−(2k+1)/(2k+2)) is at most C·n^(−1/(2k+2)). There is no logarithmic factor. | `MainStatement` | `main_theorem` |
+| Theorem 1, σ = 1 | For independent data whose distribution functions grow at least and at most linearly near the τ-quantile (Assumptions A and B), a true trend whose total variation of order r = k + 1 (the paper's TV^(r)) is at most V̄, and a penalty λ = c·n^((2k+1)/2), the expected posterior mass of the trends whose loss Δ²ₙ exceeds M·n^(−(2k+1)/(2k+2)) is at most C·n^(−1/(2k+2)). There is no logarithmic factor. | `MainStatement` | `main_theorem` |
 | Theorem 1, any fixed scale σ₀ > 0 | The same bound, with constants that may also depend on σ₀. | `MainStatementScale` | `main_theorem_scale` |
 | Theorem 2, unit scales | For J quantile levels fitted jointly under the non-crossing constraint, the same bound holds for the largest of the J losses, so all levels contract at the same rate at once. | `JointStatement` | `joint_theorem` |
 | Theorem 2, any fixed scales σ₀ⱼ > 0 | The same, with a separate scale at each level. | `JointStatementScale` | `joint_theorem_scale` |
@@ -36,6 +36,7 @@ Both contraction theorems of the paper are proved in [Lean 4](https://lean-lang.
 The observations need not be identically distributed and no moment is assumed. The asymmetric Laplace density is a working likelihood only.
 <!-- src: FINAL_AUDIT_astra.md:26 ("Distinct marginal laws and infinite data moments are allowed") -->
 <!-- NOTE for the head: "working likelihood only" is the paper's wording (theory.tex), not in the allowed sources. FINAL_AUDIT:26,29 support "product of arbitrary marginal laws" and "working check loss". Keep or cut. -->
+<!-- Lean head: KEEP. It is accurate. In Lean, the posterior is built from the check loss (asymmetric Laplace kernel), and the data law is an arbitrary product of marginals, unrelated to that kernel (BQTF/Spec.lean; FINAL_AUDIT_astra.md:26,29). -->
 
 In Theorem 2 the true quantile curves are not assumed to be separated, and nothing is assumed about independence across levels: every level uses the same observations.
 <!-- src: FINAL_AUDIT_astra.md:45 ("No additional separation of the truth or independence across levels is assumed"; "All levels use one vector of independent observations") -->
@@ -47,15 +48,18 @@ The four statements are collected in [`lean/BQTF/Spec.lean`](lean/BQTF/Spec.lean
 
 - **No `sorry`.** Nothing is left unproved.
   <!-- src: lean/README.md:10; source scan FINAL_AUDIT_astra.md:105-109 (pattern sorry|admit|native_decide|axiom |unsafe|implemented_by|set_option; sole match is a heartbeat limit, Main.lean:233) -->
-- **Standard axioms only.** `#print axioms` on each of the four theorems lists `propext`, `Classical.choice` and `Quot.sound`, the three axioms of ordinary mathematics in Lean, and nothing else.
+- **Standard axioms only.** `#print axioms` on each of the four theorems lists `propext`, `Classical.choice` and `Quot.sound`, the three axioms of ordinary mathematics in Lean, and nothing else. This was last checked, with a full build and the source scan, at commit f64025a. No Lean source, lakefile, manifest or toolchain file has changed since.
+  <!-- Lean head (2026-11-26): confirmed. Full build, AxiomCheck and the source scan on main at f64025a (Polish_2026-11-26.md, rulings). Later lean/ commit f7aa3c6 touched docs and SHA256SUMS only. A from-scratch rebuild of BQTF at 19be187, whose lean/ tree equals f7aa3c6's, repeated AxiomCheck. -->
+  <!-- Lean head: the audit at 5c3d923 and the later polish are kept separate on purpose. The CLEAN verdict is the audit's, at 5c3d923. The D12 change and the docstrings came after it and were reviewed separately (PolishDocstrings_Astra_2026-11-26.md, at 7ea4cfc). 11 commits touch lean/ after 5c3d923. -->
   <!-- src: lean/README.md:10; lean/AxiomCheck.lean:12-13,20-21; printed output FINAL_AUDIT_astra.md:84-87; again after the polish pass, PolishDocstrings_Astra_2026-11-26.md:3 -->
 - **The statements are pinned.** [`lean/AxiomCheck.lean`](lean/AxiomCheck.lean) contains lines such as `example : MainStatement := main_theorem`. They compile only if each theorem has exactly the type written in `Spec.lean`, so a proof of something weaker cannot pass under the same name.
   <!-- src: lean/README.md:25; lean/AxiomCheck.lean:4-5,9-10,17-18 -->
 - **Independent final audit: CLEAN.** A reviewer who wrote none of the proofs compared the four compiled statements with the paper, hypothesis by hypothesis, and reran the axiom check and the source scan. The verdict: all four Lean statements imply their paper counterparts, with no gap in any of them.
   <!-- src: FINAL_AUDIT_astra.md:1 (title "Independent final audit at 5c3d923"); :3 ("CLEAN. All four compiled propositions imply their paper counterparts."); :32,38,48,54 ("Top-level gaps: none." x4); :73 ("No blocker, major or minor fidelity gap in the four top-level statements"); :77-109 (commands and output) -->
-  <!-- NOTE for the head: "who wrote none of the proofs" is my reading of "independent"; the audit file does not say it in words. Reword to "An independent reviewer" if you prefer. -->
-- **Every module was reviewed.** Each module has a dated code review in [`lean/notes/reviews/`](lean/notes/reviews), and the head ruled on every finding.
+  <!-- Lean head: CONFIRMED. The final auditor was a fresh agent launched for the audit, with no part in writing or reviewing the proofs (audit brief, 2026-11-26). -->
+- **Every module was reviewed.** Every source file is covered by a dated code review in [`lean/notes/reviews/`](lean/notes/reviews), written by a reviewer who did not write that file. The statements were audited separately, in [`lean/notes/audits/`](lean/notes/audits). Every finding was ruled on.
   <!-- src: lean/README.md:67 ("per-module code reviews"); PAPER_CORRECTIONS.md:12 ("a fresh Sol review has passed, and the head has ruled on every finding"); 29 dated review files in lean/notes/reviews/ besides the final audit -->
+  <!-- Lean head: checked file by file. Each of the 56 files under lean/BQTF is named in at least one review. Some reviews cover a group of files: for example, the Denominator review covers Asym/*, and the SmallBall review covers Lin/GaussianSmallBall and LaplaceMixture. So "every source file is covered", not "each module has its own review". -->
 
 ### Classical results proved from scratch
 
@@ -66,9 +70,9 @@ No classical result enters as a hypothesis. Where Mathlib did not have a result 
 |---|---|---|
 | Efron–Stein inequality, one-sided form | `BQTF.Prob.efronStein_oneSided` | `lean/BQTF/Prob/EfronStein.lean` |
 | Rademacher contraction principle (Ledoux–Talagrand, Theorem 4.12) | `BQTF.Prob.contraction_abs` | `lean/BQTF/Prob/Contraction.lean` |
-| Symmetrization | `symmetrization_finset` | `lean/BQTF/Prob/Symmetrization.lean` |
-| Eckart–Young tail bound for singular values | `eckartYoung_tail` (namespace `BQTF.Lin`) | `lean/BQTF/Lin/EckartYoung.lean` |
-| Prékopa–Leindler inequality, in the form the proof uses (log-concavity of the product-Laplace slice mass) | `prekopa_laplace` | `lean/BQTF/Shift/PrekopaLaplace.lean` |
+| Symmetrization for finite empirical processes (van der Vaart and Wellner, Lemma 2.3.6) | `BQTF.Prob.symmetrization_finset` | `lean/BQTF/Prob/Symmetrization.lean` |
+| Eckart–Young tail bound for singular values (Frobenius form) | `BQTF.Lin.eckartYoung_tail` | `lean/BQTF/Lin/EckartYoung.lean` |
+| Prékopa–Leindler inequality: the functional form on ℝ, tensorized to the product Laplace law on ℝᵈ. The proof uses it as joint log-concavity of the Laplace slice mass. | `BQTF.PL.pl_one`, `BQTF.PL.plProp_Qlam`; applied in `BQTF.prekopa_laplace` | `lean/BQTF/Shift/PrekopaLaplace/OneDim.lean`, `…/Tensor.lean`, `lean/BQTF/Shift/PrekopaLaplace.lean` |
 <!-- src Efron–Stein: lean/README.md:10; PAPER_CORRECTIONS.md:85 (name and file) -->
 <!-- src contraction: lean/notes/logs/cp_opus2_progress.md:1 ("Ledoux–Talagrand contraction (BQTF.Prob.contraction_abs)"); reviews/Contraction_2026-11-25.md:1,60 ("The paper cites Ledoux–Talagrand Thm 4.12"); logs/neonB_questions.md:50,61 (not in Mathlib) -->
 <!-- src symmetrization: reviews/Concentration_2026-11-25.md:31 (file), :79 ("concentration and symmetrization_finset use the standard 3 axioms only"); PolishDocstrings_Astra_2026-11-26.md:20 (the three modules supply symmetrization_finset, contraction_abs, efronStein_oneSided) -->
@@ -77,6 +81,12 @@ No classical result enters as a hypothesis. Where Mathlib did not have a result 
 <!-- NOTE for the head (1): lean/README.md:10 names three results (Efron–Stein, Eckart–Young, Prékopa–Leindler). The brief asks for five. Contraction and symmetrization are supported by the notes cited above but not by lean/README.md. Confirm that both are proved here without a hypothesis, and consider adding them to lean/README.md:10 so the two READMEs agree. -->
 <!-- NOTE for the head (2): PolishDocstrings:17 calls the Prékopa result a "product-Laplace slice specialization" (row label "Scope"). I therefore do not write "the Prékopa–Leindler inequality" without the qualifier. lean/README.md:10 does. Decide which wording is right and use it in both places. -->
 <!-- NOTE for the head (3): the fully qualified names of symmetrization_finset and prekopa_laplace are not given in the notes; I wrote them unqualified. -->
+<!-- Lean head, ON (1)-(3), 2026-11-26:
+  - All five results are proved in-tree with no hypothesis standing in for the classical result. `#print axioms` gives [propext, Classical.choice, Quot.sound] for each of: BQTF.Prob.efronStein_oneSided, BQTF.Prob.contraction_abs, BQTF.Prob.symmetrization_finset, BQTF.Lin.eckartYoung_tail, BQTF.PL.pl_one, BQTF.PL.plProp_Qlam and BQTF.prekopa_laplace.
+  - Prékopa–Leindler: the full functional inequality is proved, not only the slice specialization. pl_one is Prékopa–Leindler for Lebesgue measure on ℝ (via a one-dimensional weighted Brunn–Minkowski). Tensor.lean shows it is stable under products, measure-preserving linear equivalences and log-concave densities, which gives plProp_Qlam for the product Laplace law on ℝᵈ. prekopa_laplace (PolishDocstrings:17) is the specialization the proof uses. Both READMEs now say "functional form on ℝ, tensorized to the product Laplace law".
+  - lean/README.md:10 now lists all five.
+  - Fully qualified names: BQTF.Prob.symmetrization_finset, BQTF.prekopa_laplace, BQTF.Lin.eckartYoung_tail, BQTF.Prob.contraction_abs, BQTF.Prob.efronStein_oneSided. eckartYoung_tail is outside the inner EckartYoung namespace, which ends at EckartYoung.lean:112. -->
+
 
 ### What the formalization changed in the paper
 
@@ -85,6 +95,8 @@ Formalizing the proofs found eleven places where the paper's argument needed a f
 <!-- src C-01..C-11 headings: PAPER_CORRECTIONS.md:31,42,52,61,70,79,95,104,113,122,138 (eleven "## C-xx" headings, none skipped) -->
 <!-- src "in the paper" and "checked": status lines PAPER_CORRECTIONS.md:40 (C-01 verified; fix already in the paper at 906be2b, :35-37), :50 (C-02), :59 (C-03), :68 (C-04), :77 (C-05), :86 (C-06), :102 (C-07), :111 (C-08), :120 (C-09), :136 (C-10), :145 (C-11); each reads "in paper (<hash>)" and "verified" -->
 <!-- NOTE for the head: please confirm line 145 (C-11) ends with "verified" as the others do; I read "in paper (3cae0ec); verified (2026-11-26, Lean head)". -->
+<!-- Lean head: CONFIRMED. All eleven status lines (40, 50, 59, 68, 77, 86, 102, 111, 120, 136, 145) read "verified", and C-02 to C-11 each carry an "in paper (<hash>)". Theory confirmed every one. -->
+<!-- Lean head: the C-06, C-07 and C-02/C-11 examples were checked against PAPER_CORRECTIONS. All three are accurate. -->
 
 Three examples:
 
@@ -104,18 +116,22 @@ Both theorems have the paper's hypotheses and conclusions. [`lean/docs/statement
   <!-- src: lean/README.md:45; FINAL_AUDIT_astra.md:60,61,63,64,68 ("Equivalent" for D1, D2, D4, D5, D9) -->
 - **Stronger conclusions** (D3, D8): measurability of the posterior mass is proved as part of the theorem.
   <!-- src: lean/README.md:46; FINAL_AUDIT_astra.md:62,67 ("Stronger conclusion") -->
-- **Safe generalizations** (D6, D7, D11): the level spacing enters through a lower bound, the number of levels is any natural number, and the gap lemma needs Assumption B only.
+- **Safe generalizations** (D6, D7, D11): the level spacing enters through a lower bound, both in Theorem 2 and in the gap lemma, and the number of levels is any natural number.
+  <!-- Lean head: CORRECTED. The old text "the gap lemma needs Assumption B only" implied the paper's lemma needs more, but the paper's Lemma gap (appendix_theory.tex, \label{pf:lem:gap}) also assumes B only. The generalization in D11 is that `level_gap_of_assB` accepts any lower bound gmin on the adjacent spacings; the minimum spacing gives the paper's g₀ exactly (PolishDocstrings_Astra_2026-11-26.md, D11). -->
   <!-- src: lean/README.md:47,50; FINAL_AUDIT_astra.md:65,66,70 ("Safe" for D6, D7, D11) -->
 - **Lemma sup** (D12) is proved on the paper's named event, as `supNorm_concentration_events`, so it matches the paper.
   <!-- src: lean/README.md:51,55 ("Since then, the named-event version supNorm_concentration_events has been added, so Lemma sup now matches the paper"); PolishDocstrings_Astra_2026-11-26.md:28 -->
-- **One difference is weaker than the paper** (D10). Three constants that the paper gives explicitly in appendix lemmas are existential in Lean: C_E in Lemma evid, C_pr in Proposition prior, and the quad-shift coefficient. So the Lean versions of those standalone lemmas say less than the paper's. The two theorems are not affected: their constants are existential in the paper too, and the final audit traced that the weaker lemmas suffice.
+- **One difference is weaker than the paper** (D10). Two constants that the paper gives explicitly in appendix lemmas are existential in Lean: C_E in Lemma evid and C_pr in Proposition prior. A third, the quad-shift coefficient, is a different explicit constant, in place of the paper's eventual bound of 2. So the Lean versions of those standalone lemmas say less than the paper's. The two theorems are not affected: their constants are existential in the paper too, and the final audit traced that the weaker lemmas suffice.
+  <!-- Lean head: CORRECTED. The quad-shift coefficient is not existential: it is H = (1 + K_max/2)/(1 − e^{−2}), in place of the paper's eventual c_K ≤ 2 (docs/statements.md D10; FINAL_AUDIT_astra.md:13). lean/README.md:49 had the same slip and is fixed in the same commit. -->
+  <!-- Lean head, ON POINT 1: the wording keeps the two reviews cleanly separate. "Final audit: CLEAN" (Why you can trust it) describes 5c3d923, where the audit marked D10 and D12 weaker. The D12 bullet here describes the current tree, where D12 was closed by supNorm_concentration_events (323b228) and reviewed in PolishDocstrings_Astra_2026-11-26.md at 7ea4cfc. Neither sentence claims the audit covered the later commit. Approved as written. -->
   <!-- src: lean/README.md:49,53,55; FINAL_AUDIT_astra.md:69 ("D10 | Weaker explicit appendix coefficients, sufficient for both theorems"), :13-15 (trace), :73 ("D10 and D12 limit standalone appendix claims") -->
 <!-- COUNT CHECK for the head: D1..D12 = 12 entries: 5 equivalent (D1, D2, D4, D5, D9) + 2 stronger (D3, D8) + 3 safe (D6, D7, D11) + D12 + D10 = 12. -->
 <!-- NOTE for the head, "only D10 weaker": the final audit (at 5c3d923) marks TWO entries weaker, D10 (:69) and D12 (:71). D12 was closed afterwards by supNorm_concentration_events (commits 323b228 and f7aa3c6 per the lean/ log; lean/README.md:55), and that addition was audited separately (PolishDocstrings_Astra_2026-11-26.md:3,28, at 7ea4cfc). So "only D10 is weaker" is true of the current tree, and "the final audit found only D10 weaker" would be false. The text above is worded for the current tree. -->
 
 ### Build and check
 
-You need [elan](https://github.com/leanprover/elan). It installs the toolchain pinned in `lean/lean-toolchain` (`leanprover/lean4:v4.35.0-rc2`); Mathlib is pinned in `lean/lake-manifest.json`.
+You need [elan](https://github.com/leanprover/elan). It installs the toolchain pinned in `lean/lean-toolchain` (`leanprover/lean4:v4.35.0-rc2`). Mathlib is pinned in `lean/lake-manifest.json`, at revision `065356127b1dc0016f66b7283ce0ce2c4055aa55` (input revision `v4.35.0-rc2`).
+<!-- Lean head: the Mathlib rev and inputRev are from lean/lake-manifest.json, and the toolchain from lean/lean-toolchain. Both have been unchanged since 5c3d923. -->
 <!-- src: lean/README.md:14 -->
 <!-- NOTE for the head: the Mathlib revision itself is not in the allowed sources (lean/README.md:14 says only "pinned in lake-manifest.json, at the same revision as the Large Prior formalization"). If you want the commit or tag printed here, supply it: [Lean head: Mathlib revision]. -->
 
@@ -128,6 +144,9 @@ sha256sum -c SHA256SUMS.txt     # the Lean sources are the ones we checked
 ```
 <!-- src: lean/README.md:16-21 (first three commands, verbatim), :28 (SHA256SUMS) -->
 <!-- NOTE for the head: build time is not stated in the allowed sources. The LP repo's README says "~15 min". Supply a measured time or leave it out: [Lean head: build time with the Mathlib cache]. -->
+
+With the prebuilt Mathlib, `lake build` takes about 15–20 minutes on 3 cores.
+<!-- Lean head: measured 2026-11-26. A from-scratch build of the BQTF modules at 19be187 (lean/ tree = f7aa3c6), Mathlib from the cache, -j 3 on a shared server, took 1046 s ("Build completed successfully (8988 jobs)"). AxiomCheck then printed the standard three axioms for all four theorems. -->
 
 The third command should print four lines, each ending in `[propext, Classical.choice, Quot.sound]`.
 <!-- src: lean/README.md:26; lean/AxiomCheck.lean:12-13,20-21 (four #print axioms); FINAL_AUDIT_astra.md:84-87 -->
@@ -154,17 +173,18 @@ A rough map of `lean/BQTF/`:
 | `Spec.lean` | The four statements and the definitions they use |
 | `Basic.lean`, `Coord.lean` | Norms, the prior in difference coordinates; the posterior as a ratio and its properness (Lemma coord) |
 | `CheckLoss.lean` | The check loss and its moments (Lemma check) |
-| `Gram.lean`, `Falling.lean`, `Smooth.lean`, `Interp.lean`, `SplineApprox.lean` | Polynomial Gram matrices (g_r > 0), local smoothing, interpolation, spline approximation |
+| `Gram.lean`, `Falling.lean`, `Smooth.lean`, `Interp.lean`, `SplineApprox.lean` | The polynomial Gram constant (g_r > 0), falling factorials, the smoothed truth (Lemma smooth), the interpolation inequality, spline approximation (Lemma F) |
 | `Width.lean`, `Concentration.lean`, `Score.lean` | The width bound, concentration of the empirical process, the score events |
-| `SmallBall.lean`, `QuadShift.lean`, `PriorMass.lean`, `Denominator.lean` | Small-ball probability, the quadratic-shift lemma, prior mass, the lower bound on the denominator |
-| `Localization.lean`, `Shells.lean` | Localization and the bound on shells |
+| `SmallBall.lean`, `QuadShift.lean`, `PriorMass.lean`, `Prior/`, `Denominator.lean` | Small-ball probability, the quadratic-shift lemma, prior mass (Proposition prior), the lower bound on the denominator (Lemma evid; `Prior/` holds the prior matrix and smoothing window at which it applies Proposition prior) |
+| `Localization.lean`, `Shells.lean` | Localization of the posterior to the set K(ρₙ, Tₙ) (Proposition local), and the bound on the shells outside it (Proposition shell) |
 | `Main.lean` | Theorem 1 at σ = 1 |
 | `Reduction.lean`, `Scale/` | Theorem 1 at a general scale, by rescaling the data |
 | `Joint/` | Theorem 2: the product posterior and its conditioning on the non-crossing set, the gap between levels, sup-norm concentration, transfer, and the two joint theorems (`Joint/Main.lean`) |
 | `Prob/` | Efron–Stein, the contraction principle, symmetrization |
 | `Lin/` | Eckart–Young, the Gaussian small-ball bound, the Laplace scale mixture |
 | `Shift/` | Prékopa–Leindler for the Laplace measure, Rademacher maxima, slice bounds |
-| `Asym/` | Rates and elementary integrals used throughout |
+| `Asym/` | Helpers for Localization, Shells, Denominator, Theorem 1 and the sup-norm lemma. The 8 files cover asymptotic rate bounds (`Rates`, `LocalRates`, `ShellRates`), the Laplace moment generating function and product integrals (`Laplace`), measurability and exponential integrals of the check-loss increments (`CheckIntegrals`), the local prior mass in polynomial coordinates (`LocalMass`), and continuity, closedness and norm identities (`LocalGeometry`, `Vector`). |
+<!-- Lean head: the Localization row is CONFIRMED and made precise. Localization.lean:3 is Proposition pf:prop:local, with K_n = K(ρ_n, T_n) and Ω_G at Localization.lean:5-6. The Asym row is CORRECTED: the old "rates and elementary integrals used throughout" missed LocalMass, LocalGeometry and Vector, and these files feed Localization, Shells, Denominator, Main and Joint/SupNorm, not everything (grep of imports). The Prior/ row was missing: Prior/Geometry (priorMatrix, deltaA_priorMatrix) and Prior/Window (smoothingPower, priorBudget) are imported only by Denominator.lean, which applies prior_mass at that matrix and window. Both files are covered by the PriorMass and Denominator reviews. The Smooth/Falling wording follows the module headers (Smooth.lean:3 "The smoothed truth"; Falling.lean:3 "Falling factorials"). -->
 <!-- src Spec: lean/README.md:39,63; PolishDocstrings:26 -->
 <!-- src Basic, Coord: FINAL_AUDIT_astra.md:29 (Basic.lean: norms, product Laplace prior in difference coordinates), :63 (Coord.lean:747 properness); PAPER_CORRECTIONS.md:58 (posterior_eq_ratio, Coord.lean, Lemma coord) -->
 <!-- src CheckLoss: PAPER_CORRECTIONS.md:97,101 (Lemma check(e), remK_moments) -->
@@ -225,5 +245,37 @@ FOR THE LEAN HEAD: things to confirm or decide (none of this prints)
 8. TWO INFERRED ROWS in the module map: Localization and Asym. Marked above.
 
 9. I did not rebuild. Every statement about what compiles is taken from the notes.
+==========================================================================================
+-->
+
+<!--
+==========================================================================================
+LEAN HEAD RESOLUTIONS (2026-11-26). Verdict: CORRECTED (list in the reply to HQ). Signed off once
+the build-time line is filled in.
+
+1. COUNTS: confirmed. There are 11 corrections and 12 differences. The classification is 5 equivalent,
+   2 stronger, 3 safe (D11 safe because of the gmin lower bound, not because of "B only"), D12
+   matching the paper, and D10 weaker.
+2. "ONLY D10 WEAKER": approved as worded. The audit at 5c3d923 and the polish review at 7ea4cfc are
+   kept separate; see the note under D10.
+3. AUDITED COMMIT vs CURRENT TREE: closed. The full build, AxiomCheck and source scan ran on main
+   at f64025a, which the README cites. No .lean, lakefile, manifest or toolchain file changed after
+   it; f7aa3c6 touched docs and SHA256SUMS only. A from-scratch BQTF build at 19be187, whose lean/
+   tree equals f7aa3c6's, repeated AxiomCheck. SHA256SUMS.txt is from f7aa3c6, over the same 58
+   sources, and `sha256sum -c` gives all OK. Note that 11 commits touch lean/ after 5c3d923, not 6.
+4. FIVE CLASSICAL RESULTS: confirmed, each with the standard 3 axioms. lean/README.md:10 now lists
+   all five. The Prékopa–Leindler wording is now "functional form on ℝ, tensorized to the product
+   Laplace law" in both READMEs, which is accurate.
+5. PINS: filled in. The toolchain is leanprover/lean4:v4.35.0-rc2. Mathlib is
+   065356127b1dc0016f66b7283ce0ce2c4055aa55, input revision v4.35.0-rc2. Build time: see the
+   Build section.
+6. maxHeartbeats: no need to mention it publicly. It raises an elaboration resource limit for one
+   declaration, and the kernel still checks the proof (FINAL_AUDIT_astra.md:109).
+7. HOME PATHS IN lean/notes/: valid. This is referred to HQ as a separate decision: a doc-only pass
+   rewriting absolute paths to repo-relative ones in lean/notes would also edit review reports that
+   were committed verbatim. It changes no Lean source and no checksum.
+8. INFERRED ROWS: Localization was confirmed and made precise. Asym was corrected. The missing
+   Prior/ row was added.
+9. REBUILD: done by the Lean head (see 3).
 ==========================================================================================
 -->

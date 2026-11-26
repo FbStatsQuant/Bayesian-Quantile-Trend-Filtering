@@ -7,7 +7,12 @@ This folder contains machine-checked proofs, in Lean 4 with Mathlib, of the pape
 - **Theorem 1** (`thm:main`): posterior contraction of Bayesian quantile trend filtering at a single quantile level, at the unit scale and at any fixed scale σ₀.
 - **Theorem 2** (`thm:joint`): joint contraction of the non-crossing posterior over a grid of quantile levels, again at unit and at general scales.
 
-Everything is proved: there is no `sorry`, and the only axioms are Lean's standard three (`propext`, `Classical.choice`, `Quot.sound`). No classical result enters as a hypothesis. The Efron–Stein inequality (one-sided form), the Eckart–Young tail bound and the Prékopa–Leindler inequality are all proved here.
+Everything is proved: there is no `sorry`, and the only axioms are Lean's standard three (`propext`, `Classical.choice`, `Quot.sound`). No classical result enters as a hypothesis. Five are proved here:
+- the one-sided Efron–Stein inequality;
+- the Rademacher contraction principle;
+- symmetrization for finite empirical processes;
+- the Eckart–Young tail bound;
+- the Prékopa–Leindler inequality, in functional form on ℝ and tensorized to the product Laplace law.
 
 ## Build and check
 
@@ -46,7 +51,7 @@ Both theorems have the paper's hypotheses and conclusions. [`docs/statements.md`
 - **Safe additions to the conclusions.** Measurability of y ↦ Π(B | y) and of y ↦ Π_𝒞(B | y) is proved as part of the conclusion (D3, D8). Without it the expectations in the theorems would only be lower integrals.
 - **Safe generalizations.** In Theorem 2, the dependence on the smallest level spacing is encoded as a lower bound gmin > 0 on the spacings (D6). The number of levels J ranges over all of ℕ (D7).
 - **Intermediate lemmas.**
-  - Some constants that the paper gives explicitly are existential in Lean: C_E in Lemma evid, C_pr in Proposition prior, and the quad-shift coefficient (D10).
+  - Two constants that the paper gives explicitly are existential in Lean: C_E in Lemma evid, and C_pr in Proposition prior. A third, the quad-shift coefficient, is a different explicit constant, H = (1 + K_max/2)/(1 − e^{−2}), in place of the paper's eventual c_K ≤ 2 (D10).
   - Lemma gap is `level_gap_of_assB`, which needs Assumption B only, with the pairwise core `quantile_gap` (D11).
   - Lemma sup is proved on the paper's named event Ω_G ∩ Ω_E, as `supNorm_concentration_events`. The joint proof uses its existential-event wrapper, `supNorm_concentration` (D12).
 
