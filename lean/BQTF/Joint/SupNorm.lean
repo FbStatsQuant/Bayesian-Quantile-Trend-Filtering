@@ -16,8 +16,10 @@ One level, `σ = 1`, in the setting of Theorem `thm:main`:
 `s_n` is not monotone in `n` (Theory, PLAN §5.5 item 5), so thresholds on it are stated as
 eventual conditions (`∀ᶠ n in atTop`), never as checks at one `n`.
 
-`Ω` is existential and not asserted measurable: the paper never uses measurability of
-`Ω_E ∩ Ω_G`, and the assembly (`Joint/Transfer`) uses a measurable hull, as `Main` does.
+`supNorm_concentration_events` gives both bounds on `OmegaG … ∩ OmegaE …`. The wrapper
+`supNorm_concentration` packages this intersection as an existential event. Neither statement
+asserts its measurability, and the transfer argument (`Joint/Transfer`) uses a measurable hull, as
+`Main` does.
 
 Nonvacuity: `k = 1`, `c = 1`, `L = 1/4`, `f̲ = f̄ = 1`, `V̄ = 0`, `τ = 1/2`, all `μ_i` uniform on
 `[0,1]` and `θ* ≡ 1/2` satisfy `DataHyp` for every `n`.

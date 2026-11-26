@@ -4,8 +4,9 @@ import BQTF.Shift.Rademacher
 /-!
 # Width of `K(ρ, T)` (appendix, Lemma `pf:lem:width`)
 
-Owner: Neon-B. The classical input, `E max` of `2m` sub-Gaussian variables, is proved in
-`Shift/Rademacher` (`integral_rademacherMax_le`).
+Owner: Neon-B. For m > 0 and columns of Euclidean norm at most B > 0, `integral_rademacherMax_le`
+in `Shift/Rademacher` bounds the expected maximum absolute Rademacher dot product by
+B√(2 log(2m)).
 -/
 
 open MeasureTheory Finset

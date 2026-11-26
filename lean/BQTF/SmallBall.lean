@@ -10,10 +10,11 @@ Owner: Neon-A. `A = n^{−1/2} P^⊥ S`, `B_ϱ = {u : ‖A u‖₂ ≤ ϱ}`, `φ
 The lemma is stated as a lower bound on `Q_λ(B_ϱ)` (equivalent to the paper's upper bound on
 `φ`, and meaningful also when `Q_λ(B_ϱ) = 0` would make `log` degenerate).
 
-The classical inputs are proved in the `Lin/` helper modules: the Gaussian scale mixture of the
-Laplace law (`Lin/LaplaceMixture`), the Eckart–Young / Ky Fan tail bound (`Lin/EckartYoung`),
-rotation invariance of the standard Gaussian and `P(|γ| ≤ t) ≥ 0.48 min{t, 1}`
-(`Lin/GaussianSmallBall`).
+`Lin/LaplaceMixture` proves the Gaussian scale mixture representation and `Lin/EckartYoung`
+proves the squared singular-value tail bound. In `Lin/GaussianSmallBall`,
+`gaussian_norm_sq_measure_le` uses Gaussian rotation invariance (Mathlib's
+`stdGaussian_eq_map_pi_orthonormalBasis`) to diagonalize the squared norm, and
+`gaussianReal_abs_le_lower` proves the 0.48 min(t,1) lower bound for t ≥ 0.
 -/
 
 open MeasureTheory ProbabilityTheory Finset
