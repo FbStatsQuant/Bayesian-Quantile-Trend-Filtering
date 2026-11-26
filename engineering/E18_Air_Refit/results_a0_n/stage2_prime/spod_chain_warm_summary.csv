@@ -1,0 +1,3 @@
+"seed","a0","n_success","n_requested","n_ipm_fallback_median","n_ipm_fallback_min","n_ipm_fallback_max","n_ipm_fallback_share_200","n_warm_ipm_unconverged_median","n_warm_ipm_unconverged_min","n_warm_ipm_unconverged_max","n_warm_ipm_unconverged_share_200"
+1,8640,15,15,200,200,200,1,200,200,200,1
+2,8640,15,15,200,200,200,1,200,200,200,1
