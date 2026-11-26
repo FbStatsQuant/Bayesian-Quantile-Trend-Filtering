@@ -181,3 +181,27 @@ the same byte encoding. All other preregistered settings and gates apply.
 - Total usage was 1.710 CPU s (0.000475 core-hours). Both jobs stopped
   before sampling and produced zero fit files. No pilot or production
   array was submitted. No pilot projection or E-19 verdict is available.
+
+### 2026-11-26 second pairing amendment
+
+HQ approved an absolute tolerance of `1e-12` for pairing after the
+NOTS reference check exposed cross-platform math-library rounding.
+Of the 3,000 Owls-regenerated truth vectors, 1,000 matched archived
+E-14 bit for bit, and the largest absolute difference was `8.9e-16`.
+The exact-match rates were 0% for Beta, 20% for Mixed, and 80% for Normal.
+[Paired audit](preflight/truth_owls_vs_e14.csv)
+
+Every fit still regenerates its data on NOTS with the verified
+`01526e1` generator. The fit stops before sampling if its maximum
+absolute difference from archived E-14 truth exceeds `1e-12`.
+Each result records that maximum and the SHA-256 of its regenerated
+response in little-endian IEEE-754 double encoding.
+
+Before the pilot, the NOTS compute node must reproduce the 12 reference
+responses and 12 truth vectors to a maximum absolute difference of
+`1e-12` per vector. The reference was built on Owls from the pinned
+generator and verified against all 24 exact SHA-256 digests in
+[DATA_MATCH.md](../E14_Inner_Rerun/DATA_MATCH.md). The
+[reference RDS](preflight/reference_owls.rds) SHA-256 is
+`6a2972c8fcc9cd3a70148fa1037972ef6dde349e63539713e630fb7f4715359d`.
+All other preregistered settings and gates apply.
