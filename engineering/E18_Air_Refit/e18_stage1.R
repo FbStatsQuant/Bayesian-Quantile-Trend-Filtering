@@ -112,6 +112,7 @@ by_cell <- do.call(rbind, lapply(seq_len(nrow(trace)), function(i) {
     t$chosen_at_tau, t$selected_for_real)
   for (k in c("n_sigma_guard", "n_sigma_guard_postburn", "n_ipm_fallback", "n_warm_ipm_unconverged"))
     row[[k]] <- sum(d[[k]])
+  if (prime) row <- cbind(row, as.data.frame(e18_warm_summary(d)))
   row$median_theta_error_sq_ess <- median_finite(d$theta_error_sq_ess)
   row$median_lambda_ess_e14 <- median_finite(d$lambda_ess_e14)
   row$min_acc <- if (nrow(d)) min(d$acc_post) else NA_real_

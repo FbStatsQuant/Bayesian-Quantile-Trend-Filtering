@@ -58,6 +58,9 @@ if (length(ok)) {
       STOP_stall = x$lambda_stalled || x$theta_stalled,
       gate_pass = x$acc >= .4 & x$acc <= .6 & x$n_sigma_guard == 0L)
   }))
+  if (prime) {
+    for (k in e18_warm_fields) chain_health[[paste0(k, "_is_200")]] <- chain_health[[k]] == 200L
+  }
   emit(chain_health, "spod_chain_health")
   plot_trace <- function(b0) {
     label <- sprintf("r%d", round(-log10(b0)))
@@ -81,6 +84,16 @@ if (length(ok)) {
   }
   invisible(lapply(grid_rates, plot_trace))
 }
+if (prime) {
+  chain_warm <- do.call(rbind, lapply(unique(real_grid$seed), function(seed) {
+    chains <- Filter(function(x) x$task$seed == seed, ok)
+    counts <- setNames(lapply(e18_warm_fields, function(k)
+      vapply(chains, function(x) as.numeric(x[[k]]), 0)), e18_warm_fields)
+    data.frame(seed = seed, a0 = 8640L, n_success = length(chains),
+      n_requested = sum(real_grid$seed == seed), e18_warm_summary(counts))
+  }))
+  emit(chain_warm, "spod_chain_warm_summary")
+}
 if (with_admm) {
   benchmark <- data.frame(tau = e18_taus, paper_lambda = exp(c(4, 7, 7)),
     refit_lambda = vapply(admm$records, function(x) if (is.null(x)) NA_real_ else x$lambda_selected, 0))
@@ -89,9 +102,62 @@ if (with_admm) {
   emit(benchmark, "spod_admm_lambda_check")
 }
 
+# Arm 4b used coda's classic PSRF point estimate on four half-chains.
+# Each coordinate is independent in this calculation. Batch the columns
+# because coda computes full covariance matrices even with multivariate=FALSE.
+theta_split_rhat <- function(draws) {
+  halves <- seq_len(nrow(draws[[1L]]) / 2L)
+  columns <- seq_len(ncol(draws[[1L]]))
+  batches <- split(columns, (columns - 1L) %/% 32L)
+  unlist(lapply(batches, function(j) {
+    split_draws <- unlist(lapply(draws, function(x) list(
+      x[halves, j, drop = FALSE], x[halves + length(halves), j, drop = FALSE])),
+      recursive = FALSE)
+    traces <- do.call(coda::mcmc.list, lapply(split_draws, coda::mcmc))
+    coda::gelman.diag(traces, autoburnin = FALSE, transform = FALSE,
+      multivariate = FALSE)$psrf[, 1L]
+  }), use.names = FALSE)
+}
+
+theta_comparison <- function(draws, medians, tau) {
+  rhat <- theta_split_rhat(draws)
+  finite <- is.finite(rhat)
+  gap <- abs(medians[1L, ] - medians[2L, ])
+  iqr <- IQR(d$block_mean)
+  max_gap <- max(gap)
+  rms_gap <- sqrt(mean(gap^2))
+  below <- rowMeans(sweep(medians, 2L, d$block_mean, FUN = ">"))
+  data.frame(
+    theta_rhat_method = "classic split Gelman-Rubin (coda)",
+    theta_rhat_n_finite = sum(finite),
+    theta_rhat_n_nonfinite = sum(!finite),
+    theta_rhat_median = if (any(finite)) median(rhat[finite]) else NA_real_,
+    theta_rhat_p90 = if (any(finite)) unname(quantile(rhat[finite], .9)) else NA_real_,
+    theta_rhat_share_gt_1_1 = if (any(finite)) mean(rhat[finite] > 1.1) else NA_real_,
+    chain_median_gap_max_pid = max_gap, chain_median_gap_rms_pid = rms_gap,
+    y_iqr_pid = iqr,
+    chain_median_gap_max_over_iqr = if (iqr > 0) max_gap / iqr else NA_real_,
+    chain_median_gap_rms_over_iqr = if (iqr > 0) rms_gap / iqr else NA_real_,
+    fraction_below_chain_1 = below[1L], fraction_below_chain_2 = below[2L],
+    fraction_below_pooled = below[3L],
+    fraction_below_minus_tau_chain_1 = below[1L] - tau,
+    fraction_below_minus_tau_chain_2 = below[2L] - tau,
+    fraction_below_minus_tau_pooled = below[3L] - tau)
+}
+
 record_cell <- function(chains, tau, b0) {
   if (any(vapply(chains, is.null, FALSE))) return(NULL)
-  fit <- d$center + d$scale * apply(do.call(rbind, lapply(chains, `[[`, "theta_thin")), 2L, median)
+  draws <- lapply(chains, `[[`, "theta_thin")
+  if (prime) {
+    medians <- d$center + d$scale * vapply(seq_len(n), function(i) {
+      a <- draws[[1L]][, i]
+      b <- draws[[2L]][, i]
+      c(median(a), median(b), median(c(a, b)))
+    }, numeric(3L))
+    fit <- medians[3L, ]
+  } else {
+    fit <- d$center + d$scale * apply(do.call(rbind, draws), 2L, median)
+  }
   traces <- do.call(coda::mcmc.list, lapply(chains, function(x) coda::mcmc(x$log_lambda)))
   diagnostic <- tryCatch({
     val <- coda::gelman.diag(traces, autoburnin = FALSE, transform = FALSE,
@@ -100,7 +166,7 @@ record_cell <- function(chains, tau, b0) {
     list(rhat = val, detail = "")
   }, error = function(err) list(rhat = NA_real_, detail = conditionMessage(err)))
   field <- function(k) vapply(chains, function(x) as.numeric(x[[k]]), 0)
-  list(fit = fit, diagnostics = data.frame(tau = tau, b0 = b0, a0 = if (prime) 8640L else 1L,
+  diagnostics <- data.frame(tau = tau, b0 = b0, a0 = if (prime) 8640L else 1L,
     log_lambda_ess_chain_1 = field("ess_log_lambda")[1L],
     log_lambda_ess_chain_2 = field("ess_log_lambda")[2L],
     log_lambda_ess_combined = as.numeric(coda::effectiveSize(traces)),
@@ -112,7 +178,11 @@ record_cell <- function(chains, tau, b0) {
     acceptance_chain_1 = field("acc")[1L], acceptance_chain_2 = field("acc")[2L],
     sigma_guards = sum(field("n_sigma_guard")), ipm_fallbacks = sum(field("n_ipm_fallback")),
     warm_ipm_unconverged = sum(field("n_warm_ipm_unconverged")),
-    fit_wall_seconds_chain_1 = field("seconds")[1L], fit_wall_seconds_chain_2 = field("seconds")[2L]))
+    fit_wall_seconds_chain_1 = field("seconds")[1L], fit_wall_seconds_chain_2 = field("seconds")[2L])
+  if (!prime) return(list(fit = fit, diagnostics = diagnostics))
+  warm <- e18_warm_summary(setNames(lapply(e18_warm_fields, field), e18_warm_fields))
+  list(fit = fit, chain_medians = medians[1:2, , drop = FALSE],
+    diagnostics = cbind(diagnostics, theta_comparison(draws, medians, tau), as.data.frame(warm)))
 }
 
 pmala <- setNames(lapply(grid_rates, function(b0) {
@@ -199,6 +269,29 @@ plot_detrended <- function(name, series) {
     abline(h = cuts, col = colors, lty = 2:4, lwd = 2)
     legend("topright", c("90th percentile", "95th percentile", "99th percentile"),
       col = colors, lty = 2:4, bty = "n")
+  }
+}
+plot_chain_overlay <- function(tau, b0, medians) {
+  file <- file.path(out, sprintf("spod_chain_overlay_t%02d_r%d.png",
+    round(100 * tau), round(-log10(b0))))
+  png(file, 1440, 780, res = 144)
+  on.exit(dev.off())
+  par(mar = c(4, 4.5, 3, 1))
+  plot(hours, d$block_mean, type = "l", col = "grey62",
+    ylim = range(d$block_mean, medians), xlim = c(0, 24), xaxt = "n",
+    xlab = "Hour on June 15", ylab = "PID (counts)",
+    main = sprintf("Chain posterior medians at tau %.2f, b0 = %.0e", tau, b0))
+  axis(1L, at = seq(0, 24, by = 4))
+  lines(hours, medians[1L, ], col = "#0072B2", lwd = 2)
+  lines(hours, medians[2L, ], col = "#D55E00", lwd = 2, lty = 2)
+  legend("topright", c("Observed", "Chain A (seed 1001)", "Chain B (seed 1002)"),
+    col = c("grey62", "#0072B2", "#D55E00"), lty = c(1, 1, 2), bty = "n")
+}
+if (prime) {
+  for (i in which(!is.na(selected$b0))) {
+    b0 <- selected$b0[i]
+    cell <- pmala[[match(b0, grid_rates)]][[i]]
+    if (!is.null(cell)) plot_chain_overlay(e18_taus[i], b0, cell$chain_medians)
   }
 }
 for (name in names(fits)) {

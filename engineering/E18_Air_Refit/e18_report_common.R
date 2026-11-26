@@ -30,6 +30,17 @@ e18_collect <- function(run, stage, grid, validate) {
 e18_sampler_diagnostics <- c("ess_log_lambda", "lambda_ess_e14", "ess_theta_median",
   "ess_theta_p05", "acc", "n_sigma_guard", "n_sigma_guard_postburn", "n_ipm_fallback",
   "n_warm_ipm_unconverged", "seconds")
+e18_warm_fields <- c("n_ipm_fallback", "n_warm_ipm_unconverged")
+
+e18_warm_summary <- function(d) {
+  stats <- lapply(e18_warm_fields, function(k) {
+    x <- d[[k]]
+    vals <- if (length(x)) c(median(x), min(x), max(x), mean(x == 200L)) else rep(NA_real_, 4L)
+    setNames(vals, paste0(k, c("_median", "_min", "_max", "_share_200")))
+  })
+  as.list(unlist(stats))
+}
+
 e18_stat <- function(x, fields) {
   vapply(fields, function(k) {
     stopifnot(length(x[[k]]) == 1L, is.finite(x[[k]]))

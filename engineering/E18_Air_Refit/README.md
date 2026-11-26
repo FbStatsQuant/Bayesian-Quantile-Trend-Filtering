@@ -268,8 +268,44 @@ the closed Stage 1 budget. If the projection exceeds 80, stop
 and report it to HQ. Keep all five rates and 100 replications per cell.
 
 Stage 2′ has a separate 40-core-hour cap for its 30 runs, including its
-pilot and associated work. It keeps the same authorization and real-data
-diagnostic gates as Stage 2.
+pilot and associated work. Once Stage 1′ selects the triple, start
+with the standing one-fit compute-node pilot. Record MaxRSS and CPU
+and verify the existing real-data gates before production.
+
+Stage 2′ workers already save `theta_thin` as 666 retained draws by
+8,640 points per fit. The matrix is about 46 MB (43.9 MiB) before RDS
+compression, or 1.38 GB (1.29 GiB) across all 30 outputs before
+metadata. The worker holds the full 20,000 by 8,640 retained matrix
+in memory during fitting. That matrix alone is 1.29 GiB. The worker
+also needs space for R and validation temporaries, so use the pilot's
+measured MaxRSS with headroom to size the production memory request.
+
+At each level, the reported curve is the pointwise posterior median
+of the two pooled, equally sized thinned chains at the rate chosen
+by Stage 1′. Existing `spod_quantiles_*` and `spod_detrended_*` plots
+use these pooled curves. Each `spod_chain_overlay_*` figure overlays
+the two separate chain medians on the observed PID series at the
+selected rate for that level.
+
+For every level and rate, `spod_cell_health.csv` reports the median,
+90th percentile and share above 1.1 of pointwise θ R-hat. As in arm
+4b, use coda's classic Gelman–Rubin point estimate on four halves
+of 333 draws, with no extra burn-in or transform. Summaries use
+finite R-hat values and report the nonfinite count. θ R-hat is
+descriptive. The log-λ R-hat across both chains keeps the existing
+STOP threshold above 1.1. The same CSV reports the maximum and RMS
+chain-median gap in PID counts and divided by the IQR of observed
+PID counts. It gives the fraction strictly below each chain median
+and the pooled median, with signed differences from nominal τ.
+
+Both prime stages retain `n_ipm_fallback` and
+`n_warm_ipm_unconverged` in the per-fit RDS and CSV outputs
+(`per_fit.csv` and `spod_chain_health.csv`). `pmala_cells.csv`
+and `spod_cell_health.csv` summarize the median, minimum, maximum
+and share at 200 of 200 for each counter and cell, over successful
+fits. In Stage 2′ the per-fit table flags 200 of 200 for each chain
+and cell. `spod_chain_warm_summary.csv` also summarizes each chain
+across cells and gives the successful and planned fit counts.
 
 Stage 2′ PMALA reports have no ADMM dependency. Keep the existing ADMM
 figure unless an independent `admm-real` refit takes minutes and adds
