@@ -29,8 +29,17 @@ avoid introducing the observed floating-point differences.
 
 [table2_data_sha256.csv](table2_data_sha256.csv) records SHA-256 hashes
 of the archived vectors and all 300 quantile curves, encoded as
-little-endian IEEE-754 doubles. The truth for each level is formed from
-the archived baseline and the paper's `0.25 * qnorm(tau)` offset.
+little-endian IEEE-754 doubles. The derived quantile offset can vary by
+a few ULPs across R builds. Data identity is enforced bitwise on the
+observations and archived baseline. Fits and reports add the fixed
+R 4.5.2 NOTS offset from [table2_offsets.csv](table2_offsets.csv) to
+that baseline, so truth hashes are also reproducible. Workers record
+the local R version and 17-digit `qnorm(tau)`, and require the local
+offset to agree with the fixed value within 64 machine epsilons.
+On Owls R 4.6.0, the local offsets differ from these archived values by
+0, 2, and 1 ULP respectively. At each level the recorded offset was the
+only double within eight ULPs of the Owls value that reproduced all
+100 archived Laplace MSEs bitwise.
 The check confirms that true signal labels are unchanged by
 regeneration, and independently reproduces MSE, CL and the four CAA
 values for all 300 archived Laplace fits (tolerance 1e-12).

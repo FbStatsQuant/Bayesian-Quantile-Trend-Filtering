@@ -4,6 +4,7 @@ dest <- "engineering/E18_Air_Refit"
 legacy <- "experiments/air_simulation/onizuka_laplace_20261023"
 attempt <- file.path(legacy, "attempt_20261023T171713_511660")
 arch <- e18_table2_archive(".")
+offsets <- e18_table2_offsets(".")
 a <- e18_air_generator(".")
 b <- e18_air_generator(".", "admm_air_sim.R")
 same <- function(x, y) identical(x, y, num.eq = FALSE)
@@ -22,9 +23,9 @@ audit <- do.call(rbind, lapply(1:100, function(seed) {
       all(abs(i - x) <= 64 * .Machine$double.eps * pmax(1, abs(x))))
     max(abs(i - x))
   }, 0)
-  truth_hash <- vapply(e18_taus, function(tau) {
-    q <- indiv$theta + .25 * qnorm(tau)
-    original <- saved$theta + .25 * qnorm(tau)
+  truth_hash <- vapply(offsets, function(offset) {
+    q <- indiv$theta + offset
+    original <- saved$theta + offset
     stopifnot(all(abs(q - original) <= 64 * .Machine$double.eps * pmax(1, abs(original))))
     e18_vector_sha(original)
   }, "")
@@ -50,7 +51,7 @@ stopifnot(nrow(pt) == 300L, length(arch$est) == nrow(pt))
 for (i in seq_len(nrow(pt))) {
   d <- arch$data[[pt$seed[i]]]
   est <- arch$est[[i]]
-  q <- d$theta + .25 * qnorm(pt$tau[i])
+  q <- d$theta + offsets[match(pt$tau[i], e18_taus)]
   got <- e18_metrics(d$y, est, q, d$s, pt$tau[i])[metrics]
   stopifnot(isTRUE(all.equal(unname(got), as.numeric(pt[i, metrics]), tolerance = 1e-12)))
 }

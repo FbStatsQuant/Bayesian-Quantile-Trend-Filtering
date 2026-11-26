@@ -5,7 +5,7 @@
 | Item | E-18 |
 |---|---|
 | Data | Table 2, Brantley §4.2 design, 100 seeds, 500 observations per seed |
-| Estimand | Baseline plus `0.25 * qnorm(tau)` |
+| Estimand | Baseline plus the fixed NOTS R 4.5.2 value of `0.25 * qnorm(tau)` from [table2_offsets.csv](table2_offsets.csv) |
 | Quantiles | 0.01, 0.05, 0.10 |
 | Sampler | Individual PMALA at `63f2a56205b8d2ec311565db8c98874cd96754b2` |
 | Prior | `k = 2`, `a0 = 1`, `b0 ∈ {1e-3, 1e-4, 1e-5, 1e-6}`, `sigma ~ IG(0.1, 0.1)` |
@@ -119,6 +119,10 @@ supplied, its row records its pending status. The report writes
 `paired_pmala_benchmarks.csv` with seed-matched differences and
 `discarded_reps.csv` with the method, level, seed, and recorded reason
 for each excluded benchmark replication in the supplied runs.
+Next to coverage the PMALA summary shows the median and 10th percentile
+of log-λ ESS and of per-fit median pointwise θ ESS, the median of the
+per-fit 5th-percentile pointwise θ ESS, and the fraction of successful
+fits with log-λ ESS below 20.
 For a terminal Stage 1 production array with failed tasks, Sol-B can
 use `ops/collect.sh --allow-failures RUN_ID EXPECTED_FITS` to collect
 verified available outputs and terminal Slurm accounting. Missing

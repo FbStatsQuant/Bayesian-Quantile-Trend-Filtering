@@ -57,6 +57,20 @@ e18_table2_archive <- function(code) {
   readRDS(path)
 }
 
+e18_table2_offsets <- function(code) {
+  path <- file.path(code, "engineering", "E18_Air_Refit", "table2_offsets.csv")
+  tab <- read.csv(path, colClasses = c(tau = "numeric", offset_hex = "character"))
+  offset <- as.numeric(tab$offset_hex)
+  stopifnot(identical(tab$tau, e18_taus), all(is.finite(offset)))
+  offset
+}
+
+e18_checked_offset <- function(offset, local_qnorm) {
+  if (!is.finite(local_qnorm) || abs(.25 * local_qnorm - offset) > 64 * .Machine$double.eps)
+    stop(sprintf("Local qnorm %.17g disagrees with sealed offset %a", local_qnorm, offset))
+  offset
+}
+
 e18_metrics <- function(y, est, truth, signal, tau, lo = NULL, hi = NULL) {
   residual <- y - est
   positive <- signal > .5

@@ -20,15 +20,28 @@ out <- file.path(run, "report")
 dir.create(out, showWarnings = FALSE)
 emit <- function(x, file) write.csv(x, file.path(out, paste0(file, ".csv")), row.names = FALSE)
 audit <- read.csv(file.path(folder, "table2_data_sha256.csv"))
+code <- file.path(folder, "..", "..")
+archive <- e18_table2_archive(code)
+offsets <- e18_table2_offsets(code)
 hash_cols <- c("q01_sha256", "q05_sha256", "q10_sha256")
+truth_shas <- unname(vapply(offsets, function(offset)
+  vapply(archive$data, function(d) e18_vector_sha(d$theta + offset), ""), character(100L)))
+stopifnot(identical(truth_shas, unname(as.matrix(audit[hash_cols]))))
 metrics <- c("MSE", "CL", paste0("CAA_", e18_h))
 fields <- c(e18_sampler_diagnostics, "ess_error_sq")
+provenance_fields <- c("truth_sha", "R.version.string", "qnorm_tau")
 check_data <- function(x) {
-  stopifnot(identical(x$y_sha, audit$y_sha256[x$task$seed]),
-    identical(x$truth_sha, audit[[hash_cols[match(x$task$tau, e18_taus)]]][x$task$seed]),
+  seed <- x$task$seed
+  j <- match(x$task$tau, e18_taus)
+  stopifnot(identical(x$y_sha, audit$y_sha256[seed]),
+    identical(x$baseline_sha, audit$baseline_sha256[seed]),
+    identical(x$truth_sha, truth_shas[seed, j]),
+    is.character(x$R.version.string), length(x$R.version.string) == 1L, nzchar(x$R.version.string),
+    is.character(x$qnorm_tau), length(x$qnorm_tau) == 1L,
     identical(names(x$metrics), c(metrics, "coverage")),
     all(is.finite(x$metrics[c("MSE", "CL")])),
-    all(is.finite(x$metrics[paste0("CAA_", e18_h)]) == (audit$n_signal[x$task$seed] > 0L)))
+    all(is.finite(x$metrics[paste0("CAA_", e18_h)]) == (audit$n_signal[seed] > 0L)))
+  e18_checked_offset(offsets[j], as.numeric(x$qnorm_tau))
 }
 grid <- e18_grid("sim")
 if (pilot) grid <- grid[grid$index %in% e18_pilot_indices, ]
@@ -51,6 +64,8 @@ per_fit <- do.call(rbind, lapply(seq_len(nrow(grid)), function(i) {
   else result <- c(x$metrics, e18_stat(x, fields))
   row <- grid[i, c("tau", "b0", "seed")]
   row[c(metric_cols, fit_cols)] <- as.list(result)
+  row[provenance_fields] <- if (is.null(x)) as.list(rep(NA_character_, length(provenance_fields)))
+    else x[provenance_fields]
   row$failed <- is.null(x)
   row$commit <- e18_pin
   row
@@ -69,14 +84,20 @@ trace <- selection$trace
 
 mean_finite <- function(x) if (any(is.finite(x))) mean(x, na.rm = TRUE) else NA_real_
 median_finite <- function(x) if (any(is.finite(x))) median(x, na.rm = TRUE) else NA_real_
+p10_finite <- function(x) if (any(is.finite(x))) unname(quantile(x, .1, na.rm = TRUE)) else NA_real_
 summarize <- function(d, method, tau, b0, n, status, eligible = NA, chosen = NA, selected = NA) {
   row <- data.frame(tau = tau, method = method, b0 = b0, n = n,
     n_CAA_defined = if (is.na(n)) NA_integer_ else sum(is.finite(d[["CAA_0.5"]])),
     n_failed_or_missing = 100L - n, eligible = eligible,
     chosen_at_tau = chosen, selected_for_real = selected, status = status)
   for (k in metric_cols) row[[k]] <- mean_finite(d[[k]])
-  for (k in c("lambda_ess", "theta_ess_median", "theta_ess_p05", "acc_post"))
-    row[[k]] <- median_finite(d[[k]])
+  row$lambda_ess <- median_finite(d$lambda_ess)
+  row$lambda_ess_p10 <- p10_finite(d$lambda_ess)
+  row$theta_ess_median <- median_finite(d$theta_ess_median)
+  row$theta_ess_p10 <- p10_finite(d$theta_ess_median)
+  row$theta_ess_p05 <- median_finite(d$theta_ess_p05)
+  row$lambda_ess_fraction_below_20 <- mean_finite(d$lambda_ess < 20)
+  row$acc_post <- median_finite(d$acc_post)
   row
 }
 by_cell <- do.call(rbind, lapply(seq_len(nrow(trace)), function(i) {
@@ -121,6 +142,7 @@ benchmarks <- setNames(lapply(seq_along(benchmark_stages), function(i) {
   fits <- do.call(rbind, lapply(ok, function(x) {
     row <- data.frame(tau = x$task$tau, seed = x$task$seed, seconds = x$seconds)
     row[metric_cols] <- as.list(x$metrics)
+    row[provenance_fields] <- x[provenance_fields]
     row
   }))
   issues <- data.frame(method = character(), tau = numeric(), seed = integer(), reason = character())
@@ -136,7 +158,6 @@ benchmarks <- setNames(lapply(seq_along(benchmark_stages), function(i) {
 }), benchmark_methods[seq_along(benchmark_stages)])
 emit(do.call(rbind, lapply(benchmarks, `[[`, "issues")), "discarded_reps")
 
-archive <- e18_table2_archive(file.path(folder, "..", ".."))
 lap <- archive$per_task
 keys <- expand.grid(seed = 1:100, tau = e18_taus)
 stopifnot(nrow(lap) == nrow(keys), all(lap$method == "onizuka_lap"),
