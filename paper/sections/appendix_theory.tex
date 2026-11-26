@@ -426,7 +426,7 @@ that is, $\Theta\in\mathcal C$. Hence, since $s_{n,l}\le g_0/2$, a union bound a
 \[
 \Pi_{\mathcal C}(U\mid y)\le\sum_{j=1}^J\Pi_{\mathcal C}(\theta_j\in A_j\mid y)\le\sum_{j=1}^J\frac{\Pi_j(A_j\mid y)}{\Pi^{\otimes}(\mathcal C\mid y)}\le2\sum_{j=1}^J\Pi_j(A_j\mid y),
 \]
-and $\Pi_{\mathcal C}\le1$ on $\Omega^c$. Since $M\ge M^{(j)}$, Theorem~\ref{thm:main} at the level $\tau_j$ bounds $\E_{\thetas}\Pi_j(A_j\mid y)$ by $C^{(j)}n^{-1/(2r)}$. With the probability bound of Lemma~\ref{pf:lem:sup} at each level,
+and $\Pi_{\mathcal C}\le1$ on $\Omega^c$. For every Borel $B$ the map $y\mapsto\Pi_{\mathcal C}(B\mid y)$ is Borel measurable: the Lebesgue density of $\Pi^{\otimes}(\cdot\mid y)$ is jointly measurable in $(y,\Theta)$, being the product of the weights of \eqref{pf:eq:post} divided by their normalizers, which are measurable in $y$ and positive and finite (see the proof of Theorem~\ref{thm:main}); by Tonelli its integrals over $B\cap\mathcal C$ and over the closed set $\mathcal C$ are measurable in $y$, and the latter is positive by Lemma~\ref{pf:lem:cond} and at most $1$, so their ratio is measurable. Since $M\ge M^{(j)}$, Theorem~\ref{thm:main} at the level $\tau_j$ bounds $\E_{\thetas}\Pi_j(A_j\mid y)$ by $C^{(j)}n^{-1/(2r)}$. With the probability bound of Lemma~\ref{pf:lem:sup} at each level,
 \[
 \begin{aligned}
 \E_{\thetas}\,\Pi_{\mathcal C}(U\mid y)&\le\pr(\Omega^c)+2\sum_{j=1}^J\E_{\thetas}\Pi_j(A_j\mid y)\\
