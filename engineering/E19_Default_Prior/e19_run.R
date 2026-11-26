@@ -10,7 +10,9 @@ e19_hash_vector <- function(x) {
 
 e19_verify_generator <- function(code) {
   path <- file.path(code, "engineering", "E14_Inner_Rerun", "e14_data.R")
-  blob <- system2("git", c("hash-object", "--no-filters", shQuote(path)), stdout = TRUE)
+  contents <- readBin(path, "raw", n = file.size(path))
+  header <- c(charToRaw(paste("blob", length(contents))), as.raw(0))
+  blob <- digest::digest(c(header, contents), algo = "sha1", serialize = FALSE)
   if (!identical(blob, e19_generator_blob)) stop("Unexpected E-14 generator blob: ", path)
   path
 }
