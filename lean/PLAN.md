@@ -233,6 +233,12 @@ The maximum effort for every agent is "high". Fable is not on this team.
 - **Sol-W1** (gpt-6.2-sol, high; HQ authorization of 2026-11-25): `Main`, plus helpers under `BQTF/Asym/`. It proves the assembly against the frozen statements, as an early test that the interfaces suffice. `Main` was proved on 2026-11-25 (8b10d87, now under Sol review). Since 2026-11-25 Sol-W1 also owns `Shells`, `Localization` and `Denominator`, on branch `t3/sol-w1-assembly`.
 - **Sol-W2** (gpt-6.2-sol, high): `Reduction`, then `PriorMass` (both proved on 2026-11-25, 7265e3e, under review), plus helpers under `BQTF/Scale/` and `BQTF/Prior/`. Since 2026-11-25 it also owns `QuadShift` and `Width` (helpers under `BQTF/Shift/`), on branch `t3/sol-w2-shift-width`.
 - **Opus worker** (Claude Opus 5.5 via `antigravity`; HQ authorization of 2026-11-25): at most 1, spawned only when needed. Not spawned yet.
+- **Claude Personal workers** (Opus 5.5 high, owner directive 2026-11-25: via Claude Personal only, never antigravity), carved out after telling the previous owner:
+  - CP-Opus1: `Prob/EfronStein.lean`, `efronStein_oneSided` (taken from Neon-B's Prob/).
+  - CP-Opus2: `Prob/Contraction.lean` plus helpers. **Merged b9dd763.**
+  - CP-Opus3: `Lin/EckartYoung.lean`, `eckartYoung_tail` (taken from Neon-A's Lin/). Proved at 84f23e3; in review.
+  - CP-Opus4: `Shift/PrekopaLaplace.lean` plus `Shift/PrekopaLaplace/`, `prekopa_laplace` (frozen at Sol-W2 8ebfb2f; taken from Sol-W2).
+  - Neon-B keeps `Prob/Symmetrization.lean` and the Concentration glue. Neon-A keeps the SmallBall helpers (Andrews–Mallows, Gaussian small ball, rotation glue). Sol-W2 keeps QuadShift and the Shift/ slice consequences.
 - The head proves no lemmas. A file never has two owners at once.
 
 Every module merge gets a fresh Sol review, written to `notes/reviews/<module>_<date>.md`. The head rules on each finding before merging.
