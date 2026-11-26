@@ -359,9 +359,10 @@ If E-18 settles on an `(a0, b0)` pair for the air data, E-19 will test
 that same pair on the §4.1 interior VS and S baselines with the E-14
 design. Compare paired runs on `(signal, noise, tau, seed)`. If the
 setting performs well, it becomes the paper's default. Otherwise the
-paper keeps separate settings and explains why. HQ will set acceptance
-criteria before any E-19 fit. The E-18 export keeps explicit `a0` and
-`b0` columns.
+paper keeps separate settings and explains why. HQ fixed the acceptance
+criteria before any E-19 fit. They are pre-registered in
+[E19_Default_Prior/README.md](../E19_Default_Prior/README.md)
+(`49e625d`). The E-18 export keeps explicit `a0` and `b0` columns.
 
 | E-18 `per_fit.csv` | E-14 `runs/E14-inner-rerun-20261125/e14_summary.csv` | Definition or source |
 |---|---|---|
