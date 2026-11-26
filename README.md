@@ -36,9 +36,9 @@ density. For one level the map is a fixed number of banded ADMM iterations, so a
 in n: a median 2.0 ms at n = 250 and 36.6 ms at n = 4,000 (τ = 0.5, k = 2, one laptop core). In the joint sampler the map is box-constrained: the same ADMM when no
 bound binds, otherwise banded interior-point steps, each linear in n.
 
-![A shaded band between two estimated quantile curves, with the data points on top](examples/readme_figures/reference_outputs/readme_combined.png)
+![Two panels: a shaded band between two estimated quantile curves with the data points on top, for children's height by age and for data simulated from an explicit function](examples/readme_figures/reference_outputs/readme_combined.png)
 
-*Bands between jointly sampled 0.1 and 0.9 quantile curves, which cannot cross. (a) Height of 4,817 Dutch boys, joint-sampler fit; the band holds 80.5% of the children. (b) Height of 5,190 Dutch girls, joint-sampler fit; the band holds 80.3% of the children.*
+*Bands between jointly sampled 0.1 and 0.9 quantile curves; both fits are by the joint sampler, and the curves cannot cross. (a) Height of 4,817 Dutch children; the band holds 80.5% of them (nominal 80%). (b) n = 1,000 points simulated from the explicit function f(u) = 2 + sin(4u − 2) + 2·exp(−30(4u − 2)²), with u = i/1000, plus Gaussian errors with standard deviation (1 + u²)/4; the band holds 80.9% of the points (nominal 80%); dotted: f.*
 
 In the peak-detection simulation of Brantley et al. (2020) for air-quality sensors, the MSE for
 the peak-free baseline is [E-18: MSE PMALA, τ = 0.01] for the sampler against

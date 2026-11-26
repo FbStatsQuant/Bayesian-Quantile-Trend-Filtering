@@ -200,12 +200,12 @@ hero_panel <- function() {
   }
   share <- inside(d$y, d$q10, d$q90)
   cat(sprintf("hero: n = %d, share inside [q0.1, q0.9] = %.4f\n", nrow(d), share))
-  note <- sprintf("Band: \u03c4 = 0.1 to 0.9 curves\n%s of points inside (nominal 80%%)\nDotted line: true signal",
+  note <- sprintf("Band: \u03c4 = 0.1 to 0.9 curves\n%s of points inside (nominal 80%%)\nDotted line: the true function f",
                   pct(share))
   make <- function(size = SIZES$single, letter = NULL) {
     stack <- identical(size, SIZES$stack)
     band_panel(pts = d[c("x", "y")], curve = d, note = note,
-               title = lettered(letter, sprintf("Simulated signal, n = %s", format(nrow(d), big.mark = ","))),
+               title = lettered(letter, sprintf("Simulated data from an explicit function, n = %s", format(nrow(d), big.mark = ","))),
                subtitle = JOINT_SUB, xlab = "Index", ylab = "y",
                point_size = if (stack) 1.25 else 1.0, point_alpha = 0.85, demo = DEMO, size = size)
   }
@@ -237,7 +237,7 @@ growth_panel <- function(sex) {
     stack <- identical(size, SIZES$stack)
     band_panel(pts = data.frame(x = kids$age, y = kids$hgt), curve = curve, note = note,
                title = lettered(letter, sprintf("Height of %s Dutch %s, by age", format(nrow(kids), big.mark = ","),
-                                                lab)),
+                                                if (is.null(letter)) lab else "children")),   # hero: no sex named (owner 11-26)
                subtitle = JOINT_SUB, xlab = "Age (years)", ylab = "Height (cm)",
                point_size = if (stack) 0.8 else 0.6, point_alpha = if (stack) 0.3 else 0.5, size = size) +
       scale_x_continuous(breaks = seq(0, 22, 2))
@@ -407,12 +407,12 @@ if (!is.null(spod_path)) {
 
 if (!is.null(hero)) {
   S <- SIZES$stack
-  rows <- list(hero$make(S, "a"), gb$make(S, "b"), gg$make(S, "c"))
+  rows <- list(gb$make(S, "a"), hero$make(S, "b"))   # owner 11-26: growth (boys, titled "children") then the simulation; no girls panel
   if (!is.null(spod) && spod$n_cross == 0) {
-    rows[[4]] <- spod$make(S, "d")
-    cat("combined: SPod order check 0 crossings -> panel (d) added\n")
+    rows[[3]] <- spod$make(S, "c")
+    cat("combined: SPod order check 0 crossings -> panel (c) added\n")
   } else if (!is.null(spod)) {
-    cat(sprintf("combined: SPod curves cross at %d time point(s) -> panel (d) left out; hero stays at 3 panels\n",
+    cat(sprintf("combined: SPod curves cross at %d time point(s) -> panel (d) left out; hero stays at 2 panels\n",
                 spod$n_cross))
   }
   combine(rows, paste0("readme_combined", hero$tag, sfx))
